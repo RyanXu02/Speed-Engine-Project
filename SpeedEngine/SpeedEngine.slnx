@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="SpeedEngine.vcxproj" />
+  <Project Path="SpeedEngine.vcxproj" Id="073a8cf7-a910-4016-a810-b49661f6f62a" />
 </Solution>

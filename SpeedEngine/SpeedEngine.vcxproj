@@ -111,14 +111,27 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp23</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <IntrinsicFunctions>
+      </IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)ThirdParty\include\stb;$(ProjectDir)ThirdParty\include\nlohmann;$(ProjectDir)ThirdParty\include\glm;$(ProjectDir)ThirdParty\include\glfw;$(ProjectDir)ThirdParty\include\glad\include;$(ProjectDir)ThirdParty\include\spdlog;$(ProjectDir)ThirdParty\include\imgui;$(ProjectDir)ThirdParty\include\FMOD;$(ProjectDir)ThirdParty\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Jolt.lib;glfw3dll.lib;spdlog.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -139,6 +152,45 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="ThirdParty\include\glad\src\gl.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\include\imgui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\include\imgui\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\include\imgui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\include\imgui\imgui_impl_glfw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\include\imgui\imgui_impl_opengl3.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\include\imgui\imgui_tables.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\include\imgui\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ThirdParty\include\imgui\imconfig.h" />
+    <ClInclude Include="ThirdParty\include\imgui\imgui.h" />
+    <ClInclude Include="ThirdParty\include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="ThirdParty\include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="ThirdParty\include\imgui\imgui_internal.h" />
+    <ClInclude Include="ThirdParty\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="ThirdParty\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="ThirdParty\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="ThirdParty\pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
