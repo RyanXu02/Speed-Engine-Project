@@ -152,7 +152,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\SubSystems\Logger\Logger.cpp" />
+    <ClCompile Include="src\Core\Logger\Logger.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
@@ -185,7 +185,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\SubSystems\Logger\Logger.h" />
+    <ClInclude Include="src\Core\Logger\Logger.h" />
     <ClInclude Include="src\Core\Engine.h" />
     <ClInclude Include="src\Core\EngineConfig.h" />
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
