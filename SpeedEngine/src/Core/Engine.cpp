@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Engine.h"
+#include "SubSystems/SubSystem.h"
 
 namespace SE
 {
@@ -12,7 +13,7 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		
+		m_subSystems.push_back(std::make_unique<SubSystems::SubSystem>("Logger"));
 	}
 	void Engine::start()
 	{
