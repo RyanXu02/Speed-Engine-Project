@@ -152,6 +152,8 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Core\EngineConfig.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="ThirdParty\include\glad\src\gl.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -182,6 +184,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Engine.h" />
+    <ClInclude Include="src\Core\EngineConfig.h" />
     <ClInclude Include="ThirdParty\include\imgui\imconfig.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui_impl_glfw.h" />
