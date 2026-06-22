@@ -2,6 +2,8 @@
 
 namespace SE
 {
+	class SubSystem;
+
 	class Engine
 	{
 	public:
@@ -17,6 +19,6 @@ namespace SE
 		bool m_isRunning;
 		double m_deltaTime;
 		
-		std::vector<std::unique_ptr<SubSystems::SubSystem>> m_subSystems;
+		std::vector<std::unique_ptr<SubSystem>> m_subSystems;
 	};
 }

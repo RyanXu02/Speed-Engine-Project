@@ -13,7 +13,7 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		m_subSystems.push_back(std::make_unique<SubSystems::SubSystem>("Logger"));
+		m_subSystems.push_back(std::make_unique<SubSystem>("Logger"));
 	}
 	void Engine::start()
 	{

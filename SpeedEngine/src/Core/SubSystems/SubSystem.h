@@ -1,10 +1,14 @@
 #pragma once
 
-namespace SE::SubSystems
+namespace SE
 {
+	class Logger;
+
 	class SubSystem 
 	{
 	public:
+		SubSystem(const std::string& name);
+		
 		const std::string& getName() const 
 		{
 			return m_name;
@@ -17,8 +21,10 @@ namespace SE::SubSystems
 		virtual ~SubSystem();
 
 	protected:
-		SubSystem(const std::string& name) : m_name(name) {};
 		std::string m_name;
+		std::unique_ptr<Logger> m_logger;
+
+		bool isActive;
 	};
 }
 

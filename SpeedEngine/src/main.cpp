@@ -1,6 +1,6 @@
 #include "pch.h"
 
-// using namespace Speed;
+#include "Core/Logger/Logger.h"
 
 #include "glm.hpp"
 #include "glad/gl.h"
@@ -21,6 +21,7 @@
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
 
+
 int main() {
     
     std::queue<int> myQueue;
@@ -32,7 +33,9 @@ int main() {
 
     JPH::RegisterDefaultAllocator();
 
-    spdlog::info("test");
+    SE::Logger logger;
+    logger.init("CoolLLogger");
+    logger.critical("test");
 
     //SN::AppConfig appConfig{};
     //appConfig.title = "Slippery Slope";
