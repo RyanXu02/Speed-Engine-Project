@@ -22,6 +22,7 @@ namespace SE
 	{
 		while (m_isRunning)
 		{
+			printf("Engine is running...\n");
 			// Update delta time
 			m_deltaTime = 0.016; // Placeholder for actual delta time calculation
 			// Handle input
