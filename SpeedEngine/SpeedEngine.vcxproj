@@ -153,7 +153,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\Core\EngineConfig.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="ThirdParty\include\glad\src\gl.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
