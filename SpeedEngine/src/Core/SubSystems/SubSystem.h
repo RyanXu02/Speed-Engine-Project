@@ -4,10 +4,12 @@ namespace SE
 {
 	class Logger;
 
+	// baseclass
 	class SubSystem 
 	{
 	public:
 		SubSystem(const std::string& name);
+		virtual ~SubSystem();
 		
 		const std::string& getName() const 
 		{
@@ -18,7 +20,6 @@ namespace SE
 		virtual void update(double deltaTime);
 		virtual void shutdown();
 
-		virtual ~SubSystem();
 
 	protected:
 		std::string m_name;

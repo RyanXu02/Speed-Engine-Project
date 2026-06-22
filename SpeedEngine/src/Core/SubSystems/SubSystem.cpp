@@ -19,8 +19,7 @@ namespace SE
 
 	void SubSystem::update(double deltaTime)
 	{
-		if (!isActive)
-			return;
+		if (!isActive) return;
 	}
 
 	void SubSystem::shutdown()
