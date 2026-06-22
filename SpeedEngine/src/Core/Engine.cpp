@@ -2,6 +2,8 @@
 #include "Engine.h"
 #include "SubSystems/SubSystem.h"
 
+#include "ResourceManagers/Texture/TextureManager.h"
+
 namespace SE
 {
 	Engine::Engine()
@@ -13,7 +15,12 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		m_subSystems.push_back(std::make_unique<SubSystem>("Logger"));
+		m_subSystems.push_back(std::make_unique<TextureManager>());
+
+		for (auto& subSystem : m_subSystems)
+		{
+			subSystem->init();
+		}
 	}
 	void Engine::start()
 	{
@@ -34,5 +41,9 @@ namespace SE
 	void Engine::stop()
 	{
 		m_isRunning = false;
+		for (auto& subSystem : m_subSystems)
+		{
+			subSystem->shutdown();
+		}
 	}
 }
