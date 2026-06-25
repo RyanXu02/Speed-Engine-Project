@@ -1,5 +1,6 @@
 #pragma once
 #include "../ResourceManager.h"
+#include "Texture.h"
 
 namespace SE
 {
@@ -12,8 +13,11 @@ namespace SE
         void init() override;
         void shutdown() override;
 
+        uint32_t loadTexture(const std::string& filePath);
+		void unloadTexture(uint32_t textureId);
+
     private:
-		std::unordered_map<uint32_t, std::string> m_textures;
+		std::unordered_map<uint32_t, std::unique_ptr<Texture>> m_textures;
     };
 }
 

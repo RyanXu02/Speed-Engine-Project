@@ -152,12 +152,15 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
     <ClCompile Include="src\Core\Logger\Logger.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Texture\TextureManager.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Texture\Texture.cpp" />
     <ClCompile Include="ThirdParty\include\glad\src\gl.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -187,12 +190,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h" />
     <ClInclude Include="src\Core\Logger\Logger.h" />
     <ClInclude Include="src\Core\Engine.h" />
     <ClInclude Include="src\Core\EngineConfig.h" />
     <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h" />
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Texture\TextureManager.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Texture\Texture.h" />
     <ClInclude Include="ThirdParty\include\imgui\imconfig.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui_impl_glfw.h" />
