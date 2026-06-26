@@ -2,7 +2,7 @@
 #include "Engine.h"
 #include "SubSystems/SubSystem.h"
 
-#include "ResourceManagers/Texture/TextureManager.h"
+#include "ResourceManagers/Shader/ShaderManager.h"
 
 namespace SE
 {
@@ -15,7 +15,7 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		m_subSystems.push_back(std::make_unique<TextureManager>());
+		m_subSystems.push_back(std::make_unique<ShaderManager>());
 
 		for (auto& subSystem : m_subSystems)
 		{
