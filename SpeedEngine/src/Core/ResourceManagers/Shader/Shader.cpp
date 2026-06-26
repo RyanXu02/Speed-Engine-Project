@@ -4,7 +4,7 @@
 
 namespace SE
 {
-	Shader::Shader(uint32_t id) : m_id(id)
+	Shader::Shader(uint32_t resourceId, std::string resourceName) : Resource(resourceName), m_ResourceId(resourceId), m_ProgramId(0)
 	{
 	}
 
@@ -37,19 +37,19 @@ namespace SE
 		if (!status.success) return status;
 
 		// Clean up shaders as they are no longer needed after linking
-		glDetachShader(m_id, vertexShader);
-		glDetachShader(m_id, fragmentShader);
+		glDetachShader(m_ProgramId, vertexShader);
+		glDetachShader(m_ProgramId, fragmentShader);
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
 
-		m_id = program;
+		m_ProgramId = program;
 
 		return status;
 	}
 
 	void Shader::bind()
 	{
-		glUseProgram(m_id);
+		glUseProgram(m_ProgramId);
 	}
 	void Shader::unbind()
 	{
@@ -57,7 +57,7 @@ namespace SE
 	}
 	void Shader::destroy()
 	{
-		glDeleteProgram(m_id);
+		glDeleteProgram(m_ProgramId);
 	}
 
 	GLCompStatus Shader::_checkCompilationErr(unsigned int shader, std::string_view type)
@@ -86,7 +86,7 @@ namespace SE
 		}
 		else
 		{
-			unsigned int location = glGetUniformLocation(m_id, name.data());
+			unsigned int location = glGetUniformLocation(m_ProgramId, name.data());
 			m_uniforms[name.data()] = location;
 			return location;
 		}

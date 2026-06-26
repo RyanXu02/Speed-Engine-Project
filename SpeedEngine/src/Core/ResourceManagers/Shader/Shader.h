@@ -7,6 +7,8 @@
 #include "mat3x3.hpp"
 #include "mat4x4.hpp"
 
+#include"../Resource.h"
+
 namespace SE
 {
 	struct GLCompStatus
@@ -15,10 +17,10 @@ namespace SE
 		std::string log { "" };
 	};
 
-	class Shader
+	class Shader : public Resource
 	{
 	public:
-		Shader(uint32_t id);
+		Shader(uint32_t id, std::string resourceName);
 
 		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
 		void bind();
@@ -41,7 +43,8 @@ namespace SE
 
 
 	private:
-		uint32_t m_id;
+		uint32_t m_ResourceId;
+		unsigned int m_ProgramId;
 
 		unsigned int _getUniformLocation(std::string_view name);
 		std::unordered_map<std::string, unsigned int> m_uniforms;
