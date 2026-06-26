@@ -14,14 +14,11 @@ namespace SE
     class ShaderManager : public SubSystem
     {
     public:
-        ShaderManager() { m_name = "ShaderManager"; }
+        ShaderManager(const std::string& name) : SubSystem(name) {}
         ~ShaderManager() override = default;
 
         void init() override;
         void shutdown() override;
-
-    protected:
-
 
     private:
 		// id -> ShaderProgram
@@ -29,7 +26,7 @@ namespace SE
 		
 		std::pair<std::string, std::string> _verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath);
         
-        uint32_t _addShader(std::string_view vertexShaderPath, std::string_view fragmentShaderPath);
+        bool _addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName);
         const Shader* _getShader(uint32_t shaderId);
     };
     

@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "SubSystems/SubSystem.h"
 
+#include "ResourceManagers/ResourceManager.h"
 #include "ResourceManagers/Shader/ShaderManager.h"
 
 namespace SE
@@ -15,7 +16,8 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		m_subSystems.push_back(std::make_unique<ShaderManager>());
+		m_subSystems.push_back(std::make_unique<ResourceManager>("ResourceManager"));
+		m_subSystems.push_back(std::make_unique<ShaderManager>("ShaderManager"));
 
 		for (auto& subSystem : m_subSystems)
 		{
@@ -28,6 +30,7 @@ namespace SE
 	}
 	void Engine::run()
 	{
+
 		while (m_isRunning)
 		{
 			printf("Engine is running...\n");
