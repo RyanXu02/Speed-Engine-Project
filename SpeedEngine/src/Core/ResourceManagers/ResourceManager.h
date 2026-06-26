@@ -3,53 +3,55 @@
 
 namespace SE
 {
-	// baseclass
-	class ResourceManager : public SubSystem
-	{
-	public:
-		ResourceManager() : SubSystem("ResourceManager") {}
-		void init() override;
-		
-		uint32_t generateId();
-
-		static ResourceManager& Instance()
-		{
-			return *s_instance;
-		}
-
-		std::string getString(std::string_view filePath);
-
-		template<typename... Args>
-		uint32_t addResource(ResourceType type, Args... args)
-		{
-
-		}
-
-		Resource* getResource(uint32_t);
-
-
-	private:
-		static ResourceManager* s_instance;
-
-		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
-
-		// path -> file contents
-		std::unordered_map<std::string, std::string> m_stringCache;
-	};
-
 	enum class ResourceType
 	{
 		Texture,
 		Shader,
 	};
 
-	class ResourceRegistry
+	class ResourceManager : public SubSystem
 	{
+	class ShaderManager;
 	public:
-		void registerManager(ResourceType, ResourceManager* manager);
-		void registerResource(uint32_t id, ResourceType type);
+		ResourceManager() : SubSystem("ResourceManager") {}
+		
+
+		static ResourceManager& Instance()
+		{
+			static ResourceManager instance;
+			s_instance = &instance;
+			return *s_instance;
+		}
+
+		void registerManager(Manager& manager);
+
+		uint32_t generateId();
+
+		std::string getString(std::string_view filePath);
+		
+		template<typename... Args>
+		uint32_t addResource(ResourceType type, Args... args)
+		{
+			switch (type)
+			{
+			case Texture:
+				break;
+			case Shader:
+				m_shaderManager->_addShader(generateId(), args...);
+			}
+		}
+
+		//Resource* getResource(uint32_t);
+
+
 	private:
-		std::unordered_map<ResourceType, ResourceManager*> m_managers;
-		std::unordered_map<uint32_t, ResourceType> m_resourceTypes;
+		static ResourceManager* s_instance;
+
+		ShaderManager* m_shaderManager;
+
+		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
+
+		// path -> file contents
+		std::unordered_map<std::string, std::string> m_stringCache;
 	};
 }

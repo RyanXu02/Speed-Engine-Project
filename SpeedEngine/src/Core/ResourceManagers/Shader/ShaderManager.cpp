@@ -1,17 +1,18 @@
 #include "pch.h"
 #include "ShaderManager.h"
 #include "../../Logger/Logger.h"
+#include "../../ResourceManagers/ResourceManager.h"
 
 namespace SE
 {
 	void ShaderManager::init()
 	{
-		ResourceManager::init();
+		SubSystem::init();
 	}
 
 	void ShaderManager::shutdown()
 	{
-		ResourceManager::shutdown();
+		SubSystem::shutdown();
 		
 		for (auto& [k, shaderProgram] : m_shaders)
 		{
@@ -25,14 +26,14 @@ namespace SE
 		m_logger->info("ShaderManager cleared all shaders.");
 	}
 
-	uint32_t ShaderManager::_addShader(std::string_view vertexShaderPath, std::string_view fragmentShaderPath)
+	bool ShaderManager::_addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName)
 	{
 		// check if vertex and fragment shader paths are valid
 		auto shaderPaths = _verifyShaderPaths(vertexShaderPath, fragmentShaderPath);
 		if (shaderPaths.first.empty() || shaderPaths.second.empty())
 		{
 			m_logger->critical("One or more invalid shader paths: {} and {}", vertexShaderPath, fragmentShaderPath);
-			return 0;
+			return false;
 		}
 		// look for in cache
 		auto it = std::ranges::find_if(m_shaders, [shaderPaths](const auto& kv) {
@@ -40,27 +41,26 @@ namespace SE
 			});
 		if (it != m_shaders.end()) {
 			m_logger->verbose("Shader already loaded: {} and {} with ID {}", shaderPaths.first, shaderPaths.second, it->first);
-			return it->first;
+			return false;
 		}
 
 		// Load shader source code from file
-		uint32_t resourceId = generateId();
-		auto shader = std::make_unique<Shader>(resourceId);
+		auto shader = std::make_unique<Shader>(id, programName.data());
 
-		std::string vertexSource = ResourceManager::getString(shaderPaths.first);
-		std::string fragmentSource = ResourceManager::getString(shaderPaths.second);
+		std::string vertexSource = ResourceManager::Instance().getString(shaderPaths.first);
+		std::string fragmentSource = ResourceManager::Instance().getString(shaderPaths.second);
 
 		GLCompStatus status = shader->init(vertexSource, fragmentSource);
 		if (!status.success)
 		{
-			m_logger->critical("Shader compilation failed for {}: {}", resourceId, status.log);
-			return 0;
+			m_logger->critical("Shader compilation failed for {}: {}", programName, status.log);
+			return false;
 		}
 
-		m_shaders[resourceId] = { shaderPaths, std::move(shader) };
-		m_logger->info("Shader loaded: ID {}", resourceId);
+		m_shaders[id] = { shaderPaths, std::move(shader) };
+		m_logger->info("Shader loaded: ID {}", id);
 
-		return resourceId;
+		return true;
 	}
 
 	std::pair<std::string, std::string> ShaderManager::_verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath)

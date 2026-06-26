@@ -4,6 +4,9 @@
 
 namespace SE
 {
+
+	ResourceManager* ResourceManager::s_instance = nullptr;
+
 	uint32_t ResourceManager::generateId()
 	{
 		return m_ids.fetch_add(1, std::memory_order_relaxed);
