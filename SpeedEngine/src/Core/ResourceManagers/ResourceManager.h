@@ -1,18 +1,18 @@
 #pragma once
 #include "../SubSystems/SubSystem.h"
+#include "Resource.h"
+#include "Manager.h"
+
+#include "Shader/ShaderManager.h"
+#include "Texture/TextureManager.h"
 
 namespace SE
 {
-	enum class ResourceType
-	{
-		Texture,
-		Shader,
-	};
 
 	class ResourceManager : public SubSystem
 	{
-	class ShaderManager;
 	public:
+
 		ResourceManager() : SubSystem("ResourceManager") {}
 		
 
@@ -23,7 +23,8 @@ namespace SE
 			return *s_instance;
 		}
 
-		void registerManager(Manager& manager);
+		void init() override;
+		void shutdown() override;
 
 		uint32_t generateId();
 
@@ -34,24 +35,46 @@ namespace SE
 		{
 			switch (type)
 			{
-			case Texture:
+			case ResourceType::Texture:
+				_getManager<TextureManager>()->loadTexture(args...);
 				break;
-			case Shader:
-				m_shaderManager->_addShader(generateId(), args...);
+			case ResourceType::Shader:
+				_getManager<ShaderManager>()->addShader(generateId(), args...);
+				break;
 			}
 		}
 
-		//Resource* getResource(uint32_t);
+		Resource* getResource(uint32_t);
 
 
 	private:
+		// static instance for public
 		static ResourceManager* s_instance;
 
-		ShaderManager* m_shaderManager;
-
+		// universal id for all resources in the engine
 		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
+
+		// All registered managers
+		std::vector<std::unique_ptr<Manager>> m_managers;
 
 		// path -> file contents
 		std::unordered_map<std::string, std::string> m_stringCache;
+		// id -> ResourceType
+		std::unordered_map<uint32_t, ResourceType> m_resourceTypes;
+
+		// get manager of type T
+		template<typename T>
+		T* _getManager()
+		{
+			for (auto& manager : m_managers)
+			{
+				if (auto ptr = dynamic_cast<T*>(manager.get()))
+				{
+					return ptr;
+				}
+			}
+			return nullptr;
+		}
+
 	};
 }

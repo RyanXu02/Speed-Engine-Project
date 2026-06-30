@@ -13,5 +13,11 @@ namespace SE
 	private:
 		std::string m_resourceName;
 	};
+	
+	enum class ResourceType
+	{
+		Texture,
+		Shader,
+	};
 }
 

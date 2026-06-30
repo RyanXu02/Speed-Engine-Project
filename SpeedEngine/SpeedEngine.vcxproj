@@ -191,6 +191,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Manager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Resource.h" />
     <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h" />
