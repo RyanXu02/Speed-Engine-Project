@@ -6,13 +6,11 @@ namespace SE
 {
 	void TextureManager::init()
 	{
-		ResourceManager::init();
-		m_logger->warn("TextureManager initialized.");
+		Manager::init();
 	}
 
 	void TextureManager::shutdown()
 	{
-		m_logger->warn("TextureManager shutting down.");
-		ResourceManager::shutdown();
+		Manager::shutdown();
 	}
 }

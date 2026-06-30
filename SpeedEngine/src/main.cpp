@@ -7,7 +7,7 @@ int main() {
     SE::Engine engine;
     engine.init();
     engine.start();
-    // engine.run();
+    engine.run();
     engine.stop();
 
     return 0;

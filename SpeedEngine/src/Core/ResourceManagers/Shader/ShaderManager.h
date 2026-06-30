@@ -1,25 +1,37 @@
 #pragma once
-#include "../ResourceManager.h"
+#include "../Manager.h"
 #include "Shader.h"
 
 namespace SE
 {
-    class ShaderManager : public ResourceManager
+
+	struct ShaderProgram
+	{
+        std::pair<std::string, std::string> sm_shaderPaths;
+		std::unique_ptr<Shader> sm_shaderPtr;
+	};
+
+    class ShaderManager : public Manager
     {
     public:
-        ShaderManager() { m_name = "ShaderManager"; }
+        ShaderManager(const std::string& name = "ShaderManager") : Manager(ResourceType::Shader, name) {}
         ~ShaderManager() override = default;
 
         void init() override;
         void shutdown() override;
 
-        uint32_t addShader(const std::string& filePath);
-        void unloadShader(uint32_t shaderId);
-
+        bool addShader(uint32_t id, 
+            std::string_view vertexShaderPath,
+            std::string_view fragmentShaderPath,
+            std::string_view programName);
+        const Shader* getShader(uint32_t shaderId);
     private:
-        // TODO: shared ptr of shaders? What to do with ids????
-		std::unordered_map<std::string, uint32_t> m_shaderFilePathToId;
-        std::unordered_map<uint32_t, std::unique_ptr<Shader>> m_shaders;
+		// id -> ShaderProgram
+        std::unordered_map<uint32_t, ShaderProgram> m_shaders;
+		
+		std::pair<std::string, std::string> _verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath);
+        
     };
+    
 }
 
