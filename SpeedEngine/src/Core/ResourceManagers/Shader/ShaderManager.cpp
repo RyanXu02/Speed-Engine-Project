@@ -8,6 +8,8 @@ namespace SE
 	void ShaderManager::init()
 	{
 		Manager::init();
+
+		m_shaders.reserve(64);
 	}
 
 	void ShaderManager::shutdown()
@@ -26,7 +28,10 @@ namespace SE
 		m_logger->info("ShaderManager cleared all shaders.");
 	}
 
-	bool ShaderManager::addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName)
+	bool ShaderManager::addShader(uint32_t id, 
+		std::string_view vertexShaderPath, 
+		std::string_view fragmentShaderPath, 
+		std::string_view programName)
 	{
 		// check if vertex and fragment shader paths are valid
 		auto shaderPaths = _verifyShaderPaths(vertexShaderPath, fragmentShaderPath);

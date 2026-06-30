@@ -23,9 +23,9 @@ namespace SE
 		Shader(uint32_t id, std::string resourceName);
 
 		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
-		void bind();
+		const void bind();
 		void unbind();
-		void destroy();
+		const void destroy();
 
 		// utility uniform functions
 		void setBool(std::string_view name, bool value);

@@ -1,5 +1,6 @@
 #pragma once
 #include "../SubSystems/SubSystem.h"
+#include "../Logger/Logger.h"
 #include "Resource.h"
 #include "Manager.h"
 
@@ -18,6 +19,11 @@ namespace SE
 
 		static ResourceManager& Instance()
 		{
+			if (s_instance)
+			{
+				return *s_instance;
+			}
+
 			static ResourceManager instance;
 			s_instance = &instance;
 			return *s_instance;
@@ -31,17 +37,17 @@ namespace SE
 		std::string getString(std::string_view filePath);
 		
 		template<typename... Args>
-		uint32_t addResource(ResourceType type, Args... args)
+		uint32_t addResource(ResourceType type, Args&&... args)
 		{
 			switch (type)
 			{
-			case ResourceType::Texture:
-				_getManager<TextureManager>()->loadTexture(args...);
-				break;
-			case ResourceType::Shader:
-				_getManager<ShaderManager>()->addShader(generateId(), args...);
-				break;
+				case ResourceType::Shader:
+					return _addResourceImpl<ResourceType::Shader>(std::forward<Args>(args)...);
+				case ResourceType::Texture:
+					return _addResourceImpl<ResourceType::Texture>(std::forward<Args>(args)...);
 			}
+			m_logger->warn("ResourceManager::addResource: Unhandled ResourceType");
+			return 0;
 		}
 
 		Resource* getResource(uint32_t);
@@ -74,6 +80,24 @@ namespace SE
 				}
 			}
 			return nullptr;
+		}
+
+		template<ResourceType Type, typename... Args>
+		uint32_t _addResourceImpl(Args&&... args)
+		{
+			if constexpr (Type == ResourceType::Shader)
+			{
+				return _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...); // expects 3 strings
+			}
+			else if constexpr (Type == ResourceType::Texture)
+			{
+				return _getManager<TextureManager>()->loadTexture(generateId(), std::forward<Args>(args)...); // expects 1 arg
+			}
+			else
+			{
+				static_assert(false, "Unhandled ResourceType in _addResourceImpl");
+				return 0;
+			}
 		}
 
 	};
