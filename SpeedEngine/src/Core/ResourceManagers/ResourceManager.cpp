@@ -14,6 +14,8 @@ namespace SE
 	{
 		SubSystem::init();
 
+		s_instance = this;
+
 		// init managers
 		m_managers.emplace_back(std::make_unique<ShaderManager>());
 		m_managers.emplace_back(std::make_unique<TextureManager>());
@@ -25,11 +27,14 @@ namespace SE
 
 	void ResourceManager::shutdown()
 	{
+		SubSystem::shutdown();
+
 		for (auto& manager : m_managers)
 		{
 			manager->shutdown();
 		}
 		m_managers.clear();
+
 	}
 
 	uint32_t ResourceManager::generateId()
