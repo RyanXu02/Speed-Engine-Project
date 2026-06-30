@@ -1,13 +1,13 @@
 #pragma once
-#include "../ResourceManager.h"
+#include "../Manager.h"
 #include "Texture.h"
 
 namespace SE
 {
-    class TextureManager : public ResourceManager
+    class TextureManager : public Manager
     {
     public:
-        TextureManager() { m_name = "TextureManager"; }
+		TextureManager(const std::string& name = "TextureManager") : Manager(ResourceType::Texture, name) {}
 		~TextureManager() override = default;
 		
         void init() override;

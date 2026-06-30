@@ -6,11 +6,11 @@ namespace SE
 {
 	void TextureManager::init()
 	{
-		ResourceManager::init();
+		Manager::init();
 	}
 
 	void TextureManager::shutdown()
 	{
-		ResourceManager::shutdown();
+		Manager::shutdown();
 	}
 }

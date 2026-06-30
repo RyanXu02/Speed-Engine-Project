@@ -7,12 +7,12 @@ namespace SE
 {
 	void ShaderManager::init()
 	{
-		SubSystem::init();
+		Manager::init();
 	}
 
 	void ShaderManager::shutdown()
 	{
-		SubSystem::shutdown();
+		Manager::shutdown();
 		
 		for (auto& [k, shaderProgram] : m_shaders)
 		{
@@ -26,7 +26,7 @@ namespace SE
 		m_logger->info("ShaderManager cleared all shaders.");
 	}
 
-	bool ShaderManager::_addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName)
+	bool ShaderManager::addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName)
 	{
 		// check if vertex and fragment shader paths are valid
 		auto shaderPaths = _verifyShaderPaths(vertexShaderPath, fragmentShaderPath);
@@ -86,7 +86,7 @@ namespace SE
 		return shaderPaths;
 	}
 
-	const Shader* ShaderManager::_getShader(uint32_t shaderId)
+	const Shader* ShaderManager::getShader(uint32_t shaderId)
 	{
 		auto it = m_shaders.find(shaderId);
 		if (it == m_shaders.end()) return nullptr;

@@ -2,10 +2,35 @@
 #include "ResourceManager.h"
 #include "../Logger/Logger.h"
 
+#include "Shader/ShaderManager.h"
+#include "Texture/TextureManager.h"
+
 namespace SE
 {
 
 	ResourceManager* ResourceManager::s_instance = nullptr;
+
+	void ResourceManager::init()
+	{
+		SubSystem::init();
+
+		// init managers
+		m_managers.emplace_back(std::make_unique<ShaderManager>());
+		m_managers.emplace_back(std::make_unique<TextureManager>());
+		for (auto& manager : m_managers)
+		{
+			manager->init();
+		}
+	}
+
+	void ResourceManager::shutdown()
+	{
+		for (auto& manager : m_managers)
+		{
+			manager->shutdown();
+		}
+		m_managers.clear();
+	}
 
 	uint32_t ResourceManager::generateId()
 	{

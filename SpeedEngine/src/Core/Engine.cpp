@@ -16,8 +16,7 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		m_subSystems.push_back(std::make_unique<ResourceManager>("ResourceManager"));
-		m_subSystems.push_back(std::make_unique<ShaderManager>("ShaderManager"));
+		m_subSystems.push_back(std::make_unique<ResourceManager>());
 
 		for (auto& subSystem : m_subSystems)
 		{
