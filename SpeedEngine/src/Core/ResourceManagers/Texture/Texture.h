@@ -7,9 +7,9 @@ namespace SE
 	class Texture
 	{
 		Texture(uint32_t id);
-		~Texture();
+		// ~Texture();
 
-		void init(Shader shader);
+		// void init(Shader shader);
 	};
 }
 

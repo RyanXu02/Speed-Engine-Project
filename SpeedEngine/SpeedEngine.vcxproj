@@ -130,7 +130,10 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q</Command>
+      <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q
+
+xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q
+</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,6 +155,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\ResourceManagers\Resource.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
     <ClCompile Include="src\Core\Logger\Logger.cpp" />
@@ -190,6 +194,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Manager.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Resource.h" />
     <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h" />
     <ClInclude Include="src\Core\Logger\Logger.h" />

@@ -2,7 +2,8 @@
 #include "Engine.h"
 #include "SubSystems/SubSystem.h"
 
-#include "ResourceManagers/Texture/TextureManager.h"
+#include "ResourceManagers/ResourceManager.h"
+#include "ResourceManagers/Shader/ShaderManager.h"
 
 namespace SE
 {
@@ -15,7 +16,7 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		m_subSystems.push_back(std::make_unique<TextureManager>());
+		m_subSystems.push_back(std::make_unique<ResourceManager>());
 
 		for (auto& subSystem : m_subSystems)
 		{
@@ -28,15 +29,7 @@ namespace SE
 	}
 	void Engine::run()
 	{
-		while (m_isRunning)
-		{
-			printf("Engine is running...\n");
-			// Update delta time
-			m_deltaTime = 0.016; // Placeholder for actual delta time calculation
-			// Handle input
-			// Update game logic
-			// Render
-		}
+		ResourceManager::Instance().addResource(ResourceType::Shader, "Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 	}
 	void Engine::stop()
 	{
