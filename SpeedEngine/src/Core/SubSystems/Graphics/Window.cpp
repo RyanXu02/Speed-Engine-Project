@@ -5,6 +5,8 @@
 #include "glad/gl.h"
 #include "GLFW/glfw3.h"
 
+#include "../Events/EventSystem.h"
+
 namespace SE
 {
 	void Window::init()
@@ -88,7 +90,7 @@ namespace SE
 		glfwMakeContextCurrent(m_window);
 
 		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			EventSystem::Instance().publish(std::make_unique<WindowClose>());
 			});
 
 		// init glad
