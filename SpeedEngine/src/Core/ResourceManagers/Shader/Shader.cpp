@@ -29,20 +29,16 @@ namespace SE
 		if (!status.success) return status;
 
 		// Link shaders into a program
-		unsigned int program = glCreateProgram();
-		glAttachShader(program, vertexShader);
-		glAttachShader(program, fragmentShader);
-		glLinkProgram(program);
-		status = _checkCompilationErr(program, "PROGRAM");
+		m_ProgramId = glCreateProgram();
+		glAttachShader(m_ProgramId, vertexShader);
+		glAttachShader(m_ProgramId, fragmentShader);
+		glLinkProgram(m_ProgramId);
+		status = _checkCompilationErr(m_ProgramId, "PROGRAM");
 		if (!status.success) return status;
 
 		// Clean up shaders as they are no longer needed after linking
-		glDetachShader(m_ProgramId, vertexShader);
-		glDetachShader(m_ProgramId, fragmentShader);
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
-
-		m_ProgramId = program;
 
 		return status;
 	}
