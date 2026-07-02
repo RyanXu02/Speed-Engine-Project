@@ -63,7 +63,8 @@ namespace SE
 		}
 
 		m_shaders[id] = { shaderPaths, std::move(shader) };
-		m_logger->info("Shader loaded: ID {}", id);
+		
+		m_logger->info("Shader '{}' loaded: ID {}", m_shaders[id].sm_shaderPtr->getResourceName(), id);
 
 		return true;
 	}

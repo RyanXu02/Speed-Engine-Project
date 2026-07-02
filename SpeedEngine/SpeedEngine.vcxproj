@@ -132,7 +132,7 @@
     <PreBuildEvent>
       <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q
 
-xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q
+xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
 </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -155,6 +155,9 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\Event.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Resource.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
@@ -192,8 +195,12 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q
     <ClCompile Include="ThirdParty\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
+    <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h" />
+    <ClInclude Include="src\Core\SubSystems\Events\Event.h" />
     <ClInclude Include="src\Core\ResourceManagers\Manager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Resource.h" />
     <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
@@ -214,6 +221,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q
     <ClInclude Include="ThirdParty\include\imgui\imstb_textedit.h" />
     <ClInclude Include="ThirdParty\include\imgui\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\pch.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
