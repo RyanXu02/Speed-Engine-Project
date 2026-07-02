@@ -4,6 +4,9 @@
 
 #include "SubSystems/Graphics/Window.h"
 
+#include "SubSystems/Events/EventSystem.h"
+#include "SubSystems/Events/EventSubscription.h"
+
 #include "ResourceManagers/ResourceManager.h"
 #include "ResourceManagers/Shader/ShaderManager.h"
 
@@ -14,7 +17,7 @@
 namespace SE
 {
 	Engine::Engine()
-		: m_isRunning(false), m_deltaTime(0.0)
+		: m_isRunning(false), m_deltaTime(0.0), m_windowCloseEvent()
 	{
 	}
 	Engine::~Engine()
@@ -23,12 +26,17 @@ namespace SE
 	void Engine::init()
 	{
 		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine"));
+		m_subSystems.push_back(std::make_unique<EventSystem>());
 		m_subSystems.push_back(std::make_unique<ResourceManager>());
 
 		for (auto& subSystem : m_subSystems)
 		{
 			subSystem->init();
 		}
+
+		m_windowCloseEvent = EventSystem::Instance().subscribe(EventType::WindowClose, [this](const Event& event) {
+			m_isRunning = false;
+			});
 	}
 	void Engine::start()
 	{
@@ -43,17 +51,10 @@ namespace SE
 			{
 				subSystem->update(m_deltaTime);
 			}
-
-			// temp test window close code
-			Window* window = dynamic_cast<Window*>(m_subSystems[0].get());
-			if (window && glfwWindowShouldClose(window->getWindow())) {
-				m_isRunning = false;
-			}
 		}
 	}
 	void Engine::stop()
 	{
-		m_isRunning = false;
 		for (auto& subSystem : m_subSystems)
 		{
 			subSystem->shutdown();
