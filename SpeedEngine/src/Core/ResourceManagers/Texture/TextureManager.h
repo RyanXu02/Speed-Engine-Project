@@ -13,6 +13,8 @@ namespace SE
         void init() override;
         void shutdown() override;
 
+        //@brief loads a texture
+        //@param id
         uint32_t loadTexture(uint32_t id,
             std::optional<std::string_view> albedoPath,
             std::optional<std::string_view> heightPath,

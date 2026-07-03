@@ -11,6 +11,7 @@
 
 namespace SE
 {
+	//compilation status of shader + its files
 	struct GLCompStatus
 	{
 		bool success { false };
@@ -22,9 +23,19 @@ namespace SE
 	public:
 		Shader(uint32_t id, std::string resourceName);
 
+		//@brief compiles and links a shader object
+		//@param vertexShaderSource the literal source code of vertex shader as a string
+		//@param fragmentShaderSource the literal source code of fragment shader as a string
+		//@returns compilation status containing its success (T/F) and any compilation logs
 		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
+
+		//@brief binds shader to be used in graphics pipeline
 		const void bind();
+
+		//@brief unbinds shader from use in graphics pipeline
 		void unbind();
+
+		//@brief deletes the graphics program
 		const void destroy();
 
 		// utility uniform functions
