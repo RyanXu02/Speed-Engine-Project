@@ -16,7 +16,8 @@ namespace SE
 
 		ResourceManager() : SubSystem("ResourceManager") {}
 		
-
+		//@brief gets static instance (meyers singleton)
+		//@returns reference to instance
 		static ResourceManager& Instance()
 		{
 			if (s_instance)
@@ -32,10 +33,19 @@ namespace SE
 		void init() override;
 		void shutdown() override;
 
+		//@brief generates a resource id. atomic and does not reuse ids
+		//@returns an id (uint32)
 		uint32_t generateId();
 
+		//@brief retrieves the contents of a text file
+		//@param filePath file to open and retrieve contents
+		//@returns filePath's entire contents
 		std::string getString(std::string_view filePath);
 		
+		//@brief adds a resource to the Resource Manager
+		//@param type the type of resource being added
+		//@param args arguments to pass for type of resource being added (filepaths, names, etc)
+		//@returns id of newly added resource
 		template<typename... Args>
 		uint32_t addResource(ResourceType type, Args&&... args)
 		{
@@ -50,7 +60,10 @@ namespace SE
 			return 0;
 		}
 
-		Resource* getResource(uint32_t);
+		//@brief retrieves a resource given an id
+		//@param id the id to retrieve
+		//@returns asdfasfsfasdf
+		Resource* getResource(uint32_t id);
 
 
 	private:

@@ -18,6 +18,7 @@ namespace SE
 		EventSubscription(EventSubscription&& other) noexcept;
 		EventSubscription& operator=(EventSubscription&& other) noexcept;
 	
+		//@brief unsubscribes this EventSubscription from EventSystem
 		void unsubscribe() const;
 
 	private:

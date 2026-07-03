@@ -10,6 +10,7 @@ namespace SE
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
+	//BASE CLASS
 	class Event
 	{
 	public:
