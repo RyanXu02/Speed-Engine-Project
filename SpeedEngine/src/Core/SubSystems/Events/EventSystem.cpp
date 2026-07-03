@@ -69,7 +69,7 @@ namespace SE
 			for (const auto& eventCallbackWrapper : eventTypeIt->second)
 			{
 				eventCallbackWrapper.callback(event);
-				m_logger->verbose("Fired event of type: " + event.getName() + " to callback with id: " + std::to_string(eventCallbackWrapper.id));
+				m_logger->debug("Fired event of type: " + event.getName() + " to callback with id: " + std::to_string(eventCallbackWrapper.id));
 				if (event.handled) break;
 			}
 		}
