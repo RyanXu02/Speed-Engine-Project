@@ -54,7 +54,6 @@ namespace SE
 
 
 	private:
-		uint32_t m_ResourceId;
 		unsigned int m_ProgramId;
 
 		unsigned int _getUniformLocation(std::string_view name);
