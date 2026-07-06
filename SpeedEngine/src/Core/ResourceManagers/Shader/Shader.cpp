@@ -4,7 +4,7 @@
 
 namespace SE
 {
-	Shader::Shader(uint32_t resourceId, std::string resourceName) : Resource(resourceName), m_ResourceId(resourceId), m_ProgramId(0)
+	Shader::Shader(uint32_t resourceId, std::string resourceName) : Resource(resourceId, resourceName), m_ProgramId(0)
 	{
 	}
 

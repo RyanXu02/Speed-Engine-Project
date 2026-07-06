@@ -5,7 +5,7 @@
 #include "Manager.h"
 
 #include "Shader/ShaderManager.h"
-#include "Texture/TextureManager.h"
+//#include "Texture/TextureManager.h"
 
 namespace SE
 {
@@ -53,7 +53,7 @@ namespace SE
 			{
 				case ResourceType::Shader:
 					return _addResourceImpl<ResourceType::Shader>(std::forward<Args>(args)...);
-				case ResourceType::Texture:
+				case ResourceType::Material:
 					return _addResourceImpl<ResourceType::Texture>(std::forward<Args>(args)...);
 			}
 			m_logger->warn("ResourceManager::addResource: Unhandled ResourceType");
@@ -104,7 +104,7 @@ namespace SE
 			}
 			else if constexpr (Type == ResourceType::Texture)
 			{
-				return _getManager<TextureManager>()->loadTexture(generateId(), std::forward<Args>(args)...); // expects 1 arg
+				return _getManager<Material>()->loadTexture(generateId(), std::forward<Args>(args)...); // expects 1 arg
 			}
 			else
 			{

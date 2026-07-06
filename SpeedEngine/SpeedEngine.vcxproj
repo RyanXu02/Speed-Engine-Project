@@ -166,8 +166,8 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Texture\TextureManager.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Texture\Texture.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
     <ClCompile Include="ThirdParty\include\glad\src\gl.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -210,8 +210,8 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClInclude Include="src\Core\EngineConfig.h" />
     <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h" />
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Texture\TextureManager.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Texture\Texture.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />
     <ClInclude Include="ThirdParty\include\imgui\imconfig.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui_impl_glfw.h" />

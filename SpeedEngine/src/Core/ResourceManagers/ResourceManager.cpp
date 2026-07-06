@@ -3,7 +3,6 @@
 #include "../Logger/Logger.h"
 
 #include "Shader/ShaderManager.h"
-#include "Texture/TextureManager.h"
 
 namespace SE
 {
@@ -18,7 +17,7 @@ namespace SE
 
 		// init managers
 		m_managers.emplace_back(std::make_unique<ShaderManager>());
-		m_managers.emplace_back(std::make_unique<TextureManager>());
+		//m_managers.emplace_back(std::make_unique<Material>());
 		for (auto& manager : m_managers)
 		{
 			manager->init();
