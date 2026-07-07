@@ -13,7 +13,7 @@ namespace SE
         Material(uint32_t id, std::string resourceName, Logger& logger) : Resource(id, resourceName), 
             m_logger(logger, fmt::format("Material:{}", resourceName)) {}
 		
-        void init(Shader* shader, std::initializer_list<std::pair<TextureType, std::string_view>> textures);
+        bool init(uint32_t shaderId, std::initializer_list<std::pair<TextureType, std::string_view>> textures);
     
         void destroy();
 
@@ -27,7 +27,7 @@ namespace SE
 
         bool m_isValid{ false };
 		std::vector<std::unique_ptr<Texture>> m_textures;
-        Shader* m_shader{ nullptr };
+        uint32_t m_shaderId{ 0 };
 
         LoggerProxy m_logger;
     };

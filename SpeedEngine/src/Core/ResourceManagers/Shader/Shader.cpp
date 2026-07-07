@@ -43,7 +43,7 @@ namespace SE
 		return status;
 	}
 
-	const void Shader::bind()
+	void Shader::bind()
 	{
 		glUseProgram(m_ProgramId);
 	}
@@ -51,7 +51,7 @@ namespace SE
 	{
 		glUseProgram(0);
 	}
-	const void Shader::destroy()
+	void Shader::destroy()
 	{
 		glDeleteProgram(m_ProgramId);
 	}

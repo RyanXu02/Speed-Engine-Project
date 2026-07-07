@@ -42,6 +42,7 @@ namespace SE
 	}
 	void Engine::run()
 	{
+		ResourceManager::Instance().addResource(ResourceType::Shader, "Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		while (m_isRunning)
 		{
 			for (auto& subSystem : m_subSystems)
