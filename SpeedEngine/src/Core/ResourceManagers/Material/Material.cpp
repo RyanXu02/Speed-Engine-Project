@@ -10,19 +10,27 @@ namespace SE
 
 	void Material::init(Shader* shader, std::initializer_list<std::pair<TextureType, std::string_view>> textures) {
 		m_shader = shader;
+
 		for (const auto& [type, filePath] : textures) {
 			if (addTexture(type, filePath))
 				m_isValid = true;
 		}
+		if (m_isValid) m_logger.info("Successfully initialized");
+		else m_logger.warn("Failed to initialize");
 	}
 
 	void Material::destroy() {
-		//TODO IMPLEMENT
+		for (auto& tex : m_textures) {
+			tex.get()->destroy();
+		}
 	}
 
 	bool Material::addTexture(TextureType type, std::string_view filePath) {
 		auto newTexture = std::make_unique<Texture>(type);
-		//todo: create texture!
+		std::string msg = newTexture.get()->init(filePath);
+		if (msg != "") { //texture failed to load
+			m_logger.warn(msg);
+		}
 		m_textures.push_back(std::move(newTexture));
 		return true;
 	}

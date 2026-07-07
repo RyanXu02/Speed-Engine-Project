@@ -2,13 +2,22 @@
 
 namespace SE
 {
+	enum class TextureType {
+		None = -1,
+		Albedo,
+		Normal,
+		Height,
+		AmbOcc,
+		Roughness
+	};
+
 	class Texture
 	{
 	public:
 		Texture(TextureType type);
 		~Texture();
 
-		void init();
+		std::string init(std::string_view filePath);
 		void destroy();
 
 		TextureType getType() const { return m_type; }
@@ -19,15 +28,9 @@ namespace SE
 	private:
 		TextureType m_type{ TextureType::None };
 		std::string name{ "" };
+		int width, height;
+		unsigned int format;
 	};
 
-	enum class TextureType {
-		None = -1,
-		Albedo,
-		Normal,
-		Height,
-		AmbOcc,
-		Roughness
-	};
 }
 

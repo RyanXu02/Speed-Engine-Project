@@ -158,5 +158,8 @@
     <ClInclude Include="src\Core\SubSystems\Events\Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Logger\LoggerProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
