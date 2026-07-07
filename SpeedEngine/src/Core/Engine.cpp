@@ -10,9 +10,7 @@
 #include "ResourceManagers/ResourceManager.h"
 #include "ResourceManagers/Shader/ShaderManager.h"
 
-//temp include to test glfw window close
-#include "GLFW/glfw3.h"
-#include "SubSystems/Graphics/Window.h"
+#include "ResourceManagers/Material/Material.h"
 
 namespace SE
 {
@@ -44,7 +42,6 @@ namespace SE
 	}
 	void Engine::run()
 	{
-		ResourceManager::Instance().addResource(ResourceType::Shader, "Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		while (m_isRunning)
 		{
 			for (auto& subSystem : m_subSystems)

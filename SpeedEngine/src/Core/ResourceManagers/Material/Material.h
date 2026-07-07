@@ -1,5 +1,6 @@
 #pragma once
 #include "../Resource.h"
+#include "../../Logger/LoggerProxy.h"
 #include "Texture.h"
 
 namespace SE
@@ -9,7 +10,8 @@ namespace SE
     class Material : public Resource
     {
     public:
-        Material(uint32_t id, std::string resourceName) : Resource(id, resourceName) {}
+        Material(uint32_t id, std::string resourceName, Logger& logger) : Resource(id, resourceName), 
+            m_logger(logger, fmt::format("Material:{}", resourceName)) {}
 		
         void init(Shader* shader, std::initializer_list<std::pair<TextureType, std::string_view>> textures);
     
@@ -23,10 +25,11 @@ namespace SE
     private:
         void _bindTexture(unsigned int slot, Texture& tex);
 
-        uint32_t m_resourceId;
+        bool m_isValid{ false };
 		std::vector<std::unique_ptr<Texture>> m_textures;
         Shader* m_shader{ nullptr };
-        bool m_isValid{ false };
+
+        LoggerProxy m_logger;
     };
 }
 

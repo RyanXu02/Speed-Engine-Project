@@ -198,6 +198,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Events\Event.h" />
