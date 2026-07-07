@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Material.h"
-#include "../Shader/Shader.h"
+#include "../Shader/ShaderManager.h"
 
 #include "glad/gl.h"
 
@@ -8,15 +8,21 @@ namespace SE
 {
 
 
-	void Material::init(Shader* shader, std::initializer_list<std::pair<TextureType, std::string_view>> textures) {
-		m_shader = shader;
+	bool Material::init(uint32_t shaderId, std::initializer_list<std::pair<TextureType, std::string_view>> textures) {
+		m_shader = shaderId;
 
 		for (const auto& [type, filePath] : textures) {
 			if (addTexture(type, filePath))
 				m_isValid = true;
 		}
-		if (m_isValid) m_logger.info("Successfully initialized");
-		else m_logger.warn("Failed to initialize");
+		if (m_isValid) {
+			m_logger.info("Successfully initialized");
+			return true;
+		}
+		else {
+			m_logger.warn("Failed to initialize");
+			return false;
+		}
 	}
 
 	void Material::destroy() {
@@ -30,6 +36,7 @@ namespace SE
 		std::string msg = newTexture.get()->init(filePath);
 		if (msg != "") { //texture failed to load
 			m_logger.warn(msg);
+			return false;
 		}
 		m_textures.push_back(std::move(newTexture));
 		return true;
@@ -69,7 +76,7 @@ namespace SE
 	void Material::_bindTexture(unsigned int slot, Texture& tex) {
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, tex.glTextureId);
-		m_shader->setInt(tex.getVarName(), slot);
+		ResourceManager::Instance()._getShader(m_shaderId).setInt(tex.getVarName(), slot);
 	}
 	
 

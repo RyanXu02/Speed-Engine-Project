@@ -30,13 +30,13 @@ namespace SE
 		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
 
 		//@brief binds shader to be used in graphics pipeline
-		const void bind();
+		void bind();
 
 		//@brief unbinds shader from use in graphics pipeline
 		void unbind();
 
 		//@brief deletes the graphics program
-		const void destroy();
+		void destroy();
 
 		// utility uniform functions
 		void setBool(std::string_view name, bool value);

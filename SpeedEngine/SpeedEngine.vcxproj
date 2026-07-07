@@ -155,6 +155,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\Event.cpp" />
@@ -198,6 +199,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
     <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h" />

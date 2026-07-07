@@ -38,7 +38,6 @@ namespace SE
 		int channels;
 		unsigned char* image = stbi_load(filePath.data(), &width, &height, &channels, 0);
 		if (!image) {
-			stbi_image_free(image);
 			return "Failed to load texture " + std::string(filePath);
 		}
 		else {

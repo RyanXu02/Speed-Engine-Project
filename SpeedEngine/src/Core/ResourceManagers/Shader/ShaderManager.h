@@ -27,7 +27,7 @@ namespace SE
         //@param fragmentShaderPath file path to the fragment shader
         //@param programName name of the shader object (for readability in logs)
         //@returns true if shader successfully added, otherwise false
-        bool addShader(uint32_t id, 
+        uint32_t addShader(uint32_t id, 
             std::string_view vertexShaderPath,
             std::string_view fragmentShaderPath,
             std::string_view programName);
