@@ -64,6 +64,9 @@ namespace SE
 
 	//@brief deletes texture data
 	void Texture::destroy() {
-		glDeleteTextures(1, &glTextureId);
+		if (glTextureId != 0) {
+			glDeleteTextures(1, &glTextureId);
+			glTextureId = 0;
+		}
 	}
 }

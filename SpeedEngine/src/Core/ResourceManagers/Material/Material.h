@@ -13,7 +13,7 @@ namespace SE
         Material(uint32_t id, std::string_view resourceName, Logger& logger) : Resource(id, std::string(resourceName)), 
             m_logger(logger, fmt::format("Material:{}", resourceName)) {}
 		
-        bool init(uint32_t shaderId, std::initializer_list<std::pair<TextureType, std::string_view>> textures);
+        bool init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures);
     
         void destroy();
 

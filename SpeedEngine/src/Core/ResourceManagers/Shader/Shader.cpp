@@ -53,7 +53,10 @@ namespace SE
 	}
 	void Shader::destroy()
 	{
-		glDeleteProgram(m_ProgramId);
+		if (m_ProgramId != 0) {
+			glDeleteProgram(m_ProgramId);
+			m_ProgramId = 0;
+		}
 	}
 
 	GLCompStatus Shader::_checkCompilationErr(unsigned int shader, std::string_view type)
