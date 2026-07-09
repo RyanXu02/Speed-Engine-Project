@@ -46,18 +46,22 @@ namespace SE
 		//@param type the type of resource being added
 		//@param args arguments to pass for type of resource being added (filepaths, names, etc)
 		//@returns id of newly added resource
-		template<typename... Args>
-		uint32_t addResource(ResourceType type, Args&&... args)
+		template<ResourceType Type, typename... Args>
+		uint32_t addResource(Args&&... args)
 		{
-			switch (type)
+			if constexpr (Type == ResourceType::Shader)
 			{
-				case ResourceType::Shader:
-					return _addResourceImpl<ResourceType::Shader>(std::forward<Args>(args)...);
-				case ResourceType::Material:
-					return _addResourceImpl<ResourceType::Material>(std::forward<Args>(args)...);
+				return _addResourceImpl<ResourceType::Shader>(std::forward<Args>(args)...);
 			}
-			m_logger->warn("ResourceManager::addResource: Unhandled ResourceType");
-			return 0;
+			else if constexpr (Type == ResourceType::Material)
+			{
+				return _addResourceImpl<ResourceType::Material>(std::forward<Args>(args)...);
+			}
+			else
+			{
+				m_logger->warn("ResourceManager::addResource: Unhandled ResourceType");
+				return 0;
+			}
 		}
 
 		//@brief retrieves a resource of requested type given an id

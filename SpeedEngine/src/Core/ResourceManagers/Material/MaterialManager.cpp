@@ -33,7 +33,7 @@ namespace SE
 			return it->first;
 		}
 
-		auto newMat = std::make_unique<Material>(id, materialName, m_logger);
+		auto newMat = std::make_unique<Material>(id, materialName, *m_logger);
 		if (newMat->init(shaderId, textures)) return 0;
 		m_materials[id] = std::move(newMat);
 		m_logger->info("Material '{}' loaded: ID {}", m_materials[id]->getResourceName(), id);
