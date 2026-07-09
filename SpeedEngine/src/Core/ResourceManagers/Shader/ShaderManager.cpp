@@ -107,7 +107,7 @@ namespace SE
 		return shaderPaths;
 	}
 
-	const Shader* ShaderManager::getShader(uint32_t shaderId)
+	Shader* ShaderManager::getShader(uint32_t shaderId)
 	{
 		auto it = m_shaders.find(shaderId);
 		if (it == m_shaders.end()) return nullptr;

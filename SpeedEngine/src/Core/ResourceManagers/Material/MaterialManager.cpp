@@ -41,11 +41,10 @@ namespace SE
 		return id;
 	}
 
-	const Material* MaterialManager::getMaterial(uint32_t materialId) {
+	Material* MaterialManager::getMaterial(uint32_t materialId) {
 		auto it = m_materials.find(materialId);
 		if (it == m_materials.end()) return nullptr;
 
 		return it->second.get();
-		}
 	}
 }

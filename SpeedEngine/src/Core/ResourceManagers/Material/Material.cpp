@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Material.h"
 #include "../Shader/ShaderManager.h"
+#include "../ResourceManager.h"
 
 #include "glad/gl.h"
 
@@ -9,7 +10,7 @@ namespace SE
 
 
 	bool Material::init(uint32_t shaderId, std::initializer_list<std::pair<TextureType, std::string_view>> textures) {
-		m_shader = shaderId;
+		m_shaderId = shaderId;
 
 		for (const auto& [type, filePath] : textures) {
 			if (addTexture(type, filePath))
@@ -42,7 +43,7 @@ namespace SE
 		return true;
 	}
 
-	//slot 0 = albedo, slot 1 = normal, slot 2 = height, slot 3 = ambient occluision, slot 4 = roughness
+	//slot 0 = albedo, slot 1 = normal, slot 2 = height, slot 3 = ambient occlusion, slot 4 = roughness
 	void Material::bind() {
 		for (auto& t : m_textures) {
 			if (!t->isLoaded()) continue;
@@ -76,7 +77,12 @@ namespace SE
 	void Material::_bindTexture(unsigned int slot, Texture& tex) {
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, tex.glTextureId);
-		ResourceManager::Instance()._getShader(m_shaderId).setInt(tex.getVarName(), slot);
+		Shader* s = ResourceManager::Instance().getResource<Shader>(m_shaderId);
+		if (!s) {
+			m_logger.critical("Slot {} failed to bind in shader (ID = {}", slot, m_shaderId);
+			return;
+		}
+		s->setInt(tex.getVarName(), slot);
 	}
 	
 
