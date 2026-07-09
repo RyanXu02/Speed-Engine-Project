@@ -5,6 +5,7 @@
 #include "Manager.h"
 
 #include "Shader/ShaderManager.h"
+#include "Material/MaterialManager.h"
 
 namespace SE
 {
@@ -59,10 +60,22 @@ namespace SE
 			return 0;
 		}
 
-		//@brief retrieves a resource given an id
+		//@brief retrieves a resource of requested type given an id
 		//@param id the id to retrieve
-		//@returns asdfasfsfasdf
-		Resource* getResource(uint32_t id);
+		//@returns the requested resource of the specified type if it exists, nullptr if not
+		template<typename T>
+		T* getResource(uint32_t id) {
+			auto it = m_resourceTypes.find(id);
+			if (it != m_resourceTypes.end()) {
+				if constexpr (std::is_same_v<T, Shader>) {
+					return _getManager<ShaderManager>()->getShader(id);
+				}
+				else if constexpr (std::is_same_v<T, Material>) {
+					return _getManager<MaterialManager>()->getMaterial(id);
+				}
+			}
+			return nullptr;
+		}
 
 
 	private:
@@ -99,12 +112,11 @@ namespace SE
 		{
 			if constexpr (Type == ResourceType::Shader)
 			{
-				return _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...); // expects 3 strings
+				return _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
 			}
 			else if constexpr (Type == ResourceType::Material)
 			{
-				//return _getManager<Material>()->loadTexture(generateId(), std::forward<Args>(args)...); // expects 1 arg
-				return 0;
+				return _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
 			}
 			else
 			{

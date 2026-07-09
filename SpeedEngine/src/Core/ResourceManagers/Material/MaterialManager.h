@@ -17,7 +17,7 @@ namespace SE
 			std::initializer_list<std::pair<TextureType, std::string_view>> textures,
 			std::string_view materialName);
 
-		const Material* getMaterial(uint32_t materialId);
+		Material* getMaterial(uint32_t materialId);
 	private:
 		//id -> material object
 		std::unordered_map<uint32_t, std::unique_ptr<Material>> m_materials;
