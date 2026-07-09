@@ -10,7 +10,7 @@ namespace SE
     class Material : public Resource
     {
     public:
-        Material(uint32_t id, std::string resourceName, Logger& logger) : Resource(id, resourceName), 
+        Material(uint32_t id, std::string_view resourceName, Logger& logger) : Resource(id, std::string(resourceName)), 
             m_logger(logger, fmt::format("Material:{}", resourceName)) {}
 		
         bool init(uint32_t shaderId, std::initializer_list<std::pair<TextureType, std::string_view>> textures);
