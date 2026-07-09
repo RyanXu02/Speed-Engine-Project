@@ -103,7 +103,7 @@ namespace SE
 		{
 			for (auto& manager : m_managers)
 			{
-				if (auto ptr = static_cast<T*>(manager.get()))
+				if (auto ptr = dynamic_cast<T*>(manager.get()))
 				{
 					return ptr;
 				}

@@ -4,14 +4,6 @@
 
 namespace SE
 {
-
-    //encapsulates a shader program (vert/frag paths + shader obj)
-	struct ShaderProgram
-	{
-        std::pair<std::string, std::string> sm_shaderPaths;
-		std::unique_ptr<Shader> sm_shaderPtr;
-	};
-
     class ShaderManager : public Manager
     {
     public:
@@ -38,7 +30,7 @@ namespace SE
         Shader* getShader(uint32_t shaderId);
     private:
 		// id -> ShaderProgram
-        std::unordered_map<uint32_t, ShaderProgram> m_shaders;
+        std::unordered_map<uint32_t, std::unique_ptr<Shader>> m_shaders;
 		
 		std::pair<std::string, std::string> _verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath);
         

@@ -9,7 +9,7 @@ namespace SE
 {
 
 
-	bool Material::init(uint32_t shaderId, std::initializer_list<std::pair<TextureType, std::string_view>> textures) {
+	bool Material::init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures) {
 		m_shaderId = shaderId;
 
 		for (const auto& [type, filePath] : textures) {

@@ -23,9 +23,9 @@ namespace SE
 	}
 	void Engine::init()
 	{
-		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine"));
 		m_subSystems.push_back(std::make_unique<EventSystem>());
 		m_subSystems.push_back(std::make_unique<ResourceManager>());
+		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine")); //has to be after ResourceManager
 
 		for (auto& subSystem : m_subSystems)
 		{
@@ -42,7 +42,9 @@ namespace SE
 	}
 	void Engine::run()
 	{
-		ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
+		uint32_t id = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
+		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
+		ResourceManager::Instance().addResource<ResourceType::Material>(id,texlist, "testMaterial");
 		while (m_isRunning)
 		{
 			for (auto& subSystem : m_subSystems)

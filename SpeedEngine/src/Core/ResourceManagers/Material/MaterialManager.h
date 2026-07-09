@@ -14,7 +14,7 @@ namespace SE
 		void shutdown() override;
 
 		uint32_t addMaterial(uint32_t id, uint32_t shaderId,
-			std::initializer_list<std::pair<TextureType, std::string_view>> textures,
+			std::span<const std::pair<TextureType, std::string_view>> textures,
 			std::string_view materialName);
 
 		Material* getMaterial(uint32_t materialId);

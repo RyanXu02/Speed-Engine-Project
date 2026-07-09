@@ -21,7 +21,7 @@ namespace SE
 	}
 
 	uint32_t MaterialManager::addMaterial(uint32_t id, uint32_t shaderId,
-		std::initializer_list<std::pair<TextureType, std::string_view>> textures,
+		std::span<const std::pair<TextureType, std::string_view>> textures,
 		std::string_view materialName) 
 	{
 		//look for material in cache
@@ -34,7 +34,7 @@ namespace SE
 		}
 
 		auto newMat = std::make_unique<Material>(id, materialName, *m_logger);
-		if (newMat->init(shaderId, textures)) return 0;
+		if (!newMat->init(shaderId, textures)) return 0;
 		m_materials[id] = std::move(newMat);
 		m_logger->info("Material '{}' loaded: ID {}", m_materials[id]->getResourceName(), id);
 		

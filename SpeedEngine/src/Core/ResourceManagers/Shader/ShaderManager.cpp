@@ -16,11 +16,11 @@ namespace SE
 	{
 		Manager::shutdown();
 		
-		for (auto& [k, shaderProgram] : m_shaders)
+		for (auto& [k, shader] : m_shaders)
 		{
-			if (shaderProgram.sm_shaderPtr)
+			if (shader)
 			{
-				shaderProgram.sm_shaderPtr->destroy();
+				shader->destroy();
 			}
 		}
 		m_shaders.clear();
@@ -48,22 +48,15 @@ namespace SE
 		}
 		// look for in cache
 		auto it = std::ranges::find_if(m_shaders, [programName](const auto& kv) {
-			return kv.second.sm_shaderPtr->getResourceName() == programName;
+			return kv.second->getResourceName() == programName;
 			});
 		if (it != m_shaders.end()) {
-			m_logger->verbose("Shader with name already loaded: {} with ID {}", it->second.sm_shaderPtr->getResourceName(), it->first);
+			m_logger->verbose("Shader with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
 			return it->first;
 		}
-		/*auto it = std::ranges::find_if(m_shaders, [shaderPaths](const auto& kv) {
-			return kv.second.sm_shaderPaths == shaderPaths;
-			});
-		if (it != m_shaders.end()) {
-			m_logger->verbose("Shader already loaded: {} and {} with ID {}", shaderPaths.first, shaderPaths.second, it->first);
-			return it->first;
-		}*/
 
 		// Load shader source code from file
-		auto shader = std::make_unique<Shader>(id, programName.data());
+		auto shader = std::make_unique<Shader>(id, std::string(programName));
 
 		std::string vertexSource = ResourceManager::Instance().getString(shaderPaths.first);
 		std::string fragmentSource = ResourceManager::Instance().getString(shaderPaths.second);
@@ -75,9 +68,9 @@ namespace SE
 			return 0;
 		}
 
-		m_shaders[id] = { shaderPaths, std::move(shader) };
+		m_shaders.try_emplace(id, std::move(shader));
 		
-		m_logger->info("Shader '{}' loaded: ID {}", m_shaders[id].sm_shaderPtr->getResourceName(), id);
+		m_logger->info("Shader '{}' loaded: ID {}", m_shaders[id]->getResourceName(), id);
 
 		return id;
 	}
@@ -112,6 +105,6 @@ namespace SE
 		auto it = m_shaders.find(shaderId);
 		if (it == m_shaders.end()) return nullptr;
 		
-		return it->second.sm_shaderPtr.get();
+		return it->second.get();
 	}
 }

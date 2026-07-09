@@ -54,7 +54,7 @@ namespace SE
 
 
 	private:
-		unsigned int m_ProgramId;
+		unsigned int m_ProgramId = 0;
 
 		unsigned int _getUniformLocation(std::string_view name);
 		std::unordered_map<std::string, unsigned int> m_uniforms;
