@@ -3,6 +3,7 @@
 #include "../Logger/Logger.h"
 
 #include "Shader/ShaderManager.h"
+#include "Material/MaterialManager.h"
 
 namespace SE
 {
@@ -17,7 +18,7 @@ namespace SE
 
 		// init managers
 		m_managers.emplace_back(std::make_unique<ShaderManager>());
-		//m_managers.emplace_back(std::make_unique<Material>());
+		m_managers.emplace_back(std::make_unique<MaterialManager>());
 		for (auto& manager : m_managers)
 		{
 			manager->init();
