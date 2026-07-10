@@ -67,6 +67,14 @@ namespace SE
 
     private:
 		std::shared_ptr<spdlog::logger> m_spdlogger;
+
+		// Static shared sinks reused by all loggers
+		static std::shared_ptr<spdlog::sinks::basic_file_sink_mt> s_file_sinkd;
+		static std::shared_ptr<spdlog::sinks::basic_file_sink_mt> s_file_sinkv;
+		static std::once_flag s_sinks_init_flag; //for use with std::call_once
+
+		//inits 2 static shared sinks
+		static void initSharedSinks();
     };
 }
 
