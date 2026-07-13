@@ -155,6 +155,9 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\ImGuiSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
@@ -199,6 +202,10 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\ImGuiSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
     <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />

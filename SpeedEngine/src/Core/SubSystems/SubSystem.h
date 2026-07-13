@@ -20,6 +20,9 @@ namespace SE
 		virtual void update(double deltaTime);
 		virtual void shutdown();
 
+		void enable() { isActive = true; }
+		void disable() { isActive = false; }
+		bool getActive() const { return isActive; }
 
 	protected:
 		std::string m_name;
