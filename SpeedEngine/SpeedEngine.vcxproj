@@ -124,13 +124,16 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Jolt.lib;glfw3dll.lib;spdlog.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Jolt.lib;glfw3dll.lib;spdlog.lib;fmodL_vc.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q</Command>
+      <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q
+
+xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,7 +155,20 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\Event.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Resource.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
+    <ClCompile Include="src\Core\Logger\Logger.cpp" />
+    <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
     <ClCompile Include="ThirdParty\include\glad\src\gl.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -180,8 +196,25 @@
     <ClCompile Include="ThirdParty\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
+    <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
+    <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
+    <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h" />
+    <ClInclude Include="src\Core\SubSystems\Events\Event.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Manager.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Resource.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h" />
+    <ClInclude Include="src\Core\Logger\Logger.h" />
+    <ClInclude Include="src\Core\Engine.h" />
+    <ClInclude Include="src\Core\EngineConfig.h" />
+    <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h" />
+    <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />
     <ClInclude Include="ThirdParty\include\imgui\imconfig.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui.h" />
     <ClInclude Include="ThirdParty\include\imgui\imgui_impl_glfw.h" />
@@ -191,6 +224,7 @@
     <ClInclude Include="ThirdParty\include\imgui\imstb_textedit.h" />
     <ClInclude Include="ThirdParty\include\imgui\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\pch.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
