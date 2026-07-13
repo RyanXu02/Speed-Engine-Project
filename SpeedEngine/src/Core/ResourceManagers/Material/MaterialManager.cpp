@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "MaterialManager.h"
 
+
 namespace SE
 {
 	void MaterialManager::init() {
