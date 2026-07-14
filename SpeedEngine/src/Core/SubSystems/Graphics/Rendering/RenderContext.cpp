@@ -5,8 +5,7 @@
 
 namespace SE
 {
-    RenderContext::RenderContext(const Window* window)
-        : m_window(window)
+    RenderContext::RenderContext()
     {
         resetStats();
     }
@@ -15,12 +14,12 @@ namespace SE
 	{
 	}
 
-	void RenderContext::setCamera(const Camera& camera)
+	void RenderContext::setCameraFrustum(const CameraFrustum& cameraFrustum)
 	{
-		m_camera = camera;
-		m_camera.viewMatrix = glm::lookAt(m_camera.position, m_camera.target, m_camera.up);
-		m_camera.projectionMatrix = glm::perspective(glm::radians(m_camera.fov), m_viewport.aspectRatio(), m_camera.nearPlane, m_camera.farPlane);
-		m_camera.viewProjectionMatrix = m_camera.projectionMatrix * m_camera.viewMatrix;
+		m_cameraFrustum = cameraFrustum;
+		m_cameraFrustum.viewMatrix = glm::lookAt(m_cameraFrustum.position, m_cameraFrustum.target, m_cameraFrustum.up);
+		m_cameraFrustum.projectionMatrix = glm::perspective(glm::radians(m_cameraFrustum.fov), m_viewport.aspectRatio(), m_cameraFrustum.nearPlane, m_cameraFrustum.farPlane);
+		m_cameraFrustum.viewProjectionMatrix = m_cameraFrustum.projectionMatrix * m_cameraFrustum.viewMatrix;
 	}
 
 	void RenderContext::resetStats()

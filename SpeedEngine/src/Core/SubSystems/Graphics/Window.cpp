@@ -26,8 +26,6 @@ namespace SE
 	{
 		SubSystem::update(deltaTime);
 
-		glfwSwapInterval(m_vsyncEnabled ? 1 : 0);
-
 		double currentTime = glfwGetTime();
 		m_deltaTime = currentTime - m_lastFrameTime;
 		m_lastFrameTime = currentTime;
@@ -73,14 +71,14 @@ namespace SE
 
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
 		// create window
-		m_window = glfwCreateWindow(m_width, m_height, m_windowTitle.c_str(), NULL, NULL);
+		m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), NULL, NULL);
 		if (!m_window) {
 			m_logger->critical("Failed to create GLFW window");
 			glfwTerminate();
 			return false;
 		}
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-		m_windowShared = glfwCreateWindow(m_width, m_height, m_windowTitle.c_str(), NULL, m_window);
+		m_windowShared = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), NULL, m_window);
 		if (!m_windowShared) {
 			m_logger->critical("Failed to create GLFW shared window");
 			glfwTerminate();
