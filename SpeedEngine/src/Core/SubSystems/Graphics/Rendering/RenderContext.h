@@ -18,7 +18,7 @@ namespace SE
 		}
 	};
 
-	struct Camera
+	struct CameraFrustum
 	{
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 5.0f);
 		glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -44,7 +44,7 @@ namespace SE
 	class RenderContext
 	{
 	public:
-		RenderContext(const Window* window);
+		RenderContext();
 		~RenderContext();
 
 		void setWindow(const Window* window) { m_window = window; }
@@ -53,25 +53,16 @@ namespace SE
 		void setViewport(const Viewport& viewport) { m_viewport = viewport; }
 		const Viewport& getViewport() const { return m_viewport; }
 
-		void setCamera(const Camera& camera);
-		const Camera& getCamera() const { return m_camera; }
-		Camera& getCamera() { return m_camera; }
+		void setCameraFrustum(const CameraFrustum& cameraFrustum);
+		const CameraFrustum& getCameraFrustum() const { return m_cameraFrustum; }
+		CameraFrustum& getCameraFrustum() { return m_cameraFrustum; }
 
-		glm::mat4 getViewMatrix() const { return m_camera.viewMatrix; }
-		glm::mat4 getProjectionMatrix() const { return m_camera.projectionMatrix; }
-		glm::mat4 getViewProjectionMatrix() const { return m_camera.viewProjectionMatrix; }
+		glm::mat4 getViewMatrix() const { return m_cameraFrustum.viewMatrix; }
+		glm::mat4 getProjectionMatrix() const { return m_cameraFrustum.projectionMatrix; }
+		glm::mat4 getViewProjectionMatrix() const { return m_cameraFrustum.viewProjectionMatrix; }
 
 		void setBackgroundColor(const glm::vec4& color) { m_backgroundColor = color; }
 		const glm::vec4& getBackgroundColor() const { return m_backgroundColor; }
-
-		void setDeltaTime(double deltaTime) { m_deltaTime = deltaTime; }
-		const double getDeltaTime() const { return m_deltaTime; }
-
-		void setFrameIndex(uint64_t frameIndex) { m_frameIndex = frameIndex; }
-		const uint64_t getFrameIndex() const { return m_frameIndex; }
-
-		void setElapsedTime(double elapsedTime) { m_elapsedTime = elapsedTime; }
-		const double getElapsedTime() const { return m_elapsedTime; }
 
 		void setWireFrameMode(bool enabled) { m_wireFrameMode = enabled; }
 		const bool isWireFrameMode() const { return m_wireFrameMode; }
@@ -86,13 +77,9 @@ namespace SE
 		const Window* m_window;
 
 		Viewport m_viewport;
-		Camera m_camera;
+		CameraFrustum m_cameraFrustum;
 
-		glm::vec4 m_backgroundColor;
-
-		double m_deltaTime = 0.0;
-		uint64_t m_frameIndex = 0;
-		double m_elapsedTime = 0.0;
+		glm::vec4 m_backgroundColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		bool m_wireFrameMode = false;
 		
