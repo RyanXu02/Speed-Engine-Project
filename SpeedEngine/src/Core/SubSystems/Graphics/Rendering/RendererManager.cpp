@@ -1,71 +1,102 @@
 #include "pch.h"
 #include "RendererManager.h"
-#include "RenderContext.h"
+
+#include <glad/gl.h>
 
 #include "SceneRenderer/SceneRenderer.h"
 
 namespace SE
 {
-	void RendererManager::addRenderer(std::unique_ptr<Renderer> renderer,  std::unique_ptr<RenderContext> context)
-	{
-		// if the type of renderer is already in the list, do not add it again
-		auto type = std::type_index(typeid(*renderer));
-		if (m_rendererMap.find(type) != m_rendererMap.end())
-		{
-			m_logger->info("Renderer {} already exists in RendererManager. Not adding again.", type.name());
-			return;
-		}
-
-		if (!renderer->init())
-		{
-			m_logger->warn("Renderer {} failed to initialize. Not adding to RendererManager.", type.name());
-			return;
-		}
-		m_renderers.push_back(std::move(renderer));
-		m_rendererMap[type] = std::move(context);
-	}
-
 	void RendererManager::init()
 	{
 		SubSystem::init();
 
-		auto sceneRenderContext = std::make_unique<RenderContext>();
-		auto sceneRenderer = std::make_unique<SceneRenderer>(*sceneRenderContext, *m_logger);
-		addRenderer(std::move(sceneRenderer), std::move(sceneRenderContext));
+		// init all renderers
+		m_sceneRenderer = std::make_unique<SceneRenderer>(*m_logger);
+		m_sceneRenderer->init();
+
+		// Initialize OpenGL states
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW);
+
+		createViewport(m_window->getWidth(), m_window->getHeight());
 	}
 
 	void RendererManager::update(double deltaTime)
 	{
 		SubSystem::update(deltaTime);
-		for (auto& renderer : m_renderers)
+		if (m_sceneRenderer)
 		{
-			renderer->update(deltaTime);
+			m_sceneRenderer->update(deltaTime);
 		}
+	}
 
-		// potentially moved in the future
-		for (auto& renderer : m_renderers)
+	void RendererManager::render() const
+	{
+		if (m_sceneRenderer)
 		{
-			renderer->beginFrame();
-
-			auto type = std::type_index(typeid(*renderer));
-			auto contextIt = m_rendererMap.find(type);
-			if (contextIt != m_rendererMap.end())
+			for (const auto& [id, viewport] : m_viewports)
 			{
-				renderer->render();
+				if (viewport)
+				{
+					m_sceneRenderer->render(*viewport);
+				}
 			}
-
-			renderer->endFrame();
 		}
+
+		m_window->swapBuffers();
 	}
 
 	void RendererManager::shutdown()
 	{
 		SubSystem::shutdown();
-		for (auto& renderer : m_renderers)
+		if (m_sceneRenderer)
 		{
-			renderer->shutdown();
+			m_sceneRenderer->shutdown();
+			m_sceneRenderer.reset();
 		}
-		m_renderers.clear();
-		m_rendererMap.clear();
+
+		for (auto& [id, viewport] : m_viewports)
+		{
+			viewport.reset();
+		}
+		m_viewports.clear();
+	}
+
+	uint32_t RendererManager::createViewport(uint32_t width, uint32_t height)
+	{
+		static uint32_t newID = 1;
+		uint32_t id = newID++;
+		m_viewports[id] = std::make_unique<Viewport>(width, height);
+		m_logger->info("Created viewport with ID {} ({}x{})", id, width, height);
+		return id;
+	}
+	void RendererManager::destroyViewport(uint32_t viewportId)
+	{
+		auto it = m_viewports.find(viewportId);
+		if (it != m_viewports.end())
+		{
+			it->second.reset();
+			m_viewports.erase(it);
+		}
+		else
+		{
+			m_logger->warn("Viewport with ID {} not found for destruction.", viewportId);
+		}
+	}
+	Viewport* RendererManager::getViewport(uint32_t viewportId)
+	{
+		auto it = m_viewports.find(viewportId);
+		if (it != m_viewports.end())
+		{
+			return it->second.get();
+		}
+		else
+		{
+			m_logger->warn("Viewport with ID {} not found.", viewportId);
+			return nullptr;
+		}
 	}
 }

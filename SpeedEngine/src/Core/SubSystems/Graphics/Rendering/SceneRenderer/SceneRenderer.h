@@ -6,15 +6,13 @@ namespace SE
     class SceneRenderer : public Renderer
     {
     public:
-		SceneRenderer(RenderContext& context, Logger& logger) : Renderer(context, logger, "SceneRenderer") {};
+		SceneRenderer(Logger& logger) : Renderer(logger, "SceneRenderer") {};
 
         bool init() override;
         void shutdown() override;
         void update(double deltaTime) override;
 
-        void beginFrame() override;
-        void endFrame() override;
-        void render() const override;
+        void render(Viewport& viewport) const override;
 
     private:
     };

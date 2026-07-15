@@ -43,6 +43,11 @@ namespace SE
 		glfwTerminate();
 	}
 
+	void Window::swapBuffers() const
+	{
+		glfwSwapBuffers(m_window);
+	}
+
 	bool Window::_initGLFW()
 	{
 		// Set GLFW window hints for OpenGL version and profile
