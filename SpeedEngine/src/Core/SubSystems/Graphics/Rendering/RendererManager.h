@@ -1,9 +1,12 @@
 #pragma once
-#include <typeindex>
-
 #include "../../SubSystem.h"
+
+#include "../Window.h"
+
 #include "Renderer.h"
-#include "RenderContext.h"
+#include "SceneRenderer/SceneRenderer.h"
+
+#include "Viewport.h"
 
 namespace SE
 {
@@ -17,57 +20,45 @@ namespace SE
 		const Window* getWindow() const { return m_window; }
 		void setWindow(const Window& window) { m_window = &window; }
 
-		void addRenderer(std::unique_ptr<Renderer> renderer, std::unique_ptr<RenderContext> context);
-
 		template <typename T> requires std::derived_from<T, Renderer>
         T* getRenderer()
         {
-			auto it = std::ranges::find_if(m_renderers, [&](const std::unique_ptr<Renderer>& renderer) {
-				return dynamic_cast<T*>(renderer.get()) != nullptr;
-				});
-			if (it != m_renderers.end())
-				return static_cast<T*>(it->get());
-			return nullptr;
+            if (m_sceneRenderer && dynamic_cast<T*>(m_sceneRenderer.get()))
+            {
+                return static_cast<T*>(m_sceneRenderer.get());
+            }
+            return nullptr;
         }
 
 		template <typename T> requires std::derived_from<T, Renderer>
 		void removeRenderer()
 		{
-			auto it = std::ranges::find_if(m_renderers, [&](const std::unique_ptr<Renderer>& renderer) {
-				return dynamic_cast<T*>(renderer.get()) != nullptr;
-				});
-			if (it != m_renderers.end())
+			if (m_sceneRenderer && dynamic_cast<T*>(m_sceneRenderer.get()))
 			{
-				auto type = std::type_index(typeid(**it));
-				m_rendererMap.erase(type);
-				m_renderers.erase(it);
-
-			}
-
-		}
-
-		template <typename T> requires std::derived_from<T, Renderer>
-		void modifyRendererContext(std::unique_ptr<RenderContext> newContext)
-		{
-			auto it = std::ranges::find_if(m_renderers, [&](const std::unique_ptr<Renderer>& renderer) {
-				return dynamic_cast<T*>(renderer.get()) != nullptr;
-				});
-			if (it != m_renderers.end())
-			{
-				auto type = std::type_index(typeid(**it));
-				m_rendererMap[type] = std::move(newContext);
+				m_sceneRenderer->shutdown();
+				m_sceneRenderer.reset();
 			}
 		}
+
+		// viewport management
+		uint32_t createViewport(uint32_t width, uint32_t height);
+		void destroyViewport(uint32_t viewportId);
+		Viewport* getViewport(uint32_t viewportId);
 
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
 
+		void render() const;
+
     private:
 		const Window* m_window;
 
-		std::vector<std::unique_ptr<Renderer>> m_renderers;
-		std::unordered_map<std::type_index, std::unique_ptr<RenderContext>> m_rendererMap;
+		std::unique_ptr<SceneRenderer> m_sceneRenderer;
+		// subsequent renderers for parts such as ui and debug views
+		// ...
+
+		std::unordered_map<uint32_t, std::unique_ptr<Viewport>> m_viewports;
     };
 }
 

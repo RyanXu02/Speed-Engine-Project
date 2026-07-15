@@ -3,25 +3,22 @@
 
 namespace SE
 {
-    class RenderContext;
+    class Viewport;
 
     class Renderer
     {
     public:
-		Renderer(RenderContext& context, Logger& logger, std::string_view rendererName) : m_context(&context), m_logger(logger, fmt::format("Renderer: {}", rendererName)) {}
+		Renderer(Logger& logger, std::string_view rendererName) : m_logger(logger, fmt::format("Renderer: {}", rendererName)) {}
         virtual ~Renderer() {};
 
         virtual bool init() = 0;
         virtual void shutdown() = 0;
         virtual void update(double deltaTime) = 0;
 
-        virtual void beginFrame() = 0;
-        virtual void endFrame() = 0;
-        virtual void render() const = 0;
+        virtual void render(Viewport& viewport) const = 0;
 
     protected:
 		LoggerProxy m_logger;
-        RenderContext* m_context;
     };
 }
 

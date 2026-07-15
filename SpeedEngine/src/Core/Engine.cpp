@@ -30,7 +30,7 @@ namespace SE
 		// push back subsystems in order of initialization
 		m_subSystems.push_back(std::make_unique<EventSystem>());
 		m_subSystems.push_back(std::make_unique<ResourceManager>());
-		m_subSystems.push_back(std::make_unique<Window>(128, 72, "Speed Engine")); //has to be after ResourceManager
+		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine")); //has to be after ResourceManager
 		m_subSystems.push_back(std::make_unique<RendererManager>(*_getSubSystem<Window>())); // has to be after Window
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
@@ -58,6 +58,10 @@ namespace SE
 			{
 				subSystem->update(m_deltaTime);
 			}
+
+			// render
+			auto* rendererManager = _getSubSystem<RendererManager>();
+			rendererManager->render();
 		}
 	}
 	void Engine::stop()

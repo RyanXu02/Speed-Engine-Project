@@ -24,6 +24,8 @@ namespace SE
 		void update(double deltaTime) override;
 		void shutdown() override;
 
+		void swapBuffers() const;
+
 		GLFWwindow* getWindow() const { return m_window; }
 
 		unsigned int getWidth() const { return m_windowWidth; }
