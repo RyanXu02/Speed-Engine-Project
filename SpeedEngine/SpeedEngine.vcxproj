@@ -155,8 +155,9 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\ImGuiSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
@@ -200,10 +201,12 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\ImGuiSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
@@ -232,6 +235,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClInclude Include="ThirdParty\include\imgui\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\pch.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
