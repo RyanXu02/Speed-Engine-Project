@@ -11,7 +11,7 @@ namespace SE
 		Renderer(Logger& logger, std::string_view rendererName) : m_logger(logger, fmt::format("Renderer: {}", rendererName)) {}
         virtual ~Renderer() {};
 
-        virtual bool init() = 0;
+        virtual void init() = 0;
         virtual void shutdown() = 0;
         virtual void update(double deltaTime) = 0;
 
