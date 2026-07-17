@@ -66,7 +66,7 @@ namespace SE
 	}
 	void Engine::stop()
 	{
-		for (auto& subSystem : m_subSystems)
+		for (auto& subSystem : m_subSystems | std::views::reverse)
 		{
 			subSystem->shutdown();
 		}

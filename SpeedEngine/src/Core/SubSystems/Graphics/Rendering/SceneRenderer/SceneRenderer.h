@@ -8,7 +8,7 @@ namespace SE
     public:
 		SceneRenderer(Logger& logger) : Renderer(logger, "SceneRenderer") {};
 
-        bool init() override;
+        void init() override;
         void shutdown() override;
         void update(double deltaTime) override;
 

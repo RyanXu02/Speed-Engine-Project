@@ -14,6 +14,9 @@ namespace SE
 		// init all renderers
 		m_sceneRenderer = std::make_unique<SceneRenderer>(*m_logger);
 		m_sceneRenderer->init();
+		m_imguiRenderer = std::make_unique<ImGuiRenderer>(*m_logger, *m_window);
+		m_imguiRenderer->init();
+		//...
 
 		// Initialize OpenGL states
 		glEnable(GL_DEPTH_TEST);
@@ -27,24 +30,26 @@ namespace SE
 	void RendererManager::update(double deltaTime)
 	{
 		SubSystem::update(deltaTime);
-		if (m_sceneRenderer)
-		{
-			m_sceneRenderer->update(deltaTime);
-		}
+		if (m_sceneRenderer) m_sceneRenderer->update(deltaTime);
+		if (m_imguiRenderer) m_imguiRenderer->update(deltaTime);
+		// ...
 	}
 
 	void RendererManager::render() const
 	{
-		if (m_sceneRenderer)
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		for (const auto& [id, viewport] : m_viewports)
 		{
-			for (const auto& [id, viewport] : m_viewports)
-			{
-				if (viewport)
-				{
-					m_sceneRenderer->render(*viewport);
-				}
-			}
+			if (!viewport) continue;
+			
+			m_sceneRenderer->render(*viewport);
+			m_imguiRenderer->render(*viewport);
+			// ...
 		}
+		
 
 		m_window->swapBuffers();
 	}
@@ -57,6 +62,12 @@ namespace SE
 			m_sceneRenderer->shutdown();
 			m_sceneRenderer.reset();
 		}
+		if (m_imguiRenderer)
+		{
+			m_imguiRenderer->shutdown();
+			m_imguiRenderer.reset();
+		}
+		// ...
 
 		for (auto& [id, viewport] : m_viewports)
 		{

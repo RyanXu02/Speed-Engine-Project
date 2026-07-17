@@ -9,10 +9,9 @@
 
 namespace SE
 {
-	bool SceneRenderer::init()
+	void SceneRenderer::init()
 	{
 		m_logger.info("Initializing");
-		return true;
 	}
 	void SceneRenderer::shutdown()
 	{

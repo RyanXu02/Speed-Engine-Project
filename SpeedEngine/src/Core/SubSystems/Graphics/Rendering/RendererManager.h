@@ -5,6 +5,7 @@
 
 #include "Renderer.h"
 #include "SceneRenderer/SceneRenderer.h"
+#include "ImGuiRenderer/ImGuiRenderer.h"
 
 #include "Viewport.h"
 
@@ -14,11 +15,11 @@ namespace SE
     {
     public:
 		RendererManager() = delete;
-		RendererManager(const Window& window) : SubSystem("RendererManager"), m_window(&window) {};
+		RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window) {};
 		~RendererManager() {};
 
 		const Window* getWindow() const { return m_window; }
-		void setWindow(const Window& window) { m_window = &window; }
+		void setWindow(Window& window) { m_window = &window; }
 
 		template <typename T> requires std::derived_from<T, Renderer>
         T* getRenderer()
@@ -55,6 +56,7 @@ namespace SE
 		const Window* m_window;
 
 		std::unique_ptr<SceneRenderer> m_sceneRenderer;
+		std::unique_ptr<ImGuiRenderer> m_imguiRenderer;
 		// subsequent renderers for parts such as ui and debug views
 		// ...
 
