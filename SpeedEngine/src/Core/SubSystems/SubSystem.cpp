@@ -24,7 +24,7 @@ namespace SE
 
 	void SubSystem::update(double deltaTime)
 	{
-		//m_logger->verbose("{} updating. Delta time: {}", m_name, deltaTime);
+		// m_logger->verbose("{} updating. Delta time: {}", m_name, deltaTime);
 		if (!isActive) return;
 	}
 

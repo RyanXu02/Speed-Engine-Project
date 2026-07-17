@@ -1,0 +1,35 @@
+#include "pch.h"
+#include "MainWidget.h"
+
+#include <imgui.h>
+
+namespace SE
+{
+	void MainWidget::render()
+	{
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "Ctrl+Z")) {}
+				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {} // Disabled item
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "Ctrl+X")) {}
+				if (ImGui::MenuItem("Copy", "Ctrl+C")) {}
+				if (ImGui::MenuItem("Paste", "Ctrl+V")) {}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
+	}
+	void MainWidget::shutdown()
+	{
+		_setMessage("Shutting down MainWidget");
+	}
+}
