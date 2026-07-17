@@ -155,6 +155,11 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
@@ -197,8 +202,17 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\TestWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
     <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
@@ -225,6 +239,9 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClInclude Include="ThirdParty\include\imgui\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\pch.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\TestWidget.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
