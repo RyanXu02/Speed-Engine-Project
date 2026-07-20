@@ -63,4 +63,17 @@ namespace SE
 		m_stringCache[filePath.data()] = contents;
 		return contents;
 	}
+
+	Resource* ResourceManager::getResource(uint32_t id) {
+		auto it = m_resourceTypes.find(id);
+		if (it != m_resourceTypes.end()) {
+			if (it->second == ResourceType::Shader) {
+				return _getManager<ShaderManager>()->getShader(id);
+			}
+			else if (it->second == ResourceType::Material) {
+				return _getManager<MaterialManager>()->getMaterial(id);
+			}
+		}
+		return nullptr;
+	}
 }
