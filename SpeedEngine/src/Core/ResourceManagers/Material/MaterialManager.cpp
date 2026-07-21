@@ -48,4 +48,12 @@ namespace SE
 
 		return it->second.get();
 	}
+
+	bool MaterialManager::removeMaterial(uint32_t materialId) {
+		auto it = m_materials.find(materialId);
+		if (it == m_materials.end()) return false;
+
+		m_materials.erase(materialId);
+		return true;
+	}
 }

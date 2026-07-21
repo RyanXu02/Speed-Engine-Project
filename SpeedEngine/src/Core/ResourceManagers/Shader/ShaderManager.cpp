@@ -107,4 +107,12 @@ namespace SE
 		
 		return it->second.get();
 	}
+
+	bool ShaderManager::removeShader(uint32_t shaderId) {
+		auto it = m_shaders.find(shaderId);
+		if (it == m_shaders.end()) return false;
+
+		m_shaders.erase(shaderId);
+		return true;
+	}
 }

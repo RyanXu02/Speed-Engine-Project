@@ -18,6 +18,11 @@ namespace SE
 			std::string_view materialName);
 
 		Material* getMaterial(uint32_t materialId);
+
+		//@brief removes a material from the manager given an id
+		//@param materialId the id of material to remove
+		//@returns true if successfully removed, false if not
+		bool removeMaterial(uint32_t materialId);
 	private:
 		//id -> material object
 		std::unordered_map<uint32_t, std::unique_ptr<Material>> m_materials;

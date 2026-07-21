@@ -15,6 +15,7 @@ namespace SE
 	private:
 		std::unordered_map<uint32_t, ResourceType> m_resourceCache;
 		EventSubscription m_resourceChanged;
+
 	};
 
 }

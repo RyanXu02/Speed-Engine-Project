@@ -87,21 +87,15 @@ namespace SE
 		//@returns a the resource as a Resource* if it exists, nullptr if not
 		Resource* getResource(uint32_t id);
 
+		//@brief gets the resource type map as a copy
 		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const {
 			return m_resourceTypes;
 		}
-
-
-		/*void getAllResources() {
-			go thru m_resourcesTypes ids
-		}
-		click() {
-			switch (it->second) {
-			case RT::shader:
-				openpanel(dynamic_cast<Shader>(getResource(id)))
-				openpanel(getResource<Shader>(id))
-			}
-		}*/
+		
+		//@brief removes a resource given an id
+		//@param id the id of the resource to remove
+		//@returns true if successfully removed, false if not
+		bool removeResource(uint32_t id);
 
 
 	private:
@@ -138,14 +132,19 @@ namespace SE
 		{
 			if constexpr (Type == ResourceType::Shader)
 			{
-				
 				uint32_t id = _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
+				if (id != 0) {
+					m_resourceTypes.insert({ id, ResourceType::Shader });
+				}
 				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
 			else if constexpr (Type == ResourceType::Material)
 			{
 				uint32_t id = _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
+				if (id != 0) {
+					m_resourceTypes.insert({ id, ResourceType::Material });
+				}
 				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
