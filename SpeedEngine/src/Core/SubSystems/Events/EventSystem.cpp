@@ -70,6 +70,7 @@ namespace SE
 			{
 				eventCallbackWrapper.callback(event);
 				m_logger->debug("Fired event of type: " + event.getName() + " to callback with id: " + std::to_string(eventCallbackWrapper.id));
+				m_logger->debug("Event info: {}", event.getDataAsString());
 				if (event.handled) break;
 			}
 		}

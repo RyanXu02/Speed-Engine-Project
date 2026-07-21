@@ -10,6 +10,7 @@
 #include "../../../ImGui/Widget.h"
 #include "../../../ImGui/Widgets/TestWidget.h"
 #include "../../../ImGui/Widgets/MainWidget.h"
+#include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
 
 namespace SE
 {
@@ -37,6 +38,7 @@ namespace SE
 	{
 		createWidget<MainWidget>();
 		createWidget<TestWidget>();
+		createWidget<ResourceBrowserWidget>();
 		// ...
 	}
 

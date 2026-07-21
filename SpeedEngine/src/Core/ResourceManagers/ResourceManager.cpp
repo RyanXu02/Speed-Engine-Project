@@ -76,4 +76,22 @@ namespace SE
 		}
 		return nullptr;
 	}
+
+	bool ResourceManager::removeResource(uint32_t id) {
+		bool removed = false;
+		auto it = m_resourceTypes.find(id);
+		if (it == m_resourceTypes.end()) return false;
+		if (it->second == ResourceType::Shader) {
+			removed = _getManager<ShaderManager>()->removeShader(id);
+			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			return removed;
+		}
+		else if (it->second == ResourceType::Material) {
+			removed = _getManager<MaterialManager>()->removeMaterial(id);
+			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			return removed;
+		}
+		return false;
+		//.....
+	}
 }

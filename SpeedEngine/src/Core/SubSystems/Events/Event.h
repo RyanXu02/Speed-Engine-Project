@@ -21,6 +21,7 @@ namespace SE
 		virtual ~Event() = default;
 		virtual EventType getEventType() const = 0;
 		virtual std::string getName() const = 0;
+		virtual std::string getDataAsString() const = 0;
 
 	};
 
@@ -28,6 +29,7 @@ namespace SE
 	{
 		EventType getEventType() const override { return EventType::WindowClose; }
 		std::string getName() const override { return "WindowClose"; }
+		std::string getDataAsString() const override { return "no data"; }
 	};
 
 	class ResourceChanged : public Event
@@ -41,6 +43,10 @@ namespace SE
 
 		EventType getEventType() const override { return EventType::ResourceChanged; }
 		std::string getName() const override { return "ResourceChanged"; }
+		std::string getDataAsString() const override { 
+			//return std::format("id {}, type {}, adding = {}",id, type, adding);
+			return "data but not yet";
+		}
 	};
 }
 
