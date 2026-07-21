@@ -7,7 +7,7 @@ namespace SE
 {
 	void TestWidget::render()
 	{
-		_setMessage("Rendering TestWidget");
+		_setStatus("Rendering TestWidget");
 
         ImGuiWindowFlags window_flags = 0; // Default flags allow docking
         ImGui::Begin("TestWidget", nullptr, window_flags);
@@ -37,6 +37,6 @@ namespace SE
 	
 	void TestWidget::shutdown()
 	{
-		_setMessage("Shutting down TestWidget");
+		_setStatus("Shutting down TestWidget");
 	}
 }

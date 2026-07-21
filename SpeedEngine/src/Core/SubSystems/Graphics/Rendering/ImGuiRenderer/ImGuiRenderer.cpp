@@ -37,7 +37,6 @@ namespace SE
 	void ImGuiRenderer::initWidgets()
 	{
 		createWidget<MainWidget>();
-		createWidget<TestWidget>();
 		createWidget<ResourceBrowserWidget>();
 		// ...
 	}
