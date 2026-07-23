@@ -31,7 +31,13 @@ namespace SE
 		m_subSystems.push_back(std::make_unique<EventSystem>());
 		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine")); //has to be BEFORE ResourceManager
 		m_subSystems.push_back(std::make_unique<ResourceManager>());
-		m_subSystems.push_back(std::make_unique<RendererManager>(*_getSubSystem<Window>())); // has to be after Window
+
+		//create RendererManager
+		std::unique_ptr<RendererManager> rendermgr = std::make_unique<RendererManager>(*_getSubSystem<Window>());
+		RendererManager::InitInstance(rendermgr.get());
+		//m_subSystems.push_back(std::make_unique<RendererManager>(*_getSubSystem<Window>())); // has to be after Window
+		m_subSystems.push_back(std::move(rendermgr));
+
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
 		{

@@ -18,6 +18,23 @@ namespace SE
 		RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window) {};
 		~RendererManager() {};
 
+		//@brief Initialize the static instance
+		//@param instance Pointer to the RendererManager instance
+		static void InitInstance(RendererManager* instance)
+		{
+			if (!s_instance)
+			{
+				s_instance = instance;
+			}
+		}
+
+		//@brief gets static instance (meyers singleton)
+		//@returns reference to instance
+		static RendererManager& Instance()
+		{
+			return *s_instance;
+		}
+
 		const Window* getWindow() const { return m_window; }
 		void setWindow(Window& window) { m_window = &window; }
 
@@ -42,7 +59,7 @@ namespace SE
 		}
 
 		// viewport management
-		uint32_t createViewport(uint32_t width, uint32_t height);
+		uint32_t createViewport(uint32_t width, uint32_t height, Renderer* renderer);
 		void destroyViewport(uint32_t viewportId);
 		Viewport* getViewport(uint32_t viewportId);
 
@@ -53,6 +70,7 @@ namespace SE
 		void render() const;
 
     private:
+		static RendererManager* s_instance;
 		const Window* m_window;
 
 		std::unique_ptr<SceneRenderer> m_sceneRenderer;
