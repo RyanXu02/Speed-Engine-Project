@@ -105,10 +105,16 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\TestWidget.cpp">
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -212,10 +218,16 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\TestWidget.h">
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

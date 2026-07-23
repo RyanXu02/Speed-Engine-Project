@@ -1,16 +1,16 @@
 #include "pch.h"
-#include "TestWidget.h"
+#include "ConsoleWidget.h"
 
 #include <imgui.h>
 
 namespace SE
 {
-	void TestWidget::render()
+	void ConsoleWidget::render()
 	{
-		_setStatus("Rendering TestWidget");
+		_setStatus("Rendering ConsoleWidget");
 
         ImGuiWindowFlags window_flags = 0; // Default flags allow docking
-        ImGui::Begin("TestWidget", nullptr, window_flags);
+        ImGui::Begin("ConsoleWidget", nullptr, window_flags);
 
         if (ImGui::BeginTable("table1", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
         {
@@ -35,8 +35,8 @@ namespace SE
         ImGui::End();
 	}
 	
-	void TestWidget::shutdown()
+	void ConsoleWidget::shutdown()
 	{
-		_setStatus("Shutting down TestWidget");
+		_setStatus("Shutting down ConsoleWidget");
 	}
 }
