@@ -19,7 +19,7 @@
 namespace SE
 {
 	Engine::Engine()
-		: m_isRunning(false), m_deltaTime(0.0), m_windowCloseEvent()
+		: m_isRunning(false), m_deltaTime(0.0), m_currentTime(0.0), m_lastTime(0.0), m_windowCloseEvent()
 	{
 	}
 	Engine::~Engine()
@@ -64,15 +64,27 @@ namespace SE
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
 		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(id, texlist, "testMaterial");
 		//ResourceManager::Instance().removeResource(matid);
+		
+		auto* window = _getSubSystem<Window>();
+		auto* rendererManager = _getSubSystem<RendererManager>();
+		
+		double lastTime = window->getCurrentTime();
+		int frameCounter = 0;
+		double fpsTimer = 0.0;
+		double currentFPS = 0.0;
+		const double targetFrameTime = 1.0 / window->getFPS();
 		while (m_isRunning)
 		{
+			m_currentTime = window->getCurrentTime();
+			m_deltaTime = m_currentTime - m_lastTime;
+			m_lastTime = m_currentTime;
+
 			for (auto& subSystem : m_subSystems)
 			{
 				subSystem->update(m_deltaTime);
 			}
 
 			// render
-			auto* rendererManager = _getSubSystem<RendererManager>();
 			rendererManager->render();
 		}
 	}
