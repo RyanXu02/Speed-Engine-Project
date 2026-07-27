@@ -18,7 +18,10 @@ namespace SE
 
 	private:
 		bool m_isRunning;
+
 		double m_deltaTime;
+		double m_currentTime;
+		double m_lastTime;
 
 		template <typename T> requires std::derived_from<T, SubSystem>
 		T* _getSubSystem()
