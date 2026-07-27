@@ -63,4 +63,35 @@ namespace SE
 		m_stringCache[filePath.data()] = contents;
 		return contents;
 	}
+
+	Resource* ResourceManager::getResource(uint32_t id) {
+		auto it = m_resourceTypes.find(id);
+		if (it != m_resourceTypes.end()) {
+			if (it->second == ResourceType::Shader) {
+				return _getManager<ShaderManager>()->getShader(id);
+			}
+			else if (it->second == ResourceType::Material) {
+				return _getManager<MaterialManager>()->getMaterial(id);
+			}
+		}
+		return nullptr;
+	}
+
+	bool ResourceManager::removeResource(uint32_t id) {
+		bool removed = false;
+		auto it = m_resourceTypes.find(id);
+		if (it == m_resourceTypes.end()) return false;
+		if (it->second == ResourceType::Shader) {
+			removed = _getManager<ShaderManager>()->removeShader(id);
+			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			return removed;
+		}
+		else if (it->second == ResourceType::Material) {
+			removed = _getManager<MaterialManager>()->removeMaterial(id);
+			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			return removed;
+		}
+		return false;
+		//.....
+	}
 }

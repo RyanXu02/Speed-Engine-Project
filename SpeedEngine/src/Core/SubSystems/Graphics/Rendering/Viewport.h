@@ -1,6 +1,7 @@
 #pragma once
 #include "glm/glm.hpp"
 #include "FBO.h"
+#include "../Rendering/Renderer.h"
 
 namespace SE
 {
@@ -22,17 +23,25 @@ namespace SE
 	class Viewport
 	{
     public:
-        Viewport(uint32_t width, uint32_t height)
+        Viewport(uint32_t width, uint32_t height, Renderer* renderer)
             : m_FBO(std::make_unique<FBO>(width, height))
             , m_cameraFrustum()
             , m_isActive(true)
+			, m_assignedRenderer(renderer)
         {}
 
         FBO& getFBO() { return *m_FBO; }
 		CameraFrustum& getCameraFrustum() { return m_cameraFrustum; }
+		bool isAssignedTo(Renderer* rndr) const {
+			return rndr == m_assignedRenderer;
+		}
 
     private:
+		const Renderer* const m_assignedRenderer;
         std::unique_ptr<FBO> m_FBO;  // Viewport owns FBO
+		//MIGHT NEED MULTIPLE FBOS IN THE FUTURE
+		//ex: vector of fbos, with enum {SCENE, DEBUG, UI} and index into vector like
+		//vec[SCENE] = scene fbo
 		CameraFrustum m_cameraFrustum;
         bool m_isActive;
 	};

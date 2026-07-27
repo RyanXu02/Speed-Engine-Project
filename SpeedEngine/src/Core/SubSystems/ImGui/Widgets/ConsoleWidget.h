@@ -3,10 +3,10 @@
 
 namespace SE
 {
-    class TestWidget : public Widget
+    class ConsoleWidget : public Widget
     {
     public:
-		TestWidget() : Widget("TestWidget") {};
+        ConsoleWidget() : Widget("ConsoleWidget") {};
 		void render() override;
 		void shutdown() override;
     private:

@@ -8,8 +8,10 @@
 #include "../../Window.h"
 
 #include "../../../ImGui/Widget.h"
-#include "../../../ImGui/Widgets/TestWidget.h"
+#include "../../../ImGui/Widgets/ConsoleWidget.h"
 #include "../../../ImGui/Widgets/MainWidget.h"
+#include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
+#include "../../../ImGui/Widgets/ScenePreviewWidget.h"
 
 namespace SE
 {
@@ -36,7 +38,9 @@ namespace SE
 	void ImGuiRenderer::initWidgets()
 	{
 		createWidget<MainWidget>();
-		createWidget<TestWidget>();
+		createWidget<ResourceBrowserWidget>();
+		//createWidget<ConsoleWidget>();
+		createWidget<ScenePreviewWidget>();
 		// ...
 	}
 
@@ -45,7 +49,7 @@ namespace SE
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		// ImGui::ShowDemoWindow(); // Show demo window! :)
+		ImGui::ShowDemoWindow(); // Show demo window! :)
 	}
 
 	void ImGuiRenderer::render(Viewport& viewport) const
@@ -57,7 +61,9 @@ namespace SE
 				widget->render();
 			}
 		}
+	}
 
+	void ImGuiRenderer::finalizeFrame() const {
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}

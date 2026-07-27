@@ -26,10 +26,6 @@ namespace SE
 	{
 		SubSystem::update(deltaTime);
 
-		double currentTime = glfwGetTime();
-		m_deltaTime = currentTime - m_lastFrameTime;
-		m_lastFrameTime = currentTime;
-
 		glfwPollEvents();
 	}
 
@@ -106,5 +102,10 @@ namespace SE
 		}
 
 		return true;
+	}
+
+	double Window::getCurrentTime() const
+	{
+		return glfwGetTime();
 	}
 }

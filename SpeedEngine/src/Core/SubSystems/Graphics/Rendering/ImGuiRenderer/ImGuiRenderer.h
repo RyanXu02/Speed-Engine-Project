@@ -47,6 +47,8 @@ namespace SE
 			}
 		}
 
+		void finalizeFrame() const;
+
 	private:
 		std::unordered_map<uint32_t, std::unique_ptr<Widget>> m_widgets;
 
@@ -54,6 +56,8 @@ namespace SE
 		uint32_t _assignID() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 
 		const Window* m_window{ nullptr };
+
+
 	};
 }
 

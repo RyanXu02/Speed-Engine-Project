@@ -7,6 +7,8 @@
 
 namespace SE
 {
+	RendererManager* RendererManager::s_instance = nullptr;
+
 	void RendererManager::init()
 	{
 		SubSystem::init();
@@ -24,7 +26,10 @@ namespace SE
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
 
-		createViewport(m_window->getWidth(), m_window->getHeight());
+		//scene viewport
+		//createViewport(750, 750, m_sceneRenderer.get()); //TEMP DIMENSIONS
+		//whole window viewport, only imgui uses it (kind of lol)
+		createViewport(m_window->getWidth(), m_window->getHeight(), m_imguiRenderer.get());
 	}
 
 	void RendererManager::update(double deltaTime)
@@ -44,12 +49,14 @@ namespace SE
 		for (const auto& [id, viewport] : m_viewports)
 		{
 			if (!viewport) continue;
-			
-			m_sceneRenderer->render(*viewport);
-			m_imguiRenderer->render(*viewport);
+			//if (viewport->isAssignedTo(m_sceneRenderer.get()))
+				m_sceneRenderer->render(*viewport);
+			//else if (viewport->isAssignedTo(m_imguiRenderer.get()))
+				m_imguiRenderer->render(*viewport);
 			// ...
 		}
 		
+		m_imguiRenderer->finalizeFrame();
 
 		m_window->swapBuffers();
 	}
@@ -76,11 +83,12 @@ namespace SE
 		m_viewports.clear();
 	}
 
-	uint32_t RendererManager::createViewport(uint32_t width, uint32_t height)
+	uint32_t RendererManager::createViewport(uint32_t width, uint32_t height, Renderer* renderer)
 	{
 		static uint32_t newID = 1;
 		uint32_t id = newID++;
-		m_viewports[id] = std::make_unique<Viewport>(width, height);
+		m_viewports[id] = std::make_unique<Viewport>(width, height, renderer);
+		//m_logger->info("Created viewport with ID {} ({}x{}) assigned to {}", id, width, height, fmt::ptr(renderer));
 		m_logger->info("Created viewport with ID {} ({}x{})", id, width, height);
 		return id;
 	}
