@@ -6,6 +6,7 @@
 
 #include "Shader/ShaderManager.h"
 #include "Material/MaterialManager.h"
+#include "../SubSystems/Events/EventSystem.h"
 
 namespace SE
 {
@@ -15,7 +16,7 @@ namespace SE
 	public:
 
 		ResourceManager() : SubSystem("ResourceManager") {}
-		
+
 		//@brief gets static instance (meyers singleton)
 		//@returns reference to instance
 		static ResourceManager& Instance()
@@ -41,7 +42,7 @@ namespace SE
 		//@param filePath file to open and retrieve contents
 		//@returns filePath's entire contents
 		std::string getString(std::string_view filePath);
-		
+
 		//@brief adds a resource to the Resource Manager
 		//@param type the type of resource being added
 		//@param args arguments to pass for type of resource being added (filepaths, names, etc)
@@ -81,6 +82,21 @@ namespace SE
 			return nullptr;
 		}
 
+		//@brief retrieves a resource given an id
+		//@param id the id of a resource to retrieve
+		//@returns a the resource as a Resource* if it exists, nullptr if not
+		Resource* getResource(uint32_t id);
+
+		//@brief gets the resource type map as a copy
+		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const {
+			return m_resourceTypes;
+		}
+		
+		//@brief removes a resource given an id
+		//@param id the id of the resource to remove
+		//@returns true if successfully removed, false if not
+		bool removeResource(uint32_t id);
+
 
 	private:
 		// static instance for public
@@ -116,11 +132,21 @@ namespace SE
 		{
 			if constexpr (Type == ResourceType::Shader)
 			{
-				return _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
+				uint32_t id = _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
+				if (id != 0) {
+					m_resourceTypes.insert({ id, ResourceType::Shader });
+				}
+				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
+				return id;
 			}
 			else if constexpr (Type == ResourceType::Material)
 			{
-				return _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
+				uint32_t id = _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
+				if (id != 0) {
+					m_resourceTypes.insert({ id, ResourceType::Material });
+				}
+				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
+				return id;
 			}
 			else
 			{

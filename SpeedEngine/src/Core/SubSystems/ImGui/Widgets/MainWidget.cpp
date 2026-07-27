@@ -30,6 +30,6 @@ namespace SE
 	}
 	void MainWidget::shutdown()
 	{
-		_setMessage("Shutting down MainWidget");
+		_setStatus("Shutting down MainWidget");
 	}
 }

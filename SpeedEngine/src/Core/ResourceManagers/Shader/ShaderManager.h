@@ -28,6 +28,11 @@ namespace SE
         //@param shaderId the id of shader to retrieve
         //@returns pointer to shader obj, nullptr if not found
         Shader* getShader(uint32_t shaderId);
+
+        //@brief removes a shader from manager given an id
+        //@param shaderId the id of shader to remove
+        //@returns true if successfully removed, false if not
+        bool removeShader(uint32_t shaderId);
     private:
 		// id -> ShaderProgram
         std::unordered_map<uint32_t, std::unique_ptr<Shader>> m_shaders;
