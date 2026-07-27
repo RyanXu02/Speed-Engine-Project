@@ -155,6 +155,10 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Scene\Entity\Component\Component.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
+    <ClCompile Include="src\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
@@ -209,6 +213,10 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Scene\Entity\Component\Component.h" />
+    <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
+    <ClInclude Include="src\Core\Scene\Scene.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
