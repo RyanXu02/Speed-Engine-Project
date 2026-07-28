@@ -12,6 +12,7 @@
 #include "../../../ImGui/Widgets/MainWidget.h"
 #include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
 #include "../../../ImGui/Widgets/ScenePreviewWidget.h"
+#include "../../../ImGui/Widgets/SceneInfoWidget.h"
 
 namespace SE
 {
@@ -22,9 +23,9 @@ namespace SE
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// IF using Docking Branch
 
 		// Setup Platform/Renderer backends
 		ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
@@ -41,6 +42,7 @@ namespace SE
 		createWidget<ResourceBrowserWidget>();
 		//createWidget<ConsoleWidget>();
 		createWidget<ScenePreviewWidget>();
+		createWidget<SceneInfoWidget>();
 		// ...
 	}
 

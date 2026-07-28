@@ -97,7 +97,7 @@ namespace SE
 
 		ImGui::PushID(id);
 		ImGui::PushStyleColor(ImGuiCol_Button, bgColor);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 
 		// Draw button square with ID as placeholder content
 		char label[32];

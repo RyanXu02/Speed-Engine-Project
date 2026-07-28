@@ -9,7 +9,8 @@ namespace SE
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
-		ResourceChanged
+		ResourceChanged, SceneChanged,
+		ActiveSceneModified
 	};
 
 	//BASE CLASS
@@ -29,7 +30,7 @@ namespace SE
 	{
 		EventType getEventType() const override { return EventType::WindowClose; }
 		std::string getName() const override { return "WindowClose"; }
-		std::string getDataAsString() const override { return "no data"; }
+		std::string getDataAsString() const override { return ""; }
 	};
 
 	class ResourceChanged : public Event
@@ -45,7 +46,35 @@ namespace SE
 		std::string getName() const override { return "ResourceChanged"; }
 		std::string getDataAsString() const override { 
 			//return std::format("id {}, type {}, adding = {}",id, type, adding);
-			return "data but not yet";
+			return "";
+		}
+	};
+
+	class SceneChanged : public Event
+	{
+	public:
+		std::string name;
+
+		SceneChanged(const std::string& p_name) : name(p_name) {}
+
+		EventType getEventType() const override { return EventType::SceneChanged; }
+		std::string getName() const override { return "SceneChanged"; }
+		std::string getDataAsString() const override { 
+			return std::format("changing scene to {}", name);
+		}
+	};
+
+	class ActiveSceneModified : public Event
+	{
+	public:
+		bool adding;
+		uint32_t id;
+		std::string name;
+		ActiveSceneModified(bool isAdding, uint32_t id, const std::string& name) : adding(isAdding), id(id), name(name) {}
+		EventType getEventType() const override { return EventType::ActiveSceneModified; }
+		std::string getName() const override { return "ActiveSceneModified"; }
+		std::string getDataAsString() const override {
+			return std::format("adding {}, id {}, name {}", adding, id, name);
 		}
 	};
 }

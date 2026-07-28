@@ -155,6 +155,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\Component.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
@@ -213,6 +214,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Component.h" />
     <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h" />
     <ClInclude Include="src\Core\Scene\Entity\Entity.h" />

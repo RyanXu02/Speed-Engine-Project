@@ -17,7 +17,7 @@ namespace SE
 		
 		const std::string& getName() const { return m_name; }
 
-		std::vector<std::unique_ptr<Entity>>& getEntities() { return m_entities; }
+		std::unordered_map<uint32_t, std::string> getEntityList();
 
 		void addEntity(std::unique_ptr<Entity> entity);
 
@@ -27,7 +27,12 @@ namespace SE
 	private:
 		LoggerProxy m_logger;
 		std::string m_name;
+
 		std::vector<std::unique_ptr<Entity>> m_entities;
+		std::vector<std::unique_ptr<Entity>> m_entitiesToAdd;
+
+		bool m_isInitialized{ false };
+		bool m_isUpdating{ false };
 	};
 }
 
