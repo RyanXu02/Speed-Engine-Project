@@ -132,6 +132,9 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThirdParty\pch.h">
@@ -258,6 +261,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

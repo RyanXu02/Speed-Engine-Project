@@ -18,6 +18,7 @@ namespace SE
 		uint32_t getInstanceId() const { return m_instanceId; }
 
 		const std::string& getName() const { return m_name; }
+		void setName(std::string_view name);
 
 		void killEntity() { m_isAlive = false; }
 		bool isAlive() const { return m_isAlive; }

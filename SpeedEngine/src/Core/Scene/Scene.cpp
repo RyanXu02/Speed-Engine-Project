@@ -5,6 +5,8 @@
 
 namespace SE
 {
+	using MT = ActiveSceneModified::ModifyType;
+
 	void Scene::initializeScene()
 	{
 		m_logger.info("Initializing Scene");
@@ -37,8 +39,9 @@ namespace SE
 			{
 				m_logger.debug("adding entity: {}", entity->getName());
 				entity->initializeEntity(this);
-				// Event is published with "isAdding" set to true
-				EventSystem::Instance().publish(std::make_unique<ActiveSceneModified>(true, entity->getInstanceId(), entity->getName()));
+				EventSystem::Instance().publish(
+					std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
+				);
 				m_entities.push_back(std::move(entity));
 			}
 			m_entitiesToAdd.clear();
@@ -52,8 +55,7 @@ namespace SE
 				{
 					m_logger.debug("removing entity: {}", entity->getName());
 					EventSystem::Instance().publish(
-						// Event is published with "isAdding" set to false
-						std::make_unique<ActiveSceneModified>(false, entity->getInstanceId(), entity->getName())
+						std::make_unique<ActiveSceneModified>(MT::Remove, entity->getInstanceId(), entity->getName())
 					);
 					return true;
 				}
@@ -89,8 +91,9 @@ namespace SE
 		{
 			m_logger.debug("adding entity: {}", entity->getName());
 			entity->initializeEntity(this);
-			// Event is published with "isAdding" set to true
-			EventSystem::Instance().publish(std::make_unique<ActiveSceneModified>(true, entity->getInstanceId(), entity->getName()));
+			EventSystem::Instance().publish(
+				std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
+			);
 			m_entities.push_back(std::move(entity));
 		}
 	}
@@ -120,7 +123,9 @@ namespace SE
 		}
 
 		// event is published with "isAdding" set to false
-		EventSystem::Instance().publish(std::make_unique<ActiveSceneModified>(false, instanceId, ""));
+		EventSystem::Instance().publish(
+			std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, "")
+		);
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()

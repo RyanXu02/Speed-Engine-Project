@@ -67,14 +67,20 @@ namespace SE
 	class ActiveSceneModified : public Event
 	{
 	public:
-		bool adding;
+		enum class ModifyType
+		{
+			Add,
+			Remove,
+			Rename
+		};
+		ModifyType modifytype;
 		uint32_t id;
 		std::string name;
-		ActiveSceneModified(bool isAdding, uint32_t id, const std::string& name) : adding(isAdding), id(id), name(name) {}
+		ActiveSceneModified(ModifyType modifytype, uint32_t id, const std::string& name) : modifytype(modifytype), id(id), name(name) {}
 		EventType getEventType() const override { return EventType::ActiveSceneModified; }
 		std::string getName() const override { return "ActiveSceneModified"; }
 		std::string getDataAsString() const override {
-			return std::format("adding {}, id {}, name {}", adding, id, name);
+			return std::format("modifytype {}, id {}, name {}", static_cast<int>(modifytype), id, name);
 		}
 	};
 }
