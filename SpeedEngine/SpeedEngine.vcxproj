@@ -155,6 +155,11 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Component.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
+    <ClCompile Include="src\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
@@ -207,8 +212,14 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Component.h" />
+    <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
+    <ClInclude Include="src\Core\Scene\Scene.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
@@ -246,6 +257,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

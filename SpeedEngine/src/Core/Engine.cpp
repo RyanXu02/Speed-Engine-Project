@@ -11,9 +11,10 @@
 
 #include "SubSystems/Graphics/Rendering/RendererManager.h"
 
+#include "SubSystems/Scenes/SceneSystem.h"
+
 // temp
 #include "ResourceManagers/Shader/ShaderManager.h"
-
 #include "ResourceManagers/Material/Material.h"
 
 namespace SE
@@ -31,13 +32,12 @@ namespace SE
 		m_subSystems.push_back(std::make_unique<EventSystem>());
 		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine")); //has to be BEFORE ResourceManager
 		m_subSystems.push_back(std::make_unique<ResourceManager>());
-
 		//create RendererManager
 		std::unique_ptr<RendererManager> rendermgr = std::make_unique<RendererManager>(*_getSubSystem<Window>());
 		RendererManager::InitInstance(rendermgr.get());
-		//m_subSystems.push_back(std::make_unique<RendererManager>(*_getSubSystem<Window>())); // has to be after Window
 		m_subSystems.push_back(std::move(rendermgr));
-
+		m_subSystems.push_back(std::make_unique<SceneSystem>());
+		
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
 		{
@@ -55,6 +55,15 @@ namespace SE
 	}
 	void Engine::run()
 	{
+		SceneSystem::Instance().newScene("TestScene");
+		SceneSystem::Instance().setCurrentScene("TestScene");
+		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity"));
+		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity1"));
+		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity2"));
+		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
+		auto entityList = SceneSystem::Instance().getCurrentScene()->getEntityList();
+		SceneSystem::Instance().getCurrentScene()->removeEntity(entityList.begin()->first);
+
 		uint32_t id = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		uint32_t id2 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		uint32_t id3 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader3");
@@ -65,9 +74,11 @@ namespace SE
 		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(id, texlist, "testMaterial");
 		//ResourceManager::Instance().removeResource(matid);
 		
+		// get subsystems used in loop
 		auto* window = _getSubSystem<Window>();
 		auto* rendererManager = _getSubSystem<RendererManager>();
 		
+		// init time
 		double lastTime = window->getCurrentTime();
 		int frameCounter = 0;
 		double fpsTimer = 0.0;
