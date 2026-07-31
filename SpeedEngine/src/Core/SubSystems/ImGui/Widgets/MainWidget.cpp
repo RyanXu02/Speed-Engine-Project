@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "MainWidget.h"
 
+#include "../../Scenes/SceneSystem.h"
+
 #include <imgui.h>
 
 namespace SE
@@ -25,8 +27,20 @@ namespace SE
 				if (ImGui::MenuItem("Paste", "Ctrl+V")) {}
 				ImGui::EndMenu();
 			}
-			ImGui::EndMainMenuBar();
+			if (ImGui::BeginMenu("Entity"))
+			{
+				if (ImGui::MenuItem("Create Empty")) 
+				{
+					if (Scene * scene = SceneSystem::Instance().getCurrentScene())
+					{
+						scene->addEntity(std::make_unique<Entity>("New Empty"));
+					}
+				}
+				// add prefabs later
+				ImGui::EndMenu();
+			}
 		}
+		ImGui::EndMainMenuBar();
 	}
 	void MainWidget::shutdown()
 	{

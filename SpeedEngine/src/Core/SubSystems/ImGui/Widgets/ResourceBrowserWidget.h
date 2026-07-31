@@ -20,7 +20,7 @@ namespace SE
 		// Display options, CURRENTLY NOT BEING CHANGED
 		struct BrowserOptions
 		{
-			float iconSize = 200.0f;
+			float iconSize = 100.0f;
 			int iconSpacing = 10;
 			bool showTypeOverlay = true;
 			bool stretchSpacing = true;
