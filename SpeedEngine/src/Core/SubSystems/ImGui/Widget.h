@@ -6,6 +6,7 @@ namespace SE
 	{
 	public:
 		Widget(std::string_view name) : m_name(std::string(name)) {};
+		virtual ~Widget() = default;
 
 		virtual void render() = 0;
 		virtual void shutdown() = 0;

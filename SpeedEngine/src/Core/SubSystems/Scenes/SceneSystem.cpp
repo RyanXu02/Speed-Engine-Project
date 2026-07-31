@@ -57,6 +57,12 @@ namespace SE
 
 	void SceneSystem::unloadScene(Scene* scene)
 	{
+		if (!scene)
+		{
+			m_logger->warn("Attempted to unload a null scene.");
+			return;
+		}
+
 		m_logger->info("Unloading scene: {}", scene->getName());
 		if (scene == m_currentScene)
 		{
@@ -66,8 +72,11 @@ namespace SE
 
 		m_scenes.erase(
 			std::remove_if(m_scenes.begin(), m_scenes.end(),
-				[scene](const std::unique_ptr<Scene>& s) {
-					return s.get() == scene;
+				[this, scene](const std::unique_ptr<Scene>& s) {
+					if (s.get() != scene) return false;
+					s->shutdownScene();
+					if (scene == m_currentScene) m_currentScene = nullptr;
+					return true;
 				}),
 			m_scenes.end()
 		);
@@ -77,17 +86,16 @@ namespace SE
 	{
 		m_logger->info("Setting current scene: {}", name);
 
-		if (m_currentScene)
-		{
-			m_currentScene->shutdownScene();
-		}
 
 		auto it = std::find_if(m_scenes.begin(), m_scenes.end(),
 			[&name](const std::unique_ptr<Scene>& scene) {
 				return scene->getName() == name;
 			});
+
 		if (it != m_scenes.end())
 		{
+			if (m_currentScene) m_currentScene->shutdownScene();
+			
 			m_currentScene = it->get();
 			m_currentScene->initializeScene();
 

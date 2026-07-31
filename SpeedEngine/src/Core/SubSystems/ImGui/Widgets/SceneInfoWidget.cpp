@@ -28,8 +28,10 @@ namespace SE
 
         m_sceneChanged = EventSystem::Instance().subscribe(EventType::SceneChanged, [this](Event& event)
             {
-                SceneChanged& sce = static_cast<SceneChanged&>(event);
-                m_entityNameCache = SceneSystem::Instance().getCurrentScene()->getEntityList();
+                if (Scene* scene = SceneSystem::Instance().getCurrentScene())
+                    m_entityNameCache = scene->getEntityList();
+                else
+                    m_entityNameCache.clear();
             });
     }
 
@@ -53,9 +55,9 @@ namespace SE
             }
             else
             {
-                _LeftClickHandle(name, id);
-                _RightClickMenu(name, id);
-                _F2Handle(name, id);
+                _leftClickHandle(name, id);
+                _rightClickMenu(name, id);
+                _f2Handle(name, id);
             }
 
             ImGui::PopID();
@@ -79,7 +81,7 @@ namespace SE
         m_entityNameCache.clear();
     }
 
-    void SceneInfoWidget::_RightClickMenu(const std::string& name, uint32_t id)
+    void SceneInfoWidget::_rightClickMenu(const std::string& name, uint32_t id)
     {
         bool isSelected = m_selectedEntities.find(id) != m_selectedEntities.end();
         bool multiSelected = m_selectedEntities.size() > 1;
@@ -115,7 +117,7 @@ namespace SE
         }
     }
 
-    void SceneInfoWidget::_LeftClickHandle(const std::string& name, uint32_t id)
+    void SceneInfoWidget::_leftClickHandle(const std::string& name, uint32_t id)
     {
         bool isSelected = m_selectedEntities.find(id) != m_selectedEntities.end();
 
@@ -173,7 +175,7 @@ namespace SE
 
     }
 
-    void SceneInfoWidget::_F2Handle(const std::string& name, uint32_t id)
+    void SceneInfoWidget::_f2Handle(const std::string& name, uint32_t id)
     {
         bool multiSelected = m_selectedEntities.size() > 1;
         bool isItemFocused = ImGui::IsItemFocused();
