@@ -29,9 +29,9 @@ namespace SE
 
 		bool m_requestDelete = false;
 
-		void _RightClickMenu(const std::string& name,uint32_t id);
-		void _LeftClickHandle(const std::string& name, uint32_t id);
-		void _F2Handle(const std::string& name, uint32_t id);
+		void _rightClickMenu(const std::string& name,uint32_t id);
+		void _leftClickHandle(const std::string& name, uint32_t id);
+		void _f2Handle(const std::string& name, uint32_t id);
 		void _renamingHandle(uint32_t id);
 	};
 }

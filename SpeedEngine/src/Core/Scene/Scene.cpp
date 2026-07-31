@@ -122,7 +122,6 @@ namespace SE
 			}
 		}
 
-		// event is published with "isAdding" set to false
 		EventSystem::Instance().publish(
 			std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, "")
 		);
