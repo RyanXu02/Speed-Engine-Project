@@ -23,6 +23,8 @@ namespace SE
 
 		Entity* getEntity(uint32_t instanceId);
 		void removeEntity(uint32_t instanceId);
+
+		LoggerProxy& getLogger() { return m_logger; }
 	
 	private:
 		LoggerProxy m_logger;

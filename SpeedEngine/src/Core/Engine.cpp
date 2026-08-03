@@ -16,6 +16,7 @@
 // temp
 #include "ResourceManagers/Shader/ShaderManager.h"
 #include "ResourceManagers/Material/Material.h"
+#include "Scene/Entity/Component/Transform.h"
 
 namespace SE
 {
@@ -55,6 +56,8 @@ namespace SE
 	}
 	void Engine::run()
 	{
+
+		// temp
 		SceneSystem::Instance().newScene("TestScene");
 		SceneSystem::Instance().setCurrentScene("TestScene");
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity"));
@@ -62,18 +65,15 @@ namespace SE
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity2"));
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
 		auto entityList = SceneSystem::Instance().getCurrentScene()->getEntityList();
-		SceneSystem::Instance().getCurrentScene()->removeEntity(entityList.begin()->first);
 
 		uint32_t id = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		uint32_t id2 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		uint32_t id3 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader3");
-		uint32_t id4 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader4");
-		uint32_t id5 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader5");
-		uint32_t id6 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader6");
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
 		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(id, texlist, "testMaterial");
-		//ResourceManager::Instance().removeResource(matid);
-		
+		// end temp
+
+
 		// get subsystems used in loop
 		auto* window = _getSubSystem<Window>();
 		auto* rendererManager = _getSubSystem<RendererManager>();
