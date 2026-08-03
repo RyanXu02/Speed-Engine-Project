@@ -11,6 +11,8 @@ namespace SE
 	public:
 		Entity(std::string name);
 
+		Entity(const Entity&);
+
 		void initializeEntity(Scene* parentScene);
 		void updateEntity(double deltaTime) {};
 		void shutdownEntity() {};
@@ -22,6 +24,8 @@ namespace SE
 
 		void killEntity() { m_isAlive = false; }
 		bool isAlive() const { return m_isAlive; }
+
+		void addComponent(std::unique_ptr<Component> component);
 	private:
 		bool m_isAlive{ true };
 
