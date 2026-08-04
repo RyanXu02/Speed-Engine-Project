@@ -71,6 +71,8 @@ namespace SE
 		uint32_t id3 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader3");
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
 		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(id, texlist, "testMaterial");
+
+		//uint32_t id = ResourceManager::Instance().addResource<ResourceType::MeshResource>("Assets/Meshes/somemesh.obj", "Assets/Materials/somemat.mtl");
 		// end temp
 
 
