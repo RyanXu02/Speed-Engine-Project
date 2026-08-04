@@ -6,6 +6,7 @@
 
 #include "Shader/ShaderManager.h"
 #include "Material/MaterialManager.h"
+#include "MeshResource/MeshResourceManager.h"
 #include "../SubSystems/Events/EventSystem.h"
 
 namespace SE
@@ -58,6 +59,10 @@ namespace SE
 			{
 				return _addResourceImpl<ResourceType::Material>(std::forward<Args>(args)...);
 			}
+			else if constexpr (Type == ResourceType::MeshResource)
+			{
+				return _addResourceImpl<ResourceType::MeshResource>(std::forward<Args>(args)...);
+			}
 			else
 			{
 				m_logger->warn("ResourceManager::addResource: Unhandled ResourceType");
@@ -65,7 +70,7 @@ namespace SE
 			}
 		}
 
-		//@brief retrieves a resource of requested type given an id
+		//@brief retrieves a resource of requested type given an id. KIND OF NOT SUPPOSED TO BE USED
 		//@param id the id to retrieve
 		//@returns the requested resource of the specified type if it exists, nullptr if not
 		template<typename T>
@@ -144,6 +149,15 @@ namespace SE
 				uint32_t id = _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
 				if (id != 0) {
 					m_resourceTypes.insert({ id, ResourceType::Material });
+				}
+				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
+				return id;
+			}
+			else if constexpr (Type == ResourceType::MeshResource)
+			{
+				uint32_t id = _getManager<MeshResourceManager>()->addMeshResource(generateId(), std::forward<Args>(args)...);
+				if (id != 0) {
+					m_resourceTypes.insert({ id, ResourceType::MeshResource });
 				}
 				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
