@@ -25,8 +25,10 @@ namespace SE
 		m_logger->info("MeshResourceManager cleared all mesh resources.");
 	}
 
-	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view objpath, std::string_view mtlpath) { //asdfhasfhlsadfsakjf
-		return 0;
+	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath) { //asdfhasfhlsadfsakjf
+		auto newMesh = std::make_unique<MeshResource>(id, meshName, *m_logger);
+		if (!newMesh->init(objpath, mtlpath)) return 0;
+		return id;
 	}
 
 	MeshResource* MeshResourceManager::getMeshResource(uint32_t meshResourceId) {

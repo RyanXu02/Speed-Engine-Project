@@ -26,6 +26,19 @@ namespace SE
 		bool isAlive() const { return m_isAlive; }
 
 		void addComponent(std::unique_ptr<Component> component);
+
+		template <typename T>
+		T* getComponent() const
+		{
+			for (const auto& component : m_components)
+			{
+				if (typeid(*component.get()) == typeid(T))
+				{
+					return static_cast<T*>(component.get());
+				}
+			}
+			return nullptr;
+		}
 	private:
 		bool m_isAlive{ true };
 

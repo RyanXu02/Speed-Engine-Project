@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "SceneRenderer.h"
+#include "../../../../Scene/Entity/Entity.h"
+#include "../../../../Scene/Entity/Component/Mesh.h"
+
 #include <glad/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../RendererManager.h"
+#include "../../../Scenes/SceneSystem.h"
 
 
 
@@ -43,10 +47,15 @@ namespace SE
 		// enable depth test
 		glEnable(GL_DEPTH_TEST);
 
+		for (auto& entity : getDrawableEntities()) {
+			Mesh* mesh = entity->getComponent<Mesh>();
+			DrawData data = mesh->getDrawData();
+		}
 		// render scene here
 		/*
 		for (auto& entity : scene.getRenderables())
 		{
+
 			auto* mesh = entity.getMesh();
 			auto* material = entity.getMaterial();
 			auto& transform = entity.getTransform();
@@ -70,5 +79,15 @@ namespace SE
 
 		// unbind fbo
 		fbo.unbind();
+	}
+
+	std::vector<Entity*> SceneRenderer::getDrawableEntities() const {
+		std::vector<Entity*> retlist;
+		for (const auto& entity : SceneSystem::Instance().getCurrentScene()->getEntities()) {
+			if (entity.get()->getComponent<Mesh>()) {
+				retlist.push_back(entity.get());
+			}
+		}
+		return retlist;
 	}
 }

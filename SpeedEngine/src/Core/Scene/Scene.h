@@ -17,6 +17,8 @@ namespace SE
 		
 		const std::string& getName() const { return m_name; }
 
+
+		//for use with ui widget
 		std::unordered_map<uint32_t, std::string> getEntityList();
 
 		void addEntity(std::unique_ptr<Entity> entity);
@@ -25,6 +27,8 @@ namespace SE
 		void removeEntity(uint32_t instanceId);
 
 		LoggerProxy& getLogger() { return m_logger; }
+
+		const std::vector<std::unique_ptr<Entity>>& getEntities() const { return m_entities; }
 	
 	private:
 		LoggerProxy m_logger;
