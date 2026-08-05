@@ -115,7 +115,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)ThirdParty\include\stb;$(ProjectDir)ThirdParty\include\nlohmann;$(ProjectDir)ThirdParty\include\glm;$(ProjectDir)ThirdParty\include\glfw;$(ProjectDir)ThirdParty\include\glad\include;$(ProjectDir)ThirdParty\include\spdlog;$(ProjectDir)ThirdParty\include\imgui;$(ProjectDir)ThirdParty\include\FMOD;$(ProjectDir)ThirdParty\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)ThirdParty\include\stb;$(ProjectDir)ThirdParty\include\nlohmann;$(ProjectDir)ThirdParty\include\glm;$(ProjectDir)ThirdParty\include\glfw;$(ProjectDir)ThirdParty\include\glad\include;$(ProjectDir)ThirdParty\include\spdlog;$(ProjectDir)ThirdParty\include\imgui;$(ProjectDir)ThirdParty\include\FMOD;$(ProjectDir)ThirdParty\include;$(ProjectDir)ThirdParty\include\rapidobj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>

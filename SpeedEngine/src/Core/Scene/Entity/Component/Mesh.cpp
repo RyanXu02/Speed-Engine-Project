@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Mesh.h"
 
+#include "../../../ResourceManagers/ResourceManager.h"
+
 namespace SE
 {
 	Mesh::Mesh(const Mesh* other) : Component(DISALLOW_MULTIPLE_COMPONENTS),
@@ -14,10 +16,10 @@ namespace SE
 
 	bool Mesh::updateComponent() {
 		if (m_isDirty) {
-			/*MeshResource* mr = static_cast<MeshResource>(ResourceManager::Instance().getResource(m_meshResourceId));
-			m_posititoisn = mr.createPositions() //this is ok, copy vector from meshresource to mesh.positions
-				.asfdjklasfdjha*/
-			//function signature in meshResource: std::vector<MEsh::Vertex> createPositions()....
+			MeshResource* mr = static_cast<MeshResource*>(ResourceManager::Instance().getResource(m_meshResourceId));
+			m_positions = mr->getVertices(); //this is ok, copy vector from meshresource to mesh.positions
+			//submesh stuff also here....
+			m_indices = mr->getIndices();
 		}
 		return true;
 	}

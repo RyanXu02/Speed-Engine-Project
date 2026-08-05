@@ -3,6 +3,8 @@
 
 namespace SE
 {
+    class Entity;
+
     class SceneRenderer : public Renderer
     {
     public:
@@ -14,7 +16,9 @@ namespace SE
 
         void render(Viewport& viewport) const override;
 
+
     private:
+        std::vector<Entity*> getDrawableEntities() const;
     };
 }
 

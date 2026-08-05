@@ -17,6 +17,7 @@
 #include "ResourceManagers/Shader/ShaderManager.h"
 #include "ResourceManagers/Material/Material.h"
 #include "Scene/Entity/Component/Transform.h"
+#include "Scene/Entity/Component/Mesh.h"
 
 namespace SE
 {
@@ -64,7 +65,8 @@ namespace SE
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity1"));
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity2"));
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
-		auto entityList = SceneSystem::Instance().getCurrentScene()->getEntityList();
+		auto entity = SceneSystem::Instance().getCurrentScene()->getEntity(3);
+		entity->addComponent(std::make_unique<Mesh>());
 
 		uint32_t id = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		uint32_t id2 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
@@ -72,7 +74,8 @@ namespace SE
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
 		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(id, texlist, "testMaterial");
 
-		//uint32_t id = ResourceManager::Instance().addResource<ResourceType::MeshResource>("Assets/Meshes/somemesh.obj", "Assets/Materials/somemat.mtl");
+		uint32_t id232 = ResourceManager::Instance().addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
+		uint32_t id2323 = ResourceManager::Instance().addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 		// end temp
 
 
