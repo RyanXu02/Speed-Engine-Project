@@ -11,8 +11,10 @@ namespace SE
 	public:
 		Entity(std::string name);
 
+		Entity(const Entity&);
+
 		void initializeEntity(Scene* parentScene);
-		void updateEntity(double deltaTime) {};
+		void updateEntity(double deltaTime);
 		void shutdownEntity() {};
 
 		uint32_t getInstanceId() const { return m_instanceId; }
@@ -22,6 +24,21 @@ namespace SE
 
 		void killEntity() { m_isAlive = false; }
 		bool isAlive() const { return m_isAlive; }
+
+		void addComponent(std::unique_ptr<Component> component);
+
+		template <typename T>
+		T* getComponent() const
+		{
+			for (const auto& component : m_components)
+			{
+				if (typeid(*component.get()) == typeid(T))
+				{
+					return static_cast<T*>(component.get());
+				}
+			}
+			return nullptr;
+		}
 	private:
 		bool m_isAlive{ true };
 

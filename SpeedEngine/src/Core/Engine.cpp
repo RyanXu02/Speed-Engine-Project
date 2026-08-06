@@ -16,6 +16,8 @@
 // temp
 #include "ResourceManagers/Shader/ShaderManager.h"
 #include "ResourceManagers/Material/Material.h"
+#include "Scene/Entity/Component/Transform.h"
+#include "Scene/Entity/Component/Mesh.h"
 
 namespace SE
 {
@@ -55,25 +57,35 @@ namespace SE
 	}
 	void Engine::run()
 	{
+
+		// temp
 		SceneSystem::Instance().newScene("TestScene");
 		SceneSystem::Instance().setCurrentScene("TestScene");
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity"));
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity1"));
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity2"));
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
-		auto entityList = SceneSystem::Instance().getCurrentScene()->getEntityList();
-		SceneSystem::Instance().getCurrentScene()->removeEntity(entityList.begin()->first);
 
-		uint32_t id = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
-		uint32_t id2 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
-		uint32_t id3 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader3");
-		uint32_t id4 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader4");
-		uint32_t id5 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader5");
-		uint32_t id6 = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader6");
+
+		uint32_t defaultShaderIid = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
-		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(id, texlist, "testMaterial");
-		//ResourceManager::Instance().removeResource(matid);
+		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
+
+		uint32_t meshId = ResourceManager::Instance().addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
+		uint32_t meshId2 = ResourceManager::Instance().addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 		
+		auto entity1 = SceneSystem::Instance().getCurrentScene()->getEntity(2);
+		entity1->addComponent(std::make_unique<Mesh>());
+		entity1->getComponent<Mesh>()->setMeshResourceId(meshId);
+		entity1->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+		auto entity2 = SceneSystem::Instance().getCurrentScene()->getEntity(3);
+		entity2->addComponent(std::make_unique<Mesh>());
+		entity2->getComponent<Mesh>()->setMeshResourceId(meshId2);
+		entity2->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		// end temp
+
+
 		// get subsystems used in loop
 		auto* window = _getSubSystem<Window>();
 		auto* rendererManager = _getSubSystem<RendererManager>();

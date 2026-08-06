@@ -4,6 +4,7 @@
 
 #include "Shader/ShaderManager.h"
 #include "Material/MaterialManager.h"
+#include "MeshResource/MeshResourceManager.h"
 
 namespace SE
 {
@@ -19,6 +20,8 @@ namespace SE
 		// init managers
 		m_managers.emplace_back(std::make_unique<ShaderManager>());
 		m_managers.emplace_back(std::make_unique<MaterialManager>());
+		m_managers.emplace_back(std::make_unique<MeshResourceManager>());
+		//...
 		for (auto& manager : m_managers)
 		{
 			manager->init();
@@ -73,6 +76,10 @@ namespace SE
 			else if (it->second == ResourceType::Material) {
 				return _getManager<MaterialManager>()->getMaterial(id);
 			}
+			else if (it->second == ResourceType::MeshResource) {
+				return _getManager<MeshResourceManager>()->getMeshResource(id);
+			}
+			//.......
 		}
 		return nullptr;
 	}
@@ -91,7 +98,12 @@ namespace SE
 			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
-		return false;
+		else if (it->second == ResourceType::MeshResource) {
+			removed = _getManager<MeshResourceManager>()->removeMeshResource(id);
+			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			return removed;
+		}
 		//.....
+		return false;
 	}
 }
