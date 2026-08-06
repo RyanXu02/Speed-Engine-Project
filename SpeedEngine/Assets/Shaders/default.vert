@@ -1,22 +1,27 @@
 #version 330 core
 
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 vertexUV;
+layout (location = 1) in vec2 aTexCoord;
 layout (location = 2) in vec3 aNormal;
-layout (location = 3) in vec3 tangent;
-layout (location = 4) in vec3 bitangent;
 
-out vec2 uv;
-out vec3 normal;
+out vec3 FragPos;
+out vec3 Normal;
+out vec2 TexCoord;
 
 uniform mat4 model;
-uniform mat4 projection;
-uniform mat4 view;
+uniform mat4 projectionView;
 
 void main()
 {
-    normal = aNormal;
-    uv = vertexUV;
-      
-    gl_Position = projection * view * model * vec4(aPos.x, aPos.y, aPos.z, 1.0);   //TODO: ideally want this to avoid stretching
+    // Transform position to world space
+    FragPos = vec3(model * vec4(aPos, 1.0));
+    
+    // Transform normal to world space (should use normal matrix for non-uniform scaling)
+    Normal = mat3(transpose(inverse(model))) * aNormal;
+    
+    // Pass through texture coordinates
+    TexCoord = aTexCoord;
+    
+    // Calculate final position
+    gl_Position = projectionView * vec4(FragPos, 1.0);
 }

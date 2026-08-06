@@ -26,8 +26,22 @@ namespace SE
 	}
 
 	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath) { //asdfhasfhlsadfsakjf
+		// Check if mesh resource already exists
+		if (m_meshresources.find(id) != m_meshresources.end()) {
+			m_logger->debug("MeshResource with id {} already exists", id);
+			return 0;
+		}
+
 		auto newMesh = std::make_unique<MeshResource>(id, meshName, *m_logger);
-		if (!newMesh->init(objpath, mtlpath)) return 0;
+		if (!newMesh->init(objpath, mtlpath)) {
+			m_logger->warn("Failed to initialize MeshResource {} from {}", meshName, objpath);
+			return 0;
+		}
+
+		// Actually add the mesh to the map!
+		m_meshresources[id] = std::move(newMesh);
+		m_logger->info("Added MeshResource {} with id {}", meshName, id);
+
 		return id;
 	}
 

@@ -37,6 +37,14 @@ namespace SE
 		m_parentScene = parentScene;
 	}
 
+	void Entity::updateEntity(double deltaTime)
+	{
+		for (const auto& component : m_components)
+		{
+			component->updateComponent();
+		}
+	}
+
 	void Entity::setName(std::string_view name)
 	{
 		m_name = std::string(name);

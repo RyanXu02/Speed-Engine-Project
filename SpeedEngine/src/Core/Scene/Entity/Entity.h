@@ -14,7 +14,7 @@ namespace SE
 		Entity(const Entity&);
 
 		void initializeEntity(Scene* parentScene);
-		void updateEntity(double deltaTime) {};
+		void updateEntity(double deltaTime);
 		void shutdownEntity() {};
 
 		uint32_t getInstanceId() const { return m_instanceId; }

@@ -6,8 +6,11 @@
 namespace SE
 {
 	Mesh::Mesh(const Mesh* other) : Component(DISALLOW_MULTIPLE_COMPONENTS),
-		m_positions(other->m_positions), m_submeshes(other->m_submeshes),
-		m_meshResourceId(other->m_meshResourceId)
+		m_positions(other->m_positions),
+		m_submeshes(other->m_submeshes),
+		m_indices(other->m_indices),
+		m_meshResourceId(other->m_meshResourceId),
+		m_isDirty(other->m_isDirty)
 	{}
 
 	bool Mesh::initComponent() {
@@ -15,11 +18,19 @@ namespace SE
 	}
 
 	bool Mesh::updateComponent() {
-		if (m_isDirty) {
+		if (m_isDirty && m_meshResourceId != 0) {
 			MeshResource* mr = static_cast<MeshResource*>(ResourceManager::Instance().getResource(m_meshResourceId));
-			m_positions = mr->getVertices(); //this is ok, copy vector from meshresource to mesh.positions
-			//submesh stuff also here....
-			m_indices = mr->getIndices();
+			if (mr)
+			{
+				m_positions = mr->getVertices();
+				//submesh stuff also here....
+				m_indices = mr->getIndices();
+				m_isDirty = false;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return true;
 	}
@@ -32,7 +43,15 @@ namespace SE
 
 		m_positions.clear();
 		m_submeshes.clear();
+		m_indices.clear();
 		return true;
+	}
+
+	DrawData Mesh::getDrawData() {
+		DrawData data;
+		data.positions = m_positions;
+		data.indices = m_indices;
+		return data;
 	}
 
 }
