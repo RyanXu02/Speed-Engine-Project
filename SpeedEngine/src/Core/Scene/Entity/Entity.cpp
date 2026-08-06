@@ -28,7 +28,9 @@ namespace SE
 	{
 		for (const auto& component : other.m_components)
 		{
-			m_components.push_back(std::unique_ptr<Component>(component->clone()));
+			auto cloned = std::unique_ptr<Component>(component->clone());
+			cloned->setParentEntity(this);
+			m_components.push_back(std::move(cloned));
 		}
 	}
 

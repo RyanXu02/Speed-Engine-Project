@@ -50,10 +50,10 @@ void main()
     vec3 lighting = (ambient + diffuse) * intensity;
     
     // Combine texture and color with lighting
+    // vec4 finalColor = texColor *color;
     vec4 finalColor = color;
     finalColor.rgb *= lighting;
     
-    FragColor = vec4(0.0, 1.0, 0.0, 1.0);
     FragColor = finalColor;
     
     // Discard transparent fragments

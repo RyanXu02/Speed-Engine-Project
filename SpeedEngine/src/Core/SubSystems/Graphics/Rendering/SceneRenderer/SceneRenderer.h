@@ -1,6 +1,9 @@
 #pragma once
 #include "../Renderer.h"
 
+#include "../../../../ResourceManagers/MeshResource/MeshResource.h"
+
+
 namespace SE
 {
     class Entity;
@@ -31,7 +34,12 @@ namespace SE
         std::vector<Entity*> getDrawableEntities() const;
 
         // Helper methods for mesh rendering
-        void uploadMeshToGPU(uint32_t meshId, const DrawData& drawData) const;
+        void uploadMeshToGPU(
+            uint32_t meshId, 
+            const std::vector<Vertex>& positions, 
+            const std::vector<SubMesh>& subMeshes, 
+            const std::vector<uint32_t>& indices
+        ) const;
         void cleanupMeshGPU(uint32_t meshId) const;
 
         // Cache of GPU mesh data (mutable for const render method)

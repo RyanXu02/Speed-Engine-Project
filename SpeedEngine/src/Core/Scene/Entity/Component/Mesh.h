@@ -4,11 +4,6 @@
 
 namespace SE 
 {
-	struct DrawData {
-		std::vector<Vertex> positions;
-		std::vector<uint32_t> indices;
-	};
-
 	class Mesh : public Component
 	{
 	public:
@@ -22,12 +17,14 @@ namespace SE
 		bool renderComponent();
 		bool shutdownComponent();
 
-		DrawData getDrawData();
+		const std::vector<Vertex>& getPositionsToDraw() const { return m_positions; }
+		const std::vector<SubMesh>& getSubMeshesToDraw() const { return m_submeshes; }
+		const std::vector<uint32_t>& getIndicesToDraw() const { return m_indices; }
 
 		uint32_t getMeshResourceId() const { return m_meshResourceId; }
 		void setMeshResourceId(uint32_t meshResourceId) { m_meshResourceId = meshResourceId; m_isDirty = true; }
 	private:
-		Mesh* clone() const { return new Mesh(*this); }
+		Mesh* clone() const override { return new Mesh(this); }
 
 		std::vector<Vertex> m_positions; //vertex data
 		std::vector<SubMesh> m_submeshes; //draw calls as data, mainly for the materials
