@@ -13,8 +13,7 @@ namespace SE
 		void init() override;
 		void shutdown() override;
 
-		uint32_t addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath = ""); //TODO: IMPL,EMENT
-
+		uint32_t addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath = "");
 		MeshResource* getMeshResource(uint32_t meshResourceId);
 
 		bool removeMeshResource(uint32_t meshResourceId);

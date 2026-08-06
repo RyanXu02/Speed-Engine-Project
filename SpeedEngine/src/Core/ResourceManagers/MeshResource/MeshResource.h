@@ -22,13 +22,13 @@ namespace SE
 		MeshResource(uint32_t id, std::string_view resourceName, Logger& logger) : Resource(id, std::string(resourceName)),
 			m_logger(logger, fmt::format("MeshResource:{}", resourceName)) {}
 
-		bool init(std::string_view objpath, std::string_view mtlpath); //asdfasfsadfsa
+		bool init(std::string_view objpath, std::string_view mtlpath);
 
 		void destroy();
 
-		std::vector<Vertex> getVertices() const { return m_vertices; }
-		std::vector<SubMesh> getSubMeshes() const { return m_submeshes; }
-		std::vector<uint32_t> getIndices() const { return m_indices; }
+		const std::vector<Vertex>& getVertices() const { return m_vertices; }
+		const std::vector<SubMesh>& getSubMeshes() const { return m_submeshes; }
+		const std::vector<uint32_t>& getIndices() const { return m_indices; }
 
 	private:
 		std::vector<Vertex> m_vertices;

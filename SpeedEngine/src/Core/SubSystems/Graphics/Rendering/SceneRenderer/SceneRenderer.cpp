@@ -72,14 +72,16 @@ namespace SE
 			uint32_t meshResourceId = mesh->getMeshResourceId();
 			if (meshResourceId == 0) continue;
 
-			DrawData drawData = mesh->getDrawData();
-			if (drawData.indices.empty() || drawData.positions.empty()) {
+			const std::vector<Vertex>& positions = mesh->getPositionsToDraw();
+			const std::vector<SubMesh>& subMeshes = mesh->getSubMeshesToDraw();
+			const std::vector<uint32_t>& indices = mesh->getIndicesToDraw();
+			if (indices.empty() || positions.empty()) {
 				continue;
 			}
 
 			auto it = m_meshCache.find(meshResourceId);
 			if (it == m_meshCache.end() || it->second.needsUpdate) {
-				uploadMeshToGPU(meshResourceId, drawData);
+				uploadMeshToGPU(meshResourceId, positions, subMeshes, indices);
 			}
 
 			const MeshGPUData& gpuData = m_meshCache[meshResourceId];
@@ -127,7 +129,12 @@ namespace SE
 		return retlist;
 	}
 
-	void SceneRenderer::uploadMeshToGPU(uint32_t meshId, const DrawData& drawData) const {
+	void SceneRenderer::uploadMeshToGPU(
+		uint32_t meshId, 
+		const std::vector<Vertex>& positions, 
+		const std::vector<SubMesh>& subMeshes, 
+		const std::vector<uint32_t>& indices) const 
+	{
 		MeshGPUData& gpuData = m_meshCache[meshId];
 
 		// Delete old buffers if they exist
@@ -146,15 +153,15 @@ namespace SE
 		// Upload vertex data
 		glBindBuffer(GL_ARRAY_BUFFER, gpuData.VBO);
 		glBufferData(GL_ARRAY_BUFFER,
-			drawData.positions.size() * sizeof(Vertex),
-			drawData.positions.data(),
+			positions.size() * sizeof(Vertex),
+			positions.data(),
 			GL_STATIC_DRAW);
 
 		// Upload index data
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpuData.EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			drawData.indices.size() * sizeof(uint32_t),
-			drawData.indices.data(),
+			indices.size() * sizeof(uint32_t),
+			indices.data(),
 			GL_STATIC_DRAW);
 
 		// Set vertex attributes
@@ -176,11 +183,11 @@ namespace SE
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		// Update cache
-		gpuData.indexCount = drawData.indices.size();
+		gpuData.indexCount = indices.size();
 		gpuData.needsUpdate = false;
 
 		m_logger.info("Uploaded mesh {} to GPU: {} vertices, {} indices",
-			meshId, drawData.positions.size(), drawData.indices.size());
+			meshId, positions.size(), indices.size());
 	}
 
 	void SceneRenderer::cleanupMeshGPU(uint32_t meshId) const {

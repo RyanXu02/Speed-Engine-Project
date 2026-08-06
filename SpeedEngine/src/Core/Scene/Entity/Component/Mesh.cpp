@@ -23,7 +23,7 @@ namespace SE
 			if (mr)
 			{
 				m_positions = mr->getVertices();
-				//submesh stuff also here....
+				m_submeshes = mr->getSubMeshes();
 				m_indices = mr->getIndices();
 				m_isDirty = false;
 			}
@@ -46,12 +46,4 @@ namespace SE
 		m_indices.clear();
 		return true;
 	}
-
-	DrawData Mesh::getDrawData() {
-		DrawData data;
-		data.positions = m_positions;
-		data.indices = m_indices;
-		return data;
-	}
-
 }

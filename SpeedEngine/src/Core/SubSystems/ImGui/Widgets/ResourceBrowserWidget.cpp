@@ -77,7 +77,8 @@ namespace SE
 		int col = 0;
 		for (const auto& [id, type] : m_resourceCache)
 		{
-			if (id < 2) continue; // skip default shader
+			constexpr uint32_t kDefaultShaderId = 2;
+			if (id < kDefaultShaderId) continue; // skip default shader
 
 			DrawResourceItem(id, type);
 
@@ -101,7 +102,8 @@ namespace SE
 		ImGui::PushStyleColor(ImGuiCol_Button, bgColor);
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 
-		std::string name = ResourceManager::Instance().getResource(id)->getResourceName();
+		Resource* res = ResourceManager::Instance().getResource(id);
+		std::string name = res ? res->getResourceName() : "<missing>";
 
 		// Draw button square with ID as placeholder content
 		char label[32];

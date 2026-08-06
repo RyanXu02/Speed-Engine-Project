@@ -70,7 +70,7 @@ namespace SE
 			}
 		}
 
-		//@brief retrieves a resource of requested type given an id. KIND OF NOT SUPPOSED TO BE USED
+		//@brief retrieves a resource of requested type given an id (Not prefered, used the other one. It is callers responsibility to ensure the type is correct)
 		//@param id the id to retrieve
 		//@returns the requested resource of the specified type if it exists, nullptr if not
 		template<typename T>
