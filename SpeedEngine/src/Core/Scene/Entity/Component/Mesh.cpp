@@ -5,12 +5,12 @@
 
 namespace SE
 {
+	const std::vector<Vertex> Mesh::s_emptyVertices;
+	const std::vector<SubMesh> Mesh::s_emptySubMeshes;
+	const std::vector<uint32_t> Mesh::s_emptyIndices;
+
 	Mesh::Mesh(const Mesh* other) : Component(DISALLOW_MULTIPLE_COMPONENTS),
-		m_positions(other->m_positions),
-		m_submeshes(other->m_submeshes),
-		m_indices(other->m_indices),
-		m_meshResourceId(other->m_meshResourceId),
-		m_isDirty(other->m_isDirty)
+		m_meshResourceId(other->m_meshResourceId)
 	{}
 
 	bool Mesh::initComponent() {
@@ -18,20 +18,6 @@ namespace SE
 	}
 
 	bool Mesh::updateComponent() {
-		if (m_isDirty && m_meshResourceId != 0) {
-			MeshResource* mr = static_cast<MeshResource*>(ResourceManager::Instance().getResource(m_meshResourceId));
-			if (mr)
-			{
-				m_positions = mr->getVertices();
-				m_submeshes = mr->getSubMeshes();
-				m_indices = mr->getIndices();
-				m_isDirty = false;
-			}
-			else
-			{
-				return false;
-			}
-		}
 		return true;
 	}
 
@@ -40,10 +26,30 @@ namespace SE
 	}
 
 	bool Mesh::shutdownComponent() {
-
-		m_positions.clear();
-		m_submeshes.clear();
-		m_indices.clear();
 		return true;
+	}
+
+	MeshResource* Mesh::_getResource() const {
+		if (m_meshResourceId == 0) return nullptr;
+		return static_cast<MeshResource*>(ResourceManager::Instance().getResource(m_meshResourceId));
+	}
+
+	bool Mesh::hasValidResource() const {
+		return _getResource() != nullptr;
+	}
+
+	const std::vector<Vertex>& Mesh::getPositionsToDraw() const {
+		MeshResource* resource = _getResource();
+		return resource ? resource->getVertices() : s_emptyVertices;
+	}
+
+	const std::vector<SubMesh>& Mesh::getSubMeshesToDraw() const {
+		MeshResource* resource = _getResource();
+		return resource ? resource->getSubMeshes() : s_emptySubMeshes;
+	}
+
+	const std::vector<uint32_t>& Mesh::getIndicesToDraw() const {
+		MeshResource* resource = _getResource();
+		return resource ? resource->getIndices() : s_emptyIndices;
 	}
 }
