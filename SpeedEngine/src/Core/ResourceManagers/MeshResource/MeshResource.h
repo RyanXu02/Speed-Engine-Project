@@ -27,6 +27,7 @@ namespace SE
 		void destroy();
 
 		std::vector<Vertex> getVertices() const { return m_vertices; }
+		std::vector<SubMesh> getSubMeshes() const { return m_submeshes; }
 		std::vector<uint32_t> getIndices() const { return m_indices; }
 
 	private:

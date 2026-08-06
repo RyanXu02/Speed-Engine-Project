@@ -77,6 +77,8 @@ namespace SE
 		int col = 0;
 		for (const auto& [id, type] : m_resourceCache)
 		{
+			if (id < 2) continue; // skip default shader
+
 			DrawResourceItem(id, type);
 
 			col++;
@@ -99,9 +101,11 @@ namespace SE
 		ImGui::PushStyleColor(ImGuiCol_Button, bgColor);
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 
+		std::string name = ResourceManager::Instance().getResource(id)->getResourceName();
+
 		// Draw button square with ID as placeholder content
 		char label[32];
-		snprintf(label, sizeof(label), "ID: %u##%u", id, id);
+		snprintf(label, sizeof(label), "%s##%u", name.c_str(), id);
 
 		if (ImGui::Button(label, m_layout.itemSize))
 		{
@@ -178,6 +182,7 @@ namespace SE
 		{
 		case ResourceType::Shader: return "Shader";
 		case ResourceType::Material: return "Material";
+		case ResourceType::MeshResource: return "Mesh";
 		default: return "Unknown";
 		}
 	}
@@ -188,6 +193,7 @@ namespace SE
 		{
 		case ResourceType::Shader: return ImVec4(0.2f, 0.8f, 0.2f, 0.8f); // Green
 		case ResourceType::Material: return ImVec4(0.8f, 0.2f, 0.8f, 0.8f); // Magenta
+		case ResourceType::MeshResource: return ImVec4(0.1f, 0.2f, 0.8f, 0.8f); // Blue
 		default: return ImVec4(0.5f, 0.5f, 0.5f, 0.8f); // Gray
 		}
 	}

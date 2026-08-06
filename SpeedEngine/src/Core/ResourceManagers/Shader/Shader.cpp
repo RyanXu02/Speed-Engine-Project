@@ -127,4 +127,17 @@ namespace SE
 	{
 		glUniform4f(_getUniformLocation(name), x, y, z, w);
 	}
+
+	void Shader::setMat2(std::string_view name, const glm::mat2& mat)
+	{
+		glUniformMatrix2fv(_getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+	}
+	void Shader::setMat3(std::string_view name, const glm::mat3& mat)
+	{
+		glUniformMatrix3fv(_getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+	}
+	void Shader::setMat4(std::string_view name, const glm::mat4& mat)
+	{
+		glUniformMatrix4fv(_getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+	}
 }
