@@ -17,20 +17,26 @@ namespace SE
 		bool renderComponent();
 		bool shutdownComponent();
 
-		const std::vector<Vertex>& getPositionsToDraw() const { return m_positions; }
-		const std::vector<SubMesh>& getSubMeshesToDraw() const { return m_submeshes; }
-		const std::vector<uint32_t>& getIndicesToDraw() const { return m_indices; }
+		const std::vector<Vertex>& getPositionsToDraw() const;
+		const std::vector<SubMesh>& getSubMeshesToDraw() const;
+		const std::vector<uint32_t>& getIndicesToDraw() const;
 
 		uint32_t getMeshResourceId() const { return m_meshResourceId; }
-		void setMeshResourceId(uint32_t meshResourceId) { m_meshResourceId = meshResourceId; m_isDirty = true; }
+		void setMeshResourceId(uint32_t meshResourceId) { m_meshResourceId = meshResourceId; }
+
+		bool hasValidResource() const;
+
 	private:
 		Mesh* clone() const override { return new Mesh(this); }
 
-		std::vector<Vertex> m_positions; //vertex data
-		std::vector<SubMesh> m_submeshes; //draw calls as data, mainly for the materials
-		std::vector<uint32_t> m_indices; //indices info, sent with vertex data to gpu
+		MeshResource* _getResource() const;
+
 		uint32_t m_meshResourceId;
-		bool m_isDirty = true;
+
+		// empty vectors to return when no resource is available
+		static const std::vector<Vertex> s_emptyVertices;
+		static const std::vector<SubMesh> s_emptySubMeshes;
+		static const std::vector<uint32_t> s_emptyIndices;
 	};
 }
 
