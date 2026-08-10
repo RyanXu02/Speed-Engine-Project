@@ -5,6 +5,7 @@
 
 namespace SE
 {
+	// @brief Represents a transform component that can be attached to an entity
     class Transform : public Component
     {
     public:

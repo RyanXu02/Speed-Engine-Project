@@ -18,6 +18,7 @@ namespace SE
         bool needsUpdate = true;
     };
 
+	// @brief SceneRenderer is responsible for rendering all drawable entities in the scene
     class SceneRenderer : public Renderer
     {
     public:

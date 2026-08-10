@@ -2,6 +2,7 @@
 
 namespace SE
 {
+	// @brief Base class for all ImGui widgets
 	class Widget
 	{
 	public:

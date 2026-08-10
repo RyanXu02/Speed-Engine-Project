@@ -5,7 +5,7 @@ struct GLFWwindow;
 
 namespace SE
 {
-
+	// @brief Represents the window subsystem of the engine
 	class Window : public SubSystem
 	{
 	public:

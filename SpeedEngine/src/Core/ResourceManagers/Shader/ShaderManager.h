@@ -6,6 +6,8 @@ namespace SE
 {
     class ShaderManager : public Manager
     {
+		friend class ResourceManager;
+
     public:
         ShaderManager(const std::string& name = "ShaderManager") : Manager(ResourceType::Shader, name) {}
         ~ShaderManager() override = default;
@@ -13,6 +15,7 @@ namespace SE
         void init() override;
         void shutdown() override;
 
+    private:
         //@brief adds a shader to manager
         //@param id the id assigned to the shader
         //@param vertexShaderPath file path to the vertex shader
@@ -33,10 +36,11 @@ namespace SE
         //@param shaderId the id of shader to remove
         //@returns true if successfully removed, false if not
         bool removeShader(uint32_t shaderId);
-    private:
-		// id -> ShaderProgram
+
+		// map ids -> ShaderPrograms
         std::unordered_map<uint32_t, std::unique_ptr<Shader>> m_shaders;
 		
+		// @brief helper fn that verifies that the vertex and fragment shader paths are valid
 		std::pair<std::string, std::string> _verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath);
         
     };

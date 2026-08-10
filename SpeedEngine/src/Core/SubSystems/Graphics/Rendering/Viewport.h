@@ -5,6 +5,7 @@
 
 namespace SE
 {
+	// @brief Represents the camera frustum for a viewport
 	struct CameraFrustum
 	{
 		glm::vec3 position = glm::vec3(0.0f, 20.0f, 50.0f);
@@ -20,6 +21,7 @@ namespace SE
 		glm::mat4 viewProjectionMatrix = glm::mat4(1.0f);
 	};
 
+	// @brief Represents a viewport in the rendering system
 	class Viewport
 	{
     public:

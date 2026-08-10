@@ -13,7 +13,7 @@ namespace SE
 		ActiveSceneModified
 	};
 
-	//BASE CLASS
+	// @brief Base class for all events that can be sent through the EventSystem
 	class Event
 	{
 	public:
@@ -26,6 +26,7 @@ namespace SE
 
 	};
 
+	// @brief Event that is triggered when the window is closed
 	class WindowClose : public Event
 	{
 		EventType getEventType() const override { return EventType::WindowClose; }
@@ -33,6 +34,7 @@ namespace SE
 		std::string getDataAsString() const override { return ""; }
 	};
 
+	// @brief Event that is triggered when a resource in the resource manager is changed
 	class ResourceChanged : public Event
 	{
 	public:
@@ -50,6 +52,7 @@ namespace SE
 		}
 	};
 
+	// @brief Event that is triggered when the active scene is changed
 	class SceneChanged : public Event
 	{
 	public:
@@ -63,7 +66,8 @@ namespace SE
 			return std::format("changing scene to {}", name);
 		}
 	};
-
+	
+	// @brief Event that is triggered when the active scene is modified
 	class ActiveSceneModified : public Event
 	{
 	public:
