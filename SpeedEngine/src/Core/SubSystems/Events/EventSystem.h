@@ -6,6 +6,7 @@ namespace SE
 {
 	class EventSubscription;
 
+	// @brief EventSystem is a singleton that manages event publishing and subscribing
     class EventSystem : public SubSystem
     {
         using EventCallback = std::function<void(Event&)>;
@@ -19,8 +20,8 @@ namespace SE
     public:
 		EventSystem() : SubSystem("EventSystem") {}
 
-		//@brief gets static instance (meyers singleton)
-		//@returns reference to instance
+		// @brief Gets the static instance (Meyers singleton)
+		// @returns Reference to the instance
 		static EventSystem& Instance()
 		{
 			if (s_instance)
@@ -59,7 +60,9 @@ namespace SE
         std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
 		uint32_t _assignId() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 
+		// map of event type to vector of callbacks
 		std::unordered_map<EventType, std::vector<EventCallbackWrapper>> m_allEventCallbacks;
+		// queue of events to be processed
 		std::queue<std::unique_ptr<Event>> m_eventQueue;
 
 		void _fireEvent(Event& event);

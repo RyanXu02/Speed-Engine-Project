@@ -2,6 +2,7 @@
 
 namespace SE
 {
+	// @brief Represents a framebuffer object (FBO) that can be used for off-screen rendering
 	class FBO
 	{
     public:

@@ -5,6 +5,7 @@
 
 namespace SE
 {
+	// @brief Manages all scenes in the engine
 	class SceneSystem : public SubSystem
 	{
 	public:

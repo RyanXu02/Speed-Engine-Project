@@ -51,7 +51,7 @@ namespace SE
 			return kv.second->getResourceName() == programName;
 			});
 		if (it != m_shaders.end()) {
-			m_logger->verbose("Shader with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
+			m_logger->debug("Shader with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
 			return it->first;
 		}
 

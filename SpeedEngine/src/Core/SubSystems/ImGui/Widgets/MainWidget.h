@@ -3,6 +3,7 @@
 
 namespace SE
 {
+    // @brief The main widget that all other widgets are docked into
     class MainWidget : public Widget
     {
     public:

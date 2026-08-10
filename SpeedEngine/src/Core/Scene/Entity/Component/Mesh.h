@@ -4,6 +4,8 @@
 
 namespace SE 
 {
+	// @brief Represents a mesh component that can be attached to an entity
+	// @brief A mesh component contains a reference to a mesh resource, which contains the vertex data, sub-meshes, and indices for a 3D model
 	class Mesh : public Component
 	{
 	public:
