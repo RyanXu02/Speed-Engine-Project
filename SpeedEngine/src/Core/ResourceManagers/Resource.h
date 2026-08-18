@@ -2,6 +2,7 @@
 
 namespace SE
 {
+	// @brief base class for a generic resource managed by the ResourceManager
 	class Resource
 	{
 	friend class ResourceManager;

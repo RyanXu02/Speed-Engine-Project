@@ -4,6 +4,8 @@
 
 namespace SE
 {
+	// @brief Represents a subscription to an event in the EventSystem
+	// @brief Helps manage subscription lifetime, automatic unsubscription when the object is destroyed
 	class EventSubscription
 	{
 	public:

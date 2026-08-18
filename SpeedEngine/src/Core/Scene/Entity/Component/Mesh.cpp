@@ -3,6 +3,8 @@
 
 #include "../../../ResourceManagers/ResourceManager.h"
 
+#include "imgui.h"
+
 namespace SE
 {
 	const std::vector<Vertex> Mesh::s_emptyVertices;
@@ -22,6 +24,23 @@ namespace SE
 	}
 
 	bool Mesh::renderComponent() {
+		return true;
+	}
+
+	bool Mesh::renderImGuiInterface() {
+		if (ImGui::CollapsingHeader("Mesh"))
+		{
+			ImGui::Text("Mesh Resource ID: %u", m_meshResourceId);
+			if (hasValidResource()) {
+				MeshResource* resource = _getResource();
+				ImGui::Text("Vertices: %zu", resource->getVertices().size());
+				ImGui::Text("SubMeshes: %zu", resource->getSubMeshes().size());
+				ImGui::Text("Indices: %zu", resource->getIndices().size());
+			}
+			else {
+				ImGui::Text("No valid mesh resource.");
+			}
+		}
 		return true;
 	}
 

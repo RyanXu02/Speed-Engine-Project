@@ -9,11 +9,13 @@ namespace SE
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
-		ResourceChanged, SceneChanged,
-		ActiveSceneModified
+		ResourceChanged, // A resource in the resource manager has been added or removed
+		SceneChanged, // Active scene has been changed
+		ActiveSceneModified, // Active scene has been modified (entity added, removed, renamed)
+		EntitySelected, // An entity has been selected in the SceneInfoWidget
 	};
 
-	//BASE CLASS
+	// @brief Base class for all events that can be sent through the EventSystem
 	class Event
 	{
 	public:
@@ -26,6 +28,7 @@ namespace SE
 
 	};
 
+	// @brief Event that is triggered when the window is closed
 	class WindowClose : public Event
 	{
 		EventType getEventType() const override { return EventType::WindowClose; }
@@ -33,6 +36,7 @@ namespace SE
 		std::string getDataAsString() const override { return ""; }
 	};
 
+	// @brief Event that is triggered when a resource in the resource manager is changed
 	class ResourceChanged : public Event
 	{
 	public:
@@ -50,6 +54,7 @@ namespace SE
 		}
 	};
 
+	// @brief Event that is triggered when the active scene is changed
 	class SceneChanged : public Event
 	{
 	public:
@@ -63,7 +68,8 @@ namespace SE
 			return std::format("changing scene to {}", name);
 		}
 	};
-
+	
+	// @brief Event that is triggered when the active scene is modified
 	class ActiveSceneModified : public Event
 	{
 	public:
@@ -82,6 +88,20 @@ namespace SE
 		std::string getDataAsString() const override {
 			return std::format("modifytype {}, id {}, name {}", static_cast<int>(modifytype), id, name);
 		}
+	};
+
+	// @brief Event that is triggered when an entity is selected in the SceneInfoWidget
+	class EntitySelected : public Event
+	{
+		public:
+			uint32_t id;
+
+			EntitySelected(uint32_t p_id) : id(p_id) {}
+			EventType getEventType() const override { return EventType::EntitySelected; }
+			std::string getName() const override { return "EntitySelected"; }
+			std::string getDataAsString() const override { 
+				return std::format("Entity with id {} has been selected", id);
+			}
 	};
 }
 

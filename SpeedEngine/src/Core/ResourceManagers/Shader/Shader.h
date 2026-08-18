@@ -18,6 +18,8 @@ namespace SE
 		std::string log { "" };
 	};
 
+	// @brief Represents a shader program
+	// @brief A shader program represents a vertex shader and a fragment shader that are compiled and linked together
 	class Shader : public Resource
 	{
 	public:

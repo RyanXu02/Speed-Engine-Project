@@ -53,10 +53,7 @@ namespace SE
 			{
 				if (!entity->isAlive())
 				{
-					m_logger.debug("removing entity: {}", entity->getName());
-					EventSystem::Instance().publish(
-						std::make_unique<ActiveSceneModified>(MT::Remove, entity->getInstanceId(), entity->getName())
-					);
+					m_logger.debug("deleting entity: {}", entity->getName());
 					return true;
 				}
 				return false;			
@@ -118,13 +115,13 @@ namespace SE
 			{
 				m_logger.debug("deferring remove entity: {}", entity->getName());
 				entity->killEntity();
+				EventSystem::Instance().publish(
+					std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, "")
+				);
 				return;
 			}
 		}
 
-		EventSystem::Instance().publish(
-			std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, "")
-		);
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
