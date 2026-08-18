@@ -12,8 +12,8 @@ namespace SE {
     public:
         PropertiesWidget();
 
-        void render();
-        void shutdown();
+        void render() override;
+        void shutdown() override;
     private:
 		EventSubscription m_EntitySelectedSubscription;
 		EventSubscription m_ActiveSceneModifiedSubscription;
