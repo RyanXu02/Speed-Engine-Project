@@ -28,7 +28,7 @@ namespace SE
 	}
 
 	bool Mesh::renderImGuiInterface() {
-		if (ImGui::CollapsingHeader("Mesh"))
+		if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::Text("Mesh Resource ID: %u", m_meshResourceId);
 			if (hasValidResource()) {

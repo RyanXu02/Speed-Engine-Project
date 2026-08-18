@@ -30,7 +30,7 @@ namespace SE
 
 	bool Transform::renderImGuiInterface()
 	{
-		if (ImGui::CollapsingHeader("Transform"))
+		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			m_isDirty = m_isDirty|| ImGui::DragFloat3("Position", &m_position[0], 0.1f);
 
