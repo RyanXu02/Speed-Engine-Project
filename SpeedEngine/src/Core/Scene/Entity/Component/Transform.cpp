@@ -4,7 +4,7 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/euler_angles.hpp"
-
+#include "imgui.h"
 
 namespace SE
 {
@@ -27,6 +27,60 @@ namespace SE
 	{
 		return true;
 	}
+
+	bool Transform::renderImGuiInterface()
+	{
+		if (ImGui::CollapsingHeader("Transform"))
+		{
+			ImGui::DragFloat3("Position", &m_position[0], 0.1f);
+			glm::vec3 rotationDegrees = glm::degrees(m_rotation);
+			ImGui::DragFloat3("Rotation", &rotationDegrees[0], 0.1f);
+			m_rotation = glm::radians(rotationDegrees);
+
+			// find ratio to change the corresponding scale component when linked
+			auto linkScale = [&](int index, float oldValue)
+				{
+					if (!m_scaleLink)
+						return;
+
+					if (oldValue != 0.0f)
+					{
+						const float ratio = m_scale[index] / oldValue;
+						for (int i = 0; i < 3; ++i)
+						{
+							if (i != index)
+								m_scale[i] *= ratio;
+						}
+					}
+					else
+					{
+						for (int i = 0; i < 3; ++i)
+						{
+							if (i != index)
+								m_scale[i] = m_scale[index];
+						}
+					}
+				};
+
+			float oldx = m_scale[0];
+			if (ImGui::DragFloat("x", &m_scale[0], 0.1f, 0.001f)) 
+				linkScale(0, oldx);
+
+			float oldy = m_scale[1];
+			if (ImGui::DragFloat("y", &m_scale[1], 0.1f, 0.001f)) 
+				linkScale(1, oldy);
+			
+			float oldz = m_scale[2];
+			if (ImGui::DragFloat("z", &m_scale[2], 0.1f, 0.001f)) 
+				linkScale(2, oldz);
+			
+
+			ImGui::Checkbox("Link Scale", &m_scaleLink);
+			m_isDirty = true;
+		}
+		return true;
+	}
+
 	bool Transform::shutdownComponent()
 	{
 		return true;

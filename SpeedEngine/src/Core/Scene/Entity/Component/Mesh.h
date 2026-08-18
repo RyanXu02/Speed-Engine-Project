@@ -17,6 +17,9 @@ namespace SE
 		bool initComponent();
 		bool updateComponent();
 		bool renderComponent();
+
+		bool renderImGuiInterface();
+
 		bool shutdownComponent();
 
 		const std::vector<Vertex>& getPositionsToDraw() const;

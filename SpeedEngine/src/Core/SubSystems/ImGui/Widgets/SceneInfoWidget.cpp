@@ -137,6 +137,16 @@ namespace SE
                 m_selectedEntities.clear();
                 m_selectedEntities.insert(id);
             }
+
+			// Publish the EntitySelected event with the selected entity ID
+            if (m_selectedEntities.size() == 1)
+            {
+                EventSystem::Instance().publish(std::make_unique<EntitySelected>(id));
+            }
+            else
+            {
+                EventSystem::Instance().publish(std::make_unique<EntitySelected>(0));
+            }
         }
     }
 

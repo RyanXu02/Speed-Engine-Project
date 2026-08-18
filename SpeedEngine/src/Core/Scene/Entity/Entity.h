@@ -42,6 +42,9 @@ namespace SE
 			}
 			return nullptr;
 		}
+
+		const std::vector<std::unique_ptr<Component>>& getComponents() const { return m_components; }
+
 	private:
 		bool m_isAlive{ true };
 
