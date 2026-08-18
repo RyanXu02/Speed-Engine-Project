@@ -62,8 +62,8 @@ namespace SE
 		SceneSystem::Instance().newScene("TestScene");
 		SceneSystem::Instance().setCurrentScene("TestScene");
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity"));
-		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity1"));
-		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity2"));
+		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("bunny"));
+		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("room"));
 		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
 
 
@@ -71,17 +71,17 @@ namespace SE
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
 		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
 
-		uint32_t meshId = ResourceManager::Instance().addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
-		uint32_t meshId2 = ResourceManager::Instance().addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
+		uint32_t bunnymeshId = ResourceManager::Instance().addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
+		uint32_t roommeshId2 = ResourceManager::Instance().addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 		
 		auto entity1 = SceneSystem::Instance().getCurrentScene()->getEntity(2);
 		entity1->addComponent(std::make_unique<Mesh>());
-		entity1->getComponent<Mesh>()->setMeshResourceId(meshId);
+		entity1->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
 		entity1->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
 		auto entity2 = SceneSystem::Instance().getCurrentScene()->getEntity(3);
 		entity2->addComponent(std::make_unique<Mesh>());
-		entity2->getComponent<Mesh>()->setMeshResourceId(meshId2);
+		entity2->getComponent<Mesh>()->setMeshResourceId(roommeshId2);
 		entity2->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		// end temp
 

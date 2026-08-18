@@ -11,7 +11,8 @@
 
 namespace SE
 {
-
+	// @brief Public interface for managing all resources in the engine.
+	// @brief Access using ResourceManager::Instance()
 	class ResourceManager : public SubSystem
 	{
 	public:
@@ -83,6 +84,14 @@ namespace SE
 				else if constexpr (std::is_same_v<T, Material>) {
 					return _getManager<MaterialManager>()->getMaterial(id);
 				}
+				else if constexpr (std::is_same_v<T, MeshResource>) {
+					return _getManager<MeshResourceManager>()->getMeshResource(id);
+				}
+				// ...
+				else {
+					m_logger->warn("ResourceManager::getResource: Unhandled type T");
+					return nullptr;
+				}
 			}
 			return nullptr;
 		}
@@ -132,6 +141,7 @@ namespace SE
 			return nullptr;
 		}
 
+		// helper function to add a resource of a specific type
 		template<ResourceType Type, typename... Args>
 		uint32_t _addResourceImpl(Args&&... args)
 		{

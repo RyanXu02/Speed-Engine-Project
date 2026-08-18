@@ -27,9 +27,13 @@ namespace SE
 
 	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath) { //asdfhasfhlsadfsakjf
 		// Check if mesh resource already exists
-		if (m_meshresources.find(id) != m_meshresources.end()) {
-			m_logger->debug("MeshResource with id {} already exists", id);
-			return 0;
+
+		auto it = std::ranges::find_if(m_meshresources, [meshName](const auto& kv) {
+			return kv.second->getResourceName() == meshName;
+			});
+		if (it != m_meshresources.end()) {
+			m_logger->debug("MeshResource with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
+			return it->first;
 		}
 
 		auto newMesh = std::make_unique<MeshResource>(id, meshName, *m_logger);

@@ -4,7 +4,7 @@ namespace SE
 {
 	class Logger;
 
-	// baseclass
+	// @brief Base class for all subsystems in the engine
 	class SubSystem 
 	{
 	public:

@@ -3,6 +3,7 @@
 
 namespace SE
 {
+	// A proxy class for the Logger that adds a context prefix to log messages without owning a logger
     class LoggerProxy
     {
     public:

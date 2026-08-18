@@ -30,7 +30,7 @@ namespace SE
 			return kv.second->getResourceName() == materialName;
 			});
 		if (it != m_materials.end()) {
-			m_logger->verbose("Material with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
+			m_logger->debug("Material with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
 			return it->first;
 		}
 

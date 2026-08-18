@@ -11,6 +11,8 @@
 
 namespace SE
 {
+	// @brief Manager for all renderers in the engine
+	// @brief Manages the lifecycle of renderers, viewports, and rendering operations
     class RendererManager : public SubSystem
     {
     public:
@@ -18,8 +20,8 @@ namespace SE
 		RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window) {};
 		~RendererManager() {};
 
-		//@brief Initialize the static instance
-		//@param instance Pointer to the RendererManager instance
+		// @brief Initialize the static instance
+		// @param instance Pointer to the RendererManager instance
 		static void InitInstance(RendererManager* instance)
 		{
 			if (!s_instance)
@@ -28,8 +30,8 @@ namespace SE
 			}
 		}
 
-		//@brief gets static instance (meyers singleton)
-		//@returns reference to instance
+		// @brief Gets the static instance (Meyers singleton)
+		// @returns Reference to the instance
 		static RendererManager& Instance()
 		{
 			return *s_instance;
@@ -78,6 +80,7 @@ namespace SE
 		// subsequent renderers for parts such as ui and debug views
 		// ...
 
+		// map ids -> viewport objects
 		std::unordered_map<uint32_t, std::unique_ptr<Viewport>> m_viewports;
     };
 }

@@ -4,6 +4,7 @@
 
 namespace SE
 {
+	// @brief Base class for all resource managers
     class Manager : public SubSystem
     {
     public:

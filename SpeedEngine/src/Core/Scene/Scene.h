@@ -6,6 +6,7 @@
 
 namespace SE
 {
+	// @brief Represents a scene in the engine, which contains a collection of entities
 	class Scene
 	{
 	public:
@@ -18,7 +19,7 @@ namespace SE
 		const std::string& getName() const { return m_name; }
 
 
-		//for use with ui widget
+		// @brief For use with UI widget
 		std::unordered_map<uint32_t, std::string> getEntityList();
 
 		void addEntity(std::unique_ptr<Entity> entity);

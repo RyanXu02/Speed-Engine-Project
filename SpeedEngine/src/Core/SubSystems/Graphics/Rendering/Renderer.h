@@ -5,6 +5,7 @@ namespace SE
 {
     class Viewport;
 
+	// @brief Abstract base class for all renderers in the engine
     class Renderer
     {
     public:

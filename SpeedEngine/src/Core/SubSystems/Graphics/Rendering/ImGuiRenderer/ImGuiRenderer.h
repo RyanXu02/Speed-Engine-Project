@@ -7,6 +7,7 @@ namespace SE
 {
 	class Window;
 
+	// @brief Renderer that uses ImGui to render widgets
     class ImGuiRenderer : public Renderer
     {
 	public:
@@ -17,7 +18,10 @@ namespace SE
 		void update(double deltaTime) override;
 		void render(Viewport& viewport) const override;
 		void shutdown() override;
-
+		
+		// @brief Creates a widget of the specified type
+		// @tparam T The type of the widget to create
+		// @return The ID of the created widget
 		template <typename T> requires std::derived_from<T, Widget>
 		uint32_t createWidget()
 		{
