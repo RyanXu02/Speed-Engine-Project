@@ -25,6 +25,9 @@ namespace SE
 		virtual bool initComponent() = 0;
 		virtual bool updateComponent() = 0;
 		virtual bool renderComponent() = 0;
+
+		virtual bool renderImGuiInterface() = 0;
+
 		virtual bool shutdownComponent() = 0;
 
 		void setParentEntity(Entity* parentEntity) { m_parentEntity = parentEntity; }

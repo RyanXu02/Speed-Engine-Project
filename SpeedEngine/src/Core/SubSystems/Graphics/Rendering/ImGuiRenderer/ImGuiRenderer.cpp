@@ -13,6 +13,7 @@
 #include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
 #include "../../../ImGui/Widgets/ScenePreviewWidget.h"
 #include "../../../ImGui/Widgets/SceneInfoWidget.h"
+#include "../../../ImGui/Widgets/PropertiesWidget.h"
 
 namespace SE
 {
@@ -43,6 +44,7 @@ namespace SE
 		//createWidget<ConsoleWidget>();
 		createWidget<ScenePreviewWidget>();
 		createWidget<SceneInfoWidget>();
+		createWidget<PropertiesWidget>();
 		// ...
 	}
 
