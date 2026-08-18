@@ -90,6 +90,7 @@ namespace SE
 		}
 	};
 
+	// @brief Event that is triggered when an entity is selected in the SceneInfoWidget
 	class EntitySelected : public Event
 	{
 		public:
