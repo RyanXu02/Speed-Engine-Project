@@ -2,6 +2,16 @@
 // as this negates the performance advantage of precompile header.
 #pragma once
 
+// reduce Windows header size and conflicts
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+// Include before GLFW to avoid macro redefinition
+#include <Windows.h>
+
 #include <stdio.h>
 
 #include <algorithm>
@@ -30,5 +40,7 @@
 #include <unordered_set>
 #include <variant>
 #include <vector>
+
+#include <bitset>
 
 #include <Jolt/Jolt.h>
