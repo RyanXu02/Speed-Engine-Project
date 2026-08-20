@@ -3,6 +3,7 @@
 #include "SubSystems/SubSystem.h"
 
 #include "SubSystems/Graphics/Window.h"
+#include "SubSystems/Input/InputSystem.h"
 
 #include "SubSystems/Events/EventSystem.h"
 #include "SubSystems/Events/EventSubscription.h"
@@ -14,7 +15,6 @@
 #include "SubSystems/Scenes/SceneSystem.h"
 
 // temp
-#include "ResourceManagers/Shader/ShaderManager.h"
 #include "ResourceManagers/Material/Material.h"
 #include "Scene/Entity/Component/Transform.h"
 #include "Scene/Entity/Component/Mesh.h"
@@ -33,6 +33,7 @@ namespace SE
 		// push back subsystems in order of initialization
 		m_subSystems.push_back(std::make_unique<EventSystem>());
 		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine")); //has to be BEFORE ResourceManager
+		m_subSystems.push_back(std::make_unique<InputSystem>());
 		m_subSystems.push_back(std::make_unique<ResourceManager>());
 		//create RendererManager
 		std::unique_ptr<RendererManager> rendermgr = std::make_unique<RendererManager>(*_getSubSystem<Window>());
@@ -57,7 +58,7 @@ namespace SE
 	}
 	void Engine::run()
 	{
-
+#
 		// temp
 		SceneSystem::Instance().newScene("TestScene");
 		SceneSystem::Instance().setCurrentScene("TestScene");
