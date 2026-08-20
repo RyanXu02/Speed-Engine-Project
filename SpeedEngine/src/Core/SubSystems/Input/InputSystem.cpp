@@ -21,7 +21,7 @@ namespace SE
 
 		// update key states
 		m_keyPrevState = m_keyCurrState;
-		for (int key = 0; key != KEY_MENU; key++)
+		for (int key = KEY_SPACE; key <= KEY_MENU; key++)
 		{
 			KeyCodes thisKey = static_cast<KeyCodes>(key);
 			switch (glfwGetKey(glfwGetCurrentContext(), key))
@@ -32,12 +32,14 @@ namespace SE
 			case GLFW_RELEASE:
 				_clearKeyState(thisKey);
 				break;
+			default:
+				break;
 			}
 		}
 
 		// update mouse states
 		m_mousePrevState = m_mouseCurrState;
-		for (int button = 0; button != MOUSE_BUTTON_LAST; button++)
+		for (int button = MOUSE_BUTTON_1; button <= MOUSE_BUTTON_LAST; button++)
 		{
 			MouseCodes thisButton = static_cast<MouseCodes>(button);
 			switch (glfwGetMouseButton(glfwGetCurrentContext(), button))
@@ -47,6 +49,8 @@ namespace SE
 				break;
 			case GLFW_RELEASE:
 				_clearMouseState(thisButton);
+				break;
+			default:
 				break;
 			}
 		}
