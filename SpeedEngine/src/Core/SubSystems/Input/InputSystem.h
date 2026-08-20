@@ -4,7 +4,7 @@
 
 namespace SE {
 
-	// @brief 0 at top left cornder, measured in screen space (sub)pixels
+	// @brief 0 at top left corner, measured in screen space (sub)pixels
 	struct MousePos
 	{
 		double x;

@@ -58,7 +58,6 @@ namespace SE
 	}
 	void Engine::run()
 	{
-#
 		// temp
 		SceneSystem::Instance().newScene("TestScene");
 		SceneSystem::Instance().setCurrentScene("TestScene");
