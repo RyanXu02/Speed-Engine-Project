@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "EventSubscription.h"
+#include "Engine.h"
 
 namespace SE
 {
@@ -27,7 +28,7 @@ namespace SE
 
 	void EventSubscription::unsubscribe() const
 	{
-		EventSystem::Instance().unsubscribe(m_id, m_eventType);
+		Engine::Instance().getSubSystem<EventSystem>()->unsubscribe(m_id, m_eventType);
 
 	}
 

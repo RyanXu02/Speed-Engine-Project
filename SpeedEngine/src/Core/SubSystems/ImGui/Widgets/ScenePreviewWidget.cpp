@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "ScenePreviewWidget.h"
+#include "Engine.h"
+
 #include "../../Graphics/Rendering/RendererManager.h"
 #include <imgui.h>
 
@@ -15,7 +17,7 @@ namespace SE
         ImGuiWindowFlags window_flags = 0; // Default flags allow docking
         ImGui::Begin("ScenePreviewWidget", nullptr, window_flags);
 
-		uint32_t fboColorId = RendererManager::Instance().getViewport(1)->getFBO().getColorTexture();
+		uint32_t fboColorId = Engine::Instance().getSubSystem<RendererManager>()->getViewport(1)->getFBO().getColorTexture();
 		ImTextureID imguiTexId = static_cast<ImTextureID>(fboColorId);
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 

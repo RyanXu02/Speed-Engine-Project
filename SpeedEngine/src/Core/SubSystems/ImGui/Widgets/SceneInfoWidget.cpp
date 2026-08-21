@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SceneInfoWidget.h"
+#include "Engine.h"
 
 #include "../../Scenes/SceneSystem.h"
 
@@ -12,7 +13,7 @@ namespace SE
 
     SceneInfoWidget::SceneInfoWidget() : Widget("Scene Info")
     {
-        m_activeSceneModified = EventSystem::Instance().subscribe(EventType::ActiveSceneModified, [this](Event& event)
+        m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified, [this](Event& event)
             {
                 ActiveSceneModified& asme = static_cast<ActiveSceneModified&>(event);
                 if (asme.modifytype == MT::Add) {
@@ -26,9 +27,9 @@ namespace SE
                 }
             });
 
-        m_sceneChanged = EventSystem::Instance().subscribe(EventType::SceneChanged, [this](Event& event)
+        m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged, [this](Event& event)
             {
-                if (Scene* scene = SceneSystem::Instance().getCurrentScene())
+                if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
                     m_entityNameCache = scene->getEntityList();
                 else
                     m_entityNameCache.clear();
@@ -65,7 +66,7 @@ namespace SE
 
         if (m_requestDelete)
         {
-            if (Scene* scene = SceneSystem::Instance().getCurrentScene())
+            if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
             {
                 for (uint32_t id : m_selectedEntities)
                     scene->removeEntity(id);
@@ -141,11 +142,11 @@ namespace SE
 			// Publish the EntitySelected event with the selected entity ID
             if (m_selectedEntities.size() == 1)
             {
-                EventSystem::Instance().publish(std::make_unique<EntitySelected>(*m_selectedEntities.begin()));
+                Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<EntitySelected>(*m_selectedEntities.begin()));
             }
             else
             {
-                EventSystem::Instance().publish(std::make_unique<EntitySelected>(0));
+                Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<EntitySelected>(0));
             }
         }
     }
@@ -171,7 +172,7 @@ namespace SE
         {
             const std::string newName(m_renameBuffer.c_str());
 
-            if (Scene* scene = SceneSystem::Instance().getCurrentScene())
+            if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
             {
                 if (Entity* entity = scene->getEntity(id))
                 {

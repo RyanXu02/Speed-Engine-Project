@@ -5,13 +5,10 @@
 #include "../../Logger/Logger.h"
 
 namespace SE
-{
-	EventSystem* EventSystem::s_instance = nullptr;
-	
+{	
 	void EventSystem::init()
 	{
 		SubSystem::init();
-		s_instance = this;
 	}
 
 	void EventSystem::update(double deltaTime)

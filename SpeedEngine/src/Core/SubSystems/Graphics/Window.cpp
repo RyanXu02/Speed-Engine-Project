@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Window.h"
+#include "Engine.h"
+
 #include "../../Logger/Logger.h"
 
 #include "glad/gl.h"
@@ -89,7 +91,7 @@ namespace SE
 		glfwMakeContextCurrent(m_window);
 
 		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
-			EventSystem::Instance().publish(std::make_unique<WindowClose>());
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<WindowClose>());
 			});
 
 		// init glad
