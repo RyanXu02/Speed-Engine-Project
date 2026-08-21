@@ -49,6 +49,8 @@ namespace SE
 
 	void EventSystem::unsubscribe(uint32_t id, EventType eventType)
 	{
+		if (id == 0) return; // invalid id
+
 		auto it = m_allEventCallbacks.find(eventType);
 		if (it != m_allEventCallbacks.end())
 		{

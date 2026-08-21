@@ -1,6 +1,7 @@
 #pragma once
 #include "SubSystems/Events/EventSubscription.h"
 
+#include <cassert>
 
 namespace SE
 {
@@ -9,6 +10,11 @@ namespace SE
 	class Engine
 	{
 	public:
+		Engine(const Engine&) = delete;
+		Engine& operator=(const Engine&) = delete;
+		Engine(Engine&&) = delete;
+		Engine& operator=(Engine&&) = delete;
+
 		~Engine();
 		static Engine& Instance();
 
@@ -28,7 +34,7 @@ namespace SE
 				});
 			if (it != m_subSystems.end())
 				return static_cast<T*>(it->get());
-			return nullptr;
+			throw std::runtime_error("SubSystem " + std::string(typeid(T).name()) + " not found or not initialized!");
 		}
 	private:
 		Engine();

@@ -81,7 +81,7 @@ namespace SE
 		glBindTexture(GL_TEXTURE_2D, tex.glTextureId);
 		Shader* s = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_shaderId);
 		if (!s) {
-			m_logger.critical("Slot {} failed to bind in shader (ID = {}", slot, m_shaderId);
+			m_logger.critical("Slot {} failed to bind in shader (ID = {})", slot, m_shaderId);
 			return;
 		}
 		s->setInt(tex.getVarName(), slot);
