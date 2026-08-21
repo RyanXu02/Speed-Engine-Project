@@ -41,11 +41,6 @@ namespace SE
 			}
 		}
 
-		// viewport management
-		uint32_t createViewport(uint32_t width, uint32_t height, Renderer* renderer);
-		void destroyViewport(uint32_t viewportId);
-		Viewport* getViewport(uint32_t viewportId);
-
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
@@ -62,9 +57,6 @@ namespace SE
 		std::unique_ptr<ImGuiRenderer> m_imguiRenderer;
 		// subsequent renderers for parts such as ui and debug views
 		// ...
-
-		// map ids -> viewport objects
-		std::unordered_map<uint32_t, std::unique_ptr<Viewport>> m_viewports;
     };
 }
 
