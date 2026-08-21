@@ -16,22 +16,7 @@ namespace SE
 	class ResourceManager : public SubSystem
 	{
 	public:
-
-		ResourceManager() : SubSystem("ResourceManager") {}
-
-		//@brief gets static instance (meyers singleton)
-		//@returns reference to instance
-		static ResourceManager& Instance()
-		{
-			if (s_instance)
-			{
-				return *s_instance;
-			}
-
-			static ResourceManager instance;
-			s_instance = &instance;
-			return *s_instance;
-		}
+		friend class Engine;
 
 		void init() override;
 		void shutdown() override;
@@ -113,8 +98,8 @@ namespace SE
 
 
 	private:
-		// static instance for public
-		static ResourceManager* s_instance;
+		// singleton instance, use singleton Engine to access its subsystems
+		ResourceManager() : SubSystem("ResourceManager") {}
 
 		// universal id for all resources in the engine
 		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
@@ -151,7 +136,7 @@ namespace SE
 				if (id != 0) {
 					m_resourceTypes.insert({ id, ResourceType::Shader });
 				}
-				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
 			else if constexpr (Type == ResourceType::Material)
@@ -160,7 +145,7 @@ namespace SE
 				if (id != 0) {
 					m_resourceTypes.insert({ id, ResourceType::Material });
 				}
-				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
 			else if constexpr (Type == ResourceType::MeshResource)
@@ -169,7 +154,7 @@ namespace SE
 				if (id != 0) {
 					m_resourceTypes.insert({ id, ResourceType::MeshResource });
 				}
-				EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, Type, true));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
 			else

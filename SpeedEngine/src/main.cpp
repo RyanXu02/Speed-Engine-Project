@@ -4,7 +4,7 @@
 
 int main() {
 
-    SE::Engine engine;
+    SE::Engine& engine = SE::Engine::Instance();
     engine.init();
     engine.start();
     engine.run();

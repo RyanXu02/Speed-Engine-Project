@@ -15,28 +15,9 @@ namespace SE
 	// @brief Manages the lifecycle of renderers, viewports, and rendering operations
     class RendererManager : public SubSystem
     {
+		friend class Engine; // only Engine should create instance of subsystems
+
     public:
-		RendererManager() = delete;
-		RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window) {};
-		~RendererManager() {};
-
-		// @brief Initialize the static instance
-		// @param instance Pointer to the RendererManager instance
-		static void InitInstance(RendererManager* instance)
-		{
-			if (!s_instance)
-			{
-				s_instance = instance;
-			}
-		}
-
-		// @brief Gets the static instance (Meyers singleton)
-		// @returns Reference to the instance
-		static RendererManager& Instance()
-		{
-			return *s_instance;
-		}
-
 		const Window* getWindow() const { return m_window; }
 		void setWindow(Window& window) { m_window = &window; }
 
@@ -72,7 +53,9 @@ namespace SE
 		void render() const;
 
     private:
-		static RendererManager* s_instance;
+		RendererManager() = delete;
+		RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window) {};
+
 		const Window* m_window;
 
 		std::unique_ptr<SceneRenderer> m_sceneRenderer;

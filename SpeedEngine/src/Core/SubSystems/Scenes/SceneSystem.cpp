@@ -1,17 +1,14 @@
 #include "pch.h"
 #include "SceneSystem.h"
+#include "Engine.h"
 
 #include "../Events/EventSystem.h"
 
 namespace SE
 {
-
-	SceneSystem* SceneSystem::s_instance = nullptr;
-
 	void SceneSystem::init()
 	{
 		SubSystem::init();
-		s_instance = this;
 	}
 
 	void SceneSystem::update(double deltaTime)
@@ -99,7 +96,7 @@ namespace SE
 			m_currentScene = it->get();
 			m_currentScene->initializeScene();
 
-			EventSystem::Instance().publish(std::make_unique<SceneChanged>(name));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<SceneChanged>(name));
 		}
 		else
 		{

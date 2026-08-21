@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ResourceBrowserWidget.h"
+#include "Engine.h"
 
 #include "../../../ResourceManagers/ResourceManager.h"
 #include "../../Events/Event.h"
@@ -8,9 +9,9 @@
 namespace SE 
 {
 	ResourceBrowserWidget::ResourceBrowserWidget() : Widget("ResourceBrowserWidget") {
-		m_resourceCache = ResourceManager::Instance().getInitialRTMap();
+		m_resourceCache = Engine::Instance().getSubSystem<ResourceManager>()->getInitialRTMap();
 
-		m_resourceChanged = EventSystem::Instance().subscribe(EventType::ResourceChanged, [this](Event& event) 
+		m_resourceChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ResourceChanged, [this](Event& event) 
 			{
 				ResourceChanged& rce = static_cast<ResourceChanged&>(event);
 				if (rce.adding) m_resourceCache[rce.id] = rce.type; //adding resource
@@ -102,7 +103,7 @@ namespace SE
 		ImGui::PushStyleColor(ImGuiCol_Button, bgColor);
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 
-		Resource* res = ResourceManager::Instance().getResource(id);
+		Resource* res = Engine::Instance().getSubSystem<ResourceManager>()->getResource(id);
 		std::string name = res ? res->getResourceName() : "<missing>";
 
 		// Draw button square with ID as placeholder content
@@ -204,7 +205,7 @@ namespace SE
 	{
 		for (uint32_t id : m_selectedResources)
 		{
-			ResourceManager::Instance().removeResource(id);
+			Engine::Instance().getSubSystem<ResourceManager>()->removeResource(id);
 		}
 		m_selectedResources.clear();
 	}
