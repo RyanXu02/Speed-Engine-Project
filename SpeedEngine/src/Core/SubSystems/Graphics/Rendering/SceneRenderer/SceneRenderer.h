@@ -22,13 +22,14 @@ namespace SE
     class SceneRenderer : public Renderer
     {
     public:
-		SceneRenderer(Logger& logger) : Renderer(logger, "SceneRenderer") {};
+		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport) : Renderer(logger, "SceneRenderer", std::move(viewport)) {
+		}
 
         void init() override;
         void shutdown() override;
         void update(double deltaTime) override;
 
-        void render(Viewport& viewport) const override;
+        void render() const override;
 
 
     private:

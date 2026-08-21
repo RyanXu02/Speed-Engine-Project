@@ -15,6 +15,8 @@
 #include "../../../../ResourceManagers/Shader/Shader.h"
 #include "../../../../ResourceManagers/Material/Material.h"
 
+#include "../../../Input/InputSystem.h"
+
 
 
 namespace SE
@@ -29,19 +31,47 @@ namespace SE
 	}
 	void SceneRenderer::update(double deltaTime)
 	{
+		CameraFrustum& camera = m_viewport->getCameraFrustum();
+		FBO& fbo = m_viewport->getFBO();
+
+		auto IS = Engine::Instance().getSubSystem<InputSystem>();
+
+		float movespeed = 10.0f * static_cast<float>(deltaTime);
+		if (IS->isKeyDown(KeyCodes::KEY_W))
+			camera.move(glm::vec3(0.0f, 0.0f, -1.0f) * movespeed);
+		if (IS->isKeyDown(KeyCodes::KEY_S))
+			camera.move(glm::vec3(0.0f, 0.0f, 1.0f) * movespeed);
+		if (IS->isKeyDown(KeyCodes::KEY_A))
+			camera.move(glm::vec3(-1.0f, 0.0f, 0.0f) * movespeed);
+		if (IS->isKeyDown(KeyCodes::KEY_D))
+			camera.move(glm::vec3(1.0f, 0.0f, 0.0f) * movespeed);
+
+		if (IS->getMouseScroll().yoffset > 0.0)
+		{
+			glm::vec3 lookDir = glm::normalize(camera.getTarget() - camera.getPosition());
+			camera.move(lookDir);
+		}
+		if (IS->getMouseScroll().yoffset < 0.0)
+		{
+			glm::vec3 lookDir = glm::normalize(camera.getTarget() - camera.getPosition());
+			camera.move(-lookDir);
+		}
+
+
+		if (camera.isDirty) {
+			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(), camera.getUp());
+			float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
+			camera.projectionMatrix = glm::perspective(glm::radians(camera.getFOV()), aspectRatio, camera.getNearPlane(), camera.getFarPlane());
+			camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
+			camera.isDirty = false;
+		}
 	}
 
-	void SceneRenderer::render(Viewport& viewport) const
+	void SceneRenderer::render() const
 	{
 		// get viewport stuff
-		FBO& fbo = viewport.getFBO();
-		CameraFrustum& camera = viewport.getCameraFrustum();
-
-		// update camera matrices
-		camera.viewMatrix = glm::lookAt(camera.position, camera.target, camera.up);
-		float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
-		camera.projectionMatrix = glm::perspective(glm::radians(camera.fov), aspectRatio, camera.nearPlane, camera.farPlane);
-		camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
+		FBO& fbo = m_viewport->getFBO();
+		CameraFrustum& camera = m_viewport->getCameraFrustum();
 
 		//bind fbo
 		fbo.bind();

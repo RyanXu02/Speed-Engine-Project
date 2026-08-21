@@ -63,7 +63,7 @@ namespace SE
 		ImGui::ShowDemoWindow(); // Show demo window! :)
 	}
 
-	void ImGuiRenderer::render(Viewport& viewport) const
+	void ImGuiRenderer::render() const
 	{
 		for (const auto& [id, widget] : m_widgets)
 		{

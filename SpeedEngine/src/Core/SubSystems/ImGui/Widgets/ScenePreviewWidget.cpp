@@ -17,7 +17,10 @@ namespace SE
         ImGuiWindowFlags window_flags = 0; // Default flags allow docking
         ImGui::Begin("ScenePreviewWidget", nullptr, window_flags);
 
-		uint32_t fboColorId = Engine::Instance().getSubSystem<RendererManager>()->getViewport(1)->getFBO().getColorTexture();
+		// This widget (along with other imgui widgets) receive the imgui viewport, but we want to display the scene viewport in this widget
+		uint32_t SceneViewportId = 1;
+		uint32_t fboColorId = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>()->getViewport()->getFBO().getColorTexture();
+		
 		ImTextureID imguiTexId = static_cast<ImTextureID>(fboColorId);
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
