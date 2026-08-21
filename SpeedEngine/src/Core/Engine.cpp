@@ -21,6 +21,12 @@
 
 namespace SE
 {
+	Engine& Engine::Instance()
+	{
+		static Engine instance;
+		return instance;
+	}
+
 	Engine::Engine()
 		: m_isRunning(false), m_deltaTime(0.0), m_currentTime(0.0), m_lastTime(0.0), m_windowCloseEvent()
 	{
@@ -31,15 +37,12 @@ namespace SE
 	void Engine::init()
 	{
 		// push back subsystems in order of initialization
-		m_subSystems.push_back(std::make_unique<EventSystem>());
-		m_subSystems.push_back(std::make_unique<Window>(1280, 720, "Speed Engine")); //has to be BEFORE ResourceManager
-		m_subSystems.push_back(std::make_unique<InputSystem>());
-		m_subSystems.push_back(std::make_unique<ResourceManager>());
-		//create RendererManager
-		std::unique_ptr<RendererManager> rendermgr = std::make_unique<RendererManager>(*_getSubSystem<Window>());
-		RendererManager::InitInstance(rendermgr.get());
-		m_subSystems.push_back(std::move(rendermgr));
-		m_subSystems.push_back(std::make_unique<SceneSystem>());
+		m_subSystems.push_back(std::unique_ptr<EventSystem>(new EventSystem()));
+		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720, "Speed Engine"))); //has to be BEFORE ResourceManager
+		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem()));
+		m_subSystems.push_back(std::unique_ptr<ResourceManager>(new ResourceManager()));
+		m_subSystems.push_back(std::unique_ptr<RendererManager>(new RendererManager(*getSubSystem<Window>())));
+		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
@@ -48,7 +51,7 @@ namespace SE
 		}
 		
 		// subscribe to window close event
-		m_windowCloseEvent = EventSystem::Instance().subscribe(EventType::WindowClose, [this](const Event& event) {
+		m_windowCloseEvent = getSubSystem<EventSystem>()->subscribe(EventType::WindowClose, [this](const Event& event) {
 			m_isRunning = false;
 			});
 	}
@@ -59,27 +62,27 @@ namespace SE
 	void Engine::run()
 	{
 		// temp
-		SceneSystem::Instance().newScene("TestScene");
-		SceneSystem::Instance().setCurrentScene("TestScene");
-		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity"));
-		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("bunny"));
-		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("room"));
-		SceneSystem::Instance().getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
+		getSubSystem<SceneSystem>()->newScene("TestScene");
+		getSubSystem<SceneSystem>()->setCurrentScene("TestScene");
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity"));
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny"));
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("room"));
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
 
 
-		uint32_t defaultShaderIid = ResourceManager::Instance().addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
+		uint32_t defaultShaderIid = getSubSystem<ResourceManager>()->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
-		uint32_t matid = ResourceManager::Instance().addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
+		uint32_t matid = getSubSystem<ResourceManager>()->addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
 
-		uint32_t bunnymeshId = ResourceManager::Instance().addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
-		uint32_t roommeshId2 = ResourceManager::Instance().addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
+		uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
+		uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 		
-		auto entity1 = SceneSystem::Instance().getCurrentScene()->getEntity(2);
+		auto entity1 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(2);
 		entity1->addComponent(std::make_unique<Mesh>());
 		entity1->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
 		entity1->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-		auto entity2 = SceneSystem::Instance().getCurrentScene()->getEntity(3);
+		auto entity2 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(3);
 		entity2->addComponent(std::make_unique<Mesh>());
 		entity2->getComponent<Mesh>()->setMeshResourceId(roommeshId2);
 		entity2->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -87,8 +90,8 @@ namespace SE
 
 
 		// get subsystems used in loop
-		auto* window = _getSubSystem<Window>();
-		auto* rendererManager = _getSubSystem<RendererManager>();
+		auto* window = getSubSystem<Window>();
+		auto* rendererManager = getSubSystem<RendererManager>();
 		
 		// init time
 		double lastTime = window->getCurrentTime();

@@ -24,6 +24,13 @@ namespace SE
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
+
+		std::error_code ec;
+		const bool hasUserIni = std::filesystem::exists("imgui.ini", ec);
+		if (!ec && !hasUserIni) {
+			ImGui::LoadIniSettingsFromDisk("default_UI.ini");
+		}
+
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// IF using Docking Branch

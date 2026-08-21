@@ -7,12 +7,9 @@
 
 namespace SE
 {
-	InputSystem* InputSystem::s_instance = nullptr;
-
 	void InputSystem::init()
 	{
 		SubSystem::init();
-		s_instance = this;
 	}
 
 	void InputSystem::update(double deltaTime)

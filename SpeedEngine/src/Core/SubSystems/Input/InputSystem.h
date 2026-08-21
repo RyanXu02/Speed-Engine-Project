@@ -13,20 +13,9 @@ namespace SE {
 
 	class InputSystem : public SubSystem
 	{
+		friend class Engine;
+
 	public:
-		InputSystem() : SubSystem("InputSystem") {}
-
-		static InputSystem& Instance()
-		{
-			if (s_instance)
-			{
-				return *s_instance;
-			}
-			static InputSystem instance;
-			s_instance = &instance;
-			return *s_instance;
-		}
-
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
@@ -52,13 +41,13 @@ namespace SE {
 		const MousePos& getMousePosition() const;
 
 	private:
+		InputSystem() : SubSystem("InputSystem") {}
+
 		void _setKeyState(KeyCodes key);
 		void _clearKeyState(KeyCodes key);
 
 		void _setMouseState(MouseCodes key);
 		void _clearMouseState(MouseCodes key);
-
-		static InputSystem* s_instance;
 
 		std::bitset<512> m_keyCurrState{ 0 };
 		std::bitset<512> m_keyPrevState{ 0 };

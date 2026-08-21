@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "Engine.h"
+
 #include "ShaderManager.h"
 #include "../../Logger/Logger.h"
 #include "../../ResourceManagers/ResourceManager.h"
@@ -58,8 +60,8 @@ namespace SE
 		// Load shader source code from file
 		auto shader = std::make_unique<Shader>(id, std::string(programName));
 
-		std::string vertexSource = ResourceManager::Instance().getString(shaderPaths.first);
-		std::string fragmentSource = ResourceManager::Instance().getString(shaderPaths.second);
+		std::string vertexSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.first);
+		std::string fragmentSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.second);
 
 		GLCompStatus status = shader->init(vertexSource, fragmentSource);
 		if (!status.success)

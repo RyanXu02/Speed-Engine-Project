@@ -7,8 +7,6 @@
 
 namespace SE
 {
-	RendererManager* RendererManager::s_instance = nullptr;
-
 	void RendererManager::init()
 	{
 		SubSystem::init();

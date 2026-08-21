@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Scene.h"
+#include "Engine.h"
 
 #include "../SubSystems/Events/EventSystem.h"
 
@@ -39,7 +40,7 @@ namespace SE
 			{
 				m_logger.debug("adding entity: {}", entity->getName());
 				entity->initializeEntity(this);
-				EventSystem::Instance().publish(
+				Engine::Instance().getSubSystem<EventSystem>()->publish(
 					std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
 				);
 				m_entities.push_back(std::move(entity));
@@ -88,7 +89,7 @@ namespace SE
 		{
 			m_logger.debug("adding entity: {}", entity->getName());
 			entity->initializeEntity(this);
-			EventSystem::Instance().publish(
+			Engine::Instance().getSubSystem<EventSystem>()->publish(
 				std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
 			);
 			m_entities.push_back(std::move(entity));
@@ -115,7 +116,7 @@ namespace SE
 			{
 				m_logger.debug("deferring remove entity: {}", entity->getName());
 				entity->killEntity();
-				EventSystem::Instance().publish(
+				Engine::Instance().getSubSystem<EventSystem>()->publish(
 					std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, "")
 				);
 				return;

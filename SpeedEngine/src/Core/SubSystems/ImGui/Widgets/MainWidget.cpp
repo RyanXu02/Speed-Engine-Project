@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "MainWidget.h"
+#include "Engine.h"
 
 #include "../../Scenes/SceneSystem.h"
 
@@ -31,7 +32,7 @@ namespace SE
 			{
 				if (ImGui::MenuItem("Create Empty")) 
 				{
-					if (Scene * scene = SceneSystem::Instance().getCurrentScene())
+					if (Scene * scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
 						scene->addEntity(std::make_unique<Entity>("New Empty"));
 					}
