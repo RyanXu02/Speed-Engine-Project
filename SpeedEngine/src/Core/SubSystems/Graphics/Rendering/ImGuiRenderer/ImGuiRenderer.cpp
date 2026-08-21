@@ -25,7 +25,9 @@ namespace SE
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 
-		if (!std::filesystem::exists("imgui.ini")) {
+		std::error_code ec;
+		const bool hasUserIni = std::filesystem::exists("imgui.ini", ec);
+		if (!ec && !hasUserIni) {
 			ImGui::LoadIniSettingsFromDisk("default_UI.ini");
 		}
 

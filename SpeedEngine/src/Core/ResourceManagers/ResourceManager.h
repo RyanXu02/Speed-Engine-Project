@@ -12,7 +12,6 @@
 namespace SE
 {
 	// @brief Public interface for managing all resources in the engine.
-	// @brief Access using ResourceManager::Instance()
 	class ResourceManager : public SubSystem
 	{
 	public:
