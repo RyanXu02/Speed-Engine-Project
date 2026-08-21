@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Entity.h"
+#include "Engine.h"
 
 #include "../../SubSystems/Scenes/SceneSystem.h"
 
@@ -50,7 +51,7 @@ namespace SE
 	void Entity::setName(std::string_view name)
 	{
 		m_name = std::string(name);
-		EventSystem::Instance().publish(
+		Engine::Instance().getSubSystem<EventSystem>()->publish(
 			std::make_unique<ActiveSceneModified>(MT::Rename, m_instanceId, m_name)
 		);
 	}

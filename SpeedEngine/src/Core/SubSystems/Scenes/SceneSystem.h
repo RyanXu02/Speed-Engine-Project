@@ -8,20 +8,8 @@ namespace SE
 	// @brief Manages all scenes in the engine
 	class SceneSystem : public SubSystem
 	{
+		friend class Engine;
 	public:
-		SceneSystem() : SubSystem("SceneSystem") {}
-
-		static SceneSystem& Instance()
-		{
-			if (s_instance)
-			{
-				return *s_instance;
-			}
-
-			static SceneSystem instance;
-			s_instance = &instance;
-			return *s_instance;
-		}
 
 		void init() override;
 		void update(double deltaTime) override;
@@ -34,7 +22,7 @@ namespace SE
 		void setCurrentScene(const std::string& name);
 		Scene* getCurrentScene() const { return m_currentScene; }
 	private:
-		static SceneSystem* s_instance;
+		SceneSystem() : SubSystem("SceneSystem") {}
 
 		std::vector<std::unique_ptr<Scene>> m_scenes;
 		Scene* m_currentScene = nullptr;

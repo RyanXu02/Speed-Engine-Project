@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "Engine.h"
+
 #include "Material.h"
 #include "../Shader/ShaderManager.h"
 #include "../ResourceManager.h"
@@ -77,9 +79,9 @@ namespace SE
 	void Material::_bindTexture(unsigned int slot, Texture& tex) {
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, tex.glTextureId);
-		Shader* s = ResourceManager::Instance().getResource<Shader>(m_shaderId);
+		Shader* s = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_shaderId);
 		if (!s) {
-			m_logger.critical("Slot {} failed to bind in shader (ID = {}", slot, m_shaderId);
+			m_logger.critical("Slot {} failed to bind in shader (ID = {})", slot, m_shaderId);
 			return;
 		}
 		s->setInt(tex.getVarName(), slot);

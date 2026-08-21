@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "PropertiesWidget.h"
+#include "Engine.h"
 
 #include "../../Scenes/SceneSystem.h"
 
@@ -8,19 +9,19 @@
 namespace SE {
 	PropertiesWidget::PropertiesWidget() : Widget("PropertiesWidget") 
 	{
-		m_EntitySelectedSubscription = EventSystem::Instance().subscribe(EventType::EntitySelected, [this](const Event& event) {
+		m_EntitySelectedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::EntitySelected, [this](const Event& event) {
 			const EntitySelected& entitySelectedEvent = static_cast<const EntitySelected&>(event);
 			m_selectedEntityId = entitySelectedEvent.id;
-			m_cachedSelectedEntity = SceneSystem::Instance().getCurrentScene()->getEntity(m_selectedEntityId);
+			m_cachedSelectedEntity = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(m_selectedEntityId);
 			});
-		m_ActiveSceneModifiedSubscription = EventSystem::Instance().subscribe(EventType::ActiveSceneModified, [this](const Event& event) {
+		m_ActiveSceneModifiedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified, [this](const Event& event) {
 			const ActiveSceneModified& activeSceneModifiedEvent = static_cast<const ActiveSceneModified&>(event);
 			if (activeSceneModifiedEvent.modifytype == ActiveSceneModified::ModifyType::Remove && activeSceneModifiedEvent.id == m_selectedEntityId) {
 				m_selectedEntityId = 0;
 				m_cachedSelectedEntity = nullptr;
 			}
 			});
-		m_SceneChangedSubscription = EventSystem::Instance().subscribe(EventType::SceneChanged, [this](const Event& event) {
+		m_SceneChangedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged, [this](const Event& event) {
 			const SceneChanged& sceneChangedEvent = static_cast<const SceneChanged&>(event);
 			m_selectedEntityId = 0;
 			m_cachedSelectedEntity = nullptr;

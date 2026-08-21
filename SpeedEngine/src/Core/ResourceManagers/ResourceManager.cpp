@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "Engine.h"
+
 #include "ResourceManager.h"
 #include "../Logger/Logger.h"
 
@@ -8,14 +10,9 @@
 
 namespace SE
 {
-
-	ResourceManager* ResourceManager::s_instance = nullptr;
-
 	void ResourceManager::init()
 	{
 		SubSystem::init();
-
-		s_instance = this;
 
 		// init managers
 		m_managers.emplace_back(std::make_unique<ShaderManager>());
@@ -90,17 +87,17 @@ namespace SE
 		if (it == m_resourceTypes.end()) return false;
 		if (it->second == ResourceType::Shader) {
 			removed = _getManager<ShaderManager>()->removeShader(id);
-			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
 		else if (it->second == ResourceType::Material) {
 			removed = _getManager<MaterialManager>()->removeMaterial(id);
-			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
 		else if (it->second == ResourceType::MeshResource) {
 			removed = _getManager<MeshResourceManager>()->removeMeshResource(id);
-			EventSystem::Instance().publish(std::make_unique<ResourceChanged>(id, it->second, false));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
 		//.....

@@ -9,6 +9,8 @@ namespace SE
 	// @brief EventSystem is a singleton that manages event publishing and subscribing
     class EventSystem : public SubSystem
     {
+		friend class Engine;
+
         using EventCallback = std::function<void(Event&)>;
 
 		struct EventCallbackWrapper
@@ -18,21 +20,6 @@ namespace SE
 		};
 
     public:
-		EventSystem() : SubSystem("EventSystem") {}
-
-		// @brief Gets the static instance (Meyers singleton)
-		// @returns Reference to the instance
-		static EventSystem& Instance()
-		{
-			if (s_instance)
-			{
-				return *s_instance;
-			}
-
-			static EventSystem instance;
-			s_instance = &instance;
-			return *s_instance;
-		}
 
 		void init() override;
 		void update(double deltaTime) override;
@@ -54,7 +41,8 @@ namespace SE
 		void unsubscribe(uint32_t id, EventType eventType);
 
     private:
-		static EventSystem* s_instance;
+		// singleton instance, use singleton Engine to access its subsystems
+		EventSystem() : SubSystem("EventSystem") {}
 
         // id for each listener
         std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id

@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "Engine.h"
+
 #include "SceneRenderer.h"
 #include "../../../../Scene/Entity/Entity.h"
 #include "../../../../Scene/Entity/Component/Mesh.h"
@@ -58,7 +60,7 @@ namespace SE
 		glFrontFace(GL_CCW);
 
 		// Get default shader
-		Shader* defaultShader = ResourceManager::Instance().getResource<Shader>(m_defaultShaderId);
+		Shader* defaultShader = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_defaultShaderId);
 		if (!defaultShader) {
 			m_logger.critical("Default shader not found, cannot render");
 			fbo.unbind();
@@ -121,7 +123,7 @@ namespace SE
 
 	std::vector<Entity*> SceneRenderer::getDrawableEntities() const {
 		std::vector<Entity*> retlist;
-		for (const auto& entity : SceneSystem::Instance().getCurrentScene()->getEntities()) {
+		for (const auto& entity : Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntities()) {
 			if (entity.get()->getComponent<Mesh>()) {
 				retlist.push_back(entity.get());
 			}

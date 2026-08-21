@@ -40,6 +40,7 @@
 #include <unordered_set>
 #include <variant>
 #include <vector>
+#include <filesystem>
 
 #include <bitset>
 
