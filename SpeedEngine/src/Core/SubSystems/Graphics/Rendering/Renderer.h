@@ -8,12 +8,18 @@ namespace SE
     class Viewport;
 
 	// @brief Abstract base class for all renderers in the engine
+	// @brief Each renderer owns a viewport and is responsible for rendering to it
     class Renderer
     {
     public:
 		Renderer(Logger& logger, std::string_view rendererName) : m_logger(logger, fmt::format("Renderer: {}", rendererName)) {}
 		Renderer(Logger& logger, std::string_view rendererName, std::unique_ptr<Viewport> viewport) : m_logger(logger, fmt::format("Renderer: {}", rendererName)), m_viewport(std::move(viewport)) {}
         virtual ~Renderer() {};
+
+		Renderer(const Renderer&) = delete;
+		Renderer& operator=(const Renderer&) = delete;
+		Renderer(Renderer&&) = delete;
+		Renderer& operator=(Renderer&&) = delete;
 
         virtual void init() = 0;
         virtual void shutdown() = 0;

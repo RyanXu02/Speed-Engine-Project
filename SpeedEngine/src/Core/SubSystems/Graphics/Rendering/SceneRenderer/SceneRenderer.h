@@ -21,9 +21,8 @@ namespace SE
 	// @brief SceneRenderer is responsible for rendering all drawable entities in the scene
     class SceneRenderer : public Renderer
     {
+		friend class RendererManager;
     public:
-		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport) : Renderer(logger, "SceneRenderer", std::move(viewport)) {
-		}
 
         void init() override;
         void shutdown() override;
@@ -31,10 +30,19 @@ namespace SE
 
         void render() const override;
 
+        // @brief get scene preview camera sensitivity
+		// @return reference to camera sensitivity, used for imgui widgets
 		float& getCameraSensitivity() { return m_sensitivity; }
+        // @brief get scene preview camera move speed
+        // @return reference to camera move speed, used for imgui widgets
 		float& getCameraMoveSpeed() { return m_cameraMoveSpeed; }
+        // @brief get scene preview camera dolly speed
+        // @return reference to camera dolly speed, used for imgui widgets
         float& getCameraDollySpeed() { return m_cameraDollySpeed; }
+
     private:
+		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport) : Renderer(logger, "SceneRenderer", std::move(viewport)) {}
+        
         std::vector<Entity*> getDrawableEntities() const;
 
         // Helper methods for mesh rendering
