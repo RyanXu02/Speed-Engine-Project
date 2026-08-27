@@ -4,6 +4,7 @@
 
 namespace SE
 {
+	// @brief Definition of world-up in the engine
 	static constexpr glm::vec3 WORLD_UP = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	// @brief Represents the camera frustum for a viewport
@@ -17,6 +18,8 @@ namespace SE
 		float nearPlane = 0.1f;
 		float farPlane = 1000.0f;
 	public:
+		// @brief Move the camera by a given offset
+		// @param delta The offset to move the camera by
 		void move(const glm::vec3& delta) { position += delta; target += delta; isDirty = true; }
 
 		const glm::vec3& getPosition() const { return position; }
@@ -57,9 +60,6 @@ namespace SE
 
     private:
         std::unique_ptr<FBO> m_FBO;  // Viewport owns FBO
-		//MIGHT NEED MULTIPLE FBOS IN THE FUTURE
-		//ex: vector of fbos, with enum {SCENE, DEBUG, UI} and index into vector like
-		//vec[SCENE] = scene fbo
 
 		CameraFrustum m_cameraFrustum;
         bool m_isActive;
