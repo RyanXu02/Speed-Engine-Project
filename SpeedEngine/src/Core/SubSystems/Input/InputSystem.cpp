@@ -72,7 +72,10 @@ namespace SE
 		m_mouseFalling = mouseChanges & (~m_mouseCurrState);
 
 		// update mouse pos
+		m_prevMousePosition = m_mousePosition;
 		glfwGetCursorPos(glfwGetCurrentContext(), &m_mousePosition.x, &m_mousePosition.y);
+		m_mouseDelta.x = m_mousePosition.x - m_prevMousePosition.x;
+		m_mouseDelta.y = m_mousePosition.y - m_prevMousePosition.y;
 	}
 
 	void InputSystem::shutdown()
@@ -123,6 +126,11 @@ namespace SE
 	const MousePos& InputSystem::getMousePosition() const
 	{
 		return m_mousePosition;
+	}
+
+	const MousePos& InputSystem::getMouseDelta() const
+	{
+		return m_mouseDelta;
 	}
 
 	const MouseScroll& InputSystem::getMouseScroll() const

@@ -31,7 +31,9 @@ namespace SE
 
         void render() const override;
 
-
+		float& getCameraSensitivity() { return m_sensitivity; }
+		float& getCameraMoveSpeed() { return m_cameraMoveSpeed; }
+        float& getCameraDollySpeed() { return m_cameraDollySpeed; }
     private:
         std::vector<Entity*> getDrawableEntities() const;
 
@@ -49,6 +51,14 @@ namespace SE
 
         // Default shader for meshes without material
         uint32_t m_defaultShaderId = 1;
+
+        // Camera controls
+		void _updateCameraPosition(double deltaTime, CameraFrustum& camera);
+		void _updateCameraTarget(double deltaTime, CameraFrustum& camera);
+		void _updateCamera(double deltaTime, CameraFrustum& camera, FBO& fbo);
+		float m_sensitivity = 0.005f;
+		float m_cameraMoveSpeed = 6.0f;
+		float m_cameraDollySpeed = 10.0f;
     };
 }
 
