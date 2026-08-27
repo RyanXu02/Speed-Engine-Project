@@ -161,6 +161,5 @@ namespace SE
 	void InputSystem::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 		m_mouseScrollAccumulated.xoffset += xoffset;
 		m_mouseScrollAccumulated.yoffset += yoffset;
-		m_logger->info("Mouse scrolled: xoffset = {}, yoffset = {}", xoffset, yoffset);
 	}
 }

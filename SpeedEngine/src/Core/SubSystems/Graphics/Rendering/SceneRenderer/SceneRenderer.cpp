@@ -220,7 +220,7 @@ namespace SE
 		float movespeed = m_cameraMoveSpeed * static_cast<float>(deltaTime);
 		glm::vec3 cameraLookDir = glm::normalize(camera.getTarget() - camera.getPosition());
 		cameraLookDir.y = 0.0f;
-		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraLookDir, worldUp));
+		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraLookDir, WORLD_UP));
 		glm::vec3 CameraMoveDir(0.0f);
 		if (IS->isKeyDown(KeyCodes::KEY_W))
 			CameraMoveDir += cameraLookDir;
@@ -250,9 +250,9 @@ namespace SE
 
 		// camera y-axis movement
 		if (IS->isKeyDown(KeyCodes::KEY_SPACE))
-			camera.move(worldUp * movespeed);
+			camera.move(WORLD_UP * movespeed);
 		if (IS->isKeyDown(KeyCodes::KEY_LEFT_CONTROL))
-			camera.move(-worldUp * movespeed);
+			camera.move(-WORLD_UP * movespeed);
 	}
 
 	void SceneRenderer::_updateCameraTarget(double deltaTime, CameraFrustum& camera) {
@@ -263,15 +263,19 @@ namespace SE
 			glm::vec2 mouseDelta = glm::vec2{ IS->getMouseDelta().x, IS->getMouseDelta().y };
 
 			glm::vec3 cameraDirection = glm::normalize(camera.getTarget() - camera.getPosition());
-			glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDirection, worldUp));
+			glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDirection, WORLD_UP));
 			glm::vec3 cameraUp = glm::normalize(glm::cross(cameraRight, cameraDirection));
 
 			float yawAngle = -mouseDelta.x * m_sensitivity;
 			glm::mat4 yawRotation = glm::rotate(glm::mat4(1.0f), yawAngle, cameraUp);
 			cameraDirection = glm::vec3(yawRotation * glm::vec4(cameraDirection, 0.0f));
+			// Limit pitch avoid gimbal lock
 			float pitchAngle = -mouseDelta.y * m_sensitivity;
-			cameraDirection = glm::vec3(glm::rotate(glm::mat4(1.0f), pitchAngle, cameraRight) * glm::vec4(cameraDirection, 0.0f));
-
+			glm::vec3 newDirection = glm::vec3(glm::rotate(glm::mat4(1.0f), pitchAngle, cameraRight) * glm::vec4(cameraDirection, 0.0f));
+			float upDot = glm::dot(newDirection, WORLD_UP);
+			if (upDot < 0.999f && upDot > -0.999f) {
+				cameraDirection = newDirection;
+			}
 
 			float distance = glm::length(camera.getTarget() - camera.getPosition());
 			glm::vec3 cameraTarget = camera.getPosition() + cameraDirection * distance;
@@ -293,7 +297,7 @@ namespace SE
 		_updateCameraPosition(deltaTime, camera);
 		_updateCameraTarget(deltaTime, camera);
 		if (camera.isDirty) {
-			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(), worldUp); // 0,1,0 is up vector
+			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(), WORLD_UP); // 0,1,0 is up vector
 			float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
 			camera.projectionMatrix = glm::perspective(glm::radians(camera.getFOV()), aspectRatio, camera.getNearPlane(), camera.getFarPlane());
 			camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;

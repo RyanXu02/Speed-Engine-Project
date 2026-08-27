@@ -1,11 +1,10 @@
 #pragma once
 #include "glm/glm.hpp"
 #include "FBO.h"
-#include "../Rendering/Renderer.h"
 
 namespace SE
 {
-	static constexpr glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	static constexpr glm::vec3 WORLD_UP = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	// @brief Represents the camera frustum for a viewport
 	struct CameraFrustum

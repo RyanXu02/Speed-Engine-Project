@@ -7,7 +7,7 @@ namespace SE
 	public:
 		ScenePreviewWidget();
 
-		void render();
+		void render() override;
 		void shutdown() override;
 	private:
 	};
