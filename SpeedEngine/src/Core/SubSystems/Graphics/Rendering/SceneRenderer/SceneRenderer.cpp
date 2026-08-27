@@ -15,6 +15,8 @@
 #include "../../../../ResourceManagers/Shader/Shader.h"
 #include "../../../../ResourceManagers/Material/Material.h"
 
+#include "../../../Input/InputSystem.h"
+
 
 
 namespace SE
@@ -29,19 +31,16 @@ namespace SE
 	}
 	void SceneRenderer::update(double deltaTime)
 	{
+		FBO& fbo = m_viewport->getFBO();
+		CameraFrustum& camera = m_viewport->getCameraFrustum();
+		_updateCamera(deltaTime, camera, fbo);
 	}
 
-	void SceneRenderer::render(Viewport& viewport) const
+	void SceneRenderer::render() const
 	{
 		// get viewport stuff
-		FBO& fbo = viewport.getFBO();
-		CameraFrustum& camera = viewport.getCameraFrustum();
-
-		// update camera matrices
-		camera.viewMatrix = glm::lookAt(camera.position, camera.target, camera.up);
-		float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
-		camera.projectionMatrix = glm::perspective(glm::radians(camera.fov), aspectRatio, camera.nearPlane, camera.farPlane);
-		camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
+		FBO& fbo = m_viewport->getFBO();
+		CameraFrustum& camera = m_viewport->getCameraFrustum();
 
 		//bind fbo
 		fbo.bind();
@@ -132,10 +131,10 @@ namespace SE
 	}
 
 	void SceneRenderer::uploadMeshToGPU(
-		uint32_t meshId, 
-		const std::vector<Vertex>& positions, 
-		const std::vector<SubMesh>& subMeshes, 
-		const std::vector<uint32_t>& indices) const 
+		uint32_t meshId,
+		const std::vector<Vertex>& positions,
+		const std::vector<SubMesh>& subMeshes,
+		const std::vector<uint32_t>& indices) const
 	{
 		MeshGPUData& gpuData = m_meshCache[meshId];
 
@@ -212,5 +211,97 @@ namespace SE
 		}
 
 		m_logger.info("Cleaned up GPU data for mesh {}", meshId);
+	}
+
+	void SceneRenderer::_updateCameraPosition(double deltaTime, CameraFrustum& camera) {
+		auto IS = Engine::Instance().getSubSystem<InputSystem>();
+
+		// x-y plane movement
+		float movespeed = m_cameraMoveSpeed * static_cast<float>(deltaTime);
+		glm::vec3 cameraLookDir = glm::normalize(camera.getTarget() - camera.getPosition());
+		cameraLookDir.y = 0.0f;
+		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraLookDir, WORLD_UP));
+		glm::vec3 CameraMoveDir(0.0f);
+		if (IS->isKeyDown(KeyCodes::KEY_W))
+			CameraMoveDir += cameraLookDir;
+		if (IS->isKeyDown(KeyCodes::KEY_S))
+			CameraMoveDir += -cameraLookDir;
+		if (IS->isKeyDown(KeyCodes::KEY_A))
+			CameraMoveDir += -cameraRight;
+		if (IS->isKeyDown(KeyCodes::KEY_D))
+			CameraMoveDir += cameraRight;
+
+		if (glm::length(CameraMoveDir) > 0.0f) {
+			CameraMoveDir = glm::normalize(CameraMoveDir);
+			camera.move(CameraMoveDir * movespeed);
+		}
+
+		// camera dolly movement (to and from target)
+		float dollySpeed = m_cameraDollySpeed * static_cast<float>(deltaTime);
+		glm::vec3 lookDir = glm::normalize(camera.getTarget() - camera.getPosition());
+		if (IS->getMouseScroll().yoffset > 0.0)
+		{
+			camera.move(lookDir * dollySpeed);
+		}
+		if (IS->getMouseScroll().yoffset < 0.0)
+		{
+			camera.move(-lookDir * dollySpeed);
+		}
+
+		// camera y-axis movement
+		if (IS->isKeyDown(KeyCodes::KEY_SPACE))
+			camera.move(WORLD_UP * movespeed);
+		if (IS->isKeyDown(KeyCodes::KEY_LEFT_CONTROL))
+			camera.move(-WORLD_UP * movespeed);
+	}
+
+	void SceneRenderer::_updateCameraTarget(double deltaTime, CameraFrustum& camera) {
+		auto IS = Engine::Instance().getSubSystem<InputSystem>();
+
+		if (IS->isMouseDown(MouseCodes::MOUSE_BUTTON_3))
+		{
+			glm::vec2 mouseDelta = glm::vec2{ IS->getMouseDelta().x, IS->getMouseDelta().y };
+
+			glm::vec3 cameraDirection = glm::normalize(camera.getTarget() - camera.getPosition());
+			glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDirection, WORLD_UP));
+			glm::vec3 cameraUp = glm::normalize(glm::cross(cameraRight, cameraDirection));
+
+			float yawAngle = -mouseDelta.x * m_sensitivity;
+			glm::mat4 yawRotation = glm::rotate(glm::mat4(1.0f), yawAngle, cameraUp);
+			cameraDirection = glm::vec3(yawRotation * glm::vec4(cameraDirection, 0.0f));
+			// Limit pitch avoid gimbal lock
+			float pitchAngle = -mouseDelta.y * m_sensitivity;
+			glm::vec3 newDirection = glm::vec3(glm::rotate(glm::mat4(1.0f), pitchAngle, cameraRight) * glm::vec4(cameraDirection, 0.0f));
+			float upDot = glm::dot(newDirection, WORLD_UP);
+			if (upDot < 0.999f && upDot > -0.999f) {
+				cameraDirection = newDirection;
+			}
+
+			float distance = glm::length(camera.getTarget() - camera.getPosition());
+			glm::vec3 cameraTarget = camera.getPosition() + cameraDirection * distance;
+			camera.setTarget(cameraTarget);
+		}
+	}
+
+	void SceneRenderer::_updateCamera(double deltaTime, CameraFrustum& camera, FBO& fbo) {
+		auto IS = Engine::Instance().getSubSystem<InputSystem>();
+		if (IS->isKeyRising(KeyCodes::KEY_LEFT_SHIFT)) {
+			m_cameraMoveSpeed *= 2.0f;
+			m_cameraDollySpeed *= 2.0f;
+		}
+		else if (IS->isKeyFalling(KeyCodes::KEY_LEFT_SHIFT))
+		{
+			m_cameraMoveSpeed /= 2.0f;
+			m_cameraDollySpeed /= 2.0f;
+		}
+		_updateCameraPosition(deltaTime, camera);
+		_updateCameraTarget(deltaTime, camera);
+		if (camera.isDirty) {
+			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(), WORLD_UP); // 0,1,0 is up vector
+			float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
+			camera.projectionMatrix = glm::perspective(glm::radians(camera.getFOV()), aspectRatio, camera.getNearPlane(), camera.getFarPlane());
+			camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
+			camera.isDirty = false;
+		}
 	}
 }
