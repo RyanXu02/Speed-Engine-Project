@@ -16,6 +16,8 @@ namespace SE
 		Engine& operator=(Engine&&) = delete;
 
 		~Engine();
+		// @brief Get the singleton instance of the Engine
+		// @brief THIS SHOULD BE THE ONLY INTERFACE TO ACCESS ANY SUBSYSTEMS WITHIN THE ENGINE
 		static Engine& Instance();
 
 		void init();

@@ -10,6 +10,11 @@ namespace SE
 	public:
 		SubSystem(const std::string& name);
 		virtual ~SubSystem();
+
+		SubSystem(const SubSystem&) = delete;
+		SubSystem& operator=(const SubSystem&) = delete;
+		SubSystem(SubSystem&&) = delete;
+		SubSystem& operator=(SubSystem&&) = delete;
 		
 		const std::string& getName() const 
 		{

@@ -26,6 +26,7 @@ namespace SE
 		virtual bool updateComponent() = 0;
 		virtual bool renderComponent() = 0;
 
+		// @brief Used to render information and controls about this component to ImGui properties window
 		virtual bool renderImGuiInterface() = 0;
 
 		virtual bool shutdownComponent() = 0;
