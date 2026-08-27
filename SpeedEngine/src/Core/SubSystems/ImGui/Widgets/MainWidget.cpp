@@ -45,10 +45,13 @@ namespace SE
 			if (ImGui::BeginMenu("Camera"))
 			{
 				auto* SR = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
-				ImGui::SliderFloat("sensitivity", &SR->getCameraSensitivity(), 0.001f, 0.01f);
-				ImGui::SliderFloat("MoveSpeed", &SR->getCameraMoveSpeed(), 1.0f, 20.0f);
-				ImGui::SliderFloat("DollySpeed", &SR->getCameraDollySpeed(), 1.0f, 40.0f);
-				ImGui::EndMenu();
+				if (SR)
+				{
+					ImGui::SliderFloat("sensitivity", &SR->getCameraSensitivity(), 0.001f, 0.01f);
+					ImGui::SliderFloat("MoveSpeed", &SR->getCameraMoveSpeed(), 1.0f, 20.0f);
+					ImGui::SliderFloat("DollySpeed", &SR->getCameraDollySpeed(), 1.0f, 40.0f);
+					ImGui::EndMenu();
+				}
 			}
 		}
 		ImGui::EndMainMenuBar();

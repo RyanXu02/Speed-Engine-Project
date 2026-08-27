@@ -12,7 +12,7 @@
 // Include before GLFW to avoid macro redefinition
 #include <Windows.h>
 
-// glm swizle
+// glm swizzle
 #define GLM_FORCE_SWIZZLE
 
 
