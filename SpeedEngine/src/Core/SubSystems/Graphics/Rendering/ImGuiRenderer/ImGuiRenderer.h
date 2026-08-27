@@ -10,8 +10,9 @@ namespace SE
 	// @brief Renderer that uses ImGui to render widgets
     class ImGuiRenderer : public Renderer
     {
+		friend class RendererManager;
+
 	public:
-		ImGuiRenderer(Logger& logger, const Window& window) : Renderer(logger, "ImGuiRenderer"), m_window(&window) {}
 
 		void init() override;
 		void initWidgets();
@@ -54,6 +55,8 @@ namespace SE
 		void finalizeFrame() const;
 
 	private:
+		ImGuiRenderer(Logger& logger, const Window& window) : Renderer(logger, "ImGuiRenderer"), m_window(&window) {}
+		
 		std::unordered_map<uint32_t, std::unique_ptr<Widget>> m_widgets;
 
 		std::atomic<uint32_t> m_ids{ 0 };

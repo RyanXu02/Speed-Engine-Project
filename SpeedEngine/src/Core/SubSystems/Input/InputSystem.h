@@ -45,8 +45,11 @@ namespace SE {
 		// @brief Mouse button is currently up (button 0)
 		bool isMouseUp(MouseCodes key) const;
 
+		// @brief Get mouse position in screen space (0,0 top left corner)
 		const MousePos& getMousePosition() const;
+		// @brief Get mouse position delta between last and this frame
 		const MousePos& getMouseDelta() const;
+		// @brief Get mouse scroll offset, automatically reset to 0 after each frame
 		const MouseScroll& getMouseScroll() const;
 
 	private:
