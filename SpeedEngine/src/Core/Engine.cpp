@@ -64,9 +64,9 @@ namespace SE
 		// temp
 		getSubSystem<SceneSystem>()->newScene("TestScene");
 		getSubSystem<SceneSystem>()->setCurrentScene("TestScene");
-		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity"));
-		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny"));
-		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("room"));
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny middle"));
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny right"));
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny left"));
 		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
 
 
@@ -77,15 +77,25 @@ namespace SE
 		uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
 		uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 		
-		auto entity1 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(2);
+		auto entity1 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(1);
 		entity1->addComponent(std::make_unique<Mesh>());
 		entity1->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
 		entity1->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-		auto entity2 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(3);
+		auto entity2 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(2);
 		entity2->addComponent(std::make_unique<Mesh>());
-		entity2->getComponent<Mesh>()->setMeshResourceId(roommeshId2);
-		entity2->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		entity2->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
+		entity2->getComponent<Transform>()->setPosition(glm::vec3(2.0f, 0.0f, 0.0f));
+
+		auto entity3 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(3);
+		entity3->addComponent(std::make_unique<Mesh>());
+		entity3->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
+		entity3->getComponent<Transform>()->setPosition(glm::vec3(-2.0f, 0.0f, 0.0f));
+
+		//auto entity2 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(3);
+		//entity2->addComponent(std::make_unique<Mesh>());
+		//entity2->getComponent<Mesh>()->setMeshResourceId(roommeshId2);
+		//entity2->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		// end temp
 
 

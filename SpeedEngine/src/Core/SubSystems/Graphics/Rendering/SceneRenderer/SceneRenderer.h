@@ -22,15 +22,18 @@ namespace SE
     class SceneRenderer : public Renderer
     {
     public:
-		SceneRenderer(Logger& logger) : Renderer(logger, "SceneRenderer") {};
+		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport) : Renderer(logger, "SceneRenderer", std::move(viewport)) {
+		}
 
         void init() override;
         void shutdown() override;
         void update(double deltaTime) override;
 
-        void render(Viewport& viewport) const override;
+        void render() const override;
 
-
+		float& getCameraSensitivity() { return m_sensitivity; }
+		float& getCameraMoveSpeed() { return m_cameraMoveSpeed; }
+        float& getCameraDollySpeed() { return m_cameraDollySpeed; }
     private:
         std::vector<Entity*> getDrawableEntities() const;
 
@@ -48,6 +51,14 @@ namespace SE
 
         // Default shader for meshes without material
         uint32_t m_defaultShaderId = 1;
+
+        // Camera controls
+		void _updateCameraPosition(double deltaTime, CameraFrustum& camera);
+		void _updateCameraTarget(double deltaTime, CameraFrustum& camera);
+		void _updateCamera(double deltaTime, CameraFrustum& camera, FBO& fbo);
+		float m_sensitivity = 0.005f;
+		float m_cameraMoveSpeed = 6.0f;
+		float m_cameraDollySpeed = 10.0f;
     };
 }
 

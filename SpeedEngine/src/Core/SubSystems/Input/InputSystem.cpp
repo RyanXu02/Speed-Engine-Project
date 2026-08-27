@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "InputSystem.h"
+#include "Engine.h"
 
 #include "GLFW/glfw3.h"
 
@@ -10,11 +11,20 @@ namespace SE
 	void InputSystem::init()
 	{
 		SubSystem::init();
+
+		glfwSetScrollCallback(glfwGetCurrentContext(),
+			[](GLFWwindow* window, double xoffset, double yoffset)
+			{
+				Engine::Instance().getSubSystem<InputSystem>()->scroll_callback(window, xoffset, yoffset);
+			});
 	}
 
 	void InputSystem::update(double deltaTime)
 	{
 		SubSystem::update(deltaTime);
+
+		m_mouseScroll = m_mouseScrollAccumulated;
+		m_mouseScrollAccumulated = { 0.0, 0.0 };
 
 		// update key states
 		m_keyPrevState = m_keyCurrState;
@@ -62,7 +72,10 @@ namespace SE
 		m_mouseFalling = mouseChanges & (~m_mouseCurrState);
 
 		// update mouse pos
+		m_prevMousePosition = m_mousePosition;
 		glfwGetCursorPos(glfwGetCurrentContext(), &m_mousePosition.x, &m_mousePosition.y);
+		m_mouseDelta.x = m_mousePosition.x - m_prevMousePosition.x;
+		m_mouseDelta.y = m_mousePosition.y - m_prevMousePosition.y;
 	}
 
 	void InputSystem::shutdown()
@@ -115,6 +128,16 @@ namespace SE
 		return m_mousePosition;
 	}
 
+	const MousePos& InputSystem::getMouseDelta() const
+	{
+		return m_mouseDelta;
+	}
+
+	const MouseScroll& InputSystem::getMouseScroll() const
+	{
+		return m_mouseScroll;
+	}
+
 	void InputSystem::_setKeyState(KeyCodes key)
 	{
 		m_keyCurrState.set(static_cast<size_t>(key));
@@ -133,5 +156,10 @@ namespace SE
 	void InputSystem::_clearMouseState(MouseCodes key)
 	{
 		m_mouseCurrState.reset(static_cast<size_t>(key));
+	}
+
+	void InputSystem::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+		m_mouseScrollAccumulated.xoffset += xoffset;
+		m_mouseScrollAccumulated.yoffset += yoffset;
 	}
 }

@@ -2,13 +2,20 @@
 #include "../SubSystem.h"
 #include "KeyCodes.h"
 
-namespace SE {
+struct GLFWwindow;
 
+namespace SE {
 	// @brief 0 at top left corner, measured in screen space (sub)pixels
 	struct MousePos
 	{
 		double x;
 		double y;
+	};
+
+	struct MouseScroll
+	{
+		double xoffset;
+		double yoffset;
 	};
 
 	class InputSystem : public SubSystem
@@ -39,6 +46,8 @@ namespace SE {
 		bool isMouseUp(MouseCodes key) const;
 
 		const MousePos& getMousePosition() const;
+		const MousePos& getMouseDelta() const;
+		const MouseScroll& getMouseScroll() const;
 
 	private:
 		InputSystem() : SubSystem("InputSystem") {}
@@ -48,6 +57,8 @@ namespace SE {
 
 		void _setMouseState(MouseCodes key);
 		void _clearMouseState(MouseCodes key);
+
+		void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 		std::bitset<512> m_keyCurrState{ 0 };
 		std::bitset<512> m_keyPrevState{ 0 };
@@ -60,6 +71,11 @@ namespace SE {
 		std::bitset<8> m_mouseFalling{ 0 };
 
 		MousePos m_mousePosition{ 0.0, 0.0 };
+		MousePos m_prevMousePosition{ 0.0, 0.0 };
+		MousePos m_mouseDelta{ 0.0, 0.0 }; // per-frame
+
+		MouseScroll m_mouseScroll{ 0.0, 0.0 };
+		MouseScroll m_mouseScrollAccumulated{ 0.0, 0.0 };
 	};
 }
 
