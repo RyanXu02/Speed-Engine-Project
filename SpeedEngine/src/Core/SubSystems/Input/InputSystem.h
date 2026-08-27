@@ -46,6 +46,7 @@ namespace SE {
 		bool isMouseUp(MouseCodes key) const;
 
 		const MousePos& getMousePosition() const;
+		const MousePos& getMouseDelta() const;
 		const MouseScroll& getMouseScroll() const;
 
 	private:
@@ -70,6 +71,8 @@ namespace SE {
 		std::bitset<8> m_mouseFalling{ 0 };
 
 		MousePos m_mousePosition{ 0.0, 0.0 };
+		MousePos m_prevMousePosition{ 0.0, 0.0 };
+		MousePos m_mouseDelta{ 0.0, 0.0 }; // per-frame
 
 		MouseScroll m_mouseScroll{ 0.0, 0.0 };
 		MouseScroll m_mouseScrollAccumulated{ 0.0, 0.0 };

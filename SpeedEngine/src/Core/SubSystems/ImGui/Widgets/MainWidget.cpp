@@ -3,6 +3,8 @@
 #include "Engine.h"
 
 #include "../../Scenes/SceneSystem.h"
+#include "../../Graphics/Rendering/RendererManager.h"
+#include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 
 #include <imgui.h>
 
@@ -38,6 +40,14 @@ namespace SE
 					}
 				}
 				// add prefabs later
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Camera"))
+			{
+				auto* SR = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
+				ImGui::SliderFloat("sensitivity", &SR->getCameraSensitivity(), 0.001f, 0.01f);
+				ImGui::SliderFloat("MoveSpeed", &SR->getCameraMoveSpeed(), 1.0f, 20.0f);
+				ImGui::SliderFloat("DollySpeed", &SR->getCameraDollySpeed(), 1.0f, 40.0f);
 				ImGui::EndMenu();
 			}
 		}
