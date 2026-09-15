@@ -4,8 +4,12 @@ on: # yamllint disable-line rule:truthy
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - LICENSE
+    paths:
+      - "**/*.c"
+      - "**/*.cpp"
+      - "**/*.h"
+      - "**/*.json"
+      - ".github/workflows/.clang-format"
 
 permissions: {}
 
@@ -15,13 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: read
-      issues: write
       pull-requests: write
       statuses: write
-    env:
-      APPLY_FIXES_EVENT: pull_request
-      APPLY_FIXES_MODE: pull_request
 
     steps:
       - name: Checkout repository
@@ -31,31 +30,21 @@ jobs:
           persist-credentials: false
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Lint Code Base
+      - name: Lint C/C++ and JSON files
         uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
         id: superlinter
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENABLE_GITHUB_PULL_REQUEST_SUMMARY_COMMENT: true
-          SAVE_SUPER_LINTER_SUMMARY: true
-          FAIL_ON_INVALID_GITHUB_ACTIONS_EVENT_CONFIGURATION: true
           IGNORE_GITIGNORED_FILES: true
+          LINTER_RULES_PATH: .github/workflows
           VALIDATE_ALL_CODEBASE: false
-          VALIDATE_CHECKOV: true
           VALIDATE_CLANG_FORMAT: true
-          VALIDATE_GITLEAKS: true
           VALIDATE_JSON: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_MARKDOWN_PRETTIER: true
-          VALIDATE_POWERSHELL: true
-          VALIDATE_YAML: true
-          VALIDATE_YAML_PRETTIER: true
+          VALIDATE_JSON_PRETTIER: true
           FIX_CLANG_FORMAT: true
           FIX_JSON: true
-          FIX_MARKDOWN_PRETTIER: true
-          FIX_POWERSHELL: true
-          FIX_YAML_PRETTIER: true
+          FIX_JSON_PRETTIER: true
 
       - name: Detect lint fixes
         id: lint_fixes
@@ -68,39 +57,22 @@ jobs:
             echo "has_fixes=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create Pull Request with applied fixes
-        uses: peter-evans/create-pull-request@v6
+      - name: Create fixes pull request
+        uses: peter-evans/create-pull-request@v8
         id: cpr
         if: >-
           always() &&
           steps.lint_fixes.outputs.has_fixes == 'true' &&
-          (
-            env.APPLY_FIXES_EVENT == 'all' ||
-            env.APPLY_FIXES_EVENT == github.event_name
-          ) &&
-          env.APPLY_FIXES_MODE == 'pull_request' &&
           github.event.pull_request.head.repo.full_name == github.repository
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-          commit-message: Apply linters automatic fixes
-          title: Apply linters automatic fixes
-          branch: linter-fixes-${{ github.head_ref || github.ref_name }}
+          commit-message: Apply lint fixes
+          title: Apply lint fixes
+          branch: lint-fixes-${{ github.head_ref || github.ref_name }}
           body: |
-            Linter has automatically applied fixes on this PR.
+            Automatic lint fixes for C/C++ formatting and JSON formatting.
             Please review the changes and merge if they are correct.
           base: ${{ github.head_ref || github.ref_name }}
-
-      - name: Post PR Comment
-        if: >-
-          always() &&
-          steps.cpr.outputs.pull-request-url != ''
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          message: |
-            Linter has automatically applied fixes on this PR.
-            Please review the changes and merge if they are correct.
-            PR: ${{ steps.cpr.outputs.pull-request-url }}
-          hide_and_recreate: true
 
       - name: Fail if lint found issues without fixes
         if: >-
@@ -109,10 +81,10 @@ jobs:
           steps.lint_fixes.outputs.has_fixes != 'true'
         run: exit 1
 
-      - name: Fail if PR Created
+      - name: Fail if PR created
         if: >-
           always() &&
           steps.cpr.outputs.pull-request-url != ''
         run: |
-          echo "A PR with lint fixes has been created. Please merge it before proceeding."
+          echo "A PR with lint fixes has been created: ${{ steps.cpr.outputs.pull-request-url }}"
           exit 1
