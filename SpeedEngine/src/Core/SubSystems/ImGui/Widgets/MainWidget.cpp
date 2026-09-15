@@ -24,30 +24,23 @@ namespace SE
 			if (ImGui::BeginMenu("Edit"))
 			{
 				if (ImGui::MenuItem("Undo", "Ctrl+Z"))
-				{
-				}
+				{}
 				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false))
-				{
-				} // Disabled item
+				{} // Disabled item
 				ImGui::Separator();
 				if (ImGui::MenuItem("Cut", "Ctrl+X"))
-				{
-				}
+				{}
 				if (ImGui::MenuItem("Copy", "Ctrl+C"))
-				{
-				}
+				{}
 				if (ImGui::MenuItem("Paste", "Ctrl+V"))
-				{
-				}
+				{}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Entity"))
 			{
 				if (ImGui::MenuItem("Create Empty"))
 				{
-					if (Scene* scene = Engine::Instance()
-					                       .getSubSystem<SceneSystem>()
-					                       ->getCurrentScene())
+					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
 						scene->addEntity(std::make_unique<Entity>("New Empty"));
 					}
@@ -57,9 +50,7 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Camera"))
 			{
-				auto* SR = Engine::Instance()
-				               .getSubSystem<RendererManager>()
-				               ->getRenderer<SceneRenderer>();
+				auto* SR = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
 				if (SR)
 				{
 					ImGui::SliderFloat("sensitivity", &SR->getCameraSensitivity(), 0.001f, 0.01f);

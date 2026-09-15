@@ -52,8 +52,7 @@ namespace SE
 		uint32_t _assignId() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 
 		// map of event type to vector of callbacks
-		std::unordered_map<EventType, std::vector<EventCallbackWrapper>>
-		    m_allEventCallbacks;
+		std::unordered_map<EventType, std::vector<EventCallbackWrapper>> m_allEventCallbacks;
 		// queue of events to be processed
 		std::queue<std::unique_ptr<Event>> m_eventQueue;
 

@@ -13,8 +13,7 @@ namespace SE
 	{
 		m_resourceCache = Engine::Instance().getSubSystem<ResourceManager>()->getInitialRTMap();
 
-		m_resourceChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(
-		    EventType::ResourceChanged,
+		m_resourceChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ResourceChanged,
 		    [this](Event& event)
 		    {
 			    ResourceChanged& rce = static_cast<ResourceChanged&>(event);
@@ -67,24 +66,20 @@ namespace SE
 			avail_width += floorf(m_layout.itemSpacing * 0.5f);
 
 		m_layout.itemSize = ImVec2(floorf(m_options.iconSize), floorf(m_options.iconSize));
-		m_layout.columnCount = std::max(
-		    (int)(avail_width / (m_layout.itemSize.x + m_layout.itemSpacing)),
-		    1);
+		m_layout.columnCount = std::max((int)(avail_width / (m_layout.itemSize.x + m_layout.itemSpacing)), 1);
 
 		if (m_options.stretchSpacing && m_layout.columnCount > 1)
 			m_layout.itemSpacing = floorf(avail_width - m_layout.itemSize.x * m_layout.columnCount) / m_layout.columnCount;
 
 		m_layout.lineCount = (static_cast<int>(m_resourceCache.size()) + m_layout.columnCount - 1) / m_layout.columnCount;
-		m_layout.itemStep = ImVec2(m_layout.itemSize.x + m_layout.itemSpacing,
-		    m_layout.itemSize.y + m_layout.itemSpacing);
+		m_layout.itemStep = ImVec2(m_layout.itemSize.x + m_layout.itemSpacing, m_layout.itemSize.y + m_layout.itemSpacing);
 	}
 
 	void ResourceBrowserWidget::DrawResourceGrid()
 	{
 		ImGui::BeginChild("ResourceGrid", ImVec2(0, 0), 0, ImGuiChildFlags_AlwaysUseWindowPadding);
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-		    ImVec2(m_options.iconSpacing, m_options.iconSpacing));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(m_options.iconSpacing, m_options.iconSpacing));
 
 		int col = 0;
 		for (const auto& [id, type] : m_resourceCache)
@@ -113,8 +108,7 @@ namespace SE
 
 		ImGui::PushID(id);
 		ImGui::PushStyleColor(ImGuiCol_Button, bgColor);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
-		    ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.26f, 0.59f, 0.98f, 0.4f));
 
 		Resource* res = Engine::Instance().getSubSystem<ResourceManager>()->getResource(id);
 		std::string name = res ? res->getResourceName() : "<missing>";
@@ -192,19 +186,14 @@ namespace SE
 		ImGui::PopID();
 	}
 
-	const char*
-	ResourceBrowserWidget::GetResourceTypeString(ResourceType type) const
+	const char* ResourceBrowserWidget::GetResourceTypeString(ResourceType type) const
 	{
 		switch (type)
 		{
-		case ResourceType::Shader:
-			return "Shader";
-		case ResourceType::Material:
-			return "Material";
-		case ResourceType::MeshResource:
-			return "Mesh";
-		default:
-			return "Unknown";
+		case ResourceType::Shader: return "Shader";
+		case ResourceType::Material: return "Material";
+		case ResourceType::MeshResource: return "Mesh";
+		default: return "Unknown";
 		}
 	}
 
@@ -212,14 +201,10 @@ namespace SE
 	{
 		switch (type)
 		{
-		case ResourceType::Shader:
-			return ImVec4(0.2f, 0.8f, 0.2f, 0.8f); // Green
-		case ResourceType::Material:
-			return ImVec4(0.8f, 0.2f, 0.8f, 0.8f); // Magenta
-		case ResourceType::MeshResource:
-			return ImVec4(0.1f, 0.2f, 0.8f, 0.8f); // Blue
-		default:
-			return ImVec4(0.5f, 0.5f, 0.5f, 0.8f); // Gray
+		case ResourceType::Shader: return ImVec4(0.2f, 0.8f, 0.2f, 0.8f); // Green
+		case ResourceType::Material: return ImVec4(0.8f, 0.2f, 0.8f, 0.8f); // Magenta
+		case ResourceType::MeshResource: return ImVec4(0.1f, 0.2f, 0.8f, 0.8f); // Blue
+		default: return ImVec4(0.5f, 0.5f, 0.5f, 0.8f); // Gray
 		}
 	}
 

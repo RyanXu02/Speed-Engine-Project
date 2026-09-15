@@ -17,8 +17,7 @@ namespace SE
 	{
 		other.m_id = 0; // invalidate the moved-from object
 	}
-	EventSubscription&
-	EventSubscription::operator=(EventSubscription&& other) noexcept
+	EventSubscription& EventSubscription::operator=(EventSubscription&& other) noexcept
 	{
 		if (this != &other)
 		{
@@ -32,8 +31,7 @@ namespace SE
 
 	void EventSubscription::unsubscribe() const
 	{
-		Engine::Instance().getSubSystem<EventSystem>()->unsubscribe(m_id,
-		    m_eventType);
+		Engine::Instance().getSubSystem<EventSystem>()->unsubscribe(m_id, m_eventType);
 	}
 
 } // namespace SE

@@ -37,8 +37,7 @@ namespace SE
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // IF using Docking Branch
 
 		// Setup Platform/Renderer backends
-		ImGui_ImplGlfw_InitForOpenGL(
-		    m_window->getWindow(),
+		ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(),
 		    true); // Second param install_callback=true will install GLFW callbacks
 		// and chain to existing ones.
 		ImGui_ImplOpenGL3_Init();

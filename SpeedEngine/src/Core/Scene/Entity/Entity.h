@@ -33,8 +33,7 @@ namespace SE
 
 		void addComponent(std::unique_ptr<Component> component);
 
-		template<typename T>
-		T* getComponent() const
+		template<typename T> T* getComponent() const
 		{
 			for (const auto& component : m_components)
 			{
@@ -46,10 +45,7 @@ namespace SE
 			return nullptr;
 		}
 
-		const std::vector<std::unique_ptr<Component>>& getComponents() const
-		{
-			return m_components;
-		}
+		const std::vector<std::unique_ptr<Component>>& getComponents() const { return m_components; }
 
 	private:
 		bool m_isAlive{ true };

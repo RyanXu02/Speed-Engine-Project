@@ -82,10 +82,7 @@ namespace SE
 
 		EventType getEventType() const override { return EventType::SceneChanged; }
 		std::string getName() const override { return "SceneChanged"; }
-		std::string getDataAsString() const override
-		{
-			return std::format("changing scene to {}", name);
-		}
+		std::string getDataAsString() const override { return std::format("changing scene to {}", name); }
 	};
 
 	// @brief Event that is triggered when the active scene is modified
@@ -106,18 +103,9 @@ namespace SE
 		      id(id),
 		      name(name)
 		{}
-		EventType getEventType() const override
-		{
-			return EventType::ActiveSceneModified;
-		}
+		EventType getEventType() const override { return EventType::ActiveSceneModified; }
 		std::string getName() const override { return "ActiveSceneModified"; }
-		std::string getDataAsString() const override
-		{
-			return std::format("modifytype {}, id {}, name {}",
-			    static_cast<int>(modifytype),
-			    id,
-			    name);
-		}
+		std::string getDataAsString() const override { return std::format("modifytype {}, id {}, name {}", static_cast<int>(modifytype), id, name); }
 	};
 
 	// @brief Event that is triggered when an entity is selected in the
@@ -132,9 +120,6 @@ namespace SE
 		{}
 		EventType getEventType() const override { return EventType::EntitySelected; }
 		std::string getName() const override { return "EntitySelected"; }
-		std::string getDataAsString() const override
-		{
-			return std::format("Entity with id {} has been selected", id);
-		}
+		std::string getDataAsString() const override { return std::format("Entity with id {} has been selected", id); }
 	};
 } // namespace SE

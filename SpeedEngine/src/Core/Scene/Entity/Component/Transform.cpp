@@ -65,8 +65,7 @@ namespace SE
 					}
 				}
 			};
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-			    ImVec2(4, ImGui::GetStyle().ItemSpacing.y));
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, ImGui::GetStyle().ItemSpacing.y));
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.218f); // hardcoded to align these 3 dragfloats to be
 			    // the same as a single dragfloat3
 			float oldx = m_scale[0];

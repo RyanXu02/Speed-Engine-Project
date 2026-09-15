@@ -13,14 +13,10 @@ namespace SE
 	{
 		SubSystem::init();
 
-		glfwSetScrollCallback(
-		    glfwGetCurrentContext(),
+		glfwSetScrollCallback(glfwGetCurrentContext(),
 		    [](GLFWwindow* window, double xoffset, double yoffset)
 		    {
-			    Engine::Instance().getSubSystem<InputSystem>()->scroll_callback(
-			        window,
-			        xoffset,
-			        yoffset);
+			    Engine::Instance().getSubSystem<InputSystem>()->scroll_callback(window, xoffset, yoffset);
 		    });
 	}
 
@@ -38,14 +34,9 @@ namespace SE
 			KeyCodes thisKey = static_cast<KeyCodes>(key);
 			switch (glfwGetKey(glfwGetCurrentContext(), key))
 			{
-			case GLFW_PRESS:
-				_setKeyState(thisKey);
-				break;
-			case GLFW_RELEASE:
-				_clearKeyState(thisKey);
-				break;
-			default:
-				break;
+			case GLFW_PRESS: _setKeyState(thisKey); break;
+			case GLFW_RELEASE: _clearKeyState(thisKey); break;
+			default: break;
 			}
 		}
 
@@ -56,14 +47,9 @@ namespace SE
 			MouseCodes thisButton = static_cast<MouseCodes>(button);
 			switch (glfwGetMouseButton(glfwGetCurrentContext(), button))
 			{
-			case GLFW_PRESS:
-				_setMouseState(thisButton);
-				break;
-			case GLFW_RELEASE:
-				_clearMouseState(thisButton);
-				break;
-			default:
-				break;
+			case GLFW_PRESS: _setMouseState(thisButton); break;
+			case GLFW_RELEASE: _clearMouseState(thisButton); break;
+			default: break;
 			}
 		}
 

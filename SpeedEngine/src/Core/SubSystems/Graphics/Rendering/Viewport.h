@@ -79,10 +79,7 @@ namespace SE
 		FBO& getFBO() { return *m_FBO; }
 
 		CameraFrustum& getCameraFrustum() { return m_cameraFrustum; }
-		void setCameraFrustum(const CameraFrustum& frustum)
-		{
-			m_cameraFrustum = frustum;
-		}
+		void setCameraFrustum(const CameraFrustum& frustum) { m_cameraFrustum = frustum; }
 
 		void setActive(bool active) { m_isActive = active; }
 		bool isActive() const { return m_isActive; }

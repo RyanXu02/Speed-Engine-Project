@@ -61,9 +61,7 @@ namespace SE
 	{
 		if (m_meshResourceId == 0)
 			return nullptr;
-		return static_cast<MeshResource*>(
-		    Engine::Instance().getSubSystem<ResourceManager>()->getResource(
-		        m_meshResourceId));
+		return static_cast<MeshResource*>(Engine::Instance().getSubSystem<ResourceManager>()->getResource(m_meshResourceId));
 	}
 
 	bool Mesh::hasValidResource() const

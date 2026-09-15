@@ -12,12 +12,10 @@ namespace SE
 
 		Result parsedfile;
 		if (mtlpath.empty())
-			parsedfile = ParseFile(
-			    objpath,
+			parsedfile = ParseFile(objpath,
 			    MaterialLibrary::Default(Load::Optional)); // no mtl provided
 		else
-			parsedfile = ParseFile(
-			    objpath,
+			parsedfile = ParseFile(objpath,
 			    MaterialLibrary::SearchPathW(mtlpath)); // mtl provided
 
 		if (parsedfile.error)
@@ -60,9 +58,7 @@ namespace SE
 					size_t pos_idx = static_cast<size_t>(idx.position_index) * 3;
 					if (pos_idx + 2 < parsedfile.attributes.positions.size())
 					{
-						vertex.position = glm::vec3(parsedfile.attributes.positions[pos_idx],
-						    parsedfile.attributes.positions[pos_idx + 1],
-						    parsedfile.attributes.positions[pos_idx + 2]);
+						vertex.position = glm::vec3(parsedfile.attributes.positions[pos_idx], parsedfile.attributes.positions[pos_idx + 1], parsedfile.attributes.positions[pos_idx + 2]);
 					}
 				}
 
@@ -72,9 +68,7 @@ namespace SE
 					size_t norm_idx = static_cast<size_t>(idx.normal_index) * 3;
 					if (norm_idx + 2 < parsedfile.attributes.normals.size())
 					{
-						vertex.normal = glm::vec3(parsedfile.attributes.normals[norm_idx],
-						    parsedfile.attributes.normals[norm_idx + 1],
-						    parsedfile.attributes.normals[norm_idx + 2]);
+						vertex.normal = glm::vec3(parsedfile.attributes.normals[norm_idx], parsedfile.attributes.normals[norm_idx + 1], parsedfile.attributes.normals[norm_idx + 2]);
 					}
 				}
 
@@ -84,8 +78,7 @@ namespace SE
 					size_t tex_idx = static_cast<size_t>(idx.texcoord_index) * 2;
 					if (tex_idx + 1 < parsedfile.attributes.texcoords.size())
 					{
-						vertex.uv = glm::vec2(parsedfile.attributes.texcoords[tex_idx],
-						    parsedfile.attributes.texcoords[tex_idx + 1]);
+						vertex.uv = glm::vec2(parsedfile.attributes.texcoords[tex_idx], parsedfile.attributes.texcoords[tex_idx + 1]);
 					}
 				}
 
@@ -96,10 +89,7 @@ namespace SE
 			m_submeshes.push_back(submesh);
 		}
 
-		m_logger.info("Loaded mesh: {} vertices, {} indices, {} submeshes",
-		    m_vertices.size(),
-		    m_indices.size(),
-		    m_submeshes.size());
+		m_logger.info("Loaded mesh: {} vertices, {} indices, {} submeshes", m_vertices.size(), m_indices.size(), m_submeshes.size());
 
 		return true;
 	}

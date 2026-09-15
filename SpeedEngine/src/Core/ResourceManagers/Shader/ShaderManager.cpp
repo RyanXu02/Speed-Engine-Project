@@ -39,40 +39,32 @@ namespace SE
 	//@param programName name of shader program to create
 	//@returns id of new shader, or id of existing shader if new shader would be a
 	// duplicate name
-	uint32_t ShaderManager::addShader(uint32_t id,
-	    std::string_view vertexShaderPath,
-	    std::string_view fragmentShaderPath,
-	    std::string_view programName)
+	uint32_t ShaderManager::addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName)
 	{
 		// check if vertex and fragment shader paths are valid
 		auto shaderPaths = _verifyShaderPaths(vertexShaderPath, fragmentShaderPath);
 		if (shaderPaths.first.empty() || shaderPaths.second.empty())
 		{
-			m_logger->critical("One or more invalid shader paths: {} and {}",
-			    vertexShaderPath,
-			    fragmentShaderPath);
+			m_logger->critical("One or more invalid shader paths: {} and {}", vertexShaderPath, fragmentShaderPath);
 			return 0;
 		}
 		// look for in cache
-		auto it = std::ranges::find_if(m_shaders, [programName](const auto& kv)
+		auto it = std::ranges::find_if(m_shaders,
+		    [programName](const auto& kv)
 		    {
 			    return kv.second->getResourceName() == programName;
 		    });
 		if (it != m_shaders.end())
 		{
-			m_logger->debug("Shader with name already loaded: {} with ID {}",
-			    it->second->getResourceName(),
-			    it->first);
+			m_logger->debug("Shader with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
 			return it->first;
 		}
 
 		// Load shader source code from file
 		auto shader = std::make_unique<Shader>(id, std::string(programName));
 
-		std::string vertexSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(
-		    shaderPaths.first);
-		std::string fragmentSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(
-		    shaderPaths.second);
+		std::string vertexSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.first);
+		std::string fragmentSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.second);
 
 		GLCompStatus status = shader->init(vertexSource, fragmentSource);
 		if (!status.success)
@@ -88,9 +80,7 @@ namespace SE
 		return id;
 	}
 
-	std::pair<std::string, std::string>
-	ShaderManager::_verifyShaderPaths(std::string_view vertexShaderPath,
-	    std::string_view fragmentShaderPath)
+	std::pair<std::string, std::string> ShaderManager::_verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath)
 	{
 		std::pair<std::string, std::string> shaderPaths{ "", "" };
 

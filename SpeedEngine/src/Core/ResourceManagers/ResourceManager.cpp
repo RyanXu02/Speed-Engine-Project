@@ -56,8 +56,7 @@ namespace SE
 			m_logger->warn("Failed to open file: {}", filePath);
 			return "";
 		}
-		std::string contents((std::istreambuf_iterator<char>(file)),
-		    std::istreambuf_iterator<char>());
+		std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		file.close();
 
 		m_stringCache[filePath.data()] = contents;
@@ -95,22 +94,19 @@ namespace SE
 		if (it->second == ResourceType::Shader)
 		{
 			removed = _getManager<ShaderManager>()->removeShader(id);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(
-			    std::make_unique<ResourceChanged>(id, it->second, false));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
 		else if (it->second == ResourceType::Material)
 		{
 			removed = _getManager<MaterialManager>()->removeMaterial(id);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(
-			    std::make_unique<ResourceChanged>(id, it->second, false));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
 		else if (it->second == ResourceType::MeshResource)
 		{
 			removed = _getManager<MeshResourceManager>()->removeMeshResource(id);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(
-			    std::make_unique<ResourceChanged>(id, it->second, false));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
 		//.....

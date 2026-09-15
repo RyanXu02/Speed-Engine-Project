@@ -29,23 +29,18 @@ namespace SE
 		m_logger->info("MeshResourceManager cleared all mesh resources.");
 	}
 
-	uint32_t MeshResourceManager::addMeshResource(
-	    uint32_t id,
-	    std::string_view meshName,
-	    std::string_view objpath,
-	    std::string_view mtlpath)
+	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath)
 	{ // asdfhasfhlsadfsakjf
 		// Check if mesh resource already exists
 
-		auto it = std::ranges::find_if(m_meshresources, [meshName](const auto& kv)
+		auto it = std::ranges::find_if(m_meshresources,
+		    [meshName](const auto& kv)
 		    {
 			    return kv.second->getResourceName() == meshName;
 		    });
 		if (it != m_meshresources.end())
 		{
-			m_logger->debug("MeshResource with name already loaded: {} with ID {}",
-			    it->second->getResourceName(),
-			    it->first);
+			m_logger->debug("MeshResource with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
 			return it->first;
 		}
 

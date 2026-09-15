@@ -34,23 +34,19 @@ namespace SE
 		//@param args arguments to pass for type of resource being added (filepaths,
 		// names, etc)
 		//@returns id of newly added resource
-		template<ResourceType Type, typename... Args>
-		uint32_t addResource(Args&&... args)
+		template<ResourceType Type, typename... Args> uint32_t addResource(Args&&... args)
 		{
 			if constexpr (Type == ResourceType::Shader)
 			{
-				return _addResourceImpl<ResourceType::Shader>(
-				    std::forward<Args>(args)...);
+				return _addResourceImpl<ResourceType::Shader>(std::forward<Args>(args)...);
 			}
 			else if constexpr (Type == ResourceType::Material)
 			{
-				return _addResourceImpl<ResourceType::Material>(
-				    std::forward<Args>(args)...);
+				return _addResourceImpl<ResourceType::Material>(std::forward<Args>(args)...);
 			}
 			else if constexpr (Type == ResourceType::MeshResource)
 			{
-				return _addResourceImpl<ResourceType::MeshResource>(
-				    std::forward<Args>(args)...);
+				return _addResourceImpl<ResourceType::MeshResource>(std::forward<Args>(args)...);
 			}
 			else
 			{
@@ -65,8 +61,7 @@ namespace SE
 		//@param id the id to retrieve
 		//@returns the requested resource of the specified type if it exists, nullptr
 		// if not
-		template<typename T>
-		T* getResource(uint32_t id)
+		template<typename T> T* getResource(uint32_t id)
 		{
 			auto it = m_resourceTypes.find(id);
 			if (it != m_resourceTypes.end())
@@ -99,10 +94,7 @@ namespace SE
 		Resource* getResource(uint32_t id);
 
 		//@brief gets the resource type map as a copy
-		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const
-		{
-			return m_resourceTypes;
-		}
+		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const { return m_resourceTypes; }
 
 		//@brief removes a resource given an id
 		//@param id the id of the resource to remove
@@ -127,8 +119,7 @@ namespace SE
 		std::unordered_map<uint32_t, ResourceType> m_resourceTypes;
 
 		// get manager of type T
-		template<typename T>
-		T* _getManager()
+		template<typename T> T* _getManager()
 		{
 			for (auto& manager : m_managers)
 			{
@@ -141,46 +132,36 @@ namespace SE
 		}
 
 		// helper function to add a resource of a specific type
-		template<ResourceType Type, typename... Args>
-		uint32_t _addResourceImpl(Args&&... args)
+		template<ResourceType Type, typename... Args> uint32_t _addResourceImpl(Args&&... args)
 		{
 			if constexpr (Type == ResourceType::Shader)
 			{
-				uint32_t id = _getManager<ShaderManager>()->addShader(
-				    generateId(),
-				    std::forward<Args>(args)...);
+				uint32_t id = _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
 				if (id != 0)
 				{
 					m_resourceTypes.insert({ id, ResourceType::Shader });
 				}
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-				    std::make_unique<ResourceChanged>(id, Type, true));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
 			else if constexpr (Type == ResourceType::Material)
 			{
-				uint32_t id = _getManager<MaterialManager>()->addMaterial(
-				    generateId(),
-				    std::forward<Args>(args)...);
+				uint32_t id = _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
 				if (id != 0)
 				{
 					m_resourceTypes.insert({ id, ResourceType::Material });
 				}
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-				    std::make_unique<ResourceChanged>(id, Type, true));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
 			else if constexpr (Type == ResourceType::MeshResource)
 			{
-				uint32_t id = _getManager<MeshResourceManager>()->addMeshResource(
-				    generateId(),
-				    std::forward<Args>(args)...);
+				uint32_t id = _getManager<MeshResourceManager>()->addMeshResource(generateId(), std::forward<Args>(args)...);
 				if (id != 0)
 				{
 					m_resourceTypes.insert({ id, ResourceType::MeshResource });
 				}
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-				    std::make_unique<ResourceChanged>(id, Type, true));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
 				return id;
 			}
 			else

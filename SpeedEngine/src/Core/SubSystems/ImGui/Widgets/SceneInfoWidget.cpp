@@ -13,8 +13,7 @@ namespace SE
 	SceneInfoWidget::SceneInfoWidget()
 	    : Widget("Scene Info")
 	{
-		m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(
-		    EventType::ActiveSceneModified,
+		m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified,
 		    [this](Event& event)
 		    {
 			    ActiveSceneModified& asme = static_cast<ActiveSceneModified&>(event);
@@ -32,13 +31,10 @@ namespace SE
 			    }
 		    });
 
-		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(
-		    EventType::SceneChanged,
+		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
 		    [this](Event& event)
 		    {
-			    if (Scene* scene = Engine::Instance()
-			                           .getSubSystem<SceneSystem>()
-			                           ->getCurrentScene())
+			    if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 				    m_entityNameCache = scene->getEntityList();
 			    else
 				    m_entityNameCache.clear();
@@ -151,13 +147,11 @@ namespace SE
 			// Publish the EntitySelected event with the selected entity ID
 			if (m_selectedEntities.size() == 1)
 			{
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-				    std::make_unique<EntitySelected>(*m_selectedEntities.begin()));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<EntitySelected>(*m_selectedEntities.begin()));
 			}
 			else
 			{
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-				    std::make_unique<EntitySelected>(0));
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<EntitySelected>(0));
 			}
 		}
 	}
@@ -167,11 +161,7 @@ namespace SE
 		ImGui::SetKeyboardFocusHere();
 
 		const ImGuiInputTextFlags flags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue;
-		const bool enterPressed = ImGui::InputText(
-		    "##EntityRename",
-		    m_renameBuffer.data(),
-		    m_renameBuffer.size(),
-		    flags);
+		const bool enterPressed = ImGui::InputText("##EntityRename", m_renameBuffer.data(), m_renameBuffer.size(), flags);
 
 		bool cancelRename = false;
 		if (ImGui::IsItemActive() && ImGui::IsKeyPressed(ImGuiKey_Escape))

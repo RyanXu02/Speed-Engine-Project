@@ -41,12 +41,10 @@ namespace SE
 		m_eventQueue.push(std::move(event));
 	}
 
-	EventSubscription EventSystem::subscribe(EventType eventType,
-	    EventCallback callback)
+	EventSubscription EventSystem::subscribe(EventType eventType, EventCallback callback)
 	{
 		uint32_t id = _assignId();
-		m_allEventCallbacks[eventType].emplace_back(
-		    EventCallbackWrapper{ id, callback });
+		m_allEventCallbacks[eventType].emplace_back(EventCallbackWrapper{ id, callback });
 		return EventSubscription(id, eventType);
 	}
 
@@ -59,11 +57,11 @@ namespace SE
 		if (it != m_allEventCallbacks.end())
 		{
 			auto& callbacks = it->second;
-			callbacks.erase(
-			    std::remove_if(callbacks.begin(), callbacks.end(), [id](const EventCallbackWrapper& eventCallbackWrapper)
-			        {
-				        return id == eventCallbackWrapper.id;
-			        }),
+			callbacks.erase(std::remove_if(callbacks.begin(), callbacks.end(),
+			                    [id](const EventCallbackWrapper& eventCallbackWrapper)
+			                    {
+				                    return id == eventCallbackWrapper.id;
+			                    }),
 			    callbacks.end());
 		}
 	}
@@ -76,8 +74,7 @@ namespace SE
 			for (const auto& eventCallbackWrapper : eventTypeIt->second)
 			{
 				eventCallbackWrapper.callback(event);
-				m_logger->verbose(
-				    "Fired event of type: " + event.getName() + " to callback with id: " + std::to_string(eventCallbackWrapper.id));
+				m_logger->verbose("Fired event of type: " + event.getName() + " to callback with id: " + std::to_string(eventCallbackWrapper.id));
 				m_logger->debug("Fired {} event with data: {}", event.getName(), event.getDataAsString());
 				if (event.handled)
 					break;

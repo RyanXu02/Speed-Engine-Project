@@ -31,11 +31,9 @@ namespace SE
 		// @tparam T The type of the SubSystem to get
 		// @return A pointer to the requested SubSystem type if it exists, otherwise
 		// returns nullptr
-		template<typename T>
-		requires std::derived_from<T, SubSystem> T* getSubSystem()
+		template<typename T> requires std::derived_from<T, SubSystem> T* getSubSystem()
 		{
-			auto it = std::ranges::find_if(
-			    m_subSystems,
+			auto it = std::ranges::find_if(m_subSystems,
 			    [&](const std::unique_ptr<SubSystem>& subSystem)
 			    {
 				    return dynamic_cast<T*>(subSystem.get()) != nullptr;

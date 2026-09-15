@@ -30,10 +30,7 @@ namespace SE
 		const std::vector<uint32_t>& getIndicesToDraw() const;
 
 		uint32_t getMeshResourceId() const { return m_meshResourceId; }
-		void setMeshResourceId(uint32_t meshResourceId)
-		{
-			m_meshResourceId = meshResourceId;
-		}
+		void setMeshResourceId(uint32_t meshResourceId) { m_meshResourceId = meshResourceId; }
 
 		bool hasValidResource() const;
 

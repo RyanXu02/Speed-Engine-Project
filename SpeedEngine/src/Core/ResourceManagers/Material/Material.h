@@ -22,8 +22,7 @@ namespace SE
 		// @param shaderId The ID of the shader to use for this material
 		// @param textures A span of pairs, each containing a TextureType and the
 		// corresponding file path for the texture
-		bool init(uint32_t shaderId,
-		    std::span<const std::pair<TextureType, std::string_view>> textures);
+		bool init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures);
 
 		void destroy();
 

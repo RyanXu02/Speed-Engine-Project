@@ -51,8 +51,7 @@ namespace SE
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<SubMesh> m_submeshes;
-		std::vector<uint32_t>
-		    m_indices; // represents rapidobj::Array<Index> without tex and normals
+		std::vector<uint32_t> m_indices; // represents rapidobj::Array<Index> without tex and normals
 
 		LoggerProxy m_logger;
 	};

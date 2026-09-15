@@ -56,8 +56,7 @@ namespace SE
 		glFrontFace(GL_CCW);
 
 		// Get default shader
-		Shader* defaultShader = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(
-		    m_defaultShaderId);
+		Shader* defaultShader = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_defaultShaderId);
 		if (!defaultShader)
 		{
 			m_logger.critical("Default shader not found, cannot render");
@@ -128,10 +127,7 @@ namespace SE
 	std::vector<Entity*> SceneRenderer::getDrawableEntities() const
 	{
 		std::vector<Entity*> retlist;
-		for (const auto& entity : Engine::Instance()
-		                              .getSubSystem<SceneSystem>()
-		                              ->getCurrentScene()
-		                              ->getEntities())
+		for (const auto& entity : Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntities())
 		{
 			if (entity.get()->getComponent<Mesh>())
 			{
@@ -141,11 +137,7 @@ namespace SE
 		return retlist;
 	}
 
-	void SceneRenderer::uploadMeshToGPU(
-	    uint32_t meshId,
-	    const std::vector<Vertex>& positions,
-	    const std::vector<SubMesh>& subMeshes,
-	    const std::vector<uint32_t>& indices) const
+	void SceneRenderer::uploadMeshToGPU(uint32_t meshId, const std::vector<Vertex>& positions, const std::vector<SubMesh>& subMeshes, const std::vector<uint32_t>& indices) const
 	{
 		MeshGPUData& gpuData = m_meshCache[meshId];
 
@@ -223,8 +215,7 @@ namespace SE
 		m_logger.info("Cleaned up GPU data for mesh {}", meshId);
 	}
 
-	void SceneRenderer::_updateCameraPosition(double deltaTime,
-	    CameraFrustum& camera)
+	void SceneRenderer::_updateCameraPosition(double deltaTime, CameraFrustum& camera)
 	{
 		auto IS = Engine::Instance().getSubSystem<InputSystem>();
 
@@ -268,8 +259,7 @@ namespace SE
 			camera.move(-WORLD_UP * movespeed);
 	}
 
-	void SceneRenderer::_updateCameraTarget(double deltaTime,
-	    CameraFrustum& camera)
+	void SceneRenderer::_updateCameraTarget(double deltaTime, CameraFrustum& camera)
 	{
 		auto IS = Engine::Instance().getSubSystem<InputSystem>();
 

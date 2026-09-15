@@ -31,10 +31,7 @@ namespace SE
 
 		LoggerProxy& getLogger() { return m_logger; }
 
-		const std::vector<std::unique_ptr<Entity>>& getEntities() const
-		{
-			return m_entities;
-		}
+		const std::vector<std::unique_ptr<Entity>>& getEntities() const { return m_entities; }
 
 	private:
 		LoggerProxy m_logger;

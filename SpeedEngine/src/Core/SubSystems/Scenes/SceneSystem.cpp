@@ -68,7 +68,8 @@ namespace SE
 			m_currentScene = nullptr;
 		}
 
-		m_scenes.erase(std::remove_if(m_scenes.begin(), m_scenes.end(), [this, scene](const std::unique_ptr<Scene>& s)
+		m_scenes.erase(std::remove_if(m_scenes.begin(), m_scenes.end(),
+		                   [this, scene](const std::unique_ptr<Scene>& s)
 		                   {
 			                   if (s.get() != scene)
 				                   return false;
@@ -84,7 +85,8 @@ namespace SE
 	{
 		m_logger->info("Setting current scene: {}", name);
 
-		auto it = std::find_if(m_scenes.begin(), m_scenes.end(), [&name](const std::unique_ptr<Scene>& scene)
+		auto it = std::find_if(m_scenes.begin(), m_scenes.end(),
+		    [&name](const std::unique_ptr<Scene>& scene)
 		    {
 			    return scene->getName() == name;
 		    });
@@ -97,8 +99,7 @@ namespace SE
 			m_currentScene = it->get();
 			m_currentScene->initializeScene();
 
-			Engine::Instance().getSubSystem<EventSystem>()->publish(
-			    std::make_unique<SceneChanged>(name));
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<SceneChanged>(name));
 		}
 		else
 		{

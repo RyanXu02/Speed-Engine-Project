@@ -33,8 +33,7 @@ namespace SE
 		// string
 		//@returns compilation status containing its success (T/F) and any compilation
 		// logs
-		GLCompStatus init(std::string_view vertexShaderSource,
-		    std::string_view fragmentShaderSource);
+		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
 
 		//@brief binds shader to be used in graphics pipeline
 		void bind();

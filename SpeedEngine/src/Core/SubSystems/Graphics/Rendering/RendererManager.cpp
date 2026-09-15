@@ -14,8 +14,7 @@ namespace SE
 
 		// init all renderers
 		auto sceneViewport = std::make_unique<Viewport>(m_window->getWidth(), m_window->getHeight());
-		m_sceneRenderer = std::unique_ptr<SceneRenderer>(
-		    new SceneRenderer(*m_logger, std::move(sceneViewport)));
+		m_sceneRenderer = std::unique_ptr<SceneRenderer>(new SceneRenderer(*m_logger, std::move(sceneViewport)));
 		m_sceneRenderer->init();
 
 		// imgui renderer doesn't need a viewport, it makes its own

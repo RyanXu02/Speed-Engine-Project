@@ -11,9 +11,7 @@
 namespace SE
 {
 
-	bool Material::init(
-	    uint32_t shaderId,
-	    std::span<const std::pair<TextureType, std::string_view>> textures)
+	bool Material::init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures)
 	{
 		m_shaderId = shaderId;
 
@@ -65,21 +63,11 @@ namespace SE
 				continue;
 			switch (t->getType())
 			{
-			case TextureType::Albedo:
-				_bindTexture(0, *t);
-				break;
-			case TextureType::Normal:
-				_bindTexture(1, *t);
-				break;
-			case TextureType::Height:
-				_bindTexture(2, *t);
-				break;
-			case TextureType::AmbOcc:
-				_bindTexture(3, *t);
-				break;
-			case TextureType::Roughness:
-				_bindTexture(4, *t);
-				break;
+			case TextureType::Albedo: _bindTexture(0, *t); break;
+			case TextureType::Normal: _bindTexture(1, *t); break;
+			case TextureType::Height: _bindTexture(2, *t); break;
+			case TextureType::AmbOcc: _bindTexture(3, *t); break;
+			case TextureType::Roughness: _bindTexture(4, *t); break;
 			}
 		}
 	}
@@ -97,8 +85,7 @@ namespace SE
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, tex.glTextureId);
-		Shader* s = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(
-		    m_shaderId);
+		Shader* s = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_shaderId);
 		if (!s)
 		{
 			m_logger.critical("Slot {} failed to bind in shader (ID = {})", slot, m_shaderId);

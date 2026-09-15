@@ -26,11 +26,7 @@ namespace SE
 		// @param materialName The name of the material shown in the resource browser
 		// @returns the ID of the newly added material, or 0 if the material could not
 		// be added
-		uint32_t addMaterial(
-		    uint32_t id,
-		    uint32_t shaderId,
-		    std::span<const std::pair<TextureType, std::string_view>> textures,
-		    std::string_view materialName);
+		uint32_t addMaterial(uint32_t id, uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures, std::string_view materialName);
 
 		// @brief retrieves a material from the manager given an id
 		// @param materialId the id of material to retrieve

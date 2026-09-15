@@ -41,9 +41,7 @@ namespace SE
 
 		// @brief helper fn that verifies that the vertex and fragment shader paths
 		// are valid
-		std::pair<std::string, std::string>
-		_verifyShaderPaths(std::string_view vertexShaderPath,
-		    std::string_view fragmentShaderPath);
+		std::pair<std::string, std::string> _verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath);
 	};
 
 } // namespace SE

@@ -49,17 +49,14 @@ namespace SE
 	void Entity::setName(std::string_view name)
 	{
 		m_name = std::string(name);
-		Engine::Instance().getSubSystem<EventSystem>()->publish(
-		    std::make_unique<ActiveSceneModified>(MT::Rename, m_instanceId, m_name));
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Rename, m_instanceId, m_name));
 	}
 
 	void Entity::addComponent(std::unique_ptr<Component> component)
 	{
 		if (!component)
 		{
-			m_parentScene->getLogger().critical(
-			    "Attempted to add a null component to entity '{}'",
-			    m_name);
+			m_parentScene->getLogger().critical("Attempted to add a null component to entity '{}'", m_name);
 			assert(false && "Attempted to add a null component to entity");
 			return;
 		}
@@ -73,8 +70,7 @@ namespace SE
 					m_parentScene->getLogger().critical(
 					    "Attempted to add a duplicate component of type '{}' to entity "
 					    "'{}'",
-					    typeid(*component).name(),
-					    m_name);
+					    typeid(*component).name(), m_name);
 					return;
 				}
 			}
@@ -82,9 +78,7 @@ namespace SE
 
 		if (!component->initComponent())
 		{
-			m_parentScene->getLogger().critical(
-			    "Failed to initialize component for entity '{}'",
-			    m_name);
+			m_parentScene->getLogger().critical("Failed to initialize component for entity '{}'", m_name);
 			assert(false && "Failed to initialize component for entity");
 			return;
 		}

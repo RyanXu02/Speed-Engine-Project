@@ -11,8 +11,7 @@ namespace SE
 	      m_ProgramId(0)
 	{}
 
-	GLCompStatus Shader::init(std::string_view vertexShaderSource,
-	    std::string_view fragmentShaderSource)
+	GLCompStatus Shader::init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource)
 	{
 		GLCompStatus status;
 
@@ -67,8 +66,7 @@ namespace SE
 		}
 	}
 
-	GLCompStatus Shader::_checkCompilationErr(unsigned int shader,
-	    std::string_view type)
+	GLCompStatus Shader::_checkCompilationErr(unsigned int shader, std::string_view type)
 	{
 		int success;
 		char infoLog[1024];
