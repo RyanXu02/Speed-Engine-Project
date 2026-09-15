@@ -1,6 +1,6 @@
 #pragma once
-#include "../Logger/Logger.h"
 #include "../Engine.h"
+#include "../Logger/Logger.h"
 #include "../SubSystems/Events/EventSystem.h"
 #include "../SubSystems/SubSystem.h"
 #include "Manager.h"
