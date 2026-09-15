@@ -1,5 +1,6 @@
-#include "Component.h"
 #include "pch.h"
+
+#include "Component.h"
 
 namespace SE
 {

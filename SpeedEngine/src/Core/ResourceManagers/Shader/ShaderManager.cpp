@@ -1,9 +1,10 @@
-#include "Engine.h"
 #include "pch.h"
+
+#include "ShaderManager.h"
 
 #include "../../Logger/Logger.h"
 #include "../../ResourceManagers/ResourceManager.h"
-#include "ShaderManager.h"
+#include "Engine.h"
 
 namespace SE
 {

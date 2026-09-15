@@ -1,5 +1,7 @@
-#include "Shader.h"
 #include "pch.h"
+
+#include "Shader.h"
+
 #include <glad/glad.h>
 
 namespace SE

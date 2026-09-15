@@ -1,7 +1,6 @@
 #pragma once
-#include "../Renderer.h"
-
 #include "../../../../ResourceManagers/MeshResource/MeshResource.h"
+#include "../Renderer.h"
 
 namespace SE
 {

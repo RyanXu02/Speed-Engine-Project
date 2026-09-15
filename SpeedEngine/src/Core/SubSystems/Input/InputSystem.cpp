@@ -1,10 +1,10 @@
-#include "InputSystem.h"
-#include "Engine.h"
 #include "pch.h"
 
-#include "GLFW/glfw3.h"
+#include "InputSystem.h"
 
 #include "../../Logger/Logger.h"
+#include "Engine.h"
+#include "GLFW/glfw3.h"
 
 namespace SE
 {

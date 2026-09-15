@@ -1,9 +1,10 @@
-#include "ResourceBrowserWidget.h"
-#include "Engine.h"
 #include "pch.h"
+
+#include "ResourceBrowserWidget.h"
 
 #include "../../../ResourceManagers/ResourceManager.h"
 #include "../../Events/Event.h"
+#include "Engine.h"
 
 namespace SE
 {

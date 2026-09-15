@@ -1,5 +1,6 @@
-#include "MaterialManager.h"
 #include "pch.h"
+
+#include "MaterialManager.h"
 
 namespace SE
 {

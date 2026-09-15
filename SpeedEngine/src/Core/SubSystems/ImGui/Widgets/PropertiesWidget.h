@@ -1,9 +1,7 @@
 #pragma once
-#include "../Widget.h"
-
 #include "../../../Scene/Entity/Component/Component.h"
-
 #include "../../Events/EventSubscription.h"
+#include "../Widget.h"
 
 namespace SE
 {

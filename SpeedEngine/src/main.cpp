@@ -1,6 +1,7 @@
+#include "pch.h"
+
 #include "Core/Engine.h"
 #include "Core/Logger/Logger.h"
-#include "pch.h"
 
 int main()
 {

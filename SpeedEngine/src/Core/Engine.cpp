@@ -1,18 +1,15 @@
-#include "Engine.h"
-#include "SubSystems/SubSystem.h"
 #include "pch.h"
 
-#include "SubSystems/Graphics/Window.h"
-#include "SubSystems/Input/InputSystem.h"
-
-#include "SubSystems/Events/EventSubscription.h"
-#include "SubSystems/Events/EventSystem.h"
+#include "Engine.h"
 
 #include "ResourceManagers/ResourceManager.h"
-
+#include "SubSystems/Events/EventSubscription.h"
+#include "SubSystems/Events/EventSystem.h"
 #include "SubSystems/Graphics/Rendering/RendererManager.h"
-
+#include "SubSystems/Graphics/Window.h"
+#include "SubSystems/Input/InputSystem.h"
 #include "SubSystems/Scenes/SceneSystem.h"
+#include "SubSystems/SubSystem.h"
 
 // temp
 #include "ResourceManagers/Material/Material.h"

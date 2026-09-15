@@ -1,9 +1,9 @@
-#include "PropertiesWidget.h"
-#include "Engine.h"
 #include "pch.h"
 
-#include "../../Scenes/SceneSystem.h"
+#include "PropertiesWidget.h"
 
+#include "../../Scenes/SceneSystem.h"
+#include "Engine.h"
 #include "imgui.h"
 
 namespace SE

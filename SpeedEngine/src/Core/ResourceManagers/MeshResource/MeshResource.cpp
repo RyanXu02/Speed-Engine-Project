@@ -1,5 +1,6 @@
-#include "MeshResource.h"
 #include "pch.h"
+
+#include "MeshResource.h"
 
 #include "rapidobj/rapidobj.hpp"
 

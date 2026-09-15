@@ -1,13 +1,13 @@
-#include "Window.h"
-#include "Engine.h"
 #include "pch.h"
 
+#include "Window.h"
+
 #include "../../Logger/Logger.h"
-
-#include "GLFW/glfw3.h"
-#include <glad/glad.h>
-
 #include "../Events/EventSystem.h"
+#include "Engine.h"
+#include "GLFW/glfw3.h"
+
+#include <glad/glad.h>
 
 namespace SE
 {

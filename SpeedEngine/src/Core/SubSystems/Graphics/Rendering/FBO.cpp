@@ -1,5 +1,6 @@
-#include "FBO.h"
 #include "pch.h"
+
+#include "FBO.h"
 
 #include <glad/glad.h>
 

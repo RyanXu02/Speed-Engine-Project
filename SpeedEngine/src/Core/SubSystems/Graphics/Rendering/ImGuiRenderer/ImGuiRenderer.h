@@ -1,7 +1,6 @@
 #pragma once
-#include "../Renderer.h"
-
 #include "../../../ImGui/Widget.h"
+#include "../Renderer.h"
 
 namespace SE
 {

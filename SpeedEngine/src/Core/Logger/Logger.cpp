@@ -1,5 +1,6 @@
-#include "Logger.h"
 #include "pch.h"
+
+#include "Logger.h"
 
 namespace SE
 {

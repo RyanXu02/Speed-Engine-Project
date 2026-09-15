@@ -1,8 +1,9 @@
-#include "EventSystem.h"
-#include "EventSubscription.h"
 #include "pch.h"
 
+#include "EventSystem.h"
+
 #include "../../Logger/Logger.h"
+#include "EventSubscription.h"
 
 namespace SE
 {

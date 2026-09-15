@@ -1,6 +1,5 @@
 #pragma once
 #include "../../../Logger/LoggerProxy.h"
-
 #include "Viewport.h"
 
 namespace SE

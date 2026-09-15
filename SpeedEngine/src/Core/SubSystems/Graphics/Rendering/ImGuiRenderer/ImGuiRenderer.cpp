@@ -1,11 +1,6 @@
-#include "ImGuiRenderer.h"
 #include "pch.h"
 
-#include "imgui.h"
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
-#include "../../Window.h"
+#include "ImGuiRenderer.h"
 
 #include "../../../ImGui/Widget.h"
 #include "../../../ImGui/Widgets/ConsoleWidget.h"
@@ -14,6 +9,11 @@
 #include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
 #include "../../../ImGui/Widgets/SceneInfoWidget.h"
 #include "../../../ImGui/Widgets/ScenePreviewWidget.h"
+#include "../../Window.h"
+#include "imgui.h"
+
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 namespace SE
 {

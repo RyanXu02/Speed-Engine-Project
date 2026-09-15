@@ -1,12 +1,9 @@
 #pragma once
 #include "../../SubSystem.h"
-
 #include "../Window.h"
-
 #include "ImGuiRenderer/ImGuiRenderer.h"
 #include "Renderer.h"
 #include "SceneRenderer/SceneRenderer.h"
-
 #include "Viewport.h"
 
 namespace SE

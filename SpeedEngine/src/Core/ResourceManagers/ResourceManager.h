@@ -1,12 +1,11 @@
 #pragma once
 #include "../Logger/Logger.h"
+#include "../SubSystems/Events/EventSystem.h"
 #include "../SubSystems/SubSystem.h"
 #include "Manager.h"
-#include "Resource.h"
-
-#include "../SubSystems/Events/EventSystem.h"
 #include "Material/MaterialManager.h"
 #include "MeshResource/MeshResourceManager.h"
+#include "Resource.h"
 #include "Shader/ShaderManager.h"
 
 namespace SE

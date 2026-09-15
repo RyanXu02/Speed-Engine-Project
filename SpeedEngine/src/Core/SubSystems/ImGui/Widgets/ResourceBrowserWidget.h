@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Events/EventSubscription.h"
 #include "../Widget.h"
+
 #include <imgui.h>
 
 namespace SE
