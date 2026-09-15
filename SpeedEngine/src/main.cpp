@@ -2,13 +2,14 @@
 #include "Core/Logger/Logger.h"
 #include "pch.h"
 
-int main() {
+int main()
+{
 
-  SE::Engine &engine = SE::Engine::Instance();
-  engine.init();
-  engine.start();
-  engine.run();
-  engine.stop();
+	SE::Engine& engine = SE::Engine::Instance();
+	engine.init();
+	engine.start();
+	engine.run();
+	engine.stop();
 
-  return 0;
+	return 0;
 }

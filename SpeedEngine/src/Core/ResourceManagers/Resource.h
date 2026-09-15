@@ -1,26 +1,31 @@
 #pragma once
 
-namespace SE {
-// @brief base class for a generic resource managed by the ResourceManager
-class Resource {
-  friend class ResourceManager;
+namespace SE
+{
+	// @brief base class for a generic resource managed by the ResourceManager
+	class Resource
+	{
+		friend class ResourceManager;
 
-public:
-  Resource(uint32_t id, std::string resourceName)
-      : m_resourceId(id), m_resourceName(resourceName) {}
-  ~Resource() = default;
+	public:
+		Resource(uint32_t id, std::string resourceName)
+		    : m_resourceId(id),
+		      m_resourceName(resourceName)
+		{}
+		~Resource() = default;
 
-  const std::string &getResourceName() const { return m_resourceName; }
-  const uint32_t getId() const { return m_resourceId; }
+		const std::string& getResourceName() const { return m_resourceName; }
+		const uint32_t getId() const { return m_resourceId; }
 
-private:
-  uint32_t m_resourceId;
-  std::string m_resourceName;
-};
+	private:
+		uint32_t m_resourceId;
+		std::string m_resourceName;
+	};
 
-enum class ResourceType {
-  Material,
-  Shader,
-  MeshResource,
-};
+	enum class ResourceType
+	{
+		Material,
+		Shader,
+		MeshResource,
+	};
 } // namespace SE

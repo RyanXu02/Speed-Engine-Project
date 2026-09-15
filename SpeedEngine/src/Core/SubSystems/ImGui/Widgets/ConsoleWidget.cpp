@@ -3,34 +3,41 @@
 
 #include <imgui.h>
 
-namespace SE {
-void ConsoleWidget::render() {
-  _setStatus("Rendering ConsoleWidget");
+namespace SE
+{
+	void ConsoleWidget::render()
+	{
+		_setStatus("Rendering ConsoleWidget");
 
-  ImGuiWindowFlags window_flags = 0; // Default flags allow docking
-  ImGui::Begin("ConsoleWidget", nullptr, window_flags);
+		ImGuiWindowFlags window_flags = 0; // Default flags allow docking
+		ImGui::Begin("ConsoleWidget", nullptr, window_flags);
 
-  if (ImGui::BeginTable("table1", 3,
-                        ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-    // Submit columns name with TableSetupColumn() and call TableHeadersRow() to
-    // create a row with a header in each column. (Later we will show how
-    // TableSetupColumn() has other uses, optional flags, sizing weight etc.)
-    ImGui::TableSetupColumn("One");
-    ImGui::TableSetupColumn("Two");
-    ImGui::TableSetupColumn("Three");
-    ImGui::TableHeadersRow();
-    for (int row = 0; row < 6; row++) {
-      ImGui::TableNextRow();
-      for (int column = 0; column < 3; column++) {
-        ImGui::TableSetColumnIndex(column);
-        ImGui::Text("Hello %d,%d", column, row);
-      }
-    }
-    ImGui::EndTable();
-  }
+		if (ImGui::BeginTable("table1", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+		{
+			// Submit columns name with TableSetupColumn() and call TableHeadersRow() to
+			// create a row with a header in each column. (Later we will show how
+			// TableSetupColumn() has other uses, optional flags, sizing weight etc.)
+			ImGui::TableSetupColumn("One");
+			ImGui::TableSetupColumn("Two");
+			ImGui::TableSetupColumn("Three");
+			ImGui::TableHeadersRow();
+			for (int row = 0; row < 6; row++)
+			{
+				ImGui::TableNextRow();
+				for (int column = 0; column < 3; column++)
+				{
+					ImGui::TableSetColumnIndex(column);
+					ImGui::Text("Hello %d,%d", column, row);
+				}
+			}
+			ImGui::EndTable();
+		}
 
-  ImGui::End();
-}
+		ImGui::End();
+	}
 
-void ConsoleWidget::shutdown() { _setStatus("Shutting down ConsoleWidget"); }
+	void ConsoleWidget::shutdown()
+	{
+		_setStatus("Shutting down ConsoleWidget");
+	}
 } // namespace SE

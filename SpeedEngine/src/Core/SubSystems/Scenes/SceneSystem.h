@@ -3,27 +3,31 @@
 #include "../../Scene/Scene.h"
 #include "../SubSystem.h"
 
-namespace SE {
-// @brief Manages all scenes in the engine
-class SceneSystem : public SubSystem {
-  friend class Engine;
+namespace SE
+{
+	// @brief Manages all scenes in the engine
+	class SceneSystem : public SubSystem
+	{
+		friend class Engine;
 
-public:
-  void init() override;
-  void update(double deltaTime) override;
-  void shutdown() override;
+	public:
+		void init() override;
+		void update(double deltaTime) override;
+		void shutdown() override;
 
-  void addScene(std::unique_ptr<Scene> scene);
-  void newScene(const std::string &name);
-  void unloadScene(Scene *scene);
+		void addScene(std::unique_ptr<Scene> scene);
+		void newScene(const std::string& name);
+		void unloadScene(Scene* scene);
 
-  void setCurrentScene(const std::string &name);
-  Scene *getCurrentScene() const { return m_currentScene; }
+		void setCurrentScene(const std::string& name);
+		Scene* getCurrentScene() const { return m_currentScene; }
 
-private:
-  SceneSystem() : SubSystem("SceneSystem") {}
+	private:
+		SceneSystem()
+		    : SubSystem("SceneSystem")
+		{}
 
-  std::vector<std::unique_ptr<Scene>> m_scenes;
-  Scene *m_currentScene = nullptr;
-};
+		std::vector<std::unique_ptr<Scene>> m_scenes;
+		Scene* m_currentScene = nullptr;
+	};
 } // namespace SE
