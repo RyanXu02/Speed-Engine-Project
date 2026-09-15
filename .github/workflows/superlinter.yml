@@ -39,3 +39,45 @@ jobs:
           VALIDATE_POWERSHELL: true
           VALIDATE_GITLEAKS: true
           VALIDATE_YAML: true
+          # Apply linter fixes configuration
+          APPLY_FIXES: all
+          
+          # Decide which event triggers application of fixes in a commit or a PR
+          # (pull_request, push, all)
+          APPLY_FIXES_EVENT: pull_request
+        
+          # If APPLY_FIXES is used, defines if the fixes are directly committed (commit)
+          # or posted in a PR (pull_request)
+          APPLY_FIXES_MODE: pull_request
+
+          
+      # Create pull request if applicable
+      # (for now works only on PR from same repository, not from forks)
+      - name: Create Pull Request with applied fixes
+        uses: peter-evans/create-pull-request@v6
+        id: cpr
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          commit-message: "Apply linters automatic fixes"
+          title: "Apply linters automatic fixes"
+          branch: linter-fixes-${{ github.head_ref }}
+          body: |
+            Linter has automatically applied linters fixes on this PR.
+            Please review the changes and merge if they are correct.
+          base: ${{ github.head_ref }}
+
+      - name: Post PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            Linter has automatically applied linters fixes on this PR.
+            Please review the changes and merge if they are correct.
+            PR: ${{ steps.cpr.outputs.pull-request-url }}
+          hide_and_recreate: true
+
+      - name: Fail if PR Created
+        run: |
+          if [ "${{ steps.cpr.outputs.pull-request-url }}" != "" ]; then
+            echo "A PR with formatting fixes has been created. Please merge it before proceeding."
+            exit 1
+          fi
