@@ -63,6 +63,21 @@ jobs:
             echo "has_fixes=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Build lint fix commit subject
+        id: lint_commit_subject
+        if: >-
+          always() &&
+          steps.lint_fixes.outputs.has_fixes == 'true' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          subject="$(git log -1 --pretty=%s)"
+          if [ -z "$subject" ]; then
+            subject="recent changes"
+          fi
+
+          printf 'subject=%s\n' "$subject" >> "$GITHUB_OUTPUT"
+
       - name: Commit lint fixes
         uses: stefanzweifel/git-auto-commit-action@v7
         id: auto_commit
@@ -73,7 +88,7 @@ jobs:
         with:
           branch: ${{ github.event.pull_request.head.ref }}
           commit_message: |
-            chore: apply lint fixes
+            chore: apply lint fixes for ${{ steps.lint_commit_subject.outputs.subject }}
 
             skip-checks:true
           commit_user_name: github-actions[bot]
