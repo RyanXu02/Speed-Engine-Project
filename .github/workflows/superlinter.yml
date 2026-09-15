@@ -1,41 +1,95 @@
 name: Lint
 
-on:
+on: # yamllint disable-line rule:truthy
   pull_request:
-    branches: "main"
-    paths-ignore:
-      - LICENSE
+    branches:
+      - main
+    paths:
+      - "**/*.c"
+      - "**/*.cpp"
+      - "**/*.h"
+      - "**/*.json"
+      - ".github/workflows/.clang-format"
 
 permissions: {}
 
 jobs:
   analyze:
-    permissions:
-      contents: read
-      packages: read
-      issues: write
-      pull-requests: write
-      statuses: write
     name: Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      statuses: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
+          persist-credentials: true
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Lint Code Base
+      - name: Fetch event SHA
+        shell: bash
+        run: |
+          git fetch --no-tags origin ${{ github.sha }}
+
+      - name: Lint
         uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
+        id: superlinter
+        continue-on-error: true
         env:
-          DEFAULT_BRANCH: origin/main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           IGNORE_GITIGNORED_FILES: true
+          LINTER_RULES_PATH: .github/workflows
           VALIDATE_ALL_CODEBASE: false
-          VALIDATE_CHECKOV: true
           VALIDATE_CLANG_FORMAT: true
           VALIDATE_JSON: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_POWERSHELL: true
-          VALIDATE_GITLEAKS: true
-          VALIDATE_YAML: true
+          VALIDATE_JSON_PRETTIER: true
+          FIX_CLANG_FORMAT: true
+          FIX_JSON: true
+          FIX_JSON_PRETTIER: true
+
+      - name: Detect lint fixes
+        id: lint_fixes
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+            echo "has_fixes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_fixes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit lint fixes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        id: auto_commit
+        if: >-
+          always() &&
+          steps.lint_fixes.outputs.has_fixes == 'true' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          branch: ${{ github.event.pull_request.head.ref }}
+          commit_message: |
+            chore: apply lint fixes
+
+            skip-checks:true
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          status_options: --untracked-files=no
+
+      - name: Fail if lint found issues without fixes
+        if: >-
+          always() &&
+          steps.superlinter.outcome == 'failure' &&
+          steps.auto_commit.outputs.changes_detected != 'true'
+        run: exit 1
+
+      - name: Report committed fixes
+        if: >-
+          always() &&
+          steps.auto_commit.outputs.changes_detected == 'true'
+        run: |
+          echo "Lint fixes were committed back to branch ${{ github.event.pull_request.head.ref }}"

@@ -1,20 +1,20 @@
 #pragma once
 #include "../SubSystems/SubSystem.h"
 
-#include "spdlog.h"
-#include "sinks/stdout_color_sinks.h"
-#include "sinks/basic_file_sink.h"
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 namespace SE
 {
-    class Logger
-    {
-    public:
+	class Logger
+	{
+	public:
 		Logger();
 
 		//@brief creates logger and its channels
 		//@param name name of this logger
-        void init(std::string_view name);
+		void init(std::string_view name);
 
 		//@brief shuts down logger
 		void shutdown();
@@ -22,8 +22,8 @@ namespace SE
 		//@brief critical level logging (literally everything)
 		//@param message message to log
 		//@param args variables to log in message
-		template <typename... Args>
-		void verbose(const std::string& message, Args&&... args) 
+		template<typename... Args>
+		void verbose(const std::string& message, Args&&... args)
 		{
 			m_spdlogger->trace(fmt::runtime(message), std::forward<Args>(args)...);
 		};
@@ -31,8 +31,8 @@ namespace SE
 		//@brief debug level logging (fine details)
 		//@param message message to log
 		//@param args variables to log in message
-		template <typename... Args>
-		void debug(const std::string& message, Args&&... args) 
+		template<typename... Args>
+		void debug(const std::string& message, Args&&... args)
 		{
 			m_spdlogger->debug(fmt::runtime(message), std::forward<Args>(args)...);
 		};
@@ -40,8 +40,8 @@ namespace SE
 		//@brief info level logging (regular level)
 		//@param message message to log
 		//@param args variables to log in message
-		template <typename... Args>
-		void info(const std::string& message, Args&&... args) 
+		template<typename... Args>
+		void info(const std::string& message, Args&&... args)
 		{
 			m_spdlogger->info(fmt::runtime(message), std::forward<Args>(args)...);
 		};
@@ -49,8 +49,8 @@ namespace SE
 		//@brief warning level logging (address asap)
 		//@param message message to log
 		//@param args variables to log in message
-		template <typename... Args>
-		void warn(const std::string& message, Args&&... args) 
+		template<typename... Args>
+		void warn(const std::string& message, Args&&... args)
 		{
 			m_spdlogger->warn(fmt::runtime(message), std::forward<Args>(args)...);
 		};
@@ -58,14 +58,14 @@ namespace SE
 		//@brief critical level logging (crashworthy)
 		//@param message message to log
 		//@param args variables to log in message
-		template <typename... Args>
-		void critical(const std::string& message, Args&&... args) 
+		template<typename... Args>
+		void critical(const std::string& message, Args&&... args)
 		{
 			m_spdlogger->critical(fmt::runtime(message), std::forward<Args>(args)...);
 		};
 
 
-    private:
+	private:
 		std::shared_ptr<spdlog::logger> m_spdlogger;
 
 		// Static shared sinks reused by all loggers
@@ -75,7 +75,5 @@ namespace SE
 
 		//inits 2 static shared sinks
 		static void initSharedSinks();
-    };
+	};
 }
-
-

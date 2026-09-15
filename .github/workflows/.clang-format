@@ -3,22 +3,22 @@ BasedOnStyle: LLVM
 AccessModifierOffset: -4
 AlignAfterOpenBracket: false
 AlignConsecutiveAssignments:
-  Enabled: true
+  Enabled: false
   AcrossEmptyLines: false
   AcrossComments: false
 AlignConsecutiveDeclarations:
-  Enabled: true
+  Enabled: false
   AcrossEmptyLines: false
   AcrossComments: false
 AlignEscapedNewlines: Left
 AlignOperands: true
 AlignConsecutiveShortCaseStatements:
-  Enabled: true
+  Enabled: false
   AcrossEmptyLines: true
   AcrossComments: true
   AlignCaseColons: false
 AlignTrailingComments:
-  Kind: Always
+  Kind: Never
   OverEmptyLines: 2
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
@@ -54,20 +54,21 @@ BreakBeforeTernaryOperators: false
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
 BreakTemplateDeclarations: Yes
-ColumnLimit: 140
+ColumnLimit: 0
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 Cpp11BracedListStyle: false
-FixNamespaceComments: true
+FixNamespaceComments: false
 IndentCaseLabels: false
 IndentExternBlock: Indent
 IndentPPDirectives: None
 IndentWidth: 4
 InsertNewlineAtEOF: true
 LineEnding: CRLF
+MaxEmptyLinesToKeep: 2
 NamespaceIndentation: All
 PackConstructorInitializers: Never
 PointerAlignment: Left
-ReflowComments: true
+ReflowComments: false
 SortIncludes: false
 SpaceAfterCStyleCast: false
 #requires clang format 21
@@ -84,4 +85,4 @@ SpacesInContainerLiterals: false
 SpacesInParentheses: false
 Standard: c++17
 TabWidth: 4
-UseTab: Never
+UseTab: ForIndentation

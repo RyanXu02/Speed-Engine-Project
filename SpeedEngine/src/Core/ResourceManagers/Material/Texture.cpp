@@ -1,14 +1,17 @@
 #include "pch.h"
 #include "Texture.h"
 
-#include "glad/gl.h"
+#include <glad/glad.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
 
-namespace SE 
+namespace SE
 {
-	Texture::Texture(TextureType type) : m_type(type) {
-		switch (m_type) {
+	Texture::Texture(TextureType type)
+	    : m_type(type)
+	{
+		switch (m_type)
+		{
 		case TextureType::Albedo:
 			name = "albedo";
 			break;
@@ -29,21 +32,27 @@ namespace SE
 		}
 	}
 
-	Texture::~Texture() {
-
+	Texture::~Texture()
+	{
 	}
 
-	std::string Texture::init(std::string_view filePath) {
+	std::string Texture::init(std::string_view filePath)
+	{
 		stbi_set_flip_vertically_on_load(true);
 		int channels;
 		unsigned char* image = stbi_load(filePath.data(), &width, &height, &channels, 0);
-		if (!image) {
+		if (!image)
+		{
 			return "Failed to load texture " + std::string(filePath);
 		}
-		else {
-			if (channels == 1) format = GL_RED;
-			else if (channels == 3) format = GL_RGB;
-			else if (channels == 4) format = GL_RGBA;
+		else
+		{
+			if (channels == 1)
+				format = GL_RED;
+			else if (channels == 3)
+				format = GL_RGB;
+			else if (channels == 4)
+				format = GL_RGBA;
 
 			glGenTextures(1, &glTextureId);
 			glBindTexture(GL_TEXTURE_2D, glTextureId);
@@ -63,8 +72,10 @@ namespace SE
 	}
 
 	//@brief deletes texture data
-	void Texture::destroy() {
-		if (glTextureId != 0) {
+	void Texture::destroy()
+	{
+		if (glTextureId != 0)
+		{
 			glDeleteTextures(1, &glTextureId);
 			glTextureId = 0;
 		}
