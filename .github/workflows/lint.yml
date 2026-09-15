@@ -3,9 +3,6 @@ name: Lint
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -20,18 +17,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out Git repository
+      - name: Check out PR branch
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Install ClangFormat
         run: sudo apt-get install -y clang-format
-        
+
       - name: Install Prettier
         run: sudo npm install -g prettier
 
       - name: Build lint fix commit message
         id: lint_commit_message
-        if: github.event.pull_request.head.repo.full_name == github.repository
         run: |
           echo "subject=$(git log -1 --pretty=%s || echo recent changes)" >> "$GITHUB_OUTPUT"
 
@@ -39,7 +37,12 @@ jobs:
         uses: wearerequired/lint-action@v3
         with:
           clang_format: true
+          clang_format_auto_fix: true
+
           prettier: true
           prettier_extensions: "json"
+          prettier_auto_fix: true
+
           auto_fix: true
+          commit: true
           commit_message:  "Lint: ${{ steps.lint_commit_message.outputs.subject }}"
