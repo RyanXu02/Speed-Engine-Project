@@ -81,6 +81,18 @@ IncludeCategories:
   - Regex: '^".*"$'
     Priority: 1
 
+  # GLAD must be before GLFW
+  - Regex: '^<glad/glad\.h>$'
+    Priority: 2
+    SortPriority: 10
+    CaseSensitive: true
+
+  # GLFW must come after GLAD
+  - Regex: '^<GLFW/glfw3\.h>$'
+    Priority: 2
+    SortPriority: 11
+    CaseSensitive: true
+
   # library headers
   - Regex: '^<.*>$'
     Priority: 2

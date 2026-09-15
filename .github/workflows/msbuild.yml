@@ -28,7 +28,7 @@ jobs:
           path: |
             ~\AppData\Local\vcpkg\archives
             SpeedEngine\vcpkg_installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('SpeedEngine/vcpkg.json', 'SpeedEngine/SpeedEngine.vcxproj') }}
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('SpeedEngine/vcpkg.json') }}
           restore-keys: |
             ${{ runner.os }}-vcpkg-
 
