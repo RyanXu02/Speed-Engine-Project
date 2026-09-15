@@ -40,7 +40,8 @@ namespace SE
 		    });
 	}
 
-void SceneInfoWidget::render(){
+	void SceneInfoWidget::render()
+	{
 		ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
 		if (!ImGui::Begin("Scene Info", nullptr))
 		{
