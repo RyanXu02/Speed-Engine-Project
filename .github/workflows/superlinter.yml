@@ -34,6 +34,7 @@ jobs:
       - name: Lint Code Base
         uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
         id: superlinter
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE_GITHUB_PULL_REQUEST_SUMMARY_COMMENT: true
@@ -53,14 +54,23 @@ jobs:
           FIX_POWERSHELL: true
           FIX_YAML_PRETTIER: true
 
+      - name: Detect lint fixes
+        id: lint_fixes
+        if: always()
+        shell: bash
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_fixes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_fixes=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Pull Request with applied fixes
         uses: peter-evans/create-pull-request@v6
         id: cpr
         if: >-
-          (
-            steps.superlinter.outputs.has_updated_sources == 'true' ||
-            steps.superlinter.outputs.has_updated_sources == '1'
-          ) &&
+          always() &&
+          steps.lint_fixes.outputs.has_fixes == 'true' &&
           (
             env.APPLY_FIXES_EVENT == 'all' ||
             env.APPLY_FIXES_EVENT == github.event_name
@@ -79,10 +89,8 @@ jobs:
 
       - name: Post PR Comment
         if: >-
-          (
-            steps.superlinter.outputs.has_updated_sources == 'true' ||
-            steps.superlinter.outputs.has_updated_sources == '1'
-          ) &&
+          always() &&
+          steps.lint_fixes.outputs.has_fixes == 'true' &&
           (
             env.APPLY_FIXES_EVENT == 'all' ||
             env.APPLY_FIXES_EVENT == github.event_name
@@ -97,7 +105,15 @@ jobs:
             PR: ${{ steps.cpr.outputs.pull-request-url }}
           hide_and_recreate: true
 
+      - name: Fail if lint found issues without fixes
+        if: >-
+          always() &&
+          steps.superlinter.outcome == 'failure' &&
+          steps.lint_fixes.outputs.has_fixes != 'true'
+        run: exit 1
+
       - name: Fail if PR Created
+        if: always()
         run: |
           if [ -n "${{ steps.cpr.outputs.pull-request-url }}" ]; then
             echo "A PR with lint fixes has been created. Please merge it before proceeding."
