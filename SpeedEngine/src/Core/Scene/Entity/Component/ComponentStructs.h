@@ -11,14 +11,16 @@ namespace SE {
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(NameComponent, name)
 	};
 
-	struct Mesh {
-	
+	struct MeshComponent {
+		uint32_t meshResourceID{};
+
 	};
 
-	struct Transform{
-		glm::vec3 translate{};
-		glm::vec3 rotate{};
-		glm::vec3 scale{};
+	struct LifeComponent {
+		LifeComponent() = default;
+		LifeComponent(bool alive) : isAlive(alive) {}
+			
+		bool isAlive{ true };
 	};
 
 }

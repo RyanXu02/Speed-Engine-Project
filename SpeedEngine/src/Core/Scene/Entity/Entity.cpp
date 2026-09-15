@@ -14,6 +14,10 @@ namespace SE
 
 	uint32_t Entity::s_nextId = 1;
 
+	Entity::Entity(uint32_t id) : m_id(id)
+	{
+	}
+
 	Entity::Entity(std::string name) :
 		m_instanceId(s_nextId++),
 		m_name(name)
@@ -31,14 +35,6 @@ namespace SE
 	void Entity::initializeEntity(Scene* parentScene)
 	{
 		m_parentScene = parentScene;
-	}
-
-	void Entity::setName(std::string_view name)
-	{
-		m_name = std::string(name);
-		Engine::Instance().getSubSystem<EventSystem>()->publish(
-			std::make_unique<ActiveSceneModified>(MT::Rename, m_instanceId, m_name)
-		);
 	}
 
 	void Entity::addComponent(std::unique_ptr<Component> component)

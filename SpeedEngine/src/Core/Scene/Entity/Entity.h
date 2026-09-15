@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Component/ComponentStructs.h"
 #include "Component/Component.h"
 #include <typeindex>
 
@@ -12,6 +13,7 @@ namespace SE
 	class Entity
 	{
 	public:
+		Entity(uint32_t id);
 		Entity(std::string name);
 		Entity(const Entity&);
 
@@ -20,15 +22,27 @@ namespace SE
 		uint32_t getInstanceId() const { return m_instanceId; }
 
 		const std::string& getName() const { return m_name; }
-		void setName(std::string_view name);
 
 		// @brief Marks the entity as dead, so it can be removed from the scene in the next update cycle
 		void killEntity() { m_isAlive = false; }
 		bool isAlive() const { return m_isAlive; }
 
 		template<typename T, typename... Args>
-		T& addComponepnt (Args&& ...args) {
+		T* addComponentNew (Args&& ...args) {
+			auto [it, status] = m_componentsNew.insert_or_assign(typeid(T), T(std::forward<Args>(args)...));
+			if (!status) {
+				return nullptr;
+			}
+			return std::any_cast<T>(&it->second);
+		}
 
+		template<typename T>
+		T* getComponentNew() {
+			auto it = m_componentsNew.find(typeid(T));
+			if (it == m_componentsNew.end()) {
+				return nullptr;
+			}
+			return std::any_cast<T>(&it->second);
 		}
 
 		void addComponent(std::unique_ptr<Component> component);
@@ -57,7 +71,6 @@ namespace SE
 		static uint32_t s_nextId;
 		
 		Scene* m_parentScene{ nullptr };
-
 		std::vector<std::unique_ptr<Component>> m_components;
 
 		uint32_t m_id;

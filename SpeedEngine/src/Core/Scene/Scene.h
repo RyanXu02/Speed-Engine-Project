@@ -19,6 +19,10 @@ namespace SE
 		const std::string& getName() const { return m_name; }
 
 
+		uint32_t addEntityNew(const std::string& name);
+		Entity* getEntityNew(uint32_t instanceId);
+
+
 		// @brief For use with UI widget
 		std::unordered_map<uint32_t, std::string> getEntityList();
 
@@ -40,10 +44,12 @@ namespace SE
 
 
 		std::atomic<uint32_t> m_entityID;
-		std::unordered_map<uint32_t, Entity> m_registry;
+		std::vector<Entity> m_registry;
 
 		bool m_isInitialized{ false };
 		bool m_isUpdating{ false };
+
+		uint32_t m_assignID();
 	};
 }
 

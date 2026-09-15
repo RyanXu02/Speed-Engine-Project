@@ -77,7 +77,7 @@ namespace SE
 		return true;
 	}
 
-	const glm::mat4& Transform::getTransform() const
+	const glm::mat4& Transform::getTransform()
 	{
 		if (m_isDirty)
 		{

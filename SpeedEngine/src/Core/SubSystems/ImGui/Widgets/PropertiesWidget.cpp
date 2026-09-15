@@ -32,7 +32,8 @@ namespace SE {
 	{
 		std::string entityName;
 		if (m_cachedSelectedEntity && m_cachedSelectedEntity->isAlive())
-			entityName = m_cachedSelectedEntity->getName();
+			//entityName = m_cachedSelectedEntity->getName();
+			entityName = "temp";
 		else
 			entityName = "None Selected";
 

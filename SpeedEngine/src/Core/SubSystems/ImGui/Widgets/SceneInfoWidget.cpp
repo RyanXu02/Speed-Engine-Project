@@ -176,7 +176,7 @@ namespace SE
             {
                 if (Entity* entity = scene->getEntity(id))
                 {
-                    entity->setName(newName);
+                    //entity->setName(newName);
                 }
             }
 

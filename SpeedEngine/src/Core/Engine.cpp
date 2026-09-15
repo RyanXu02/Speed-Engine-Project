@@ -69,6 +69,8 @@ namespace SE
 		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny left"));
 		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
 
+		getSubSystem<SceneSystem>()->getCurrentScene()->addEntityNew("test new entity");
+
 
 		uint32_t defaultShaderIid = getSubSystem<ResourceManager>()->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
