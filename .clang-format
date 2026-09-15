@@ -70,6 +70,20 @@ PackConstructorInitializers: Never
 PointerAlignment: Left
 ReflowComments: false
 SortIncludes: true
+IncludeBlocks: Regroup
+IncludeCategories:
+  # PCH must be first!!!!!!
+  - Regex: '^"pch\.h"$'
+    Priority: -1
+    CaseSensitive: true
+
+  # local headers
+  - Regex: '^".*"$'
+    Priority: 1
+
+  # library headers
+  - Regex: '^<.*>$'
+    Priority: 2
 SpaceAfterCStyleCast: false
 #requires clang format 21
 #SpaceAfterOperatorKeyword: true
