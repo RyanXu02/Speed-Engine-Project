@@ -30,7 +30,7 @@ public:
   //@brief adds a resource to the Resource Manager
   //@param type the type of resource being added
   //@param args arguments to pass for type of resource being added (filepaths,
-  //names, etc)
+  // names, etc)
   //@returns id of newly added resource
   template <ResourceType Type, typename... Args>
   uint32_t addResource(Args &&...args) {
@@ -50,11 +50,11 @@ public:
   }
 
   //@brief retrieves a resource of requested type given an id (Not prefered,
-  //used the other one. It is callers responsibility to ensure the type is
-  //correct)
+  // used the other one. It is callers responsibility to ensure the type is
+  // correct)
   //@param id the id to retrieve
   //@returns the requested resource of the specified type if it exists, nullptr
-  //if not
+  // if not
   template <typename T> T *getResource(uint32_t id) {
     auto it = m_resourceTypes.find(id);
     if (it != m_resourceTypes.end()) {

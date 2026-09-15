@@ -26,13 +26,13 @@ void ShaderManager::shutdown() {
 }
 
 //@brief adds a shader to be managed by the ShaderManager. if a shader of
-//programName already exists, returns id of existing shader
+// programName already exists, returns id of existing shader
 //@param id id of new shader
 //@param vertexShaderPath path to vertex shader file
 //@param fragmentShaderPath path to fragment shader file
 //@param programName name of shader program to create
 //@returns id of new shader, or id of existing shader if new shader would be a
-//duplicate name
+// duplicate name
 uint32_t ShaderManager::addShader(uint32_t id,
                                   std::string_view vertexShaderPath,
                                   std::string_view fragmentShaderPath,
@@ -85,7 +85,7 @@ ShaderManager::_verifyShaderPaths(std::string_view vertexShaderPath,
   std::pair<std::string, std::string> shaderPaths{"", ""};
 
   //.vert and .frag extensions have to be contained in these variables in some
-  //order
+  // order
   if (!((vertexShaderPath.contains(".vert") &&
          fragmentShaderPath.contains(".frag")) ||
         (vertexShaderPath.contains(".frag") &&

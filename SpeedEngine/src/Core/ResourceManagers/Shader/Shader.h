@@ -25,11 +25,11 @@ public:
 
   //@brief compiles and links a shader object
   //@param vertexShaderSource the literal source code of vertex shader as a
-  //string
+  // string
   //@param fragmentShaderSource the literal source code of fragment shader as a
-  //string
+  // string
   //@returns compilation status containing its success (T/F) and any compilation
-  //logs
+  // logs
   GLCompStatus init(std::string_view vertexShaderSource,
                     std::string_view fragmentShaderSource);
 

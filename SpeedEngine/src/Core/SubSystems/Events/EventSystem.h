@@ -30,7 +30,7 @@ public:
   //@param eventType the type of event that is being listened for
   //@param callback the callback function to be invoked when the event is heard
   //@return an EventSubscription obj. This is done for RAII (on destruction, it
-  //auto-unsubs itself from the event)
+  // auto-unsubs itself from the event)
   EventSubscription subscribe(EventType eventType, EventCallback callback);
 
   //@brief removes the specified id from listening to the specified event type
