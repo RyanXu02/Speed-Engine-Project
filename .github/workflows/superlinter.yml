@@ -82,33 +82,6 @@ jobs:
           github.event.pull_request.head.repo.full_name == github.repository
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-          add-paths: |
-            .clang-format
-            .editorconfig
-            .gitattributes
-            .github/**
-            *.json
-            *.md
-            *.ps1
-            *.psd1
-            *.psm1
-            *.yml
-            *.yaml
-            **/*.json
-            **/*.md
-            **/*.ps1
-            **/*.psd1
-            **/*.psm1
-            **/*.yml
-            **/*.yaml
-            **/*.c
-            **/*.cc
-            **/*.cpp
-            **/*.cxx
-            **/*.h
-            **/*.hh
-            **/*.hpp
-            **/*.hxx
           commit-message: Apply linters automatic fixes
           title: Apply linters automatic fixes
           branch: linter-fixes-${{ github.head_ref || github.ref_name }}
@@ -120,13 +93,7 @@ jobs:
       - name: Post PR Comment
         if: >-
           always() &&
-          steps.lint_fixes.outputs.has_fixes == 'true' &&
-          (
-            env.APPLY_FIXES_EVENT == 'all' ||
-            env.APPLY_FIXES_EVENT == github.event_name
-          ) &&
-          env.APPLY_FIXES_MODE == 'pull_request' &&
-          github.event.pull_request.head.repo.full_name == github.repository
+          steps.cpr.outputs.pull-request-url != ''
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
@@ -143,9 +110,9 @@ jobs:
         run: exit 1
 
       - name: Fail if PR Created
-        if: always()
+        if: >-
+          always() &&
+          steps.cpr.outputs.pull-request-url != ''
         run: |
-          if [ -n "${{ steps.cpr.outputs.pull-request-url }}" ]; then
-            echo "A PR with lint fixes has been created. Please merge it before proceeding."
-            exit 1
-          fi
+          echo "A PR with lint fixes has been created. Please merge it before proceeding."
+          exit 1
