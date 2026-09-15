@@ -10,7 +10,6 @@ env:
   PROJECT_FILE_PATH: SpeedEngine/SpeedEngine.vcxproj
   BUILD_CONFIGURATION: Debug
   BUILD_PLATFORM: x64
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -33,3 +32,4 @@ jobs:
           /m
           /p:Configuration=${{ env.BUILD_CONFIGURATION }}
           /p:Platform=${{ env.BUILD_PLATFORM }}
+          -maxcpucount
