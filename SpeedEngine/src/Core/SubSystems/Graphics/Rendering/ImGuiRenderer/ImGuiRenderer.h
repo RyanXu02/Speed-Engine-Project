@@ -3,68 +3,60 @@
 
 #include "../../../ImGui/Widget.h"
 
-namespace SE
-{
-	class Window;
+namespace SE {
+class Window;
 
-	// @brief Renderer that uses ImGui to render widgets
-    class ImGuiRenderer : public Renderer
-    {
-		friend class RendererManager;
+// @brief Renderer that uses ImGui to render widgets
+class ImGuiRenderer : public Renderer {
+  friend class RendererManager;
 
-	public:
+public:
+  void init() override;
+  void initWidgets();
+  void update(double deltaTime) override;
+  void render() const override;
+  void shutdown() override;
 
-		void init() override;
-		void initWidgets();
-		void update(double deltaTime) override;
-		void render() const override;
-		void shutdown() override;
-		
-		// @brief Creates a widget of the specified type
-		// @tparam T The type of the widget to create
-		// @return The ID of the created widget
-		template <typename T> requires std::derived_from<T, Widget>
-		uint32_t createWidget()
-		{
-			uint32_t id = _assignID();
-			m_widgets[id] = std::make_unique<T>();
-			return id;
-		}
+  // @brief Creates a widget of the specified type
+  // @tparam T The type of the widget to create
+  // @return The ID of the created widget
+  template <typename T>
+    requires std::derived_from<T, Widget>
+  uint32_t createWidget() {
+    uint32_t id = _assignID();
+    m_widgets[id] = std::make_unique<T>();
+    return id;
+  }
 
-		template <typename T> requires std::derived_from<T, Widget>
-		T* getWidget(uint32_t id)
-		{
-			auto it = m_widgets.find(id);
-			if (it != m_widgets.end())
-			{
-				return dynamic_cast<T*>(it->second.get());
-			}
-			return nullptr;
-		}
+  template <typename T>
+    requires std::derived_from<T, Widget>
+  T *getWidget(uint32_t id) {
+    auto it = m_widgets.find(id);
+    if (it != m_widgets.end()) {
+      return dynamic_cast<T *>(it->second.get());
+    }
+    return nullptr;
+  }
 
-		void destroyWidget(uint32_t id)
-		{
-			auto it = m_widgets.find(id);
-			if (it != m_widgets.end())
-			{
-				it->second.reset();
-				m_widgets.erase(it);
-			}
-		}
+  void destroyWidget(uint32_t id) {
+    auto it = m_widgets.find(id);
+    if (it != m_widgets.end()) {
+      it->second.reset();
+      m_widgets.erase(it);
+    }
+  }
 
-		void finalizeFrame() const;
+  void finalizeFrame() const;
 
-	private:
-		ImGuiRenderer(Logger& logger, const Window& window) : Renderer(logger, "ImGuiRenderer"), m_window(&window) {}
-		
-		std::unordered_map<uint32_t, std::unique_ptr<Widget>> m_widgets;
+private:
+  ImGuiRenderer(Logger &logger, const Window &window)
+      : Renderer(logger, "ImGuiRenderer"), m_window(&window) {}
 
-		std::atomic<uint32_t> m_ids{ 0 };
-		uint32_t _assignID() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
+  std::unordered_map<uint32_t, std::unique_ptr<Widget>> m_widgets;
 
-		const Window* m_window{ nullptr };
+  std::atomic<uint32_t> m_ids{0};
+  uint32_t _assignID() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 
-
-	};
-}
-
+  const Window *m_window{nullptr};
+};
+} // namespace SE

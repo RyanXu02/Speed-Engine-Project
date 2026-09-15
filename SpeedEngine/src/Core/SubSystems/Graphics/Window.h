@@ -3,51 +3,46 @@
 
 struct GLFWwindow;
 
-namespace SE
-{
-	// @brief Represents the window subsystem of the engine
-	class Window : public SubSystem
-	{
-	public:
-		Window() : SubSystem("Window"), 
-			m_windowTitle("Untitled"),
-			m_window(nullptr), m_windowShared(nullptr), 
-			m_windowWidth(800), m_windowHeight(600) {}
-		Window(unsigned int width, unsigned int height, std::string windowTitle) : SubSystem("Window"), 
-			m_windowTitle(windowTitle),
-			m_window(nullptr), m_windowShared(nullptr),
-			m_windowWidth(width), m_windowHeight(height) {}
+namespace SE {
+// @brief Represents the window subsystem of the engine
+class Window : public SubSystem {
+public:
+  Window()
+      : SubSystem("Window"), m_windowTitle("Untitled"), m_window(nullptr),
+        m_windowShared(nullptr), m_windowWidth(800), m_windowHeight(600) {}
+  Window(unsigned int width, unsigned int height, std::string windowTitle)
+      : SubSystem("Window"), m_windowTitle(windowTitle), m_window(nullptr),
+        m_windowShared(nullptr), m_windowWidth(width), m_windowHeight(height) {}
 
-		void init() override;
-		void update(double deltaTime) override;
-		void shutdown() override;
+  void init() override;
+  void update(double deltaTime) override;
+  void shutdown() override;
 
-		void swapBuffers() const;
+  void swapBuffers() const;
 
-		GLFWwindow* getWindow() const { return m_window; }
+  GLFWwindow *getWindow() const { return m_window; }
 
-		unsigned int getWidth() const { return m_windowWidth; }
-		unsigned int getHeight() const { return m_windowHeight; }
+  unsigned int getWidth() const { return m_windowWidth; }
+  unsigned int getHeight() const { return m_windowHeight; }
 
-		double getFPS() const { return m_fps; }
-		void setFPS(double fps) { m_fps = fps; }
+  double getFPS() const { return m_fps; }
+  void setFPS(double fps) { m_fps = fps; }
 
-		double getCurrentTime() const;
+  double getCurrentTime() const;
 
-	private:
-		bool _initGLFW();
+private:
+  bool _initGLFW();
 
-		bool m_vsyncEnabled { true };
+  bool m_vsyncEnabled{true};
 
-		std::string m_windowTitle;
-		
-		GLFWwindow* m_window;
-		GLFWwindow* m_windowShared;
+  std::string m_windowTitle;
 
-		unsigned int m_windowWidth;
-		unsigned int m_windowHeight;
+  GLFWwindow *m_window;
+  GLFWwindow *m_windowShared;
 
-		double m_fps { 60.0 };
-	};
-}
+  unsigned int m_windowWidth;
+  unsigned int m_windowHeight;
 
+  double m_fps{60.0};
+};
+} // namespace SE
