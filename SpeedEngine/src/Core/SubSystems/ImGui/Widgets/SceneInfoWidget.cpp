@@ -11,8 +11,8 @@ namespace SE
 	using MT = ActiveSceneModified::ModifyType;
 
 
-	SceneInfoWidget::SceneInfoWidget()
-	    : Widget("Scene Info")
+
+	SceneInfoWidget::SceneInfoWidget(): Widget("Scene Info")
 	{
 		m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified, [this](Event& event)
 		    {
@@ -33,8 +33,8 @@ namespace SE
 
 		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged, [this](Event& event)
 		    {
-			    if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
-				    m_entityNameCache = scene->getEntityList();
+			 if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
+					m_entityNameCache = scene->getEntityList();
 			    else
 				    m_entityNameCache.clear();
 		    });
