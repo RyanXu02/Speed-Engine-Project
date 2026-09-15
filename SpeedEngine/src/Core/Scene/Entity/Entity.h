@@ -33,7 +33,8 @@ namespace SE
 
 		void addComponent(std::unique_ptr<Component> component);
 
-		template<typename T> T* getComponent() const
+		template<typename T>
+		T* getComponent() const
 		{
 			for (const auto& component : m_components)
 			{

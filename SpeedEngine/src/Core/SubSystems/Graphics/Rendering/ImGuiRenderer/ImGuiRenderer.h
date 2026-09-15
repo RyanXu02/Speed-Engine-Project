@@ -21,14 +21,16 @@ namespace SE
 		// @brief Creates a widget of the specified type
 		// @tparam T The type of the widget to create
 		// @return The ID of the created widget
-		template<typename T> requires std::derived_from<T, Widget> uint32_t createWidget()
+		template<typename T>
+		requires std::derived_from<T, Widget> uint32_t createWidget()
 		{
 			uint32_t id = _assignID();
 			m_widgets[id] = std::make_unique<T>();
 			return id;
 		}
 
-		template<typename T> requires std::derived_from<T, Widget> T* getWidget(uint32_t id)
+		template<typename T>
+		requires std::derived_from<T, Widget> T* getWidget(uint32_t id)
 		{
 			auto it = m_widgets.find(id);
 			if (it != m_widgets.end())

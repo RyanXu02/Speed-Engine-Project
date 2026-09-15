@@ -34,7 +34,8 @@ namespace SE
 		//@param args arguments to pass for type of resource being added (filepaths,
 		// names, etc)
 		//@returns id of newly added resource
-		template<ResourceType Type, typename... Args> uint32_t addResource(Args&&... args)
+		template<ResourceType Type, typename... Args>
+		uint32_t addResource(Args&&... args)
 		{
 			if constexpr (Type == ResourceType::Shader)
 			{
@@ -61,7 +62,8 @@ namespace SE
 		//@param id the id to retrieve
 		//@returns the requested resource of the specified type if it exists, nullptr
 		// if not
-		template<typename T> T* getResource(uint32_t id)
+		template<typename T>
+		T* getResource(uint32_t id)
 		{
 			auto it = m_resourceTypes.find(id);
 			if (it != m_resourceTypes.end())
@@ -119,7 +121,8 @@ namespace SE
 		std::unordered_map<uint32_t, ResourceType> m_resourceTypes;
 
 		// get manager of type T
-		template<typename T> T* _getManager()
+		template<typename T>
+		T* _getManager()
 		{
 			for (auto& manager : m_managers)
 			{
@@ -132,7 +135,8 @@ namespace SE
 		}
 
 		// helper function to add a resource of a specific type
-		template<ResourceType Type, typename... Args> uint32_t _addResourceImpl(Args&&... args)
+		template<ResourceType Type, typename... Args>
+		uint32_t _addResourceImpl(Args&&... args)
 		{
 			if constexpr (Type == ResourceType::Shader)
 			{

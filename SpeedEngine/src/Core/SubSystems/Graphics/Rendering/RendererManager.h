@@ -19,7 +19,8 @@ namespace SE
 		const Window* getWindow() const { return m_window; }
 		void setWindow(Window& window) { m_window = &window; }
 
-		template<typename T> requires std::derived_from<T, Renderer> T* getRenderer()
+		template<typename T>
+		requires std::derived_from<T, Renderer> T* getRenderer()
 		{
 			if (m_sceneRenderer && dynamic_cast<T*>(m_sceneRenderer.get()))
 			{
@@ -28,7 +29,8 @@ namespace SE
 			return nullptr;
 		}
 
-		template<typename T> requires std::derived_from<T, Renderer> void removeRenderer()
+		template<typename T>
+		requires std::derived_from<T, Renderer> void removeRenderer()
 		{
 			if (m_sceneRenderer && dynamic_cast<T*>(m_sceneRenderer.get()))
 			{
