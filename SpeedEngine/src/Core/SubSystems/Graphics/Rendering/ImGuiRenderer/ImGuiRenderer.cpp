@@ -40,7 +40,7 @@ namespace SE
 		ImGui_ImplGlfw_InitForOpenGL(
 		    m_window->getWindow(),
 		    true); // Second param install_callback=true will install GLFW callbacks
-		    // and chain to existing ones.
+		// and chain to existing ones.
 		ImGui_ImplOpenGL3_Init();
 
 		initWidgets();
