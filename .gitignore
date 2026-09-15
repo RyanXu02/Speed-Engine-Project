@@ -85,6 +85,13 @@ dlldata.c
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
 
+# Super-linter outputs
+super-linter-output/
+super-linter.log
+
+# GitHub Actions leftovers
+github_conf/
+
 # .NET Core
 project.lock.json
 project.fragment.lock.json
