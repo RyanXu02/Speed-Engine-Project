@@ -13,8 +13,8 @@
 #include "../RendererManager.h"
 #include "Engine.h"
 
-#include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glad/glad.h>
 
 namespace SE
 {
