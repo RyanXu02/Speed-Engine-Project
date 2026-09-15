@@ -12,21 +12,10 @@ namespace SE
 	const std::vector<SubMesh> Mesh::s_emptySubMeshes;
 	const std::vector<uint32_t> Mesh::s_emptyIndices;
 
-	Mesh::Mesh(const Mesh* other) : Component(DISALLOW_MULTIPLE_COMPONENTS),
+	Mesh::Mesh(const Mesh* other) : Component(),
 		m_meshResourceId(other->m_meshResourceId)
 	{}
 
-	bool Mesh::initComponent() {
-		return true;
-	}
-
-	bool Mesh::updateComponent() {
-		return true;
-	}
-
-	bool Mesh::renderComponent() {
-		return true;
-	}
 
 	bool Mesh::renderImGuiInterface() {
 		if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
@@ -42,10 +31,6 @@ namespace SE
 				ImGui::Text("No valid mesh resource.");
 			}
 		}
-		return true;
-	}
-
-	bool Mesh::shutdownComponent() {
 		return true;
 	}
 

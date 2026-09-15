@@ -115,7 +115,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)ThirdParty\include\stb;$(ProjectDir)ThirdParty\include\nlohmann;$(ProjectDir)ThirdParty\include\glm;$(ProjectDir)ThirdParty\include\glfw;$(ProjectDir)ThirdParty\include\glad\include;$(ProjectDir)ThirdParty\include\spdlog;$(ProjectDir)ThirdParty\include\imgui;$(ProjectDir)ThirdParty\include\FMOD;$(ProjectDir)ThirdParty\include;$(ProjectDir)ThirdParty\include\rapidobj;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/ThirdParty/include;$(ProjectDir)/ThirdParty/include/glm;$(ProjectDir)/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -147,6 +147,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)/ThirdParty/include;$(ProjectDir)/ThirdParty/include/glm;$(ProjectDir)/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,6 +158,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Features\Math.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp" />
@@ -222,6 +224,8 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Features\Math.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.h" />
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResource.h" />

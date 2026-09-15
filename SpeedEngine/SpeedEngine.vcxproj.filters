@@ -150,6 +150,9 @@
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Features\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThirdParty\pch.h">
@@ -297,6 +300,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

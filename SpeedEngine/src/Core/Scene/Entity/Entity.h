@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component/Component.h"
+#include <typeindex>
 
 namespace SE
 {
@@ -12,12 +13,9 @@ namespace SE
 	{
 	public:
 		Entity(std::string name);
-
 		Entity(const Entity&);
 
 		void initializeEntity(Scene* parentScene);
-		void updateEntity(double deltaTime);
-		void shutdownEntity() {};
 
 		uint32_t getInstanceId() const { return m_instanceId; }
 
@@ -27,6 +25,11 @@ namespace SE
 		// @brief Marks the entity as dead, so it can be removed from the scene in the next update cycle
 		void killEntity() { m_isAlive = false; }
 		bool isAlive() const { return m_isAlive; }
+
+		template<typename T, typename... Args>
+		T& addComponepnt (Args&& ...args) {
+
+		}
 
 		void addComponent(std::unique_ptr<Component> component);
 
@@ -57,7 +60,8 @@ namespace SE
 
 		std::vector<std::unique_ptr<Component>> m_components;
 
-		std::string m_tag{ "Untagged" }; // not used, but could be used for filtering entities in the future
+		uint32_t m_id;
+		std::unordered_map<std::type_index, std::any> m_componentsNew;
 	};
 }
 

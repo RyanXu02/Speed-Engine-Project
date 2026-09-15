@@ -8,24 +8,10 @@
 
 namespace SE
 {
-	Transform::Transform(const Transform* other)
-		: Component(DISALLOW_MULTIPLE_COMPONENTS),
+	Transform::Transform(const Transform* other) : Component(),
 		m_position(other->m_position), m_rotation(other->m_rotation), m_scale(other->m_scale),
 		m_isDirty(other->m_isDirty), m_transform(other->m_transform)
 	{
-	}
-
-	bool Transform::initComponent()
-	{
-		return true;
-	}
-	bool Transform::updateComponent()
-	{
-		return true;
-	}
-	bool Transform::renderComponent()
-	{
-		return true;
 	}
 
 	bool Transform::renderImGuiInterface()
@@ -88,11 +74,6 @@ namespace SE
 
 			ImGui::Checkbox("Link Scale", &m_scaleLink);
 		}
-		return true;
-	}
-
-	bool Transform::shutdownComponent()
-	{
 		return true;
 	}
 

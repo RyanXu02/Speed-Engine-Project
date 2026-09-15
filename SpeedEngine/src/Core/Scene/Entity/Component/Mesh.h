@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "../../../ResourceManagers/MeshResource/MeshResource.h"
+#include "Core/ResourceManagers/MeshResource/MeshResource.h"
 
 namespace SE 
 {
@@ -9,18 +9,11 @@ namespace SE
 	class Mesh : public Component
 	{
 	public:
-		Mesh() : Component(DISALLOW_MULTIPLE_COMPONENTS), m_meshResourceId(0) {}
+		Mesh() : Component(), m_meshResourceId(0) {}
 		Mesh(const Mesh* other);
 		~Mesh() override {};
 
-
-		bool initComponent();
-		bool updateComponent();
-		bool renderComponent();
-
 		bool renderImGuiInterface();
-
-		bool shutdownComponent();
 
 		const std::vector<Vertex>& getPositionsToDraw() const;
 		const std::vector<SubMesh>& getSubMeshesToDraw() const;
@@ -32,7 +25,7 @@ namespace SE
 		bool hasValidResource() const;
 
 	private:
-		Mesh* clone() const override { return new Mesh(this); }
+		//Mesh* clone() const override { return new Mesh(this); }
 
 		MeshResource* _getResource() const;
 

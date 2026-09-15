@@ -29,7 +29,7 @@ namespace SE
 		{
 			if (entity->isAlive())
 			{
-				entity->updateEntity(deltaTime);
+
 			}
 		}
 
@@ -68,10 +68,6 @@ namespace SE
 	void Scene::shutdownScene()
 	{
 		m_logger.info("Shutting down");
-		for (auto& entity : m_entities)
-		{
-			entity->shutdownEntity();
-		}
 		m_entities.clear();
 		m_entitiesToAdd.clear();
 

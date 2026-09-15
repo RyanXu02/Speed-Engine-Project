@@ -38,6 +38,10 @@ namespace SE
 		std::vector<std::unique_ptr<Entity>> m_entities;
 		std::vector<std::unique_ptr<Entity>> m_entitiesToAdd;
 
+
+		std::atomic<uint32_t> m_entityID;
+		std::unordered_map<uint32_t, Entity> m_registry;
+
 		bool m_isInitialized{ false };
 		bool m_isUpdating{ false };
 	};

@@ -9,17 +9,11 @@ namespace SE
     class Transform : public Component
     {
     public:
-        Transform() : Component(DISALLOW_MULTIPLE_COMPONENTS) {};
+        Transform() : Component() {};
 		Transform(const Transform* other);
 		~Transform() override {};
 
-		bool initComponent() override;
-		bool updateComponent() override;
-		bool renderComponent() override;
-
 		bool renderImGuiInterface() override;
-
-		bool shutdownComponent() override;
 
 		void setPosition(const glm::vec3& position) { m_position = position; m_isDirty = true; }
 		void setRotation(const glm::vec3& rotation) { m_rotation = rotation; m_isDirty = true; }
@@ -31,8 +25,6 @@ namespace SE
 
 		const glm::mat4& getTransform() const;
     private:
-		Transform* clone() const override { return new Transform(this); }
-
 		glm::vec3 m_position{ 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_rotation{ 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_scale{ 1.0f, 1.0f, 1.0f };
