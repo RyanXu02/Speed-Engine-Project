@@ -1,9 +1,9 @@
 #pragma once
 #include "../SubSystems/SubSystem.h"
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 namespace SE
 {
@@ -64,16 +64,15 @@ namespace SE
 			m_spdlogger->critical(fmt::runtime(message), std::forward<Args>(args)...);
 		};
 
-
 	private:
 		std::shared_ptr<spdlog::logger> m_spdlogger;
 
 		// Static shared sinks reused by all loggers
 		static std::shared_ptr<spdlog::sinks::basic_file_sink_mt> s_file_sinkd;
 		static std::shared_ptr<spdlog::sinks::basic_file_sink_mt> s_file_sinkv;
-		static std::once_flag s_sinks_init_flag; //for use with std::call_once
+		static std::once_flag s_sinks_init_flag; // for use with std::call_once
 
-		//inits 2 static shared sinks
+		// inits 2 static shared sinks
 		static void initSharedSinks();
 	};
-}
+} // namespace SE

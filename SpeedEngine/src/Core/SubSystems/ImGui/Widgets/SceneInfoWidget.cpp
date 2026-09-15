@@ -1,20 +1,20 @@
 #include "pch.h"
+
 #include "SceneInfoWidget.h"
-#include "Engine.h"
 
 #include "../../Scenes/SceneSystem.h"
-
+#include "Engine.h"
 #include "imgui.h"
 
 namespace SE
 {
 	using MT = ActiveSceneModified::ModifyType;
 
-
 	SceneInfoWidget::SceneInfoWidget()
 	    : Widget("Scene Info")
 	{
-		m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified, [this](Event& event)
+		m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified,
+		    [this](Event& event)
 		    {
 			    ActiveSceneModified& asme = static_cast<ActiveSceneModified&>(event);
 			    if (asme.modifytype == MT::Add)
@@ -31,7 +31,8 @@ namespace SE
 			    }
 		    });
 
-		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged, [this](Event& event)
+		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
+		    [this](Event& event)
 		    {
 			    if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 				    m_entityNameCache = scene->getEntityList();
@@ -203,4 +204,4 @@ namespace SE
 			m_renameBuffer.resize(256);
 		}
 	}
-}
+} // namespace SE

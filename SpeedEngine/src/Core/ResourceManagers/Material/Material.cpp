@@ -1,15 +1,15 @@
 #include "pch.h"
-#include "Engine.h"
 
 #include "Material.h"
-#include "../Shader/ShaderManager.h"
+
 #include "../ResourceManager.h"
+#include "../Shader/ShaderManager.h"
+#include "Engine.h"
 
 #include <glad/glad.h>
 
 namespace SE
 {
-
 
 	bool Material::init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures)
 	{
@@ -45,7 +45,7 @@ namespace SE
 		auto newTexture = std::make_unique<Texture>(type);
 		std::string msg = newTexture.get()->init(filePath);
 		if (msg != "")
-		{ //texture failed to load
+		{ // texture failed to load
 			m_logger.warn(msg);
 			return false;
 		}
@@ -53,7 +53,8 @@ namespace SE
 		return true;
 	}
 
-	//slot 0 = albedo, slot 1 = normal, slot 2 = height, slot 3 = ambient occlusion, slot 4 = roughness
+	// slot 0 = albedo, slot 1 = normal, slot 2 = height, slot 3 = ambient
+	// occlusion, slot 4 = roughness
 	void Material::bind()
 	{
 		for (auto& t : m_textures)
@@ -62,21 +63,11 @@ namespace SE
 				continue;
 			switch (t->getType())
 			{
-			case TextureType::Albedo:
-				_bindTexture(0, *t);
-				break;
-			case TextureType::Normal:
-				_bindTexture(1, *t);
-				break;
-			case TextureType::Height:
-				_bindTexture(2, *t);
-				break;
-			case TextureType::AmbOcc:
-				_bindTexture(3, *t);
-				break;
-			case TextureType::Roughness:
-				_bindTexture(4, *t);
-				break;
+			case TextureType::Albedo: _bindTexture(0, *t); break;
+			case TextureType::Normal: _bindTexture(1, *t); break;
+			case TextureType::Height: _bindTexture(2, *t); break;
+			case TextureType::AmbOcc: _bindTexture(3, *t); break;
+			case TextureType::Roughness: _bindTexture(4, *t); break;
 			}
 		}
 	}
@@ -103,5 +94,4 @@ namespace SE
 		s->setInt(tex.getVarName(), slot);
 	}
 
-
-}
+} // namespace SE

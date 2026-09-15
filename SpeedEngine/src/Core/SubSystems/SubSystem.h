@@ -5,7 +5,7 @@ namespace SE
 	class Logger;
 
 	// @brief Base class for all subsystems in the engine
-	class SubSystem 
+	class SubSystem
 	{
 	public:
 		SubSystem(const std::string& name);
@@ -15,11 +15,8 @@ namespace SE
 		SubSystem& operator=(const SubSystem&) = delete;
 		SubSystem(SubSystem&&) = delete;
 		SubSystem& operator=(SubSystem&&) = delete;
-		
-		const std::string& getName() const 
-		{
-			return m_name;
-		};
+
+		const std::string& getName() const { return m_name; };
 
 		virtual void init();
 		virtual void update(double deltaTime);
@@ -35,5 +32,4 @@ namespace SE
 
 		bool isActive;
 	};
-}
-
+} // namespace SE

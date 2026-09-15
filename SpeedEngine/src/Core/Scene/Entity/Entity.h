@@ -6,8 +6,10 @@ namespace SE
 {
 	class Scene;
 
-	// @brief An entity is a container for components that define its behavior and appearance in the scene
-	// @brief An entity is owned by a scene, and can be created and destroyed by the scene
+	// @brief An entity is a container for components that define its behavior and
+	// appearance in the scene
+	// @brief An entity is owned by a scene, and can be created and destroyed by the
+	// scene
 	class Entity
 	{
 	public:
@@ -24,13 +26,14 @@ namespace SE
 		const std::string& getName() const { return m_name; }
 		void setName(std::string_view name);
 
-		// @brief Marks the entity as dead, so it can be removed from the scene in the next update cycle
+		// @brief Marks the entity as dead, so it can be removed from the scene in the
+		// next update cycle
 		void killEntity() { m_isAlive = false; }
 		bool isAlive() const { return m_isAlive; }
 
 		void addComponent(std::unique_ptr<Component> component);
 
-		template <typename T>
+		template<typename T>
 		T* getComponent() const
 		{
 			for (const auto& component : m_components)
@@ -52,12 +55,12 @@ namespace SE
 
 		uint32_t m_instanceId;
 		static uint32_t s_nextId;
-		
+
 		Scene* m_parentScene{ nullptr };
 
 		std::vector<std::unique_ptr<Component>> m_components;
 
-		std::string m_tag{ "Untagged" }; // not used, but could be used for filtering entities in the future
+		std::string m_tag{ "Untagged" }; // not used, but could be used for filtering
+		    // entities in the future
 	};
-}
-
+} // namespace SE

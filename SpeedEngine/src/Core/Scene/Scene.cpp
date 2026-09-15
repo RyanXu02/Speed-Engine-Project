@@ -1,8 +1,9 @@
 #include "pch.h"
+
 #include "Scene.h"
-#include "Engine.h"
 
 #include "../SubSystems/Events/EventSystem.h"
+#include "Engine.h"
 
 namespace SE
 {
@@ -11,7 +12,7 @@ namespace SE
 	void Scene::initializeScene()
 	{
 		m_logger.info("Initializing Scene");
-		
+
 		for (auto& entity : m_entities)
 		{
 			entity->initializeEntity(this);
@@ -40,9 +41,7 @@ namespace SE
 			{
 				m_logger.debug("adding entity: {}", entity->getName());
 				entity->initializeEntity(this);
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-					std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
-				);
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName()));
 				m_entities.push_back(std::move(entity));
 			}
 			m_entitiesToAdd.clear();
@@ -50,18 +49,18 @@ namespace SE
 
 		// delete dead entities
 		auto it = std::remove_if(m_entities.begin(), m_entities.end(),
-			[this](const std::unique_ptr<Entity>& entity) 
-			{
-				if (!entity->isAlive())
-				{
-					m_logger.debug("deleting entity: {}", entity->getName());
-					return true;
-				}
-				return false;			
-			});
+		    [this](const std::unique_ptr<Entity>& entity)
+		    {
+			    if (!entity->isAlive())
+			    {
+				    m_logger.debug("deleting entity: {}", entity->getName());
+				    return true;
+			    }
+			    return false;
+		    });
 
 		m_entities.erase(it, m_entities.end());
-		
+
 		m_isUpdating = false;
 	}
 
@@ -89,9 +88,7 @@ namespace SE
 		{
 			m_logger.debug("adding entity: {}", entity->getName());
 			entity->initializeEntity(this);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(
-				std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
-			);
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName()));
 			m_entities.push_back(std::move(entity));
 		}
 	}
@@ -116,13 +113,10 @@ namespace SE
 			{
 				m_logger.debug("deferring remove entity: {}", entity->getName());
 				entity->killEntity();
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-					std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, "")
-				);
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, ""));
 				return;
 			}
 		}
-
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
@@ -137,4 +131,4 @@ namespace SE
 		}
 		return entityList;
 	}
-}
+} // namespace SE

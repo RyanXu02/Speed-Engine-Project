@@ -2,7 +2,8 @@
 
 namespace SE
 {
-	enum class TextureType {
+	enum class TextureType
+	{
 		None = -1,
 		Albedo,
 		Normal,
@@ -32,6 +33,7 @@ namespace SE
 		bool isLoaded() const { return m_type != TextureType::None; }
 
 		unsigned int glTextureId = 0;
+
 	private:
 		TextureType m_type{ TextureType::None };
 		std::string name{ "" };
@@ -39,5 +41,4 @@ namespace SE
 		unsigned int format;
 	};
 
-}
-
+} // namespace SE

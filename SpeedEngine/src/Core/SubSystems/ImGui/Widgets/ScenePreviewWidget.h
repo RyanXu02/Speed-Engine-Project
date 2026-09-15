@@ -1,6 +1,6 @@
 #pragma once
 #include "../Widget.h"
-namespace SE 
+namespace SE
 {
 	class ScenePreviewWidget : public Widget
 	{
@@ -9,7 +9,7 @@ namespace SE
 
 		void render() override;
 		void shutdown() override;
+
 	private:
 	};
-}
-
+} // namespace SE

@@ -1,6 +1,6 @@
 #pragma once
-#include "glm/glm.hpp"
 #include "FBO.h"
+#include "glm/glm.hpp"
 
 namespace SE
 {
@@ -17,22 +17,48 @@ namespace SE
 		float fov = 90.0f;
 		float nearPlane = 0.1f;
 		float farPlane = 1000.0f;
+
 	public:
 		// @brief Move the camera by a given offset
 		// @param delta The offset to move the camera by
-		void move(const glm::vec3& delta) { position += delta; target += delta; isDirty = true; }
+		void move(const glm::vec3& delta)
+		{
+			position += delta;
+			target += delta;
+			isDirty = true;
+		}
 
 		const glm::vec3& getPosition() const { return position; }
-		void setPosition(const glm::vec3& pos) { position = pos; isDirty = true; }
+		void setPosition(const glm::vec3& pos)
+		{
+			position = pos;
+			isDirty = true;
+		}
 		const glm::vec3& getTarget() const { return target; }
-		void setTarget(const glm::vec3& tgt) { target = tgt; isDirty = true; }
+		void setTarget(const glm::vec3& tgt)
+		{
+			target = tgt;
+			isDirty = true;
+		}
 
 		const float getFOV() const { return fov; }
-		void setFOV(float f) { fov = f; isDirty = true; }
+		void setFOV(float f)
+		{
+			fov = f;
+			isDirty = true;
+		}
 		const float getNearPlane() const { return nearPlane; }
-		void setNearPlane(float n) { nearPlane = n; isDirty = true; }
-		const  float getFarPlane() const { return farPlane; }
-		void setFarPlane(float f) { farPlane = f; isDirty = true; }
+		void setNearPlane(float n)
+		{
+			nearPlane = n;
+			isDirty = true;
+		}
+		const float getFarPlane() const { return farPlane; }
+		void setFarPlane(float f)
+		{
+			farPlane = f;
+			isDirty = true;
+		}
 		// cache
 		bool isDirty = true;
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
@@ -43,27 +69,26 @@ namespace SE
 	// @brief Represents a viewport in the rendering system
 	class Viewport
 	{
-    public:
-        Viewport(uint32_t width, uint32_t height)
-            : m_FBO(std::make_unique<FBO>(width, height))
-            , m_cameraFrustum()
-            , m_isActive(true)
-        {}
+	public:
+		Viewport(uint32_t width, uint32_t height)
+		    : m_FBO(std::make_unique<FBO>(width, height)),
+		      m_cameraFrustum(),
+		      m_isActive(true)
+		{}
 
-        FBO& getFBO() { return *m_FBO; }
+		FBO& getFBO() { return *m_FBO; }
 
 		CameraFrustum& getCameraFrustum() { return m_cameraFrustum; }
 		void setCameraFrustum(const CameraFrustum& frustum) { m_cameraFrustum = frustum; }
-		
+
 		void setActive(bool active) { m_isActive = active; }
 		bool isActive() const { return m_isActive; }
 
-    private:
-        std::unique_ptr<FBO> m_FBO;  // Viewport owns FBO
+	private:
+		std::unique_ptr<FBO> m_FBO; // Viewport owns FBO
 
 		CameraFrustum m_cameraFrustum;
-        bool m_isActive;
+		bool m_isActive;
 	};
 
-};
-
+}; // namespace SE

@@ -1,11 +1,12 @@
 #include "pch.h"
+
 #include "EventSystem.h"
-#include "EventSubscription.h"
 
 #include "../../Logger/Logger.h"
+#include "EventSubscription.h"
 
 namespace SE
-{	
+{
 	void EventSystem::init()
 	{
 		SubSystem::init();
@@ -43,20 +44,25 @@ namespace SE
 	EventSubscription EventSystem::subscribe(EventType eventType, EventCallback callback)
 	{
 		uint32_t id = _assignId();
-		m_allEventCallbacks[eventType].emplace_back( EventCallbackWrapper{id, callback} );
+		m_allEventCallbacks[eventType].emplace_back(EventCallbackWrapper{ id, callback });
 		return EventSubscription(id, eventType);
 	}
 
 	void EventSystem::unsubscribe(uint32_t id, EventType eventType)
 	{
-		if (id == 0) return; // invalid id
+		if (id == 0)
+			return; // invalid id
 
 		auto it = m_allEventCallbacks.find(eventType);
 		if (it != m_allEventCallbacks.end())
 		{
 			auto& callbacks = it->second;
 			callbacks.erase(std::remove_if(callbacks.begin(), callbacks.end(),
-				[id](const EventCallbackWrapper& eventCallbackWrapper) { return id == eventCallbackWrapper.id; }), callbacks.end());
+			                    [id](const EventCallbackWrapper& eventCallbackWrapper)
+			                    {
+				                    return id == eventCallbackWrapper.id;
+			                    }),
+			    callbacks.end());
 		}
 	}
 
@@ -70,8 +76,9 @@ namespace SE
 				eventCallbackWrapper.callback(event);
 				m_logger->verbose("Fired event of type: " + event.getName() + " to callback with id: " + std::to_string(eventCallbackWrapper.id));
 				m_logger->debug("Fired {} event with data: {}", event.getName(), event.getDataAsString());
-				if (event.handled) break;
+				if (event.handled)
+					break;
 			}
 		}
 	}
-}
+} // namespace SE

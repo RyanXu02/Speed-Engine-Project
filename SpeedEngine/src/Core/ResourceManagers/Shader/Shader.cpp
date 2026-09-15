@@ -1,5 +1,7 @@
 #include "pch.h"
+
 #include "Shader.h"
+
 #include <glad/glad.h>
 
 namespace SE
@@ -7,8 +9,7 @@ namespace SE
 	Shader::Shader(uint32_t resourceId, std::string resourceName)
 	    : Resource(resourceId, resourceName),
 	      m_ProgramId(0)
-	{
-	}
+	{}
 
 	GLCompStatus Shader::init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource)
 	{
@@ -146,4 +147,4 @@ namespace SE
 	{
 		glUniformMatrix4fv(_getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 	}
-}
+} // namespace SE

@@ -1,13 +1,13 @@
 #pragma once
-#include "../SubSystems/SubSystem.h"
+#include "../Engine.h"
 #include "../Logger/Logger.h"
-#include "Resource.h"
+#include "../SubSystems/Events/EventSystem.h"
+#include "../SubSystems/SubSystem.h"
 #include "Manager.h"
-
-#include "Shader/ShaderManager.h"
 #include "Material/MaterialManager.h"
 #include "MeshResource/MeshResourceManager.h"
-#include "../SubSystems/Events/EventSystem.h"
+#include "Resource.h"
+#include "Shader/ShaderManager.h"
 
 namespace SE
 {
@@ -31,7 +31,8 @@ namespace SE
 
 		//@brief adds a resource to the Resource Manager
 		//@param type the type of resource being added
-		//@param args arguments to pass for type of resource being added (filepaths, names, etc)
+		//@param args arguments to pass for type of resource being added (filepaths,
+		// names, etc)
 		//@returns id of newly added resource
 		template<ResourceType Type, typename... Args>
 		uint32_t addResource(Args&&... args)
@@ -55,24 +56,33 @@ namespace SE
 			}
 		}
 
-		//@brief retrieves a resource of requested type given an id (Not prefered, used the other one. It is callers responsibility to ensure the type is correct)
+		//@brief retrieves a resource of requested type given an id (Not prefered,
+		// used the other one. It is callers responsibility to ensure the type is
+		// correct)
 		//@param id the id to retrieve
-		//@returns the requested resource of the specified type if it exists, nullptr if not
+		//@returns the requested resource of the specified type if it exists, nullptr
+		// if not
 		template<typename T>
-		T* getResource(uint32_t id) {
+		T* getResource(uint32_t id)
+		{
 			auto it = m_resourceTypes.find(id);
-			if (it != m_resourceTypes.end()) {
-				if constexpr (std::is_same_v<T, Shader>) {
+			if (it != m_resourceTypes.end())
+			{
+				if constexpr (std::is_same_v<T, Shader>)
+				{
 					return _getManager<ShaderManager>()->getShader(id);
 				}
-				else if constexpr (std::is_same_v<T, Material>) {
+				else if constexpr (std::is_same_v<T, Material>)
+				{
 					return _getManager<MaterialManager>()->getMaterial(id);
 				}
-				else if constexpr (std::is_same_v<T, MeshResource>) {
+				else if constexpr (std::is_same_v<T, MeshResource>)
+				{
 					return _getManager<MeshResourceManager>()->getMeshResource(id);
 				}
 				// ...
-				else {
+				else
+				{
 					m_logger->warn("ResourceManager::getResource: Unhandled type T");
 					return nullptr;
 				}
@@ -86,19 +96,18 @@ namespace SE
 		Resource* getResource(uint32_t id);
 
 		//@brief gets the resource type map as a copy
-		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const {
-			return m_resourceTypes;
-		}
-		
+		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const { return m_resourceTypes; }
+
 		//@brief removes a resource given an id
 		//@param id the id of the resource to remove
 		//@returns true if successfully removed, false if not
 		bool removeResource(uint32_t id);
 
-
 	private:
 		// singleton instance, use singleton Engine to access its subsystems
-		ResourceManager() : SubSystem("ResourceManager") {}
+		ResourceManager()
+		    : SubSystem("ResourceManager")
+		{}
 
 		// universal id for all resources in the engine
 		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
@@ -132,7 +141,8 @@ namespace SE
 			if constexpr (Type == ResourceType::Shader)
 			{
 				uint32_t id = _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
-				if (id != 0) {
+				if (id != 0)
+				{
 					m_resourceTypes.insert({ id, ResourceType::Shader });
 				}
 				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
@@ -141,7 +151,8 @@ namespace SE
 			else if constexpr (Type == ResourceType::Material)
 			{
 				uint32_t id = _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
-				if (id != 0) {
+				if (id != 0)
+				{
 					m_resourceTypes.insert({ id, ResourceType::Material });
 				}
 				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
@@ -150,7 +161,8 @@ namespace SE
 			else if constexpr (Type == ResourceType::MeshResource)
 			{
 				uint32_t id = _getManager<MeshResourceManager>()->addMeshResource(generateId(), std::forward<Args>(args)...);
-				if (id != 0) {
+				if (id != 0)
+				{
 					m_resourceTypes.insert({ id, ResourceType::MeshResource });
 				}
 				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
@@ -162,6 +174,5 @@ namespace SE
 				return 0;
 			}
 		}
-
 	};
-}
+} // namespace SE

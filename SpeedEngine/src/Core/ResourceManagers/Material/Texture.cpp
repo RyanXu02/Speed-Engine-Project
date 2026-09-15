@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "Texture.h"
 
 #include <glad/glad.h>
@@ -12,29 +13,16 @@ namespace SE
 	{
 		switch (m_type)
 		{
-		case TextureType::Albedo:
-			name = "albedo";
-			break;
-		case TextureType::Normal:
-			name = "normalmap";
-			break;
-		case TextureType::Height:
-			name = "heightmap";
-			break;
-		case TextureType::AmbOcc:
-			name = "ambientOcc";
-			break;
-		case TextureType::Roughness:
-			name = "roughness";
-			break;
-		default:
-			break;
+		case TextureType::Albedo: name = "albedo"; break;
+		case TextureType::Normal: name = "normalmap"; break;
+		case TextureType::Height: name = "heightmap"; break;
+		case TextureType::AmbOcc: name = "ambientOcc"; break;
+		case TextureType::Roughness: name = "roughness"; break;
+		default: break;
 		}
 	}
 
-	Texture::~Texture()
-	{
-	}
+	Texture::~Texture() {}
 
 	std::string Texture::init(std::string_view filePath)
 	{
@@ -61,7 +49,8 @@ namespace SE
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //tiles texture
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+			    GL_REPEAT); // tiles texture
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 			glBindTexture(GL_TEXTURE_2D, 0);
@@ -80,4 +69,4 @@ namespace SE
 			glTextureId = 0;
 		}
 	}
-}
+} // namespace SE

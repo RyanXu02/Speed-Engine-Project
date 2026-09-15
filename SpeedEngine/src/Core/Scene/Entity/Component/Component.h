@@ -8,13 +8,16 @@ namespace SE
 	class Entity;
 
 	// @brief Base class for all components that can be attached to an entity
-	// @brief A component can be allowed to be attached multiple times to an entity, or only once. This is specified in the constructor of the component.
+	// @brief A component can be allowed to be attached multiple times to an entity,
+	// or only once. This is specified in the constructor of the component.
 	class Component
 	{
 
 	public:
 		Component() = delete; // use the one below thx
-		Component(bool allowMultipleComponent) : m_allowMultipleComponent(allowMultipleComponent) {}
+		Component(bool allowMultipleComponent)
+		    : m_allowMultipleComponent(allowMultipleComponent)
+		{}
 
 		Component& operator=(const Component&) = delete;
 
@@ -26,7 +29,8 @@ namespace SE
 		virtual bool updateComponent() = 0;
 		virtual bool renderComponent() = 0;
 
-		// @brief Used to render information and controls about this component to ImGui properties window
+		// @brief Used to render information and controls about this component to
+		// ImGui properties window
 		virtual bool renderImGuiInterface() = 0;
 
 		virtual bool shutdownComponent() = 0;
@@ -37,8 +41,8 @@ namespace SE
 
 	protected:
 		Entity* m_parentEntity{ nullptr };
+
 	private:
 		bool m_allowMultipleComponent{ DISALLOW_MULTIPLE_COMPONENTS };
 	};
-}
-
+} // namespace SE

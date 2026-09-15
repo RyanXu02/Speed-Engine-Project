@@ -1,18 +1,21 @@
 #pragma once
-#include "Component.h"
 #include "../../../ResourceManagers/MeshResource/MeshResource.h"
+#include "Component.h"
 
-namespace SE 
+namespace SE
 {
 	// @brief Represents a mesh component that can be attached to an entity
-	// @brief A mesh component contains a reference to a mesh resource, which contains the vertex data, sub-meshes, and indices for a 3D model
+	// @brief A mesh component contains a reference to a mesh resource, which
+	// contains the vertex data, sub-meshes, and indices for a 3D model
 	class Mesh : public Component
 	{
 	public:
-		Mesh() : Component(DISALLOW_MULTIPLE_COMPONENTS), m_meshResourceId(0) {}
+		Mesh()
+		    : Component(DISALLOW_MULTIPLE_COMPONENTS),
+		      m_meshResourceId(0)
+		{}
 		Mesh(const Mesh* other);
-		~Mesh() override {};
-
+		~Mesh() override{};
 
 		bool initComponent();
 		bool updateComponent();
@@ -43,5 +46,4 @@ namespace SE
 		static const std::vector<SubMesh> s_emptySubMeshes;
 		static const std::vector<uint32_t> s_emptyIndices;
 	};
-}
-
+} // namespace SE

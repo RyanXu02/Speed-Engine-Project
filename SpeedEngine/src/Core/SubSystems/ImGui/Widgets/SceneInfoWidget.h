@@ -1,9 +1,7 @@
 #pragma once
-#include "../Widget.h"
-
 #include "../../../Scene/Entity/Entity.h"
 #include "../../Events/EventSubscription.h"
-
+#include "../Widget.h"
 
 namespace SE
 {
@@ -14,7 +12,6 @@ namespace SE
 
 		void render() override;
 		void shutdown() override;
-
 
 	private:
 		std::unordered_map<uint32_t, std::string> m_entityNameCache;
@@ -29,9 +26,9 @@ namespace SE
 
 		bool m_requestDelete = false;
 
-		void _rightClickMenu(const std::string& name,uint32_t id);
+		void _rightClickMenu(const std::string& name, uint32_t id);
 		void _leftClickHandle(const std::string& name, uint32_t id);
 		void _f2Handle(const std::string& name, uint32_t id);
 		void _renamingHandle(uint32_t id);
 	};
-}
+} // namespace SE

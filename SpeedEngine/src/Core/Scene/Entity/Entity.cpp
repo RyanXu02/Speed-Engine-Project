@@ -1,31 +1,29 @@
 #include "pch.h"
-#include "Entity.h"
-#include "Engine.h"
 
-#include "../../SubSystems/Scenes/SceneSystem.h"
+#include "Entity.h"
 
 #include "../../SubSystems/Events/EventSystem.h"
-
+#include "../../SubSystems/Scenes/SceneSystem.h"
 #include "Component/Transform.h"
+#include "Engine.h"
 namespace SE
 {
 	using MT = ActiveSceneModified::ModifyType;
 
-
 	uint32_t Entity::s_nextId = 1;
 
-	Entity::Entity(std::string name) :
-		m_instanceId(s_nextId++),
-		m_name(name)
+	Entity::Entity(std::string name)
+	    : m_instanceId(s_nextId++),
+	      m_name(name)
 	{
 		m_components.push_back(std::make_unique<Transform>());
 	}
 
-	Entity::Entity(const Entity& other) :
-		m_instanceId(s_nextId++),
-		m_name(other.m_name),
-		m_isAlive(other.m_isAlive),
-		m_tag(other.m_tag)
+	Entity::Entity(const Entity& other)
+	    : m_instanceId(s_nextId++),
+	      m_name(other.m_name),
+	      m_isAlive(other.m_isAlive),
+	      m_tag(other.m_tag)
 	{
 		for (const auto& component : other.m_components)
 		{
@@ -51,9 +49,7 @@ namespace SE
 	void Entity::setName(std::string_view name)
 	{
 		m_name = std::string(name);
-		Engine::Instance().getSubSystem<EventSystem>()->publish(
-			std::make_unique<ActiveSceneModified>(MT::Rename, m_instanceId, m_name)
-		);
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Rename, m_instanceId, m_name));
 	}
 
 	void Entity::addComponent(std::unique_ptr<Component> component)
@@ -71,7 +67,10 @@ namespace SE
 			{
 				if (typeid(*existingComponent) == typeid(*component))
 				{
-					m_parentScene->getLogger().critical("Attempted to add a duplicate component of type '{}' to entity '{}'", typeid(*component).name(), m_name);
+					m_parentScene->getLogger().critical(
+					    "Attempted to add a duplicate component of type '{}' to entity "
+					    "'{}'",
+					    typeid(*component).name(), m_name);
 					return;
 				}
 			}
@@ -86,4 +85,4 @@ namespace SE
 		component->setParentEntity(this);
 		m_components.push_back(std::move(component));
 	}
-}
+} // namespace SE

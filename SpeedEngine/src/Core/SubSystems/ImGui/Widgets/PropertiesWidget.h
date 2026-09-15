@@ -1,27 +1,26 @@
 #pragma once
+#include "../../../Scene/Entity/Component/Component.h"
+#include "../../Events/EventSubscription.h"
 #include "../Widget.h"
 
-#include "../../../Scene/Entity/Component/Component.h"
+namespace SE
+{
 
-#include "../../Events/EventSubscription.h"
+	class PropertiesWidget : public Widget
+	{
+	public:
+		PropertiesWidget();
 
-namespace SE {
+		void render() override;
+		void shutdown() override;
 
-    class PropertiesWidget : public Widget
-    {
-    public:
-        PropertiesWidget();
-
-        void render() override;
-        void shutdown() override;
-    private:
+	private:
 		EventSubscription m_EntitySelectedSubscription;
 		EventSubscription m_ActiveSceneModifiedSubscription;
 		EventSubscription m_SceneChangedSubscription;
 
 		uint32_t m_selectedEntityId{ 0 };
 		Entity* m_cachedSelectedEntity{ nullptr };
-    };
+	};
 
-}
-
+} // namespace SE

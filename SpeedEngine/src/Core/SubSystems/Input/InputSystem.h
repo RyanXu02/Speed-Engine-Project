@@ -4,7 +4,8 @@
 
 struct GLFWwindow;
 
-namespace SE {
+namespace SE
+{
 	// @brief 0 at top left corner, measured in screen space (sub)pixels
 	struct MousePos
 	{
@@ -53,7 +54,9 @@ namespace SE {
 		const MouseScroll& getMouseScroll() const;
 
 	private:
-		InputSystem() : SubSystem("InputSystem") {}
+		InputSystem()
+		    : SubSystem("InputSystem")
+		{}
 
 		void _setKeyState(KeyCodes key);
 		void _clearKeyState(KeyCodes key);
@@ -80,5 +83,4 @@ namespace SE {
 		MouseScroll m_mouseScroll{ 0.0, 0.0 };
 		MouseScroll m_mouseScrollAccumulated{ 0.0, 0.0 };
 	};
-}
-
+} // namespace SE

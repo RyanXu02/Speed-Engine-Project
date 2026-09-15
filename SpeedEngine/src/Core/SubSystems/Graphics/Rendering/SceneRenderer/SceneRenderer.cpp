@@ -1,22 +1,20 @@
 #include "pch.h"
-#include "Engine.h"
 
 #include "SceneRenderer.h"
-#include "../../../../Scene/Entity/Entity.h"
-#include "../../../../Scene/Entity/Component/Mesh.h"
-#include "../../../../Scene/Entity/Component/Transform.h"
 
-#include <glad/glad.h>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "../RendererManager.h"
-#include "../../../Scenes/SceneSystem.h"
+#include "../../../../ResourceManagers/Material/Material.h"
 #include "../../../../ResourceManagers/ResourceManager.h"
 #include "../../../../ResourceManagers/Shader/Shader.h"
-#include "../../../../ResourceManagers/Material/Material.h"
-
+#include "../../../../Scene/Entity/Component/Mesh.h"
+#include "../../../../Scene/Entity/Component/Transform.h"
+#include "../../../../Scene/Entity/Entity.h"
 #include "../../../Input/InputSystem.h"
+#include "../../../Scenes/SceneSystem.h"
+#include "../RendererManager.h"
+#include "Engine.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glad/glad.h>
 
 namespace SE
 {
@@ -41,10 +39,10 @@ namespace SE
 		FBO& fbo = m_viewport->getFBO();
 		CameraFrustum& camera = m_viewport->getCameraFrustum();
 
-		//bind fbo
+		// bind fbo
 		fbo.bind();
 
-		//clear framebuffer
+		// clear framebuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -139,11 +137,7 @@ namespace SE
 		return retlist;
 	}
 
-	void SceneRenderer::uploadMeshToGPU(
-	    uint32_t meshId,
-	    const std::vector<Vertex>& positions,
-	    const std::vector<SubMesh>& subMeshes,
-	    const std::vector<uint32_t>& indices) const
+	void SceneRenderer::uploadMeshToGPU(uint32_t meshId, const std::vector<Vertex>& positions, const std::vector<SubMesh>& subMeshes, const std::vector<uint32_t>& indices) const
 	{
 		MeshGPUData& gpuData = m_meshCache[meshId];
 
@@ -163,17 +157,11 @@ namespace SE
 
 		// Upload vertex data
 		glBindBuffer(GL_ARRAY_BUFFER, gpuData.VBO);
-		glBufferData(GL_ARRAY_BUFFER,
-		    positions.size() * sizeof(Vertex),
-		    positions.data(),
-		    GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(Vertex), positions.data(), GL_STATIC_DRAW);
 
 		// Upload index data
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpuData.EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-		    indices.size() * sizeof(uint32_t),
-		    indices.data(),
-		    GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
 
 		// Set vertex attributes
 		// Position attribute (location = 0)
@@ -197,10 +185,7 @@ namespace SE
 		gpuData.indexCount = indices.size();
 		gpuData.needsUpdate = false;
 
-		m_logger.info("Uploaded mesh {} to GPU: {} vertices, {} indices",
-		    meshId,
-		    positions.size(),
-		    indices.size());
+		m_logger.info("Uploaded mesh {} to GPU: {} vertices, {} indices", meshId, positions.size(), indices.size());
 	}
 
 	void SceneRenderer::cleanupMeshGPU(uint32_t meshId) const
@@ -321,11 +306,12 @@ namespace SE
 		_updateCameraTarget(deltaTime, camera);
 		if (camera.isDirty)
 		{
-			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(), WORLD_UP); // 0,1,0 is up vector
+			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(),
+			    WORLD_UP); // 0,1,0 is up vector
 			float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
 			camera.projectionMatrix = glm::perspective(glm::radians(camera.getFOV()), aspectRatio, camera.getNearPlane(), camera.getFarPlane());
 			camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
 			camera.isDirty = false;
 		}
 	}
-}
+} // namespace SE

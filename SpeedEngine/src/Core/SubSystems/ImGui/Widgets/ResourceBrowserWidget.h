@@ -1,9 +1,10 @@
 #pragma once
-#include "../Widget.h"
 #include "../../Events/EventSubscription.h"
+#include "../Widget.h"
+
 #include <imgui.h>
 
-namespace SE 
+namespace SE
 {
 	class ResourceBrowserWidget : public Widget
 	{
@@ -39,7 +40,7 @@ namespace SE
 		// State
 		std::unordered_set<uint32_t> m_selectedResources;
 		bool m_requestDelete = false;
-		uint32_t m_contextMenuItemId = 0; //currently not being used in code
+		uint32_t m_contextMenuItemId = 0; // currently not being used in code
 
 		// Helper functions
 		void UpdateLayoutSizes(float availWidth);
@@ -50,5 +51,4 @@ namespace SE
 		void DeleteSelectedResources();
 	};
 
-}
-
+} // namespace SE

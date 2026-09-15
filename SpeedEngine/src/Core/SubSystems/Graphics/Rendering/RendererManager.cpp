@@ -1,9 +1,10 @@
 #include "pch.h"
+
 #include "RendererManager.h"
 
-#include <glad/glad.h>
-
 #include "SceneRenderer/SceneRenderer.h"
+
+#include <glad/glad.h>
 
 namespace SE
 {
@@ -68,4 +69,4 @@ namespace SE
 		// ...
 	}
 
-}
+} // namespace SE

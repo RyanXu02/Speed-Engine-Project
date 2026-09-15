@@ -3,16 +3,16 @@
 
 namespace SE
 {
-    // @brief The main widget that all other widgets are docked into
-    class MainWidget : public Widget
-    {
-    public:
-		MainWidget() : Widget("MainWidget") {};
+	// @brief The main widget that all other widgets are docked into
+	class MainWidget : public Widget
+	{
+	public:
+		MainWidget()
+		    : Widget("MainWidget"){};
 
-        void render() override;
+		void render() override;
 		void shutdown() override;
-    private:
 
-    };
-}
-
+	private:
+	};
+} // namespace SE

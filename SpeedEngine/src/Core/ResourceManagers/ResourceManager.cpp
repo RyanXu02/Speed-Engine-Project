@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "Engine.h"
 
 #include "ResourceManager.h"
-#include "../Logger/Logger.h"
 
-#include "Shader/ShaderManager.h"
+#include "../Logger/Logger.h"
+#include "Engine.h"
 #include "Material/MaterialManager.h"
 #include "MeshResource/MeshResourceManager.h"
+#include "Shader/ShaderManager.h"
 
 namespace SE
 {
@@ -34,7 +34,6 @@ namespace SE
 			manager->shutdown();
 		}
 		m_managers.clear();
-
 	}
 
 	uint32_t ResourceManager::generateId()
@@ -64,16 +63,21 @@ namespace SE
 		return contents;
 	}
 
-	Resource* ResourceManager::getResource(uint32_t id) {
+	Resource* ResourceManager::getResource(uint32_t id)
+	{
 		auto it = m_resourceTypes.find(id);
-		if (it != m_resourceTypes.end()) {
-			if (it->second == ResourceType::Shader) {
+		if (it != m_resourceTypes.end())
+		{
+			if (it->second == ResourceType::Shader)
+			{
 				return _getManager<ShaderManager>()->getShader(id);
 			}
-			else if (it->second == ResourceType::Material) {
+			else if (it->second == ResourceType::Material)
+			{
 				return _getManager<MaterialManager>()->getMaterial(id);
 			}
-			else if (it->second == ResourceType::MeshResource) {
+			else if (it->second == ResourceType::MeshResource)
+			{
 				return _getManager<MeshResourceManager>()->getMeshResource(id);
 			}
 			//.......
@@ -81,21 +85,26 @@ namespace SE
 		return nullptr;
 	}
 
-	bool ResourceManager::removeResource(uint32_t id) {
+	bool ResourceManager::removeResource(uint32_t id)
+	{
 		bool removed = false;
 		auto it = m_resourceTypes.find(id);
-		if (it == m_resourceTypes.end()) return false;
-		if (it->second == ResourceType::Shader) {
+		if (it == m_resourceTypes.end())
+			return false;
+		if (it->second == ResourceType::Shader)
+		{
 			removed = _getManager<ShaderManager>()->removeShader(id);
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
-		else if (it->second == ResourceType::Material) {
+		else if (it->second == ResourceType::Material)
+		{
 			removed = _getManager<MaterialManager>()->removeMaterial(id);
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
 		}
-		else if (it->second == ResourceType::MeshResource) {
+		else if (it->second == ResourceType::MeshResource)
+		{
 			removed = _getManager<MeshResourceManager>()->removeMeshResource(id);
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 			return removed;
@@ -103,4 +112,4 @@ namespace SE
 		//.....
 		return false;
 	}
-}
+} // namespace SE

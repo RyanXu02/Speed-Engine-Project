@@ -1,28 +1,34 @@
 #include "pch.h"
+
 #include "ResourceBrowserWidget.h"
-#include "Engine.h"
 
 #include "../../../ResourceManagers/ResourceManager.h"
 #include "../../Events/Event.h"
+#include "Engine.h"
 
-
-namespace SE 
+namespace SE
 {
-	ResourceBrowserWidget::ResourceBrowserWidget() : Widget("ResourceBrowserWidget") {
+	ResourceBrowserWidget::ResourceBrowserWidget()
+	    : Widget("ResourceBrowserWidget")
+	{
 		m_resourceCache = Engine::Instance().getSubSystem<ResourceManager>()->getInitialRTMap();
 
-		m_resourceChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ResourceChanged, [this](Event& event) 
-			{
-				ResourceChanged& rce = static_cast<ResourceChanged&>(event);
-				if (rce.adding) m_resourceCache[rce.id] = rce.type; //adding resource
-				else {
-					m_resourceCache.erase(rce.id); //deleting resource
-					m_selectedResources.erase(rce.id); // Remove from selection if deleted
-				}
-			});
+		m_resourceChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ResourceChanged,
+		    [this](Event& event)
+		    {
+			    ResourceChanged& rce = static_cast<ResourceChanged&>(event);
+			    if (rce.adding)
+				    m_resourceCache[rce.id] = rce.type; // adding resource
+			    else
+			    {
+				    m_resourceCache.erase(rce.id); // deleting resource
+				    m_selectedResources.erase(rce.id); // Remove from selection if deleted
+			    }
+		    });
 	}
 
-	void ResourceBrowserWidget::render() {
+	void ResourceBrowserWidget::render()
+	{
 		ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 
 		if (!ImGui::Begin("Resource Browser"))
@@ -79,7 +85,8 @@ namespace SE
 		for (const auto& [id, type] : m_resourceCache)
 		{
 			constexpr uint32_t kDefaultShaderId = 2;
-			if (id < kDefaultShaderId) continue; // skip default shader
+			if (id < kDefaultShaderId)
+				continue; // skip default shader
 
 			DrawResourceItem(id, type);
 
@@ -210,8 +217,9 @@ namespace SE
 		m_selectedResources.clear();
 	}
 
-	void ResourceBrowserWidget::shutdown() {
+	void ResourceBrowserWidget::shutdown()
+	{
 		m_selectedResources.clear();
 		m_resourceCache.clear();
 	}
-}
+} // namespace SE

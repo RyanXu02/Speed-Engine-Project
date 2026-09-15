@@ -1,13 +1,13 @@
 #include "pch.h"
+
 #include "Window.h"
-#include "Engine.h"
 
 #include "../../Logger/Logger.h"
+#include "../Events/EventSystem.h"
+#include "Engine.h"
 
 #include <glad/glad.h>
-#include "GLFW/glfw3.h"
-
-#include "../Events/EventSystem.h"
+#include <GLFW/glfw3.h>
 
 namespace SE
 {
@@ -73,7 +73,6 @@ namespace SE
 			return false;
 		}
 
-
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
 		// create window
 		m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), NULL, NULL);
@@ -94,7 +93,8 @@ namespace SE
 
 		glfwMakeContextCurrent(m_window);
 
-		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
+		glfwSetWindowCloseCallback(m_window,
+		    [](GLFWwindow* window)
 		    {
 			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<WindowClose>());
 		    });
@@ -116,4 +116,4 @@ namespace SE
 	{
 		return glfwGetTime();
 	}
-}
+} // namespace SE

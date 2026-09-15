@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "FBO.h"
 
 #include <glad/glad.h>
@@ -131,4 +132,4 @@ namespace SE
 			m_fboID = 0;
 		}
 	}
-}
+} // namespace SE
