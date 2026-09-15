@@ -1,8 +1,9 @@
 name: Lint
 
-on:
+on: # yamllint disable-line rule:truthy
   pull_request:
-    branches: "main"
+    branches:
+      - main
     paths-ignore:
       - LICENSE
 
@@ -10,74 +11,95 @@ permissions: {}
 
 jobs:
   analyze:
+    name: Lint
+    runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: read
       issues: write
       pull-requests: write
       statuses: write
-    name: Lint
-    runs-on: ubuntu-latest
+    env:
+      APPLY_FIXES_EVENT: pull_request
+      APPLY_FIXES_MODE: pull_request
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
       - name: Lint Code Base
         uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
+        id: superlinter
         env:
-          DEFAULT_BRANCH: origin/main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENABLE_GITHUB_PULL_REQUEST_SUMMARY_COMMENT: true
+          FAIL_ON_INVALID_GITHUB_ACTIONS_EVENT_CONFIGURATION: true
           IGNORE_GITIGNORED_FILES: true
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_CHECKOV: true
           VALIDATE_CLANG_FORMAT: true
+          VALIDATE_GITLEAKS: true
           VALIDATE_JSON: true
           VALIDATE_MARKDOWN: true
           VALIDATE_POWERSHELL: true
-          VALIDATE_GITLEAKS: true
           VALIDATE_YAML: true
-          # Apply linter fixes configuration
-          APPLY_FIXES: all
-          
-          # Decide which event triggers application of fixes in a commit or a PR
-          # (pull_request, push, all)
-          APPLY_FIXES_EVENT: pull_request
-        
-          # If APPLY_FIXES is used, defines if the fixes are directly committed (commit)
-          # or posted in a PR (pull_request)
-          APPLY_FIXES_MODE: pull_request
+          FIX_CLANG_FORMAT: true
+          FIX_JSON: true
+          FIX_MARKDOWN_PRETTIER: true
+          FIX_POWERSHELL: true
+          FIX_YAML_PRETTIER: true
 
-          
-      # Create pull request if applicable
-      # (for now works only on PR from same repository, not from forks)
       - name: Create Pull Request with applied fixes
         uses: peter-evans/create-pull-request@v6
         id: cpr
+        if: >-
+          (
+            steps.superlinter.outputs.has_updated_sources == 'true' ||
+            steps.superlinter.outputs.has_updated_sources == '1'
+          ) &&
+          (
+            env.APPLY_FIXES_EVENT == 'all' ||
+            env.APPLY_FIXES_EVENT == github.event_name
+          ) &&
+          env.APPLY_FIXES_MODE == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-          commit-message: "Apply linters automatic fixes"
-          title: "Apply linters automatic fixes"
-          branch: linter-fixes-${{ github.head_ref }}
+          commit-message: Apply linters automatic fixes
+          title: Apply linters automatic fixes
+          branch: linter-fixes-${{ github.head_ref || github.ref_name }}
           body: |
-            Linter has automatically applied linters fixes on this PR.
+            Linter has automatically applied fixes on this PR.
             Please review the changes and merge if they are correct.
-          base: ${{ github.head_ref }}
+          base: ${{ github.head_ref || github.ref_name }}
 
       - name: Post PR Comment
+        if: >-
+          (
+            steps.superlinter.outputs.has_updated_sources == 'true' ||
+            steps.superlinter.outputs.has_updated_sources == '1'
+          ) &&
+          (
+            env.APPLY_FIXES_EVENT == 'all' ||
+            env.APPLY_FIXES_EVENT == github.event_name
+          ) &&
+          env.APPLY_FIXES_MODE == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
-            Linter has automatically applied linters fixes on this PR.
+            Linter has automatically applied fixes on this PR.
             Please review the changes and merge if they are correct.
             PR: ${{ steps.cpr.outputs.pull-request-url }}
           hide_and_recreate: true
 
       - name: Fail if PR Created
         run: |
-          if [ "${{ steps.cpr.outputs.pull-request-url }}" != "" ]; then
-            echo "A PR with formatting fixes has been created. Please merge it before proceeding."
+          if [ -n "${{ steps.cpr.outputs.pull-request-url }}" ]; then
+            echo "A PR with lint fixes has been created. Please merge it before proceeding."
             exit 1
           fi
