@@ -31,7 +31,7 @@ namespace SE
 			    }
 		    });
 
-		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged, [this](Event& event)
+	m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged, [this](Event& event)
 		    {
 			    if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 				    m_entityNameCache = scene->getEntityList();
