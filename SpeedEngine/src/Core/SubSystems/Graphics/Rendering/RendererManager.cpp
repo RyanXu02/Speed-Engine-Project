@@ -31,8 +31,10 @@ namespace SE
 	void RendererManager::update(double deltaTime)
 	{
 		SubSystem::update(deltaTime);
-		if (m_sceneRenderer) m_sceneRenderer->update(deltaTime);
-		if (m_imguiRenderer) m_imguiRenderer->update(deltaTime);
+		if (m_sceneRenderer)
+			m_sceneRenderer->update(deltaTime);
+		if (m_imguiRenderer)
+			m_imguiRenderer->update(deltaTime);
 		// ...
 	}
 
@@ -43,8 +45,8 @@ namespace SE
 
 		m_sceneRenderer->render();
 		m_imguiRenderer->render();
-			// ...
-		
+		// ...
+
 		m_imguiRenderer->finalizeFrame();
 
 		m_window->swapBuffers();

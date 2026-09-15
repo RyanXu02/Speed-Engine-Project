@@ -4,7 +4,9 @@
 
 namespace SE
 {
-	Shader::Shader(uint32_t resourceId, std::string resourceName) : Resource(resourceId, resourceName), m_ProgramId(0)
+	Shader::Shader(uint32_t resourceId, std::string resourceName)
+	    : Resource(resourceId, resourceName),
+	      m_ProgramId(0)
 	{
 	}
 
@@ -18,7 +20,8 @@ namespace SE
 		glShaderSource(vertexShader, 1, &vertexSourceCStr, nullptr);
 		glCompileShader(vertexShader);
 		status = _checkCompilationErr(vertexShader, "VERTEX");
-		if (!status.success) return status;
+		if (!status.success)
+			return status;
 
 		// Compile fragment shader
 		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -26,7 +29,8 @@ namespace SE
 		glShaderSource(fragmentShader, 1, &fragmentSourceCStr, nullptr);
 		glCompileShader(fragmentShader);
 		status = _checkCompilationErr(fragmentShader, "FRAGMENT");
-		if (!status.success) return status;
+		if (!status.success)
+			return status;
 
 		// Link shaders into a program
 		m_ProgramId = glCreateProgram();
@@ -34,7 +38,8 @@ namespace SE
 		glAttachShader(m_ProgramId, fragmentShader);
 		glLinkProgram(m_ProgramId);
 		status = _checkCompilationErr(m_ProgramId, "PROGRAM");
-		if (!status.success) return status;
+		if (!status.success)
+			return status;
 
 		// Clean up shaders as they are no longer needed after linking
 		glDeleteShader(vertexShader);
@@ -53,7 +58,8 @@ namespace SE
 	}
 	void Shader::destroy()
 	{
-		if (m_ProgramId != 0) {
+		if (m_ProgramId != 0)
+		{
 			glDeleteProgram(m_ProgramId);
 			m_ProgramId = 0;
 		}

@@ -6,7 +6,9 @@
 namespace SE
 {
 	FBO::FBO(uint32_t width, uint32_t height, bool includeDepth)
-		: m_width(width), m_height(height), m_includeDepth(includeDepth)
+	    : m_width(width),
+	      m_height(height),
+	      m_includeDepth(includeDepth)
 	{
 		_create();
 	}
@@ -17,8 +19,12 @@ namespace SE
 	}
 
 	FBO::FBO(FBO&& other) noexcept
-		: m_fboID(other.m_fboID), m_colorTexture(other.m_colorTexture), m_depthTexture(other.m_depthTexture),
-		m_width(other.m_width), m_height(other.m_height), m_includeDepth(other.m_includeDepth)
+	    : m_fboID(other.m_fboID),
+	      m_colorTexture(other.m_colorTexture),
+	      m_depthTexture(other.m_depthTexture),
+	      m_width(other.m_width),
+	      m_height(other.m_height),
+	      m_includeDepth(other.m_includeDepth)
 	{
 		other.m_fboID = 0;
 		other.m_colorTexture = 0;
@@ -84,7 +90,7 @@ namespace SE
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
-		
+
 		// depth if flag
 		if (m_includeDepth)
 		{

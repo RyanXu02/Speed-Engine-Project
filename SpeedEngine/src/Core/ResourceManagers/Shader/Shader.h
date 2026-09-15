@@ -7,15 +7,15 @@
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include"../Resource.h"
+#include "../Resource.h"
 
 namespace SE
 {
 	//compilation status of shader + its files
 	struct GLCompStatus
 	{
-		bool success { false };
-		std::string log { "" };
+		bool success{ false };
+		std::string log{ "" };
 	};
 
 	// @brief Represents a shader program
@@ -64,4 +64,3 @@ namespace SE
 		GLCompStatus _checkCompilationErr(unsigned int shader, std::string_view type);
 	};
 }
-
