@@ -10,24 +10,29 @@ namespace SE
 {
     using MT = ActiveSceneModified::ModifyType;
 
-
-    SceneInfoWidget::SceneInfoWidget() : Widget("Scene Info")
+    SceneInfoWidget::SceneInfoWidget()
+        : Widget("Scene Info")
     {
-        m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified, [this](Event& event)
+        m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified,
+            [this](Event& event)
             {
                 ActiveSceneModified& asme = static_cast<ActiveSceneModified&>(event);
-                if (asme.modifytype == MT::Add) {
+                if (asme.modifytype == MT::Add)
+                {
                     m_entityNameCache[asme.id] = asme.name;
                 }
-                else if (asme.modifytype == MT::Remove) {
+                else if (asme.modifytype == MT::Remove)
+                {
                     m_entityNameCache.erase(asme.id);
                 }
-                else if (asme.modifytype == MT::Rename) {
+                else if (asme.modifytype == MT::Rename)
+                {
                     m_entityNameCache[asme.id] = asme.name;
                 }
             });
 
-        m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged, [this](Event& event)
+        m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
+            [this](Event& event)
             {
                 if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
                     m_entityNameCache = scene->getEntityList();
@@ -84,7 +89,7 @@ namespace SE
 
     void SceneInfoWidget::_rightClickMenu(const std::string& name, uint32_t id)
     {
-        bool isSelected = m_selectedEntities.find(id) != m_selectedEntities.end();
+        bool isSelected    = m_selectedEntities.find(id) != m_selectedEntities.end();
         bool multiSelected = m_selectedEntities.size() > 1;
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
         {
@@ -139,7 +144,7 @@ namespace SE
                 m_selectedEntities.insert(id);
             }
 
-			// Publish the EntitySelected event with the selected entity ID
+            // Publish the EntitySelected event with the selected entity ID
             if (m_selectedEntities.size() == 1)
             {
                 Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<EntitySelected>(*m_selectedEntities.begin()));
@@ -155,8 +160,8 @@ namespace SE
     {
         ImGui::SetKeyboardFocusHere();
 
-        const ImGuiInputTextFlags flags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue;
-        const bool enterPressed = ImGui::InputText("##EntityRename", m_renameBuffer.data(), m_renameBuffer.size(), flags);
+        const ImGuiInputTextFlags flags        = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue;
+        const bool                enterPressed = ImGui::InputText("##EntityRename", m_renameBuffer.data(), m_renameBuffer.size(), flags);
 
         bool cancelRename = false;
         if (ImGui::IsItemActive() && ImGui::IsKeyPressed(ImGuiKey_Escape))
@@ -183,14 +188,13 @@ namespace SE
             m_renameEntityId = 0;
             m_renameBuffer.clear();
         }
-
     }
 
     void SceneInfoWidget::_f2Handle(const std::string& name, uint32_t id)
     {
         bool multiSelected = m_selectedEntities.size() > 1;
         bool isItemFocused = ImGui::IsItemFocused();
-        bool isF2Pressed = ImGui::IsKeyPressed(ImGuiKey_F2);
+        bool isF2Pressed   = ImGui::IsKeyPressed(ImGuiKey_F2);
         if (isItemFocused && isF2Pressed && !multiSelected)
         {
             m_renameEntityId = id;
@@ -200,4 +204,4 @@ namespace SE
             m_renameBuffer.resize(256);
         }
     }
-}
+} // namespace SE
