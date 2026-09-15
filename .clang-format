@@ -21,7 +21,7 @@ AlignTrailingComments:
   Kind: Never
   OverEmptyLines: 2
 AllowAllArgumentsOnNextLine: true
-AllowAllParametersOfDeclarationOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Inline
@@ -31,7 +31,7 @@ AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: true
 BinPackArguments: true
-BinPackParameters: true
+BinPackParameters: OnePerLine
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass: true
@@ -54,7 +54,7 @@ BreakBeforeTernaryOperators: false
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
 #BreakTemplateDeclarations: Yes
-ColumnLimit: 0
+ColumnLimit: 240
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 Cpp11BracedListStyle: false
 FixNamespaceComments: false
