@@ -6,7 +6,7 @@
 #include "../../../../Scene/Entity/Component/Mesh.h"
 #include "../../../../Scene/Entity/Component/Transform.h"
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../RendererManager.h"

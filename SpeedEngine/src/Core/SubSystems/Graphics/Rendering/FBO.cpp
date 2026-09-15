@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "FBO.h"
 
-#include "glad/gl.h"
+#include <glad/glad.h>
 
 namespace SE
 {

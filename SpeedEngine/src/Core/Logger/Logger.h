@@ -1,9 +1,9 @@
 #pragma once
 #include "../SubSystems/SubSystem.h"
 
-#include "spdlog.h"
-#include "sinks/stdout_color_sinks.h"
-#include "sinks/basic_file_sink.h"
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 namespace SE
 {

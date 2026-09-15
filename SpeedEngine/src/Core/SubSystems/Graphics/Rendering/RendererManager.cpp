@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "RendererManager.h"
 
-#include <glad/gl.h>
+#include <glad/glad.h>
 
 #include "SceneRenderer/SceneRenderer.h"
 

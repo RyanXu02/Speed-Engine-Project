@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Shader.h"
-#include "glad/gl.h"
+#include <glad/glad.h>
 
 namespace SE
 {

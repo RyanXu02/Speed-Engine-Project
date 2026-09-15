@@ -5,7 +5,7 @@
 #include "../Shader/ShaderManager.h"
 #include "../ResourceManager.h"
 
-#include "glad/gl.h"
+#include <glad/glad.h>
 
 namespace SE
 {

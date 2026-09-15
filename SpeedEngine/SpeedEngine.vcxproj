@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -53,6 +53,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.props')" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
@@ -70,6 +71,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <VcpkgRoot Condition="'$(VcpkgRoot)' == ''">$(VCInstallDir)vcpkg\</VcpkgRoot>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgManifestRoot>$(MSBuildProjectDirectory)\</VcpkgManifestRoot>
+    <VcpkgTriplet Condition="'$(Platform)' == 'x64' and '$(VcpkgTriplet)' == ''">x64-windows</VcpkgTriplet>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -115,7 +122,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)ThirdParty\include\stb;$(ProjectDir)ThirdParty\include\nlohmann;$(ProjectDir)ThirdParty\include\glm;$(ProjectDir)ThirdParty\include\glfw;$(ProjectDir)ThirdParty\include\glad\include;$(ProjectDir)ThirdParty\include\spdlog;$(ProjectDir)ThirdParty\include\imgui;$(ProjectDir)ThirdParty\include\FMOD;$(ProjectDir)ThirdParty\include;$(ProjectDir)ThirdParty\include\rapidobj;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -125,17 +132,13 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Jolt.lib;glfw3dll.lib;spdlog.lib;fmodL_vc.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q
-
-xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
-</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -188,30 +191,6 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
-    <ClCompile Include="ThirdParty\include\glad\src\gl.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_demo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_draw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_impl_glfw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_impl_opengl3.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_tables.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_widgets.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="ThirdParty\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -257,14 +236,6 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imconfig.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui_impl_opengl3.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui_internal.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imstb_rectpack.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imstb_textedit.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imstb_truetype.h" />
     <ClInclude Include="ThirdParty\pch.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
@@ -277,6 +248,7 @@ xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
     <None Include="Assets\Shaders\default.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.targets" Condition="Exists('$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.targets')" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

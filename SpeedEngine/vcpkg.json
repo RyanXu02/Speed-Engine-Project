@@ -1,0 +1,29 @@
+{
+  "name": "speedengine",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "glfw3",
+    {
+      "name": "glad",
+      "features": [
+        "gl-api-45",
+        "loader"
+      ]
+    },
+    {
+      "name": "imgui",
+      "features": [
+        "docking-experimental",
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
+    "glm",
+    "nlohmann-json",
+    "spdlog",
+    "stb",
+    "rapidobj",
+    "joltphysics"
+  ],
+  "builtin-baseline": "0c8f465c549616e897a34b9393054931fda6339c"
+}

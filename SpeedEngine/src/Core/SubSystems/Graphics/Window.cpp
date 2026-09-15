@@ -4,7 +4,7 @@
 
 #include "../../Logger/Logger.h"
 
-#include "glad/gl.h"
+#include <glad/glad.h>
 #include "GLFW/glfw3.h"
 
 #include "../Events/EventSystem.h"
@@ -95,7 +95,7 @@ namespace SE
 			});
 
 		// init glad
-		if (!gladLoadGL(glfwGetProcAddress)) {
+		if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
 			m_logger->critical("Failed to initialize GLAD for main context");
 			glfwDestroyWindow(m_window);
 			glfwDestroyWindow(m_windowShared);
