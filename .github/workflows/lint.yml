@@ -9,6 +9,10 @@ on:
   pull_request:
     branches:
       - main
+      
+permissions:
+  checks: write
+  contents: write
 
 jobs:
   run-linters:
@@ -35,4 +39,4 @@ jobs:
           prettier: true
           prettier_extensions: "json"
           auto_fix: true
-          commit_message:  "$Lint: ${{ steps.lint_commit_message.outputs.subject }}"
+          commit_message:  "Lint: ${{ steps.lint_commit_message.outputs.subject }}"
