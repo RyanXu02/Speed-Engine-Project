@@ -31,19 +31,13 @@ jobs:
           persist-credentials: true
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Fetch pull request merge ref
-        shell: bash
-        run: |
-          # Super-Linter validates against GitHub's pull request merge SHA.
-          git fetch --no-tags origin \
-            +refs/pull/${{ github.event.pull_request.number }}/merge:refs/remotes/origin/pull/${{ github.event.pull_request.number }}/merge
-
       - name: Lint
         uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
         id: superlinter
         continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_SHA: "${{ github.event.pull_request.head.sha }}"
           IGNORE_GITIGNORED_FILES: true
           LINTER_RULES_PATH: .github/workflows
           VALIDATE_ALL_CODEBASE: false
