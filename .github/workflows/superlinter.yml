@@ -37,6 +37,7 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
           IGNORE_GITIGNORED_FILES: true
           LINTER_RULES_PATH: .github/workflows
           VALIDATE_ALL_CODEBASE: false
