@@ -31,7 +31,7 @@ AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: true
 BinPackArguments: true
-BinPackParameters: OnePerLine
+BinPackParameters: true
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass: true
