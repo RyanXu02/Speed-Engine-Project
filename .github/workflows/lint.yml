@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v7
+
+      - name: Install ClangFormat
+        run: sudo apt-get install -y clang-format
+
+      - name: Build lint fix commit message
+        id: lint_commit_message
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          echo "subject=$(git log -1 --pretty=%s || echo recent changes)" >> "$GITHUB_OUTPUT"
+
+      - name: Run linters
+        uses: wearerequired/lint-action@v3
+        with:
+          clang_format: true
+          prettier: true
+          prettier_extensions: "json"
+          auto_fix: true
+          commit_message:  "$Lint: ${{ steps.lint_commit_message.outputs.subject }}"

@@ -69,7 +69,7 @@ NamespaceIndentation: All
 PackConstructorInitializers: Never
 PointerAlignment: Left
 ReflowComments: false
-SortIncludes: false
+SortIncludes: true
 SpaceAfterCStyleCast: false
 #requires clang format 21
 #SpaceAfterOperatorKeyword: true
