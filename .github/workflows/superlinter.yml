@@ -26,11 +26,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Lint C/C++ and JSON files
+      - name: Lint
         uses: super-linter/super-linter@4ce20838b8ab83717e78138c5b3a1407148e0918 # v8.7.0
         id: superlinter
         continue-on-error: true
@@ -57,22 +58,22 @@ jobs:
             echo "has_fixes=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create fixes pull request
-        uses: peter-evans/create-pull-request@v8
-        id: cpr
+      - name: Commit lint fixes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        id: auto_commit
         if: >-
           always() &&
           steps.lint_fixes.outputs.has_fixes == 'true' &&
           github.event.pull_request.head.repo.full_name == github.repository
         with:
-          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-          commit-message: Apply lint fixes
-          title: Apply lint fixes
-          branch: lint-fixes-${{ github.head_ref || github.ref_name }}
-          body: |
-            Automatic lint fixes for C/C++ formatting and JSON formatting.
-            Please review the changes and merge if they are correct.
-          base: ${{ github.head_ref || github.ref_name }}
+          branch: ${{ github.event.pull_request.head.ref }}
+          commit_message: |
+            chore: apply lint fixes
+
+            skip-checks:true
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          status_options: --untracked-files=no
 
       - name: Fail if lint found issues without fixes
         if: >-
@@ -81,10 +82,10 @@ jobs:
           steps.lint_fixes.outputs.has_fixes != 'true'
         run: exit 1
 
-      - name: Fail if PR created
+      - name: Report committed fixes
         if: >-
           always() &&
-          steps.cpr.outputs.pull-request-url != ''
+          steps.auto_commit.outputs.changes_detected == 'true'
         run: |
-          echo "A PR with lint fixes has been created: ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Lint fixes were committed back to branch ${{ github.event.pull_request.head.ref }}"
           exit 1
