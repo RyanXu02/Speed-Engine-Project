@@ -1,11 +1,10 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "ResourceBrowserWidget.h"
-
 #include "../../../ResourceManagers/ResourceManager.h"
 #include "../../Events/Event.h"
 #include "Engine.h"
+#include "ResourceBrowserWidget.h"
 
 namespace SE
 {

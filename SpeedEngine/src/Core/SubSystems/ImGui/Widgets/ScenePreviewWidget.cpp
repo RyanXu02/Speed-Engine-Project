@@ -1,10 +1,9 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "ScenePreviewWidget.h"
-
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "Engine.h"
+#include "ScenePreviewWidget.h"
 
 #include <imgui.h>
 

@@ -1,12 +1,11 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "MainWidget.h"
-
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "../../Scenes/SceneSystem.h"
 #include "Engine.h"
+#include "MainWidget.h"
 
 #include <imgui.h>
 
