@@ -95,8 +95,10 @@ namespace SE
 		//@returns a the resource as a Resource* if it exists, nullptr if not
 		Resource* getResource(uint32_t id);
 
+#if defined(COMPILE_WITH_EDITOR)
 		//@brief gets the resource type map as a copy
 		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const { return m_resourceTypes; }
+#endif
 
 		//@brief removes a resource given an id
 		//@param id the id of the resource to remove
@@ -145,7 +147,9 @@ namespace SE
 				{
 					m_resourceTypes.insert({ id, ResourceType::Shader });
 				}
+#if defined(COMPILE_WITH_EDITOR)
 				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
+#endif
 				return id;
 			}
 			else if constexpr (Type == ResourceType::Material)
@@ -155,7 +159,9 @@ namespace SE
 				{
 					m_resourceTypes.insert({ id, ResourceType::Material });
 				}
+#if defined(COMPILE_WITH_EDITOR)
 				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
+#endif
 				return id;
 			}
 			else if constexpr (Type == ResourceType::MeshResource)
@@ -165,7 +171,9 @@ namespace SE
 				{
 					m_resourceTypes.insert({ id, ResourceType::MeshResource });
 				}
+#if defined(COMPILE_WITH_EDITOR)
 				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
+#endif
 				return id;
 			}
 			else
