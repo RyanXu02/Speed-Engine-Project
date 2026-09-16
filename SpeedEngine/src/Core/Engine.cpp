@@ -75,11 +75,12 @@ namespace SE
 		uint32_t matid = getSubSystem<ResourceManager>()->addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
 
 		uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
+		uint32_t suzannemeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("suzannemesh", "Assets/Meshes/Suzanne.gltf");
 		uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 
 		auto entity1 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(1);
 		entity1->addComponent(std::make_unique<Mesh>());
-		entity1->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
+		entity1->getComponent<Mesh>()->setMeshResourceId(suzannemeshId);
 		entity1->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
 		auto entity2 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(2);
