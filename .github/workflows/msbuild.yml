@@ -8,8 +8,6 @@ on:
 
 env:
   PROJECT_FILE_PATH: SpeedEngine/SpeedEngine.vcxproj
-  BUILD_CONFIGURATION: Debug
-  BUILD_PLATFORM: x64
 
 permissions:
   contents: read
@@ -17,6 +15,12 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release, Editor]
+        platform: [x64]
 
     steps:
       - name: Checkout
@@ -40,5 +44,5 @@ jobs:
           msbuild
           "${{ env.PROJECT_FILE_PATH }}"
           /m
-          /p:Configuration=${{ env.BUILD_CONFIGURATION }}
-          /p:Platform=${{ env.BUILD_PLATFORM }}
+          /p:Configuration=${{ matrix.configuration }}
+          /p:Platform=${{ matrix.platform }}
