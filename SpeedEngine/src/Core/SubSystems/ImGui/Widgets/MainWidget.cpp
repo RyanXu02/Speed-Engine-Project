@@ -36,7 +36,7 @@ namespace SE
 				{
 					if (Scene * scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
-						scene->addEntityNew("New Empty");
+						scene->addEntity("New Empty");
 					}
 				}
 				// add prefabs later

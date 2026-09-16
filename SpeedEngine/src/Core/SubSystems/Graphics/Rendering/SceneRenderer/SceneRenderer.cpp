@@ -3,7 +3,6 @@
 
 #include "SceneRenderer.h"
 #include "../../../../Scene/Entity/Entity.h"
-#include "../../../../Scene/Entity/Component/Mesh.h"
 #include "../../../../Scene/Entity/Component/Transform.h"
 
 #include <glad/gl.h>
@@ -70,9 +69,9 @@ namespace SE
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
 		auto entities = scene->getEntitiesWith<Transform, NameComponent,MeshComponent>();
 		for (auto& entity : entities) {
-			MeshComponent* mesh = entity->getComponentNew<MeshComponent>();
-			Transform* transform = entity->getComponentNew<Transform>();
-			NameComponent* name = entity->getComponentNew<NameComponent>();
+			MeshComponent* mesh = entity->getComponent<MeshComponent>();
+			Transform* transform = entity->getComponent<Transform>();
+			NameComponent* name = entity->getComponent<NameComponent>();
 
 
 			uint32_t meshResourceId = mesh->meshResourceID;

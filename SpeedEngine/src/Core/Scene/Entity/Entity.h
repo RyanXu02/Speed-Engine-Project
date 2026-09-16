@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component/ComponentStructs.h"
-#include "Component/Component.h"
 #include <typeindex>
 
 namespace SE
@@ -18,7 +17,7 @@ namespace SE
 		uint32_t id() const { return m_id; }
 
 		template<typename T, typename... Args>
-		T* addComponentNew (Args&& ...args) {
+		T* addComponent (Args&& ...args) {
 			auto [it, status] = m_componentsNew.insert_or_assign(typeid(T), T(std::forward<Args>(args)...));
 			if (!status) {
 				return nullptr;
@@ -27,7 +26,7 @@ namespace SE
 		}
 
 		template<typename T>
-		T* getComponentNew() {
+		T* getComponent() {
 			auto it = m_componentsNew.find(typeid(T));
 			if (it == m_componentsNew.end()) {
 				return nullptr;

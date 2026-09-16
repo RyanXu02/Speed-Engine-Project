@@ -2,7 +2,8 @@
 #include "PropertiesWidget.h"
 #include "Engine.h"
 
-#include "../../Scenes/SceneSystem.h"
+#include "Core/SubSystems/Scenes/SceneSystem.h"
+#include "Core/Scene/Entity/Entity.h"
 
 #include "imgui.h"
 
@@ -12,7 +13,7 @@ namespace SE {
 		m_EntitySelectedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::EntitySelected, [this](const Event& event) {
 			const EntitySelected& entitySelectedEvent = static_cast<const EntitySelected&>(event);
 			m_selectedEntityId = entitySelectedEvent.id;
-			m_cachedSelectedEntity = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntityNew(m_selectedEntityId);
+			m_cachedSelectedEntity = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(m_selectedEntityId);
 			});
 		m_ActiveSceneModifiedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified, [this](const Event& event) {
 			const ActiveSceneModified& activeSceneModifiedEvent = static_cast<const ActiveSceneModified&>(event);
@@ -33,7 +34,7 @@ namespace SE {
 		std::string entityName;
 
 		if (m_cachedSelectedEntity) {
-			entityName = m_cachedSelectedEntity->getComponentNew<NameComponent>()->name;
+			entityName = m_cachedSelectedEntity->getComponent<NameComponent>()->name;
 		}
 		else {
 			entityName = "None Selected";

@@ -19,16 +19,16 @@ namespace SE
 		const std::string& getName() const { return m_name; }
 
 
-		uint32_t addEntityNew(const std::string& name);
-		Entity* getEntityNew(uint32_t instanceId);
-		bool removeEntityNew(uint32_t instanceId);
+		uint32_t addEntity(const std::string& name);
+		Entity* getEntity(uint32_t instanceId);
+		bool removeEntity(uint32_t instanceId);
 
 		template <typename... Ts>
 		std::vector<Entity*> getEntitiesWith() {
 			std::vector<Entity*> entities;
 
 			for (auto& entity : m_registry) {
-				if ((entity.getComponentNew<Ts>() && ...)) {
+				if ((entity.getComponent<Ts>() && ...)) {
 					entities.push_back(&entity);
 				}
 			};

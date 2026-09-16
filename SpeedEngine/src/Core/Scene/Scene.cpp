@@ -28,8 +28,8 @@ namespace SE
 		}
 
 		for (auto& entity : m_registry) {
-			if (!entity.getComponentNew<LifeComponent>()->isAlive) {
-				removeEntityNew(entity.id());
+			if (!entity.getComponent<LifeComponent>()->isAlive) {
+				removeEntity(entity.id());
 			}
 		}
 		
@@ -45,20 +45,20 @@ namespace SE
 		m_isInitialized = false;
 	}
 
-	uint32_t Scene::addEntityNew(const std::string& name)
+	uint32_t Scene::addEntity(const std::string& name)
 	{
 		m_registry.push_back(Entity(m_entityID));
-		Entity* entity = getEntityNew(m_entityID);
+		Entity* entity = getEntity(m_entityID);
 
-		entity->addComponentNew<Transform>();
-		entity->addComponentNew<NameComponent>(name);
-		entity->addComponentNew<LifeComponent>(true);
-		NameComponent* component = entity->getComponentNew<NameComponent>();
+		entity->addComponent<Transform>();
+		entity->addComponent<NameComponent>(name);
+		entity->addComponent<LifeComponent>(true);
+		NameComponent* component = entity->getComponent<NameComponent>();
 
 		return m_assignID();
 	}
 
-	Entity* Scene::getEntityNew(uint32_t instanceID)
+	Entity* Scene::getEntity(uint32_t instanceID)
 	{
 		if (instanceID < 0 || instanceID >= m_registry.size()) {
 			return nullptr;
@@ -67,15 +67,15 @@ namespace SE
 		return &m_registry[instanceID];
 	}
 
-	bool Scene::removeEntityNew(uint32_t instanceId)
+	bool Scene::removeEntity(uint32_t instanceId)
 	{
 		if (instanceId < 0 || instanceId >= m_registry.size()) {
 			return false;
 		}
 
-		Entity* entity = getEntityNew(m_entityID);
+		Entity* entity = getEntity(m_entityID);
 		if (entity) {
-			entity->getComponentNew<LifeComponent>()->isAlive = false;
+			entity->getComponent<LifeComponent>()->isAlive = false;
 		}
 		m_entitiesToRemove.push_back(instanceId);
 
@@ -92,10 +92,10 @@ namespace SE
 		std::unordered_map<uint32_t, std::string> entityList;
 		for (auto& entity : m_registry)
 		{
-			LifeComponent* life = entity.getComponentNew<LifeComponent>();
+			LifeComponent* life = entity.getComponent<LifeComponent>();
 			if (life && life->isAlive)
 			{	
-				entityList[entity.id()] = entity.getComponentNew<NameComponent>()->name;
+				entityList[entity.id()] = entity.getComponent<NameComponent>()->name;
 			}
 		}
 		return entityList;
