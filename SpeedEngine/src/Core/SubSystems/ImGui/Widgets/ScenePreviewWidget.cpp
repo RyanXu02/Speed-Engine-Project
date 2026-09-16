@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#if defined(COMPILE_WITH_EDITOR)
 #include "ScenePreviewWidget.h"
 
 #include "../../Graphics/Rendering/RendererManager.h"
@@ -37,3 +38,4 @@ namespace SE
 		_setStatus("Shutting down ScenePreviewWidget");
 	}
 } // namespace SE
+#endif

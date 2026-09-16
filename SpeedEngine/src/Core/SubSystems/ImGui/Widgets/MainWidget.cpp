@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#if defined(COMPILE_WITH_EDITOR)
 #include "MainWidget.h"
 
 #include "../../Graphics/Rendering/RendererManager.h"
@@ -67,3 +68,4 @@ namespace SE
 		_setStatus("Shutting down MainWidget");
 	}
 } // namespace SE
+#endif

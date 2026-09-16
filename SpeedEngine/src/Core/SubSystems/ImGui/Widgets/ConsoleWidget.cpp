@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#if defined(COMPILE_WITH_EDITOR)
 #include "ConsoleWidget.h"
 
 #include <imgui.h>
@@ -42,3 +43,4 @@ namespace SE
 		_setStatus("Shutting down ConsoleWidget");
 	}
 } // namespace SE
+#endif

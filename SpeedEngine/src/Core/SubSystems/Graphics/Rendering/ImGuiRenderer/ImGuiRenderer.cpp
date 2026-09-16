@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#if defined(COMPILE_WITH_EDITOR)
 #include "ImGuiRenderer.h"
 
 #include "../../../ImGui/Widget.h"
@@ -90,3 +91,4 @@ namespace SE
 		ImGui::DestroyContext();
 	}
 } // namespace SE
+#endif

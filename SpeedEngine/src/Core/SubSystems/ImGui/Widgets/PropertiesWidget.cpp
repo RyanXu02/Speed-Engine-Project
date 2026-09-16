@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#if defined(COMPILE_WITH_EDITOR)
 #include "PropertiesWidget.h"
 
 #include "../../../Engine.h"
@@ -68,3 +69,4 @@ namespace SE
 
 	void PropertiesWidget::shutdown() {}
 } // namespace SE
+#endif

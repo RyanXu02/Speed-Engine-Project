@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#if defined(COMPILE_WITH_EDITOR)
 #include "ResourceBrowserWidget.h"
 
 #include "../../../ResourceManagers/ResourceManager.h"
@@ -223,3 +224,4 @@ namespace SE
 		m_resourceCache.clear();
 	}
 } // namespace SE
+#endif
