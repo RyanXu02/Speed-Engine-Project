@@ -37,6 +37,7 @@ namespace SE
 	private:
 		uint32_t m_id;
 
+		//Note: ideally want to use sparse set and dense array but until that becomes an issue, do not touch
 		std::unordered_map<std::type_index, std::any> m_componentsNew;
 	};
 }

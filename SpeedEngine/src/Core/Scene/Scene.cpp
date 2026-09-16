@@ -39,8 +39,7 @@ namespace SE
 	void Scene::shutdownScene()
 	{
 		m_logger.info("Shutting down");
-		m_entities.clear();
-		m_entitiesToAdd.clear();
+		m_registry.clear();
 
 		m_isInitialized = false;
 	}
