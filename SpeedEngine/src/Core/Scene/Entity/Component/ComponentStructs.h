@@ -2,7 +2,7 @@
 
 #include <string>
 #include <nlohmann/json.hpp>
-#include "core/features/math.h"
+#include "Transform.h"
 
 namespace SE {
 	struct NameComponent {
@@ -12,8 +12,10 @@ namespace SE {
 	};
 
 	struct MeshComponent {
-		uint32_t meshResourceID{};
+		MeshComponent() = default;
+		MeshComponent(uint32_t meshId) : meshResourceID(meshId) {}
 
+		uint32_t meshResourceID{};
 	};
 
 	struct LifeComponent {

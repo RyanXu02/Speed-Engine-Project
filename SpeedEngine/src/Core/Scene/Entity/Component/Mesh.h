@@ -25,8 +25,6 @@ namespace SE
 		bool hasValidResource() const;
 
 	private:
-		//Mesh* clone() const override { return new Mesh(this); }
-
 		MeshResource* _getResource() const;
 
 		uint32_t m_meshResourceId;

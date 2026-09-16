@@ -12,7 +12,7 @@ namespace SE {
 		m_EntitySelectedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::EntitySelected, [this](const Event& event) {
 			const EntitySelected& entitySelectedEvent = static_cast<const EntitySelected&>(event);
 			m_selectedEntityId = entitySelectedEvent.id;
-			m_cachedSelectedEntity = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(m_selectedEntityId);
+			m_cachedSelectedEntity = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntityNew(m_selectedEntityId);
 			});
 		m_ActiveSceneModifiedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified, [this](const Event& event) {
 			const ActiveSceneModified& activeSceneModifiedEvent = static_cast<const ActiveSceneModified&>(event);
@@ -31,11 +31,13 @@ namespace SE {
 	void PropertiesWidget::render()
 	{
 		std::string entityName;
-		if (m_cachedSelectedEntity && m_cachedSelectedEntity->isAlive())
-			//entityName = m_cachedSelectedEntity->getName();
-			entityName = "temp";
-		else
+
+		if (m_cachedSelectedEntity) {
+			entityName = m_cachedSelectedEntity->getComponentNew<NameComponent>()->name;
+		}
+		else {
 			entityName = "None Selected";
+		}
 
 		std::string windowTitle = std::format("Properties - {}###PropertiesWidget", entityName);
 
@@ -44,10 +46,10 @@ namespace SE {
 
 		if (m_cachedSelectedEntity)
 		{
-			for (const auto& component : m_cachedSelectedEntity->getComponents())
-			{
-				component->renderImGuiInterface();
-			}
+			//for (const auto& component : m_cachedSelectedEntity->getComponents())
+			//{
+			//	component->renderImGuiInterface();
+			//}
 		}
 
 		ImGui::End();

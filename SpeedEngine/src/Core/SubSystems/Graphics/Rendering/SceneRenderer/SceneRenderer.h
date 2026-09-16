@@ -43,8 +43,6 @@ namespace SE
     private:
 		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport) : Renderer(logger, "SceneRenderer", std::move(viewport)) {}
         
-        std::vector<Entity*> getDrawableEntities() const;
-
         // Helper methods for mesh rendering
         void uploadMeshToGPU(
             uint32_t meshId, 

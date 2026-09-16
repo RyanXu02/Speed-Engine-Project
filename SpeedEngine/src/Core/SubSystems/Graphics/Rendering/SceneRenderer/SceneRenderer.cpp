@@ -66,16 +66,29 @@ namespace SE
 			return;
 		}
 
-		for (auto& entity : getDrawableEntities()) {
-			Mesh* mesh = entity->getComponent<Mesh>();
-			Transform* transform = entity->getComponent<Transform>();
+		ResourceManager* resourceManager = Engine::Instance().getSubSystem<ResourceManager>();
+		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		auto entities = scene->getEntitiesWith<Transform, NameComponent,MeshComponent>();
+		for (auto& entity : entities) {
+			MeshComponent* mesh = entity->getComponentNew<MeshComponent>();
+			Transform* transform = entity->getComponentNew<Transform>();
+			NameComponent* name = entity->getComponentNew<NameComponent>();
 
-			uint32_t meshResourceId = mesh->getMeshResourceId();
-			if (meshResourceId == 0) continue;
 
-			const std::vector<Vertex>& positions = mesh->getPositionsToDraw();
-			const std::vector<SubMesh>& subMeshes = mesh->getSubMeshesToDraw();
-			const std::vector<uint32_t>& indices = mesh->getIndicesToDraw();
+			uint32_t meshResourceId = mesh->meshResourceID;
+			if (meshResourceId == 0) {
+				continue;
+			}
+
+			MeshResource* meshResource = resourceManager->getResource<MeshResource>(meshResourceId);
+			if (!meshResource) {
+				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, name->name);
+				break;
+			}
+
+			const std::vector<Vertex>& positions = meshResource->getVertices();
+			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
+			const std::vector<uint32_t>& indices = meshResource->getIndices();
 			if (indices.empty() || positions.empty()) {
 				continue;
 			}
@@ -86,7 +99,9 @@ namespace SE
 			}
 
 			const MeshGPUData& gpuData = m_meshCache[meshResourceId];
-			if (gpuData.VAO == 0) continue;
+			if (gpuData.VAO == 0) {
+				continue;
+			}
 
 			defaultShader->bind();
 
@@ -118,16 +133,6 @@ namespace SE
 
 		// unbind fbo
 		fbo.unbind();
-	}
-
-	std::vector<Entity*> SceneRenderer::getDrawableEntities() const {
-		std::vector<Entity*> retlist;
-		for (const auto& entity : Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntities()) {
-			if (entity.get()->getComponent<Mesh>()) {
-				retlist.push_back(entity.get());
-			}
-		}
-		return retlist;
 	}
 
 	void SceneRenderer::uploadMeshToGPU(

@@ -47,7 +47,6 @@ namespace SE
 		double m_currentTime;
 		double m_lastTime;
 
-
 		std::vector<std::unique_ptr<SubSystem>> m_subSystems;
 
 		EventSubscription m_windowCloseEvent;

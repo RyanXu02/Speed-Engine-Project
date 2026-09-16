@@ -14,18 +14,8 @@ namespace SE
 	{
 	public:
 		Entity(uint32_t id);
-		Entity(std::string name);
-		Entity(const Entity&);
 
-		void initializeEntity(Scene* parentScene);
-
-		uint32_t getInstanceId() const { return m_instanceId; }
-
-		const std::string& getName() const { return m_name; }
-
-		// @brief Marks the entity as dead, so it can be removed from the scene in the next update cycle
-		void killEntity() { m_isAlive = false; }
-		bool isAlive() const { return m_isAlive; }
+		uint32_t id() const { return m_id; }
 
 		template<typename T, typename... Args>
 		T* addComponentNew (Args&& ...args) {
@@ -45,35 +35,9 @@ namespace SE
 			return std::any_cast<T>(&it->second);
 		}
 
-		void addComponent(std::unique_ptr<Component> component);
-
-		template <typename T>
-		T* getComponent() const
-		{
-			for (const auto& component : m_components)
-			{
-				if (typeid(*component.get()) == typeid(T))
-				{
-					return static_cast<T*>(component.get());
-				}
-			}
-			return nullptr;
-		}
-
-		const std::vector<std::unique_ptr<Component>>& getComponents() const { return m_components; }
-
 	private:
-		bool m_isAlive{ true };
-
-		std::string m_name;
-
-		uint32_t m_instanceId;
-		static uint32_t s_nextId;
-		
-		Scene* m_parentScene{ nullptr };
-		std::vector<std::unique_ptr<Component>> m_components;
-
 		uint32_t m_id;
+
 		std::unordered_map<std::type_index, std::any> m_componentsNew;
 	};
 }

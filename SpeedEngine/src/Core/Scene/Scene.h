@@ -21,15 +21,23 @@ namespace SE
 
 		uint32_t addEntityNew(const std::string& name);
 		Entity* getEntityNew(uint32_t instanceId);
+		bool removeEntityNew(uint32_t instanceId);
+
+		template <typename... Ts>
+		std::vector<Entity*> getEntitiesWith() {
+			std::vector<Entity*> entities;
+
+			for (auto& entity : m_registry) {
+				if ((entity.getComponentNew<Ts>() && ...)) {
+					entities.push_back(&entity);
+				}
+			};
+			return entities;
+		}
 
 
 		// @brief For use with UI widget
 		std::unordered_map<uint32_t, std::string> getEntityList();
-
-		void addEntity(std::unique_ptr<Entity> entity);
-
-		Entity* getEntity(uint32_t instanceId);
-		void removeEntity(uint32_t instanceId);
 
 		LoggerProxy& getLogger() { return m_logger; }
 
@@ -43,8 +51,9 @@ namespace SE
 		std::vector<std::unique_ptr<Entity>> m_entitiesToAdd;
 
 
-		std::atomic<uint32_t> m_entityID;
-		std::vector<Entity> m_registry;
+		std::atomic<uint32_t> m_entityID{ 0 };
+		std::vector<Entity> m_registry{};
+		std::vector<uint32_t> m_entitiesToRemove{};
 
 		bool m_isInitialized{ false };
 		bool m_isUpdating{ false };

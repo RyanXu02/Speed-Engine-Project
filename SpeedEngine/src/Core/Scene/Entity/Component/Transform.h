@@ -1,20 +1,14 @@
 #pragma once
-#include "Component.h"
 
-#include "glm/glm.hpp"
+#include "core/features/math.h"
 
 namespace SE
 {
 	// @brief Represents a transform component that can be attached to an entity
-    class Transform : public Component
+    class Transform
     {
     public:
-
-        Transform() : Component() {};
-		Transform(const Transform* other);
-		~Transform() override {};
-
-		bool renderImGuiInterface() override;
+        Transform() = default;
 
 		void setPosition(const glm::vec3& position) { m_position = position; m_isDirty = true; }
 		void setRotation(const glm::vec3& rotation) { m_rotation = rotation; m_isDirty = true; }

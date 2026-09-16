@@ -12,10 +12,6 @@ namespace SE
 	{
 		m_logger.info("Initializing Scene");
 		
-		for (auto& entity : m_entities)
-		{
-			entity->initializeEntity(this);
-		}
 
 		m_isInitialized = true;
 	}
@@ -24,39 +20,18 @@ namespace SE
 	{
 		m_isUpdating = true;
 
-		// update all entities
-		for (auto& entity : m_entities)
-		{
-		}
-
-		// add new entities
-		if (!m_entitiesToAdd.empty())
-		{
-			for (auto& entity : m_entitiesToAdd)
-			{
-				m_logger.debug("adding entity: {}", entity->getName());
-				entity->initializeEntity(this);
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-					std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
-				);
-				m_entities.push_back(std::move(entity));
+		if (!m_entitiesToRemove.empty()) {
+			for (uint32_t id : m_entitiesToRemove) {
+				m_registry.erase(m_registry.begin() + id);
 			}
-			m_entitiesToAdd.clear();
+			m_entitiesToRemove.clear();
 		}
 
-		// delete dead entities
-		auto it = std::remove_if(m_entities.begin(), m_entities.end(),
-			[this](const std::unique_ptr<Entity>& entity) 
-			{
-				if (!entity->isAlive())
-				{
-					m_logger.debug("deleting entity: {}", entity->getName());
-					return true;
-				}
-				return false;			
-			});
-
-		m_entities.erase(it, m_entities.end());
+		for (auto& entity : m_registry) {
+			if (!entity.getComponentNew<LifeComponent>()->isAlive) {
+				removeEntityNew(entity.id());
+			}
+		}
 		
 		m_isUpdating = false;
 	}
@@ -74,6 +49,8 @@ namespace SE
 	{
 		m_registry.push_back(Entity(m_entityID));
 		Entity* entity = getEntityNew(m_entityID);
+
+		entity->addComponentNew<Transform>();
 		entity->addComponentNew<NameComponent>(name);
 		entity->addComponentNew<LifeComponent>(true);
 		NameComponent* component = entity->getComponentNew<NameComponent>();
@@ -90,67 +67,35 @@ namespace SE
 		return &m_registry[instanceID];
 	}
 
-	void Scene::addEntity(std::unique_ptr<Entity> entity)
+	bool Scene::removeEntityNew(uint32_t instanceId)
 	{
-		if (m_isUpdating)
-		{
-			m_logger.debug("deferring addition of entity: {}", entity->getName());
-			m_entitiesToAdd.push_back(std::move(entity));
-		}
-		else
-		{
-			m_logger.debug("adding entity: {}", entity->getName());
-			entity->initializeEntity(this);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(
-				std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName())
-			);
-			m_entities.push_back(std::move(entity));
-		}
-	}
-
-	Entity* Scene::getEntity(uint32_t instanceId)
-	{
-		for (auto& entity : m_entities)
-		{
-			if (entity->getInstanceId() == instanceId && entity->isAlive())
-			{
-				return entity.get();
-			}
-		}
-		return nullptr;
-	}
-
-	void Scene::removeEntity(uint32_t instanceId)
-	{
-		for (auto& entity : m_entities)
-		{
-			if (entity->getInstanceId() == instanceId)
-			{
-				m_logger.debug("deferring remove entity: {}", entity->getName());
-				entity->killEntity();
-				Engine::Instance().getSubSystem<EventSystem>()->publish(
-					std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, "")
-				);
-				return;
-			}
+		if (instanceId < 0 || instanceId >= m_registry.size()) {
+			return false;
 		}
 
+		Entity* entity = getEntityNew(m_entityID);
+		if (entity) {
+			entity->getComponentNew<LifeComponent>()->isAlive = false;
+		}
+		m_entitiesToRemove.push_back(instanceId);
+
+		return true;
 	}
 
 	uint32_t Scene::m_assignID()
 	{
-		m_entityID.fetch_add(1, std::memory_order_relaxed);
-		return m_entityID;
+		return m_entityID.fetch_add(1, std::memory_order_relaxed);;
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
 	{
 		std::unordered_map<uint32_t, std::string> entityList;
-		for (const auto& entity : m_entities)
+		for (auto& entity : m_registry)
 		{
-			if (entity->isAlive())
-			{
-				entityList[entity->getInstanceId()] = entity->getName();
+			LifeComponent* life = entity.getComponentNew<LifeComponent>();
+			if (life && life->isAlive)
+			{	
+				entityList[entity.id()] = entity.getComponentNew<NameComponent>()->name;
 			}
 		}
 		return entityList;

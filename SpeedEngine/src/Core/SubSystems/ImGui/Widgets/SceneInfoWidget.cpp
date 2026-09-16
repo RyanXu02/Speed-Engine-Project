@@ -69,7 +69,7 @@ namespace SE
             if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
             {
                 for (uint32_t id : m_selectedEntities)
-                    scene->removeEntity(id);
+                    scene->removeEntityNew(id);
             }
             m_selectedEntities.clear();
         }
@@ -174,9 +174,10 @@ namespace SE
 
             if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
             {
-                if (Entity* entity = scene->getEntity(id))
+                if (Entity* entity = scene->getEntityNew(id))
                 {
-                    //entity->setName(newName);
+                    NameComponent* name = entity->getComponentNew<NameComponent>();
+                    name->name = newName;
                 }
             }
 
