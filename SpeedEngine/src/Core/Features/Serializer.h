@@ -2,11 +2,10 @@
 
 #include <nlohmann/json.hpp>
 
-namespace SE {
+namespace SE
+{
 
 	class Serializer
-	{
-
-	};
+	{};
 
 }

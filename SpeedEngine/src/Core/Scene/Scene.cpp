@@ -12,7 +12,7 @@ namespace SE
 	void Scene::initializeScene()
 	{
 		m_logger.info("Initializing Scene");
-		
+
 
 		m_isInitialized = true;
 	}
@@ -21,19 +21,23 @@ namespace SE
 	{
 		m_isUpdating = true;
 
-		if (!m_entitiesToRemove.empty()) {
-			for (uint32_t id : m_entitiesToRemove) {
+		if (!m_entitiesToRemove.empty())
+		{
+			for (uint32_t id : m_entitiesToRemove)
+			{
 				m_registry.erase(m_registry.begin() + id);
 			}
 			m_entitiesToRemove.clear();
 		}
 
-		for (auto& entity : m_registry) {
-			if (!entity.getComponent<LifeComponent>()->isAlive) {
+		for (auto& entity : m_registry)
+		{
+			if (!entity.getComponent<LifeComponent>()->isAlive)
+			{
 				removeEntity(entity.id());
 			}
 		}
-		
+
 		m_isUpdating = false;
 	}
 
@@ -60,7 +64,8 @@ namespace SE
 
 	Entity* Scene::getEntity(uint32_t instanceID)
 	{
-		if (instanceID < 0 || instanceID >= m_registry.size()) {
+		if (instanceID < 0 || instanceID >= m_registry.size())
+		{
 			return nullptr;
 		}
 
@@ -69,12 +74,14 @@ namespace SE
 
 	bool Scene::removeEntity(uint32_t instanceId)
 	{
-		if (instanceId < 0 || instanceId >= m_registry.size()) {
+		if (instanceId < 0 || instanceId >= m_registry.size())
+		{
 			return false;
 		}
 
 		Entity* entity = getEntity(m_entityID);
-		if (entity) {
+		if (entity)
+		{
 			entity->getComponent<LifeComponent>()->isAlive = false;
 		}
 		m_entitiesToRemove.push_back(instanceId);
@@ -84,7 +91,8 @@ namespace SE
 
 	uint32_t Scene::m_assignID()
 	{
-		return m_entityID.fetch_add(1, std::memory_order_relaxed);;
+		return m_entityID.fetch_add(1, std::memory_order_relaxed);
+		;
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
@@ -94,7 +102,7 @@ namespace SE
 		{
 			LifeComponent* life = entity.getComponent<LifeComponent>();
 			if (life && life->isAlive)
-			{	
+			{
 				entityList[entity.id()] = entity.getComponent<NameComponent>()->name;
 			}
 		}

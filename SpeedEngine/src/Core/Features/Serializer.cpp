@@ -1,6 +1,8 @@
 #include "pch.h"
+
 #include "Serializer.h"
 
-namespace SE {
+namespace SE
+{
 
 }

@@ -11,7 +11,7 @@ namespace SE
 	using MT = ActiveSceneModified::ModifyType;
 
 
-	Entity::Entity(uint32_t id) : m_id(id)
-	{
-	}
+	Entity::Entity(uint32_t id)
+	    : m_id(id)
+	{}
 } // namespace SE

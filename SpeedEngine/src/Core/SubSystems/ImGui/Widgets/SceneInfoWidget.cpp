@@ -177,14 +177,14 @@ namespace SE
 		{
 			const std::string newName(m_renameBuffer.c_str());
 
-            if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
-            {
-                if (Entity* entity = scene->getEntity(id))
-                {
-                    NameComponent* name = entity->getComponent<NameComponent>();
-                    name->name = newName;
-                }
-            }
+			if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
+			{
+				if (Entity* entity = scene->getEntity(id))
+				{
+					NameComponent* name = entity->getComponent<NameComponent>();
+					name->name = newName;
+				}
+			}
 
 			m_renameEntityId = 0;
 			m_renameBuffer.clear();

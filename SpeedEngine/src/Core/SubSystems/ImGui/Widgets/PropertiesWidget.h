@@ -1,11 +1,11 @@
 #pragma once
+#include "../../Events/EventSubscription.h"
 #include "../Widget.h"
 
-#include "../../Events/EventSubscription.h"
 
-
-namespace SE {
-    class Entity;
+namespace SE
+{
+	class Entity;
 
 	class PropertiesWidget : public Widget
 	{

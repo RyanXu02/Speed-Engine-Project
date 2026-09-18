@@ -1,8 +1,6 @@
 #include "pch.h"
 
 #include "SceneRenderer.h"
-#include "../../../../Scene/Entity/Entity.h"
-#include "../../../../Scene/Entity/Component/Transform.h"
 
 #include "../../../../ResourceManagers/Material/Material.h"
 #include "../../../../ResourceManagers/ResourceManager.h"
@@ -67,20 +65,23 @@ namespace SE
 
 		ResourceManager* resourceManager = Engine::Instance().getSubSystem<ResourceManager>();
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
-		auto entities = scene->getEntitiesWith<Transform, NameComponent,MeshComponent>();
-		for (auto& entity : entities) {
+		auto entities = scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
+		for (auto& entity : entities)
+		{
 			MeshComponent* mesh = entity->getComponent<MeshComponent>();
 			Transform* transform = entity->getComponent<Transform>();
 			NameComponent* name = entity->getComponent<NameComponent>();
 
 
 			uint32_t meshResourceId = mesh->meshResourceID;
-			if (meshResourceId == 0) {
+			if (meshResourceId == 0)
+			{
 				continue;
 			}
 
 			MeshResource* meshResource = resourceManager->getResource<MeshResource>(meshResourceId);
-			if (!meshResource) {
+			if (!meshResource)
+			{
 				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, name->name);
 				break;
 			}
@@ -88,7 +89,8 @@ namespace SE
 			const std::vector<Vertex>& positions = meshResource->getVertices();
 			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
 			const std::vector<uint32_t>& indices = meshResource->getIndices();
-			if (indices.empty() || positions.empty()) {
+			if (indices.empty() || positions.empty())
+			{
 				continue;
 			}
 
@@ -99,7 +101,8 @@ namespace SE
 			}
 
 			const MeshGPUData& gpuData = m_meshCache[meshResourceId];
-			if (gpuData.VAO == 0) {
+			if (gpuData.VAO == 0)
+			{
 				continue;
 			}
 
@@ -136,11 +139,7 @@ namespace SE
 		fbo.unbind();
 	}
 
-	void SceneRenderer::uploadMeshToGPU(
-		uint32_t meshId,
-		const std::vector<Vertex>& positions,
-		const std::vector<SubMesh>& subMeshes,
-		const std::vector<uint32_t>& indices) const
+	void SceneRenderer::uploadMeshToGPU(uint32_t meshId, const std::vector<Vertex>& positions, const std::vector<SubMesh>& subMeshes, const std::vector<uint32_t>& indices) const
 	{
 		MeshGPUData& gpuData = m_meshCache[meshId];
 

@@ -40,17 +40,14 @@ namespace SE
 		// @return reference to camera dolly speed, used for imgui widgets
 		float& getCameraDollySpeed() { return m_cameraDollySpeed; }
 
-    private:
-		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport) : Renderer(logger, "SceneRenderer", std::move(viewport)) {}
-        
-        // Helper methods for mesh rendering
-        void uploadMeshToGPU(
-            uint32_t meshId, 
-            const std::vector<Vertex>& positions, 
-            const std::vector<SubMesh>& subMeshes, 
-            const std::vector<uint32_t>& indices
-        ) const;
-        void cleanupMeshGPU(uint32_t meshId) const;
+	private:
+		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport)
+		    : Renderer(logger, "SceneRenderer", std::move(viewport))
+		{}
+
+		// Helper methods for mesh rendering
+		void uploadMeshToGPU(uint32_t meshId, const std::vector<Vertex>& positions, const std::vector<SubMesh>& subMeshes, const std::vector<uint32_t>& indices) const;
+		void cleanupMeshGPU(uint32_t meshId) const;
 
 		// Cache of GPU mesh data (mutable for const render method)
 		mutable std::unordered_map<uint32_t, MeshGPUData> m_meshCache;

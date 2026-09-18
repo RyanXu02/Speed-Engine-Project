@@ -2,10 +2,9 @@
 
 #include "PropertiesWidget.h"
 
-#include "../../../SubSystems/Scenes/SceneSystem.h"
-#include "../../../Scene/Entity/Entity.h"
 #include "../../../Engine.h"
-
+#include "../../../Scene/Entity/Entity.h"
+#include "../../../SubSystems/Scenes/SceneSystem.h"
 #include "imgui.h"
 
 namespace SE
@@ -43,10 +42,12 @@ namespace SE
 	{
 		std::string entityName;
 
-		if (m_cachedSelectedEntity) {
+		if (m_cachedSelectedEntity)
+		{
 			entityName = m_cachedSelectedEntity->getComponent<NameComponent>()->name;
 		}
-		else {
+		else
+		{
 			entityName = "None Selected";
 		}
 

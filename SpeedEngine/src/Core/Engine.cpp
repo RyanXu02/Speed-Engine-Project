@@ -13,8 +13,8 @@
 
 // temp
 #include "ResourceManagers/Material/Material.h"
-#include "Scene/Entity/Component/Transform.h"
 #include "Scene/Entity/Component/ComponentStructs.h"
+#include "Scene/Entity/Component/Transform.h"
 
 namespace SE
 {
@@ -74,7 +74,7 @@ namespace SE
 
 		uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
 		uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
-		
+
 		uint32_t entityID = currentScene->addEntity("new entity");
 		Entity* entity = currentScene->getEntity(entityID);
 		entity->addComponent<MeshComponent>(bunnymeshId);

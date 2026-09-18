@@ -26,12 +26,15 @@ namespace SE
 		Entity* getEntity(uint32_t instanceId);
 		bool removeEntity(uint32_t instanceId);
 
-		template <typename... Ts>
-		std::vector<Entity*> getEntitiesWith() {
+		template<typename... Ts>
+		std::vector<Entity*> getEntitiesWith()
+		{
 			std::vector<Entity*> entities;
 
-			for (auto& entity : m_registry) {
-				if ((entity.getComponent<Ts>() && ...)) {
+			for (auto& entity : m_registry)
+			{
+				if ((entity.getComponent<Ts>() && ...))
+				{
 					entities.push_back(&entity);
 				}
 			};
@@ -43,7 +46,7 @@ namespace SE
 		std::unordered_map<uint32_t, std::string> getEntityList();
 
 		LoggerProxy& getLogger() { return m_logger; }
-	
+
 	private:
 		LoggerProxy m_logger;
 		std::string m_name;

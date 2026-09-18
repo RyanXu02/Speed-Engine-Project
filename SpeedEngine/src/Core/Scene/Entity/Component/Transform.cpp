@@ -16,7 +16,6 @@ namespace SE
 	//		m_rotation = glm::radians(rotationDegrees);
 
 
-
 	//		ImGui::Checkbox("Link Scale", &m_scaleLink);
 	//	}
 	//	return true;
