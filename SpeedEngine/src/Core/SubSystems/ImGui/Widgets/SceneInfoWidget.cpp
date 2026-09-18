@@ -73,8 +73,17 @@ namespace SE
 		{
 			if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 			{
-				for (uint32_t id : m_selectedEntities)
+				for (uint32_t id : m_selectedEntities) {
+					Entity* entity = scene->getEntity(id);
+					auto name = entity->getComponent<NameComponent>()->name;
+					
 					scene->removeEntity(id);
+
+					EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
+					auto event = std::make_unique<ActiveSceneModified>(MT::Remove, id, name);
+					eventSystem->publish(std::move(event));
+
+				}
 			}
 			m_selectedEntities.clear();
 		}
@@ -183,6 +192,10 @@ namespace SE
 				{
 					NameComponent* name = entity->getComponent<NameComponent>();
 					name->name = newName;
+
+					EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
+					auto event = std::make_unique<ActiveSceneModified>(MT::Rename, id, newName);
+					eventSystem->publish(std::move(event));
 				}
 			}
 

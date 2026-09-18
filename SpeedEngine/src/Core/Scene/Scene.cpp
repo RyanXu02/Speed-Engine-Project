@@ -25,12 +25,12 @@ namespace SE
 		{
 			for (uint32_t id : m_entitiesToRemove)
 			{
-				m_registry.erase(m_registry.begin() + id);
+				m_registry.erase(id);
 			}
 			m_entitiesToRemove.clear();
 		}
 
-		for (auto& entity : m_registry)
+		for (auto& [id, entity] : m_registry)
 		{
 			if (!entity.getComponent<LifeComponent>()->isAlive)
 			{
@@ -51,7 +51,8 @@ namespace SE
 
 	uint32_t Scene::addEntity(const std::string& name)
 	{
-		m_registry.push_back(Entity(m_entityID));
+		m_registry.try_emplace(m_entityID, Entity(m_entityID));
+
 		Entity* entity = getEntity(m_entityID);
 
 		entity->addComponent<Transform>();
@@ -59,23 +60,23 @@ namespace SE
 		entity->addComponent<LifeComponent>(true);
 		NameComponent* component = entity->getComponent<NameComponent>();
 
-		return m_assignID();
+		return assignID();
 	}
 
 	Entity* Scene::getEntity(uint32_t instanceID)
 	{
-		if (instanceID < 0 || instanceID >= m_registry.size())
-		{
+		auto it = m_registry.find(instanceID);
+		if (it == m_registry.end()) {
 			return nullptr;
 		}
 
-		return &m_registry[instanceID];
+		return &it->second;
 	}
 
 	bool Scene::removeEntity(uint32_t instanceId)
 	{
-		if (instanceId < 0 || instanceId >= m_registry.size())
-		{
+		auto it = m_registry.find(instanceId);
+		if (it == m_registry.end()) {
 			return false;
 		}
 
@@ -89,16 +90,15 @@ namespace SE
 		return true;
 	}
 
-	uint32_t Scene::m_assignID()
+	uint32_t Scene::assignID()
 	{
 		return m_entityID.fetch_add(1, std::memory_order_relaxed);
-		;
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
 	{
 		std::unordered_map<uint32_t, std::string> entityList;
-		for (auto& entity : m_registry)
+		for (auto& [id, entity] : m_registry)
 		{
 			LifeComponent* life = entity.getComponent<LifeComponent>();
 			if (life && life->isAlive)

@@ -31,7 +31,7 @@ namespace SE
 		{
 			std::vector<Entity*> entities;
 
-			for (auto& entity : m_registry)
+			for (auto& [id, entity] : m_registry)
 			{
 				if ((entity.getComponent<Ts>() && ...))
 				{
@@ -51,13 +51,13 @@ namespace SE
 		LoggerProxy m_logger;
 		std::string m_name;
 
-		std::atomic<uint32_t> m_entityID{ 0 };
-		std::vector<Entity> m_registry{};
+		std::atomic<uint32_t> m_entityID{ 1 }; //reserve 0 for invalid entity
+		std::unordered_map<uint32_t, Entity> m_registry{};
 		std::vector<uint32_t> m_entitiesToRemove{};
 
 		bool m_isInitialized{ false };
 		bool m_isUpdating{ false };
 
-		uint32_t m_assignID();
+		uint32_t assignID();
 	};
 } // namespace SE

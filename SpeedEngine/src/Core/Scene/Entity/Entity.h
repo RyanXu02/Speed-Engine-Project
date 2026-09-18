@@ -22,19 +22,16 @@ namespace SE
 		template<typename T, typename... Args>
 		T* addComponent(Args&&... args)
 		{
-			auto [it, status] = m_componentsNew.insert_or_assign(typeid(T), T(std::forward<Args>(args)...));
-			if (!status)
-			{
-				return nullptr;
-			}
+			auto [it, status] = m_components.try_emplace(typeid(T), T(std::forward<Args>(args)...));
+
 			return std::any_cast<T>(&it->second);
 		}
 
 		template<typename T>
 		T* getComponent()
 		{
-			auto it = m_componentsNew.find(typeid(T));
-			if (it == m_componentsNew.end())
+			auto it = m_components.find(typeid(T));
+			if (it == m_components.end())
 			{
 				return nullptr;
 			}
@@ -45,6 +42,6 @@ namespace SE
 		uint32_t m_id;
 
 		//Note: ideally want to use sparse set and dense array but until that becomes an issue, do not touch
-		std::unordered_map<std::type_index, std::any> m_componentsNew;
+		std::unordered_map<std::type_index, std::any> m_components;
 	};
 } // namespace SE
