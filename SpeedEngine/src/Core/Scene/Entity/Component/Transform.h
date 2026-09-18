@@ -1,25 +1,14 @@
 #pragma once
-#include "Component.h"
-#include "glm/glm.hpp"
+
+#include <glm/glm.hpp>
 
 namespace SE
 {
 	// @brief Represents a transform component that can be attached to an entity
-	class Transform : public Component
+	class Transform
 	{
 	public:
-		Transform()
-		    : Component(DISALLOW_MULTIPLE_COMPONENTS){};
-		Transform(const Transform* other);
-		~Transform() override{};
-
-		bool initComponent() override;
-		bool updateComponent() override;
-		bool renderComponent() override;
-
-		bool renderImGuiInterface() override;
-
-		bool shutdownComponent() override;
+		Transform() = default;
 
 		void setPosition(const glm::vec3& position)
 		{
@@ -41,17 +30,15 @@ namespace SE
 		const glm::vec3& getRotation() const { return m_rotation; }
 		const glm::vec3& getScale() const { return m_scale; }
 
-		const glm::mat4& getTransform() const;
+		const glm::mat4& getTransform();
 
 	private:
-		Transform* clone() const override { return new Transform(this); }
+		bool m_scaleLink{ true };
 
+		bool m_isDirty{ true };
+		glm::mat4 m_transform{ 1.0f };
 		glm::vec3 m_position{ 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_rotation{ 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_scale{ 1.0f, 1.0f, 1.0f };
-		bool m_scaleLink{ true };
-
-		mutable bool m_isDirty{ true };
-		mutable glm::mat4 m_transform{ 1.0f };
 	};
-} // namespace SE
+}

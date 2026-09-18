@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Component/Component.h"
+#include "Component/ComponentStructs.h"
+
+#include <typeindex>
 
 namespace SE
 {
@@ -13,54 +15,33 @@ namespace SE
 	class Entity
 	{
 	public:
-		Entity(std::string name);
+		Entity(uint32_t id);
 
-		Entity(const Entity&);
+		uint32_t id() const { return m_id; }
 
-		void initializeEntity(Scene* parentScene);
-		void updateEntity(double deltaTime);
-		void shutdownEntity() {};
-
-		uint32_t getInstanceId() const { return m_instanceId; }
-
-		const std::string& getName() const { return m_name; }
-		void setName(std::string_view name);
-
-		// @brief Marks the entity as dead, so it can be removed from the scene in the
-		// next update cycle
-		void killEntity() { m_isAlive = false; }
-		bool isAlive() const { return m_isAlive; }
-
-		void addComponent(std::unique_ptr<Component> component);
-
-		template<typename T>
-		T* getComponent() const
+		template<typename T, typename... Args>
+		T* addComponent(Args&&... args)
 		{
-			for (const auto& component : m_components)
-			{
-				if (typeid(*component.get()) == typeid(T))
-				{
-					return static_cast<T*>(component.get());
-				}
-			}
-			return nullptr;
+			auto [it, status] = m_components.try_emplace(typeid(T), T(std::forward<Args>(args)...));
+
+			return std::any_cast<T>(&it->second);
 		}
 
-		const std::vector<std::unique_ptr<Component>>& getComponents() const { return m_components; }
+		template<typename T>
+		T* getComponent()
+		{
+			auto it = m_components.find(typeid(T));
+			if (it == m_components.end())
+			{
+				return nullptr;
+			}
+			return std::any_cast<T>(&it->second);
+		}
 
 	private:
-		bool m_isAlive{ true };
+		uint32_t m_id;
 
-		std::string m_name;
-
-		uint32_t m_instanceId;
-		static uint32_t s_nextId;
-
-		Scene* m_parentScene{ nullptr };
-
-		std::vector<std::unique_ptr<Component>> m_components;
-
-		std::string m_tag{ "Untagged" }; // not used, but could be used for filtering
-		    // entities in the future
+		//Note: ideally want to use sparse set and dense array but until that becomes an issue, do not touch
+		std::unordered_map<std::type_index, std::any> m_components;
 	};
 } // namespace SE

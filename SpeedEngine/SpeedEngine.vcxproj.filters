@@ -93,9 +93,6 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Scene\Entity\Component\Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -108,12 +105,6 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Scene\Entity\Component\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -124,6 +115,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Features\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Features\Serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -215,9 +215,6 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Scene\Entity\Component\Component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -228,12 +225,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Core\Scene\Entity\Component\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResource.h">
@@ -249,6 +240,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\Serializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,7 +13,7 @@
 
 // temp
 #include "ResourceManagers/Material/Material.h"
-#include "Scene/Entity/Component/Mesh.h"
+#include "Scene/Entity/Component/ComponentStructs.h"
 #include "Scene/Entity/Component/Transform.h"
 
 namespace SE
@@ -63,12 +63,10 @@ namespace SE
 	void Engine::run()
 	{
 		// temp
-		getSubSystem<SceneSystem>()->newScene("TestScene");
-		getSubSystem<SceneSystem>()->setCurrentScene("TestScene");
-		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny middle"));
-		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny right"));
-		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("bunny left"));
-		getSubSystem<SceneSystem>()->getCurrentScene()->addEntity(std::make_unique<Entity>("TestEntity3"));
+		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
+		sceneSystem->newScene("TestScene");
+		sceneSystem->setCurrentScene("TestScene");
+		Scene* currentScene = sceneSystem->getCurrentScene();
 
 		uint32_t defaultShaderIid = getSubSystem<ResourceManager>()->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { { TextureType::Albedo, "Assets/Textures/cole-foxy.jpg" } };
@@ -77,28 +75,16 @@ namespace SE
 		uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
 		uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 
-		auto entity1 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(1);
-		entity1->addComponent(std::make_unique<Mesh>());
-		entity1->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
-		entity1->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		uint32_t entityID = currentScene->addEntity("bunny");
+		Entity* entity = currentScene->getEntity(entityID);
+		entity->addComponent<MeshComponent>(bunnymeshId);
 
-		auto entity2 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(2);
-		entity2->addComponent(std::make_unique<Mesh>());
-		entity2->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
-		entity2->getComponent<Transform>()->setPosition(glm::vec3(2.0f, 0.0f, 0.0f));
+		uint32_t entityID2 = currentScene->addEntity("conference");
+		Entity* entity2 = currentScene->getEntity(entityID2);
+		entity2->addComponent<MeshComponent>(roommeshId2);
 
-		auto entity3 = getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(3);
-		entity3->addComponent(std::make_unique<Mesh>());
-		entity3->getComponent<Mesh>()->setMeshResourceId(bunnymeshId);
-		entity3->getComponent<Transform>()->setPosition(glm::vec3(-2.0f, 0.0f, 0.0f));
+		// end temp
 
-		// auto entity2 =
-		// getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(3);
-		// entity2->addComponent(std::make_unique<Mesh>());
-		// entity2->getComponent<Mesh>()->setMeshResourceId(roommeshId2);
-		// entity2->getComponent<Transform>()->setPosition(glm::vec3(0.0f, 0.0f,
-		// 0.0f));
-		//  end temp
 
 		// get subsystems used in loop
 		auto* window = getSubSystem<Window>();

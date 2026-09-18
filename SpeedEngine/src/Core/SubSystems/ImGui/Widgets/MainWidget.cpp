@@ -42,7 +42,7 @@ namespace SE
 				{
 					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
-						scene->addEntity(std::make_unique<Entity>("New Empty"));
+						scene->addEntity("New Empty");
 					}
 				}
 				// add prefabs later

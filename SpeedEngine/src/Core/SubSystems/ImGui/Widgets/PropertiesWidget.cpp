@@ -2,8 +2,9 @@
 
 #include "PropertiesWidget.h"
 
-#include "../../Scenes/SceneSystem.h"
-#include "Engine.h"
+#include "../../../Engine.h"
+#include "../../../Scene/Entity/Entity.h"
+#include "../../../SubSystems/Scenes/SceneSystem.h"
 #include "imgui.h"
 
 namespace SE
@@ -40,10 +41,15 @@ namespace SE
 	void PropertiesWidget::render()
 	{
 		std::string entityName;
-		if (m_cachedSelectedEntity && m_cachedSelectedEntity->isAlive())
-			entityName = m_cachedSelectedEntity->getName();
+
+		if (m_cachedSelectedEntity)
+		{
+			entityName = m_cachedSelectedEntity->getComponent<NameComponent>()->name;
+		}
 		else
+		{
 			entityName = "None Selected";
+		}
 
 		std::string windowTitle = std::format("Properties - {}###PropertiesWidget", entityName);
 
@@ -51,10 +57,10 @@ namespace SE
 
 		if (m_cachedSelectedEntity)
 		{
-			for (const auto& component : m_cachedSelectedEntity->getComponents())
-			{
-				component->renderImGuiInterface();
-			}
+			//for (const auto& component : m_cachedSelectedEntity->getComponents())
+			//{
+			//	component->renderImGuiInterface();
+			//}
 		}
 
 		ImGui::End();
