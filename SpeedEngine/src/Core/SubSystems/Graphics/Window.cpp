@@ -1,13 +1,13 @@
 #include "pch.h"
+
 #include "Window.h"
-#include "Engine.h"
 
 #include "../../Logger/Logger.h"
-
-#include "glad/gl.h"
-#include "GLFW/glfw3.h"
-
 #include "../Events/EventSystem.h"
+#include "Engine.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace SE
 {
@@ -57,7 +57,8 @@ namespace SE
 
 		// Get primary monitor
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-		if (!monitor) {
+		if (!monitor)
+		{
 			m_logger->critical("Failed to get primary monitor");
 			glfwTerminate();
 			return false;
@@ -65,24 +66,26 @@ namespace SE
 
 		// Get monitor video mode
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		if (!mode) {
+		if (!mode)
+		{
 			m_logger->critical("Failed to get video mode");
 			glfwTerminate();
 			return false;
 		}
 
-
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
 		// create window
 		m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), NULL, NULL);
-		if (!m_window) {
+		if (!m_window)
+		{
 			m_logger->critical("Failed to create GLFW window");
 			glfwTerminate();
 			return false;
 		}
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		m_windowShared = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), NULL, m_window);
-		if (!m_windowShared) {
+		if (!m_windowShared)
+		{
 			m_logger->critical("Failed to create GLFW shared window");
 			glfwTerminate();
 			return false;
@@ -90,12 +93,15 @@ namespace SE
 
 		glfwMakeContextCurrent(m_window);
 
-		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<WindowClose>());
-			});
+		glfwSetWindowCloseCallback(m_window,
+		    [](GLFWwindow* window)
+		    {
+			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<WindowClose>());
+		    });
 
 		// init glad
-		if (!gladLoadGL(glfwGetProcAddress)) {
+		if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
+		{
 			m_logger->critical("Failed to initialize GLAD for main context");
 			glfwDestroyWindow(m_window);
 			glfwDestroyWindow(m_windowShared);
@@ -110,4 +116,4 @@ namespace SE
 	{
 		return glfwGetTime();
 	}
-}
+} // namespace SE

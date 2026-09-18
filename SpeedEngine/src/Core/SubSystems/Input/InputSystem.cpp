@@ -1,10 +1,11 @@
 #include "pch.h"
-#include "InputSystem.h"
-#include "Engine.h"
 
-#include "GLFW/glfw3.h"
+#include "InputSystem.h"
 
 #include "../../Logger/Logger.h"
+#include "Engine.h"
+
+#include <GLFW/glfw3.h>
 
 namespace SE
 {
@@ -13,10 +14,10 @@ namespace SE
 		SubSystem::init();
 
 		glfwSetScrollCallback(glfwGetCurrentContext(),
-			[](GLFWwindow* window, double xoffset, double yoffset)
-			{
-				Engine::Instance().getSubSystem<InputSystem>()->scroll_callback(window, xoffset, yoffset);
-			});
+		    [](GLFWwindow* window, double xoffset, double yoffset)
+		    {
+			    Engine::Instance().getSubSystem<InputSystem>()->scroll_callback(window, xoffset, yoffset);
+		    });
 	}
 
 	void InputSystem::update(double deltaTime)
@@ -33,14 +34,9 @@ namespace SE
 			KeyCodes thisKey = static_cast<KeyCodes>(key);
 			switch (glfwGetKey(glfwGetCurrentContext(), key))
 			{
-			case GLFW_PRESS:
-				_setKeyState(thisKey);
-				break;
-			case GLFW_RELEASE:
-				_clearKeyState(thisKey);
-				break;
-			default:
-				break;
+			case GLFW_PRESS: _setKeyState(thisKey); break;
+			case GLFW_RELEASE: _clearKeyState(thisKey); break;
+			default: break;
 			}
 		}
 
@@ -51,14 +47,9 @@ namespace SE
 			MouseCodes thisButton = static_cast<MouseCodes>(button);
 			switch (glfwGetMouseButton(glfwGetCurrentContext(), button))
 			{
-			case GLFW_PRESS:
-				_setMouseState(thisButton);
-				break;
-			case GLFW_RELEASE:
-				_clearMouseState(thisButton);
-				break;
-			default:
-				break;
+			case GLFW_PRESS: _setMouseState(thisButton); break;
+			case GLFW_RELEASE: _clearMouseState(thisButton); break;
+			default: break;
 			}
 		}
 
@@ -158,8 +149,9 @@ namespace SE
 		m_mouseCurrState.reset(static_cast<size_t>(key));
 	}
 
-	void InputSystem::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	void InputSystem::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+	{
 		m_mouseScrollAccumulated.xoffset += xoffset;
 		m_mouseScrollAccumulated.yoffset += yoffset;
 	}
-}
+} // namespace SE

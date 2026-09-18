@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "Logger.h"
 
 namespace SE
@@ -16,11 +17,14 @@ namespace SE
 		Logger::s_file_sinkv->set_level(spdlog::level::trace);
 	}
 
-	Logger::Logger() : m_spdlogger(nullptr) {}
+	Logger::Logger()
+	    : m_spdlogger(nullptr)
+	{}
 
 	void Logger::init(std::string_view name)
 	{
-		std::call_once(s_sinks_init_flag, &Logger::initSharedSinks); //init all sinks across all threads
+		std::call_once(s_sinks_init_flag,
+		    &Logger::initSharedSinks); // init all sinks across all threads
 
 		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 		console_sink->set_level(spdlog::level::info);
@@ -37,4 +41,4 @@ namespace SE
 	{
 		spdlog::shutdown();
 	}
-}
+} // namespace SE

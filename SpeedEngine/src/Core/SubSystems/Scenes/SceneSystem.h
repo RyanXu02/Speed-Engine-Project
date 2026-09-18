@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../SubSystem.h"
 #include "../../Scene/Scene.h"
+#include "../SubSystem.h"
 
 namespace SE
 {
@@ -9,8 +9,8 @@ namespace SE
 	class SceneSystem : public SubSystem
 	{
 		friend class Engine;
-	public:
 
+	public:
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
@@ -21,11 +21,13 @@ namespace SE
 
 		void setCurrentScene(const std::string& name);
 		Scene* getCurrentScene() const { return m_currentScene; }
+
 	private:
-		SceneSystem() : SubSystem("SceneSystem") {}
+		SceneSystem()
+		    : SubSystem("SceneSystem")
+		{}
 
 		std::vector<std::unique_ptr<Scene>> m_scenes;
 		Scene* m_currentScene = nullptr;
 	};
-}
-
+} // namespace SE

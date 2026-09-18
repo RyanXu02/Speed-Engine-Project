@@ -1,18 +1,15 @@
 #include "pch.h"
+
 #include "Engine.h"
-#include "SubSystems/SubSystem.h"
-
-#include "SubSystems/Graphics/Window.h"
-#include "SubSystems/Input/InputSystem.h"
-
-#include "SubSystems/Events/EventSystem.h"
-#include "SubSystems/Events/EventSubscription.h"
 
 #include "ResourceManagers/ResourceManager.h"
-
+#include "SubSystems/Events/EventSubscription.h"
+#include "SubSystems/Events/EventSystem.h"
 #include "SubSystems/Graphics/Rendering/RendererManager.h"
-
+#include "SubSystems/Graphics/Window.h"
+#include "SubSystems/Input/InputSystem.h"
 #include "SubSystems/Scenes/SceneSystem.h"
+#include "SubSystems/SubSystem.h"
 
 // temp
 #include "ResourceManagers/Material/Material.h"
@@ -28,32 +25,36 @@ namespace SE
 	}
 
 	Engine::Engine()
-		: m_isRunning(false), m_deltaTime(0.0), m_currentTime(0.0), m_lastTime(0.0), m_windowCloseEvent()
-	{
-	}
-	Engine::~Engine()
-	{
-	}
+	    : m_isRunning(false),
+	      m_deltaTime(0.0),
+	      m_currentTime(0.0),
+	      m_lastTime(0.0),
+	      m_windowCloseEvent()
+	{}
+	Engine::~Engine() {}
 	void Engine::init()
 	{
 		// push back subsystems in order of initialization
 		m_subSystems.push_back(std::unique_ptr<EventSystem>(new EventSystem()));
-		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720, "Speed Engine"))); //has to be BEFORE ResourceManager
+		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720,
+		    "Speed Engine"))); // has to be BEFORE ResourceManager
 		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem()));
 		m_subSystems.push_back(std::unique_ptr<ResourceManager>(new ResourceManager()));
 		m_subSystems.push_back(std::unique_ptr<RendererManager>(new RendererManager(*getSubSystem<Window>())));
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
-		
+
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
 		{
 			subSystem->init();
 		}
-		
+
 		// subscribe to window close event
-		m_windowCloseEvent = getSubSystem<EventSystem>()->subscribe(EventType::WindowClose, [this](const Event& event) {
-			m_isRunning = false;
-			});
+		m_windowCloseEvent = getSubSystem<EventSystem>()->subscribe(EventType::WindowClose,
+		    [this](const Event& event)
+		    {
+			    m_isRunning = false;
+		    });
 	}
 	void Engine::start()
 	{
@@ -67,9 +68,8 @@ namespace SE
 		sceneSystem->setCurrentScene("TestScene");
 		Scene* currentScene = sceneSystem->getCurrentScene();
 
-
 		uint32_t defaultShaderIid = getSubSystem<ResourceManager>()->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
-		std::vector<std::pair<TextureType, std::string_view>> texlist = { {TextureType::Albedo,"Assets/Textures/cole-foxy.jpg"} };
+		std::vector<std::pair<TextureType, std::string_view>> texlist = { { TextureType::Albedo, "Assets/Textures/cole-foxy.jpg" } };
 		uint32_t matid = getSubSystem<ResourceManager>()->addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
 
 		uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
@@ -85,7 +85,7 @@ namespace SE
 		// get subsystems used in loop
 		auto* window = getSubSystem<Window>();
 		auto* rendererManager = getSubSystem<RendererManager>();
-		
+
 		// init time
 		double lastTime = window->getCurrentTime();
 		int frameCounter = 0;
@@ -114,4 +114,4 @@ namespace SE
 			subSystem->shutdown();
 		}
 	}
-}
+} // namespace SE

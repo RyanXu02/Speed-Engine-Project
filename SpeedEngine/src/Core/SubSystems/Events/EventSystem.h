@@ -6,12 +6,13 @@ namespace SE
 {
 	class EventSubscription;
 
-	// @brief EventSystem is a singleton that manages event publishing and subscribing
-    class EventSystem : public SubSystem
-    {
+	// @brief EventSystem is a singleton that manages event publishing and
+	// subscribing
+	class EventSystem : public SubSystem
+	{
 		friend class Engine;
 
-        using EventCallback = std::function<void(Event&)>;
+		using EventCallback = std::function<void(Event&)>;
 
 		struct EventCallbackWrapper
 		{
@@ -19,8 +20,7 @@ namespace SE
 			EventCallback callback;
 		};
 
-    public:
-
+	public:
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
@@ -32,7 +32,8 @@ namespace SE
 		//@brief creates a listener for an event
 		//@param eventType the type of event that is being listened for
 		//@param callback the callback function to be invoked when the event is heard
-		//@return an EventSubscription obj. This is done for RAII (on destruction, it auto-unsubs itself from the event)
+		//@return an EventSubscription obj. This is done for RAII (on destruction, it
+		// auto-unsubs itself from the event)
 		EventSubscription subscribe(EventType eventType, EventCallback callback);
 
 		//@brief removes the specified id from listening to the specified event type
@@ -40,12 +41,14 @@ namespace SE
 		//@param eventType the event type to unsubscribe from
 		void unsubscribe(uint32_t id, EventType eventType);
 
-    private:
+	private:
 		// singleton instance, use singleton Engine to access its subsystems
-		EventSystem() : SubSystem("EventSystem") {}
+		EventSystem()
+		    : SubSystem("EventSystem")
+		{}
 
-        // id for each listener
-        std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
+		// id for each listener
+		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
 		uint32_t _assignId() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 
 		// map of event type to vector of callbacks
@@ -54,6 +57,5 @@ namespace SE
 		std::queue<std::unique_ptr<Event>> m_eventQueue;
 
 		void _fireEvent(Event& event);
-    };
-}
-
+	};
+} // namespace SE

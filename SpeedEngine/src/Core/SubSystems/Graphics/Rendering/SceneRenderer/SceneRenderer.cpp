@@ -1,22 +1,22 @@
 #include "pch.h"
-#include "Engine.h"
 
 #include "SceneRenderer.h"
 #include "../../../../Scene/Entity/Entity.h"
 #include "../../../../Scene/Entity/Component/Transform.h"
 
-#include <glad/gl.h>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "../RendererManager.h"
-#include "../../../Scenes/SceneSystem.h"
+#include "../../../../ResourceManagers/Material/Material.h"
 #include "../../../../ResourceManagers/ResourceManager.h"
 #include "../../../../ResourceManagers/Shader/Shader.h"
-#include "../../../../ResourceManagers/Material/Material.h"
-
+#include "../../../../Scene/Entity/Component/Mesh.h"
+#include "../../../../Scene/Entity/Component/Transform.h"
+#include "../../../../Scene/Entity/Entity.h"
 #include "../../../Input/InputSystem.h"
+#include "../../../Scenes/SceneSystem.h"
+#include "../RendererManager.h"
+#include "Engine.h"
 
-
+#include <glm/gtc/matrix_transform.hpp>
+#include <glad/glad.h>
 
 namespace SE
 {
@@ -41,10 +41,10 @@ namespace SE
 		FBO& fbo = m_viewport->getFBO();
 		CameraFrustum& camera = m_viewport->getCameraFrustum();
 
-		//bind fbo
+		// bind fbo
 		fbo.bind();
 
-		//clear framebuffer
+		// clear framebuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -59,7 +59,8 @@ namespace SE
 
 		// Get default shader
 		Shader* defaultShader = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_defaultShaderId);
-		if (!defaultShader) {
+		if (!defaultShader)
+		{
 			m_logger.critical("Default shader not found, cannot render");
 			fbo.unbind();
 			return;
@@ -93,7 +94,8 @@ namespace SE
 			}
 
 			auto it = m_meshCache.find(meshResourceId);
-			if (it == m_meshCache.end() || it->second.needsUpdate) {
+			if (it == m_meshCache.end() || it->second.needsUpdate)
+			{
 				uploadMeshToGPU(meshResourceId, positions, subMeshes, indices);
 			}
 
@@ -109,7 +111,8 @@ namespace SE
 
 			// Set model matrix (use transform if available, otherwise identity)
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			if (transform) {
+			if (transform)
+			{
 				modelMatrix = transform->getTransform();
 			}
 			defaultShader->setMat4("model", modelMatrix);
@@ -143,7 +146,8 @@ namespace SE
 		MeshGPUData& gpuData = m_meshCache[meshId];
 
 		// Delete old buffers if they exist
-		if (gpuData.VAO != 0) {
+		if (gpuData.VAO != 0)
+		{
 			cleanupMeshGPU(meshId);
 		}
 
@@ -157,17 +161,11 @@ namespace SE
 
 		// Upload vertex data
 		glBindBuffer(GL_ARRAY_BUFFER, gpuData.VBO);
-		glBufferData(GL_ARRAY_BUFFER,
-			positions.size() * sizeof(Vertex),
-			positions.data(),
-			GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(Vertex), positions.data(), GL_STATIC_DRAW);
 
 		// Upload index data
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpuData.EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			indices.size() * sizeof(uint32_t),
-			indices.data(),
-			GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
 
 		// Set vertex attributes
 		// Position attribute (location = 0)
@@ -191,25 +189,29 @@ namespace SE
 		gpuData.indexCount = indices.size();
 		gpuData.needsUpdate = false;
 
-		m_logger.info("Uploaded mesh {} to GPU: {} vertices, {} indices",
-			meshId, positions.size(), indices.size());
+		m_logger.info("Uploaded mesh {} to GPU: {} vertices, {} indices", meshId, positions.size(), indices.size());
 	}
 
-	void SceneRenderer::cleanupMeshGPU(uint32_t meshId) const {
+	void SceneRenderer::cleanupMeshGPU(uint32_t meshId) const
+	{
 		auto it = m_meshCache.find(meshId);
-		if (it == m_meshCache.end()) return;
+		if (it == m_meshCache.end())
+			return;
 
 		MeshGPUData& gpuData = it->second;
 
-		if (gpuData.EBO != 0) {
+		if (gpuData.EBO != 0)
+		{
 			glDeleteBuffers(1, &gpuData.EBO);
 			gpuData.EBO = 0;
 		}
-		if (gpuData.VBO != 0) {
+		if (gpuData.VBO != 0)
+		{
 			glDeleteBuffers(1, &gpuData.VBO);
 			gpuData.VBO = 0;
 		}
-		if (gpuData.VAO != 0) {
+		if (gpuData.VAO != 0)
+		{
 			glDeleteVertexArrays(1, &gpuData.VAO);
 			gpuData.VAO = 0;
 		}
@@ -217,7 +219,8 @@ namespace SE
 		m_logger.info("Cleaned up GPU data for mesh {}", meshId);
 	}
 
-	void SceneRenderer::_updateCameraPosition(double deltaTime, CameraFrustum& camera) {
+	void SceneRenderer::_updateCameraPosition(double deltaTime, CameraFrustum& camera)
+	{
 		auto IS = Engine::Instance().getSubSystem<InputSystem>();
 
 		// x-y plane movement
@@ -235,7 +238,8 @@ namespace SE
 		if (IS->isKeyDown(KeyCodes::KEY_D))
 			CameraMoveDir += cameraRight;
 
-		if (glm::length(CameraMoveDir) > 0.0f) {
+		if (glm::length(CameraMoveDir) > 0.0f)
+		{
 			CameraMoveDir = glm::normalize(CameraMoveDir);
 			camera.move(CameraMoveDir * movespeed);
 		}
@@ -259,7 +263,8 @@ namespace SE
 			camera.move(-WORLD_UP * movespeed);
 	}
 
-	void SceneRenderer::_updateCameraTarget(double deltaTime, CameraFrustum& camera) {
+	void SceneRenderer::_updateCameraTarget(double deltaTime, CameraFrustum& camera)
+	{
 		auto IS = Engine::Instance().getSubSystem<InputSystem>();
 
 		if (IS->isMouseDown(MouseCodes::MOUSE_BUTTON_3))
@@ -277,7 +282,8 @@ namespace SE
 			float pitchAngle = -mouseDelta.y * m_sensitivity;
 			glm::vec3 newDirection = glm::vec3(glm::rotate(glm::mat4(1.0f), pitchAngle, cameraRight) * glm::vec4(cameraDirection, 0.0f));
 			float upDot = glm::dot(newDirection, WORLD_UP);
-			if (upDot < 0.999f && upDot > -0.999f) {
+			if (upDot < 0.999f && upDot > -0.999f)
+			{
 				cameraDirection = newDirection;
 			}
 
@@ -287,9 +293,11 @@ namespace SE
 		}
 	}
 
-	void SceneRenderer::_updateCamera(double deltaTime, CameraFrustum& camera, FBO& fbo) {
+	void SceneRenderer::_updateCamera(double deltaTime, CameraFrustum& camera, FBO& fbo)
+	{
 		auto IS = Engine::Instance().getSubSystem<InputSystem>();
-		if (IS->isKeyRising(KeyCodes::KEY_LEFT_SHIFT)) {
+		if (IS->isKeyRising(KeyCodes::KEY_LEFT_SHIFT))
+		{
 			m_cameraMoveSpeed *= 2.0f;
 			m_cameraDollySpeed *= 2.0f;
 		}
@@ -300,12 +308,14 @@ namespace SE
 		}
 		_updateCameraPosition(deltaTime, camera);
 		_updateCameraTarget(deltaTime, camera);
-		if (camera.isDirty) {
-			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(), WORLD_UP); // 0,1,0 is up vector
+		if (camera.isDirty)
+		{
+			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(),
+			    WORLD_UP); // 0,1,0 is up vector
 			float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
 			camera.projectionMatrix = glm::perspective(glm::radians(camera.getFOV()), aspectRatio, camera.getNearPlane(), camera.getFarPlane());
 			camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
 			camera.isDirty = false;
 		}
 	}
-}
+} // namespace SE

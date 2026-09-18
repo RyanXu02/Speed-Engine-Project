@@ -9,14 +9,22 @@ namespace SE
 	class Window : public SubSystem
 	{
 	public:
-		Window() : SubSystem("Window"), 
-			m_windowTitle("Untitled"),
-			m_window(nullptr), m_windowShared(nullptr), 
-			m_windowWidth(800), m_windowHeight(600) {}
-		Window(unsigned int width, unsigned int height, std::string windowTitle) : SubSystem("Window"), 
-			m_windowTitle(windowTitle),
-			m_window(nullptr), m_windowShared(nullptr),
-			m_windowWidth(width), m_windowHeight(height) {}
+		Window()
+		    : SubSystem("Window"),
+		      m_windowTitle("Untitled"),
+		      m_window(nullptr),
+		      m_windowShared(nullptr),
+		      m_windowWidth(800),
+		      m_windowHeight(600)
+		{}
+		Window(unsigned int width, unsigned int height, std::string windowTitle)
+		    : SubSystem("Window"),
+		      m_windowTitle(windowTitle),
+		      m_window(nullptr),
+		      m_windowShared(nullptr),
+		      m_windowWidth(width),
+		      m_windowHeight(height)
+		{}
 
 		void init() override;
 		void update(double deltaTime) override;
@@ -37,17 +45,16 @@ namespace SE
 	private:
 		bool _initGLFW();
 
-		bool m_vsyncEnabled { true };
+		bool m_vsyncEnabled{ true };
 
 		std::string m_windowTitle;
-		
+
 		GLFWwindow* m_window;
 		GLFWwindow* m_windowShared;
 
 		unsigned int m_windowWidth;
 		unsigned int m_windowHeight;
 
-		double m_fps { 60.0 };
+		double m_fps{ 60.0 };
 	};
-}
-
+} // namespace SE

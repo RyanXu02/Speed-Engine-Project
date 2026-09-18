@@ -1,16 +1,20 @@
 #include "pch.h"
+
 #include "MeshResourceManager.h"
+
 #include "../../Logger/Logger.h"
 
 namespace SE
 {
-	void MeshResourceManager::init() {
+	void MeshResourceManager::init()
+	{
 		Manager::init();
 
 		m_meshresources.reserve(16);
 	}
 
-	void MeshResourceManager::shutdown() {
+	void MeshResourceManager::shutdown()
+	{
 		Manager::shutdown();
 
 		for (auto& [k, meshresource] : m_meshresources)
@@ -25,19 +29,24 @@ namespace SE
 		m_logger->info("MeshResourceManager cleared all mesh resources.");
 	}
 
-	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath) { //asdfhasfhlsadfsakjf
+	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath)
+	{ // asdfhasfhlsadfsakjf
 		// Check if mesh resource already exists
 
-		auto it = std::ranges::find_if(m_meshresources, [meshName](const auto& kv) {
-			return kv.second->getResourceName() == meshName;
-			});
-		if (it != m_meshresources.end()) {
+		auto it = std::ranges::find_if(m_meshresources,
+		    [meshName](const auto& kv)
+		    {
+			    return kv.second->getResourceName() == meshName;
+		    });
+		if (it != m_meshresources.end())
+		{
 			m_logger->debug("MeshResource with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
 			return it->first;
 		}
 
 		auto newMesh = std::make_unique<MeshResource>(id, meshName, *m_logger);
-		if (!newMesh->init(objpath, mtlpath)) {
+		if (!newMesh->init(objpath, mtlpath))
+		{
 			m_logger->warn("Failed to initialize MeshResource {} from {}", meshName, objpath);
 			return 0;
 		}
@@ -49,18 +58,22 @@ namespace SE
 		return id;
 	}
 
-	MeshResource* MeshResourceManager::getMeshResource(uint32_t meshResourceId) {
+	MeshResource* MeshResourceManager::getMeshResource(uint32_t meshResourceId)
+	{
 		auto it = m_meshresources.find(meshResourceId);
-		if (it == m_meshresources.end()) return nullptr;
+		if (it == m_meshresources.end())
+			return nullptr;
 
 		return it->second.get();
 	}
 
-	bool MeshResourceManager::removeMeshResource(uint32_t meshResourceId) {
+	bool MeshResourceManager::removeMeshResource(uint32_t meshResourceId)
+	{
 		auto it = m_meshresources.find(meshResourceId);
-		if (it == m_meshresources.end()) return false;
+		if (it == m_meshresources.end())
+			return false;
 
 		m_meshresources.erase(meshResourceId);
 		return true;
 	}
-}
+} // namespace SE

@@ -1,37 +1,43 @@
 #pragma once
-#include "../Resource.h"
 #include "../../Logger/LoggerProxy.h"
-
+#include "../Resource.h"
 #include "glm/glm.hpp"
 
 namespace SE
 {
 	// @brief Represents a vertex in a 3D mesh
-	struct Vertex {
+	struct Vertex
+	{
 		glm::vec3 position{ 0.f };
 		glm::vec3 normal{ 0.f };
 		glm::vec2 uv{ 0.f };
 	};
 
 	// @brief Represents a sub-mesh within a 3D mesh
-	// This is used for meshes that have multiple materials applied to different parts of the mesh
-	struct SubMesh {
-		uint32_t indexOffset; //start of "mesh". index into m_indices
-		uint32_t indexCount; //how many vertices are contained in "mesh"
-		int32_t materialIndex; //index into materials container?????
+	// This is used for meshes that have multiple materials applied to different
+	// parts of the mesh
+	struct SubMesh
+	{
+		uint32_t indexOffset; // start of "mesh". index into m_indices
+		uint32_t indexCount; // how many vertices are contained in "mesh"
+		int32_t materialIndex; // index into materials container?????
 	};
 
 	// @brief Represents a 3D mesh resource
-	// A mesh resource contains the vertex data, sub-meshes, and indices for a 3D model
+	// A mesh resource contains the vertex data, sub-meshes, and indices for a 3D
+	// model
 	class MeshResource : public Resource
 	{
 	public:
-		MeshResource(uint32_t id, std::string_view resourceName, Logger& logger) : Resource(id, std::string(resourceName)),
-			m_logger(logger, fmt::format("MeshResource:{}", resourceName)) {}
+		MeshResource(uint32_t id, std::string_view resourceName, Logger& logger)
+		    : Resource(id, std::string(resourceName)),
+		      m_logger(logger, fmt::format("MeshResource:{}", resourceName))
+		{}
 
 		// @brief Initializes the mesh resource by loading the OBJ and MTL files
 		// @param objpath The file path to the OBJ file
-		// @param mtlpath The file path to the MTL file, optional (can be empty if no MTL file is used)
+		// @param mtlpath The file path to the MTL file, optional (can be empty if no
+		// MTL file is used)
 		// @returns true if the initialization was successful, false otherwise
 		bool init(std::string_view objpath, std::string_view mtlpath);
 
@@ -50,5 +56,4 @@ namespace SE
 		LoggerProxy m_logger;
 	};
 
-}
-
+} // namespace SE

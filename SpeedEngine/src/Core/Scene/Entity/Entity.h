@@ -7,8 +7,10 @@ namespace SE
 {
 	class Scene;
 
-	// @brief An entity is a container for components that define its behavior and appearance in the scene
-	// @brief An entity is owned by a scene, and can be created and destroyed by the scene
+	// @brief An entity is a container for components that define its behavior and
+	// appearance in the scene
+	// @brief An entity is owned by a scene, and can be created and destroyed by the
+	// scene
 	class Entity
 	{
 	public:
@@ -40,5 +42,4 @@ namespace SE
 		//Note: ideally want to use sparse set and dense array but until that becomes an issue, do not touch
 		std::unordered_map<std::type_index, std::any> m_componentsNew;
 	};
-}
-
+} // namespace SE

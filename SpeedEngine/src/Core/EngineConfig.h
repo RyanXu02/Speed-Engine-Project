@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace SE 
+namespace SE
 {
 	struct EngineConfig
 	{
@@ -14,4 +14,4 @@ namespace SE
 
 		std::string assetDirectory = "./assets";
 	};
-}
+} // namespace SE

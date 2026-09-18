@@ -1,19 +1,19 @@
 #include "pch.h"
+
 #include "ImGuiRenderer.h"
-
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
-#include "../../Window.h"
 
 #include "../../../ImGui/Widget.h"
 #include "../../../ImGui/Widgets/ConsoleWidget.h"
 #include "../../../ImGui/Widgets/MainWidget.h"
-#include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
-#include "../../../ImGui/Widgets/ScenePreviewWidget.h"
-#include "../../../ImGui/Widgets/SceneInfoWidget.h"
 #include "../../../ImGui/Widgets/PropertiesWidget.h"
+#include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
+#include "../../../ImGui/Widgets/SceneInfoWidget.h"
+#include "../../../ImGui/Widgets/ScenePreviewWidget.h"
+#include "../../Window.h"
+#include "imgui.h"
+
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 namespace SE
 {
@@ -27,28 +27,29 @@ namespace SE
 
 		std::error_code ec;
 		const bool hasUserIni = std::filesystem::exists("imgui.ini", ec);
-		if (!ec && !hasUserIni) {
+		if (!ec && !hasUserIni)
+		{
 			ImGui::LoadIniSettingsFromDisk("default_UI.ini");
 		}
 
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;		// Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;		// Enable Gamepad Controls
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// IF using Docking Branch
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // IF using Docking Branch
 
 		// Setup Platform/Renderer backends
-		ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+		ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(),
+		    true); // Second param install_callback=true will install GLFW callbacks
+		// and chain to existing ones.
 		ImGui_ImplOpenGL3_Init();
 
 		initWidgets();
-
-
 	}
 
 	void ImGuiRenderer::initWidgets()
 	{
 		createWidget<MainWidget>();
 		createWidget<ResourceBrowserWidget>();
-		//createWidget<ConsoleWidget>();
+		// createWidget<ConsoleWidget>();
 		createWidget<ScenePreviewWidget>();
 		createWidget<SceneInfoWidget>();
 		createWidget<PropertiesWidget>();
@@ -74,7 +75,8 @@ namespace SE
 		}
 	}
 
-	void ImGuiRenderer::finalizeFrame() const {
+	void ImGuiRenderer::finalizeFrame() const
+	{
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
@@ -87,4 +89,4 @@ namespace SE
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
-}
+} // namespace SE

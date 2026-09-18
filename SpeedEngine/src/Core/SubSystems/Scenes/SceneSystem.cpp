@@ -1,8 +1,9 @@
 #include "pch.h"
+
 #include "SceneSystem.h"
-#include "Engine.h"
 
 #include "../Events/EventSystem.h"
+#include "Engine.h"
 
 namespace SE
 {
@@ -67,32 +68,34 @@ namespace SE
 			m_currentScene = nullptr;
 		}
 
-		m_scenes.erase(
-			std::remove_if(m_scenes.begin(), m_scenes.end(),
-				[this, scene](const std::unique_ptr<Scene>& s) {
-					if (s.get() != scene) return false;
-					s->shutdownScene();
-					if (scene == m_currentScene) m_currentScene = nullptr;
-					return true;
-				}),
-			m_scenes.end()
-		);
+		m_scenes.erase(std::remove_if(m_scenes.begin(), m_scenes.end(),
+		                   [this, scene](const std::unique_ptr<Scene>& s)
+		                   {
+			                   if (s.get() != scene)
+				                   return false;
+			                   s->shutdownScene();
+			                   if (scene == m_currentScene)
+				                   m_currentScene = nullptr;
+			                   return true;
+		                   }),
+		    m_scenes.end());
 	}
 
 	void SceneSystem::setCurrentScene(const std::string& name)
 	{
 		m_logger->info("Setting current scene: {}", name);
 
-
 		auto it = std::find_if(m_scenes.begin(), m_scenes.end(),
-			[&name](const std::unique_ptr<Scene>& scene) {
-				return scene->getName() == name;
-			});
+		    [&name](const std::unique_ptr<Scene>& scene)
+		    {
+			    return scene->getName() == name;
+		    });
 
 		if (it != m_scenes.end())
 		{
-			if (m_currentScene) m_currentScene->shutdownScene();
-			
+			if (m_currentScene)
+				m_currentScene->shutdownScene();
+
 			m_currentScene = it->get();
 			m_currentScene->initializeScene();
 
@@ -103,4 +106,4 @@ namespace SE
 			m_logger->warn("Scene '{}' not found. Current scene not changed.", name);
 		}
 	}
-}
+} // namespace SE

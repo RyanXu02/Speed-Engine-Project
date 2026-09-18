@@ -1,10 +1,11 @@
 #include "pch.h"
-#include "MainWidget.h"
-#include "Engine.h"
 
-#include "../../Scenes/SceneSystem.h"
+#include "MainWidget.h"
+
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
+#include "../../Scenes/SceneSystem.h"
+#include "Engine.h"
 
 #include <imgui.h>
 
@@ -22,19 +23,24 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Edit"))
 			{
-				if (ImGui::MenuItem("Undo", "Ctrl+Z")) {}
-				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false)) {} // Disabled item
+				if (ImGui::MenuItem("Undo", "Ctrl+Z"))
+				{}
+				if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false))
+				{} // Disabled item
 				ImGui::Separator();
-				if (ImGui::MenuItem("Cut", "Ctrl+X")) {}
-				if (ImGui::MenuItem("Copy", "Ctrl+C")) {}
-				if (ImGui::MenuItem("Paste", "Ctrl+V")) {}
+				if (ImGui::MenuItem("Cut", "Ctrl+X"))
+				{}
+				if (ImGui::MenuItem("Copy", "Ctrl+C"))
+				{}
+				if (ImGui::MenuItem("Paste", "Ctrl+V"))
+				{}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Entity"))
 			{
-				if (ImGui::MenuItem("Create Empty")) 
+				if (ImGui::MenuItem("Create Empty"))
 				{
-					if (Scene * scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
+					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
 						scene->addEntity("New Empty");
 					}
@@ -60,4 +66,4 @@ namespace SE
 	{
 		_setStatus("Shutting down MainWidget");
 	}
-}
+} // namespace SE

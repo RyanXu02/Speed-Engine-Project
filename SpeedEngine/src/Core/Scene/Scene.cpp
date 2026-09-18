@@ -1,8 +1,9 @@
 #include "pch.h"
+
 #include "Scene.h"
-#include "Engine.h"
 
 #include "../SubSystems/Events/EventSystem.h"
+#include "Engine.h"
 
 namespace SE
 {
@@ -99,4 +100,4 @@ namespace SE
 		}
 		return entityList;
 	}
-}
+} // namespace SE

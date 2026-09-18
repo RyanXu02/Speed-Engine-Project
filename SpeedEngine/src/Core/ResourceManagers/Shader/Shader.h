@@ -1,34 +1,38 @@
 #pragma once
 
-#include "vec2.hpp"
-#include "vec3.hpp"
-#include "vec4.hpp"
-#include "mat2x2.hpp"
-#include "mat3x3.hpp"
-#include "mat4x4.hpp"
+#include "../Resource.h"
 
-#include"../Resource.h"
+#include <glm/mat2x2.hpp>
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace SE
 {
-	//compilation status of shader + its files
+	// compilation status of shader + its files
 	struct GLCompStatus
 	{
-		bool success { false };
-		std::string log { "" };
+		bool success{ false };
+		std::string log{ "" };
 	};
 
 	// @brief Represents a shader program
-	// @brief A shader program represents a vertex shader and a fragment shader that are compiled and linked together
+	// @brief A shader program represents a vertex shader and a fragment shader that
+	// are compiled and linked together
 	class Shader : public Resource
 	{
 	public:
 		Shader(uint32_t id, std::string resourceName);
 
 		//@brief compiles and links a shader object
-		//@param vertexShaderSource the literal source code of vertex shader as a string
-		//@param fragmentShaderSource the literal source code of fragment shader as a string
-		//@returns compilation status containing its success (T/F) and any compilation logs
+		//@param vertexShaderSource the literal source code of vertex shader as a
+		// string
+		//@param fragmentShaderSource the literal source code of fragment shader as a
+		// string
+		//@returns compilation status containing its success (T/F) and any compilation
+		// logs
 		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
 
 		//@brief binds shader to be used in graphics pipeline
@@ -54,7 +58,6 @@ namespace SE
 		void setMat3(std::string_view name, const glm::mat3& mat);
 		void setMat4(std::string_view name, const glm::mat4& mat);
 
-
 	private:
 		unsigned int m_ProgramId = 0;
 
@@ -63,5 +66,4 @@ namespace SE
 
 		GLCompStatus _checkCompilationErr(unsigned int shader, std::string_view type);
 	};
-}
-
+} // namespace SE

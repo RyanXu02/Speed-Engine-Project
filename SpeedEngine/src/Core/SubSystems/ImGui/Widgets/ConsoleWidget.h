@@ -3,14 +3,14 @@
 
 namespace SE
 {
-    class ConsoleWidget : public Widget
-    {
-    public:
-        ConsoleWidget() : Widget("ConsoleWidget") {};
+	class ConsoleWidget : public Widget
+	{
+	public:
+		ConsoleWidget()
+		    : Widget("ConsoleWidget"){};
 		void render() override;
 		void shutdown() override;
-    private:
 
-    };
-}
-
+	private:
+	};
+} // namespace SE

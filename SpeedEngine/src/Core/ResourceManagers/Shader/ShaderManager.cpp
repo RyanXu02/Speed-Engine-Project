@@ -1,9 +1,10 @@
 #include "pch.h"
-#include "Engine.h"
 
 #include "ShaderManager.h"
+
 #include "../../Logger/Logger.h"
 #include "../../ResourceManagers/ResourceManager.h"
+#include "Engine.h"
 
 namespace SE
 {
@@ -17,7 +18,7 @@ namespace SE
 	void ShaderManager::shutdown()
 	{
 		Manager::shutdown();
-		
+
 		for (auto& [k, shader] : m_shaders)
 		{
 			if (shader)
@@ -30,16 +31,15 @@ namespace SE
 		m_logger->info("ShaderManager cleared all shaders.");
 	}
 
-	//@brief adds a shader to be managed by the ShaderManager. if a shader of programName already exists, returns id of existing shader
+	//@brief adds a shader to be managed by the ShaderManager. if a shader of
+	// programName already exists, returns id of existing shader
 	//@param id id of new shader
 	//@param vertexShaderPath path to vertex shader file
 	//@param fragmentShaderPath path to fragment shader file
 	//@param programName name of shader program to create
-	//@returns id of new shader, or id of existing shader if new shader would be a duplicate name
-	uint32_t ShaderManager::addShader(uint32_t id, 
-		std::string_view vertexShaderPath, 
-		std::string_view fragmentShaderPath, 
-		std::string_view programName)
+	//@returns id of new shader, or id of existing shader if new shader would be a
+	// duplicate name
+	uint32_t ShaderManager::addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName)
 	{
 		// check if vertex and fragment shader paths are valid
 		auto shaderPaths = _verifyShaderPaths(vertexShaderPath, fragmentShaderPath);
@@ -49,10 +49,13 @@ namespace SE
 			return 0;
 		}
 		// look for in cache
-		auto it = std::ranges::find_if(m_shaders, [programName](const auto& kv) {
-			return kv.second->getResourceName() == programName;
-			});
-		if (it != m_shaders.end()) {
+		auto it = std::ranges::find_if(m_shaders,
+		    [programName](const auto& kv)
+		    {
+			    return kv.second->getResourceName() == programName;
+		    });
+		if (it != m_shaders.end())
+		{
 			m_logger->debug("Shader with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
 			return it->first;
 		}
@@ -71,7 +74,7 @@ namespace SE
 		}
 
 		m_shaders.try_emplace(id, std::move(shader));
-		
+
 		m_logger->info("Shader '{}' loaded: ID {}", m_shaders[id]->getResourceName(), id);
 
 		return id;
@@ -79,21 +82,24 @@ namespace SE
 
 	std::pair<std::string, std::string> ShaderManager::_verifyShaderPaths(std::string_view vertexShaderPath, std::string_view fragmentShaderPath)
 	{
-		std::pair<std::string, std::string> shaderPaths{"",""};
+		std::pair<std::string, std::string> shaderPaths{ "", "" };
 
-		//.vert and .frag extensions have to be contained in these variables in some order
+		//.vert and .frag extensions have to be contained in these variables in some
+		// order
 		if (!((vertexShaderPath.contains(".vert") && fragmentShaderPath.contains(".frag")) || (vertexShaderPath.contains(".frag") && fragmentShaderPath.contains(".vert"))))
 		{
 			return shaderPaths;
 		}
 
-		//vertexShaderPath contains .vert, meaning user passed in vertex path to this variable
+		// vertexShaderPath contains .vert, meaning user passed in vertex path to this
+		// variable
 		if (vertexShaderPath.contains(".vert"))
 		{
 			shaderPaths.first = std::string(vertexShaderPath);
 			shaderPaths.second = std::string(fragmentShaderPath);
 		}
-		else //vertexShaderPath contains .frag meaning user passed in fragment path to this variable, swap in shaderPaths
+		else // vertexShaderPath contains .frag meaning user passed in fragment path
+		    // to this variable, swap in shaderPaths
 		{
 			shaderPaths.first = std::string(fragmentShaderPath);
 			shaderPaths.second = std::string(vertexShaderPath);
@@ -105,16 +111,19 @@ namespace SE
 	Shader* ShaderManager::getShader(uint32_t shaderId)
 	{
 		auto it = m_shaders.find(shaderId);
-		if (it == m_shaders.end()) return nullptr;
-		
+		if (it == m_shaders.end())
+			return nullptr;
+
 		return it->second.get();
 	}
 
-	bool ShaderManager::removeShader(uint32_t shaderId) {
+	bool ShaderManager::removeShader(uint32_t shaderId)
+	{
 		auto it = m_shaders.find(shaderId);
-		if (it == m_shaders.end()) return false;
+		if (it == m_shaders.end())
+			return false;
 
 		m_shaders.erase(shaderId);
 		return true;
 	}
-}
+} // namespace SE
