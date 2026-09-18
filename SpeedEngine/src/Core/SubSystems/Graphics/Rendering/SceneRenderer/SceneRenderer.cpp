@@ -7,7 +7,6 @@
 #include "../../../../ResourceManagers/Material/Material.h"
 #include "../../../../ResourceManagers/ResourceManager.h"
 #include "../../../../ResourceManagers/Shader/Shader.h"
-#include "../../../../Scene/Entity/Component/Mesh.h"
 #include "../../../../Scene/Entity/Component/Transform.h"
 #include "../../../../Scene/Entity/Entity.h"
 #include "../../../Input/InputSystem.h"

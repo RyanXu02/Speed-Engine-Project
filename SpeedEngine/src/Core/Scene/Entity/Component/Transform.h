@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/features/math.h"
+#include <glm/glm.hpp>
 
 namespace SE
 {

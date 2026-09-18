@@ -2,8 +2,9 @@
 
 #include "PropertiesWidget.h"
 
-#include "Core/SubSystems/Scenes/SceneSystem.h"
-#include "Core/Scene/Entity/Entity.h"
+#include "../../../SubSystems/Scenes/SceneSystem.h"
+#include "../../../Scene/Entity/Entity.h"
+#include "../../../Engine.h"
 
 #include "imgui.h"
 
