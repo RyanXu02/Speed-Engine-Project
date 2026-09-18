@@ -66,7 +66,8 @@ namespace SE
 	Entity* Scene::getEntity(uint32_t instanceID)
 	{
 		auto it = m_registry.find(instanceID);
-		if (it == m_registry.end()) {
+		if (it == m_registry.end())
+		{
 			return nullptr;
 		}
 
@@ -76,7 +77,8 @@ namespace SE
 	bool Scene::removeEntity(uint32_t instanceId)
 	{
 		auto it = m_registry.find(instanceId);
-		if (it == m_registry.end()) {
+		if (it == m_registry.end())
+		{
 			return false;
 		}
 
