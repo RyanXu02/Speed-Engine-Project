@@ -83,7 +83,7 @@ namespace SE
 			if (!meshResource)
 			{
 				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, name->name);
-				break;
+				continue;
 			}
 
 			const std::vector<Vertex>& positions = meshResource->getVertices();
