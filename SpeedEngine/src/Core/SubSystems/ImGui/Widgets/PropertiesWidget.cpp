@@ -1,10 +1,9 @@
 #include "pch.h"
 
+#if defined(COMPILE_WITH_EDITOR)
+#include "../../Scenes/SceneSystem.h"
+#include "Engine.h"
 #include "PropertiesWidget.h"
-
-#include "../../../Engine.h"
-#include "../../../Scene/Entity/Entity.h"
-#include "../../../SubSystems/Scenes/SceneSystem.h"
 #include "imgui.h"
 
 namespace SE
@@ -68,3 +67,4 @@ namespace SE
 
 	void PropertiesWidget::shutdown() {}
 } // namespace SE
+#endif

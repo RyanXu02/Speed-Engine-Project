@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../../ResourceManagers/Resource.h"
+
+// When adding editor-only events, add them at the bottom of this file inside the COMPILE_WITH_EDITOR block
 namespace SE
 {
 	enum class EventType
@@ -18,12 +20,12 @@ namespace SE
 		MouseButtonReleased,
 		MouseMoved,
 		MouseScrolled,
-		ResourceChanged, // A resource in the resource manager has been added or
-		// removed
 		SceneChanged, // Active scene has been changed
-		ActiveSceneModified, // Active scene has been modified (entity added, removed,
-		// renamed)
+		ActiveSceneModified, // Active scene has been modified (entity added, removed, renamed)
+#if defined(COMPILE_WITH_EDITOR)
 		EntitySelected, // An entity has been selected in the SceneInfoWidget
+		ResourceChanged, // A resource in the resource manager has been added or removed
+#endif
 	};
 
 	// @brief Base class for all events that can be sent through the EventSystem
@@ -44,30 +46,6 @@ namespace SE
 		EventType getEventType() const override { return EventType::WindowClose; }
 		std::string getName() const override { return "WindowClose"; }
 		std::string getDataAsString() const override { return ""; }
-	};
-
-	// @brief Event that is triggered when a resource in the resource manager is
-	// changed
-	class ResourceChanged : public Event
-	{
-	public:
-		uint32_t id;
-		ResourceType type;
-		bool adding;
-
-		ResourceChanged(uint32_t p_id, ResourceType p_type, bool p_adding)
-		    : id(p_id),
-		      type(p_type),
-		      adding(p_adding)
-		{}
-
-		EventType getEventType() const override { return EventType::ResourceChanged; }
-		std::string getName() const override { return "ResourceChanged"; }
-		std::string getDataAsString() const override
-		{
-			// return std::format("id {}, type {}, adding = {}",id, type, adding);
-			return "";
-		}
 	};
 
 	// @brief Event that is triggered when the active scene is changed
@@ -107,7 +85,7 @@ namespace SE
 		std::string getName() const override { return "ActiveSceneModified"; }
 		std::string getDataAsString() const override { return std::format("modifytype {}, id {}, name {}", static_cast<int>(modifytype), id, name); }
 	};
-
+#if defined(COMPILE_WITH_EDITOR)
 	// @brief Event that is triggered when an entity is selected in the
 	// SceneInfoWidget
 	class EntitySelected : public Event
@@ -122,4 +100,29 @@ namespace SE
 		std::string getName() const override { return "EntitySelected"; }
 		std::string getDataAsString() const override { return std::format("Entity with id {} has been selected", id); }
 	};
+
+	// @brief Event that is triggered when a resource in the resource manager is
+	// changed
+	class ResourceChanged : public Event
+	{
+	public:
+		uint32_t id;
+		ResourceType type;
+		bool adding;
+
+		ResourceChanged(uint32_t p_id, ResourceType p_type, bool p_adding)
+		    : id(p_id),
+		      type(p_type),
+		      adding(p_adding)
+		{}
+
+		EventType getEventType() const override { return EventType::ResourceChanged; }
+		std::string getName() const override { return "ResourceChanged"; }
+		std::string getDataAsString() const override
+		{
+			// return std::format("id {}, type {}, adding = {}",id, type, adding);
+			return "";
+		}
+	};
+#endif
 } // namespace SE

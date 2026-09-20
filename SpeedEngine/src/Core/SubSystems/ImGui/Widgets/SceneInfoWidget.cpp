@@ -1,9 +1,9 @@
 #include "pch.h"
 
-#include "SceneInfoWidget.h"
-
+#if defined(COMPILE_WITH_EDITOR)
 #include "../../Scenes/SceneSystem.h"
 #include "Engine.h"
+#include "SceneInfoWidget.h"
 #include "imgui.h"
 
 namespace SE
@@ -219,3 +219,4 @@ namespace SE
 		}
 	}
 } // namespace SE
+#endif
