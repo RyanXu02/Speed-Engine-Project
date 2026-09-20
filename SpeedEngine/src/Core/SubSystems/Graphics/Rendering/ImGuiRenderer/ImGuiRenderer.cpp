@@ -1,7 +1,6 @@
 #include "pch.h"
 
-#include "ImGuiRenderer.h"
-
+#if defined(COMPILE_WITH_EDITOR)
 #include "../../../ImGui/Widget.h"
 #include "../../../ImGui/Widgets/ConsoleWidget.h"
 #include "../../../ImGui/Widgets/MainWidget.h"
@@ -10,6 +9,7 @@
 #include "../../../ImGui/Widgets/SceneInfoWidget.h"
 #include "../../../ImGui/Widgets/ScenePreviewWidget.h"
 #include "../../Window.h"
+#include "ImGuiRenderer.h"
 #include "imgui.h"
 
 #include <imgui_impl_glfw.h>
@@ -90,3 +90,4 @@ namespace SE
 		ImGui::DestroyContext();
 	}
 } // namespace SE
+#endif

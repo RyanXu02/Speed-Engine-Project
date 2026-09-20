@@ -45,8 +45,6 @@ namespace SE
 		    : Renderer(logger, "SceneRenderer", std::move(viewport))
 		{}
 
-		std::vector<Entity*> getDrawableEntities() const;
-
 		// Helper methods for mesh rendering
 		void uploadMeshToGPU(uint32_t meshId, const std::vector<Vertex>& positions, const std::vector<SubMesh>& subMeshes, const std::vector<uint32_t>& indices) const;
 		void cleanupMeshGPU(uint32_t meshId) const;

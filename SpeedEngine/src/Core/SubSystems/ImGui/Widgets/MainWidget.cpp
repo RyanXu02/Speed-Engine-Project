@@ -1,11 +1,11 @@
 #include "pch.h"
 
-#include "MainWidget.h"
-
+#if defined(COMPILE_WITH_EDITOR)
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "../../Scenes/SceneSystem.h"
 #include "Engine.h"
+#include "MainWidget.h"
 
 #include <imgui.h>
 
@@ -42,7 +42,7 @@ namespace SE
 				{
 					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
-						scene->addEntity(std::make_unique<Entity>("New Empty"));
+						scene->addEntity("New Empty");
 					}
 				}
 				// add prefabs later
@@ -67,3 +67,4 @@ namespace SE
 		_setStatus("Shutting down MainWidget");
 	}
 } // namespace SE
+#endif

@@ -94,19 +94,25 @@ namespace SE
 		if (it->second == ResourceType::Shader)
 		{
 			removed = _getManager<ShaderManager>()->removeShader(id);
+#if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
+#endif
 			return removed;
 		}
 		else if (it->second == ResourceType::Material)
 		{
 			removed = _getManager<MaterialManager>()->removeMaterial(id);
+#if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
+#endif
 			return removed;
 		}
 		else if (it->second == ResourceType::MeshResource)
 		{
 			removed = _getManager<MeshResourceManager>()->removeMeshResource(id);
+#if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
+#endif
 			return removed;
 		}
 		//.....

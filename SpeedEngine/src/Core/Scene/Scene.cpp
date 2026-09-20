@@ -13,10 +13,6 @@ namespace SE
 	{
 		m_logger.info("Initializing Scene");
 
-		for (auto& entity : m_entities)
-		{
-			entity->initializeEntity(this);
-		}
 
 		m_isInitialized = true;
 	}
@@ -25,41 +21,22 @@ namespace SE
 	{
 		m_isUpdating = true;
 
-		// update all entities
-		for (auto& entity : m_entities)
+		if (!m_entitiesToRemove.empty())
 		{
-			if (entity->isAlive())
+			for (uint32_t id : m_entitiesToRemove)
 			{
-				entity->updateEntity(deltaTime);
+				m_registry.erase(id);
 			}
+			m_entitiesToRemove.clear();
 		}
 
-		// add new entities
-		if (!m_entitiesToAdd.empty())
+		for (auto& [id, entity] : m_registry)
 		{
-			for (auto& entity : m_entitiesToAdd)
+			if (!entity.getComponent<LifeComponent>()->isAlive)
 			{
-				m_logger.debug("adding entity: {}", entity->getName());
-				entity->initializeEntity(this);
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName()));
-				m_entities.push_back(std::move(entity));
+				removeEntity(entity.id());
 			}
-			m_entitiesToAdd.clear();
 		}
-
-		// delete dead entities
-		auto it = std::remove_if(m_entities.begin(), m_entities.end(),
-		    [this](const std::unique_ptr<Entity>& entity)
-		    {
-			    if (!entity->isAlive())
-			    {
-				    m_logger.debug("deleting entity: {}", entity->getName());
-				    return true;
-			    }
-			    return false;
-		    });
-
-		m_entities.erase(it, m_entities.end());
 
 		m_isUpdating = false;
 	}
@@ -67,66 +44,68 @@ namespace SE
 	void Scene::shutdownScene()
 	{
 		m_logger.info("Shutting down");
-		for (auto& entity : m_entities)
-		{
-			entity->shutdownEntity();
-		}
-		m_entities.clear();
-		m_entitiesToAdd.clear();
+		m_registry.clear();
 
 		m_isInitialized = false;
 	}
 
-	void Scene::addEntity(std::unique_ptr<Entity> entity)
+	uint32_t Scene::addEntity(const std::string& name)
 	{
-		if (m_isUpdating)
-		{
-			m_logger.debug("deferring addition of entity: {}", entity->getName());
-			m_entitiesToAdd.push_back(std::move(entity));
-		}
-		else
-		{
-			m_logger.debug("adding entity: {}", entity->getName());
-			entity->initializeEntity(this);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Add, entity->getInstanceId(), entity->getName()));
-			m_entities.push_back(std::move(entity));
-		}
+		m_registry.try_emplace(m_entityID, Entity(m_entityID));
+
+		Entity* entity = getEntity(m_entityID);
+
+		entity->addComponent<Transform>();
+		entity->addComponent<NameComponent>(name);
+		entity->addComponent<LifeComponent>(true);
+		NameComponent* component = entity->getComponent<NameComponent>();
+
+		return assignID();
 	}
 
-	Entity* Scene::getEntity(uint32_t instanceId)
+	Entity* Scene::getEntity(uint32_t instanceID)
 	{
-		for (auto& entity : m_entities)
+		auto it = m_registry.find(instanceID);
+		if (it == m_registry.end())
 		{
-			if (entity->getInstanceId() == instanceId && entity->isAlive())
-			{
-				return entity.get();
-			}
+			return nullptr;
 		}
-		return nullptr;
+
+		return &it->second;
 	}
 
-	void Scene::removeEntity(uint32_t instanceId)
+	bool Scene::removeEntity(uint32_t instanceId)
 	{
-		for (auto& entity : m_entities)
+		auto it = m_registry.find(instanceId);
+		if (it == m_registry.end())
 		{
-			if (entity->getInstanceId() == instanceId)
-			{
-				m_logger.debug("deferring remove entity: {}", entity->getName());
-				entity->killEntity();
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(MT::Remove, instanceId, ""));
-				return;
-			}
+			return false;
 		}
+
+		Entity* entity = getEntity(m_entityID);
+		if (entity)
+		{
+			entity->getComponent<LifeComponent>()->isAlive = false;
+		}
+		m_entitiesToRemove.push_back(instanceId);
+
+		return true;
+	}
+
+	uint32_t Scene::assignID()
+	{
+		return m_entityID.fetch_add(1, std::memory_order_relaxed);
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
 	{
 		std::unordered_map<uint32_t, std::string> entityList;
-		for (const auto& entity : m_entities)
+		for (auto& [id, entity] : m_registry)
 		{
-			if (entity->isAlive())
+			LifeComponent* life = entity.getComponent<LifeComponent>();
+			if (life && life->isAlive)
 			{
-				entityList[entity->getInstanceId()] = entity->getName();
+				entityList[entity.id()] = entity.getComponent<NameComponent>()->name;
 			}
 		}
 		return entityList;
