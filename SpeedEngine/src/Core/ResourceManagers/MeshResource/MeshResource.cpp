@@ -3,8 +3,8 @@
 #include "MeshResource.h"
 
 #include <assimp/Importer.hpp>
-#include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 namespace SE
 {
@@ -14,10 +14,7 @@ namespace SE
 
 		// Read in mesh file with given flags
 		// NOTE: may need aiProcess_FlipUVs
-		const aiScene* scene = importer.ReadFile(meshPath.data(),
-			aiProcess_Triangulate			|
-			aiProcess_JoinIdenticalVertices	|
-			aiProcess_GenSmoothNormals);
+		const aiScene* scene = importer.ReadFile(meshPath.data(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
 
 		if (!scene)
 		{
@@ -53,7 +50,7 @@ namespace SE
 			{
 				const aiVector3D& vPos = mesh->mVertices[j];
 				const aiVector3D& vNormal = mesh->mNormals[j];
-				const aiVector3D& vUV = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][j] : aiVector3D( 0.0f, 0.0f, 0.0f );
+				const aiVector3D& vUV = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][j] : aiVector3D(0.0f, 0.0f, 0.0f);
 
 				Vertex v;
 				v.position = glm::vec3(vPos.x, vPos.y, vPos.z);
