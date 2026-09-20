@@ -19,7 +19,8 @@ namespace SE
 	struct SubMesh
 	{
 		uint32_t indexOffset; // start of "mesh". index into m_indices
-		uint32_t indexCount; // how many vertices are contained in "mesh"
+		uint32_t indexCount; // how many indices are contained in "mesh"
+		uint32_t vertexCount; // how many vertices are contained in "mesh"
 		int32_t materialIndex; // index into materials container?????
 	};
 

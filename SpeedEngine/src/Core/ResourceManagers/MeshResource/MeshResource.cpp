@@ -34,6 +34,7 @@ namespace SE
 		for (unsigned int i = 0; i < m_submeshes.size(); i++)
 		{
 			m_submeshes[i].indexCount = scene->mMeshes[i]->mNumFaces * 3;
+			m_submeshes[i].vertexCount = scene->mMeshes[i]->mNumVertices;
 			m_submeshes[i].indexOffset = numIndices;
 			m_submeshes[i].materialIndex = scene->mMeshes[i]->mMaterialIndex;
 
