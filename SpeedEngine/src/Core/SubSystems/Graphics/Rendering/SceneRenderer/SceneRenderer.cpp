@@ -129,7 +129,15 @@ namespace SE
 
 			// Bind VAO and draw
 			glBindVertexArray(gpuData.VAO);
-			glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(gpuData.indexCount), GL_UNSIGNED_INT, 0);
+
+			int vertices = 0;
+			for (unsigned int i = 0; i < subMeshes.size(); i++)
+			{
+				glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMeshes[i].indexCount), GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * subMeshes[i].indexOffset), vertices);
+
+				vertices += subMeshes[i].vertexCount;
+			}
+
 			glBindVertexArray(0);
 
 			defaultShader->unbind();

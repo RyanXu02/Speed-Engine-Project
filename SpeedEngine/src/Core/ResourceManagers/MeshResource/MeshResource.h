@@ -19,7 +19,8 @@ namespace SE
 	struct SubMesh
 	{
 		uint32_t indexOffset; // start of "mesh". index into m_indices
-		uint32_t indexCount; // how many vertices are contained in "mesh"
+		uint32_t indexCount; // how many indices are contained in "mesh"
+		uint32_t vertexCount; // how many vertices are contained in "mesh"
 		int32_t materialIndex; // index into materials container?????
 	};
 
@@ -34,12 +35,10 @@ namespace SE
 		      m_logger(logger, fmt::format("MeshResource:{}", resourceName))
 		{}
 
-		// @brief Initializes the mesh resource by loading the OBJ and MTL files
-		// @param objpath The file path to the OBJ file
-		// @param mtlpath The file path to the MTL file, optional (can be empty if no
-		// MTL file is used)
+		// @brief Initializes the mesh resource by loading the mesh file
+		// @param meshPath The file path to the mesh file
 		// @returns true if the initialization was successful, false otherwise
-		bool init(std::string_view objpath, std::string_view mtlpath);
+		bool init(std::string_view meshPath);
 
 		// @brief Destroys the mesh resource and releases any allocated resources
 		void destroy();
@@ -51,7 +50,7 @@ namespace SE
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<SubMesh> m_submeshes;
-		std::vector<uint32_t> m_indices; // represents rapidobj::Array<Index> without tex and normals
+		std::vector<uint32_t> m_indices;
 
 		LoggerProxy m_logger;
 	};

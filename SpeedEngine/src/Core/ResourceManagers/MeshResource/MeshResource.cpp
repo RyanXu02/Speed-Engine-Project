@@ -2,91 +2,69 @@
 
 #include "MeshResource.h"
 
-#include "rapidobj/rapidobj.hpp"
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 namespace SE
 {
-	bool MeshResource::init(std::string_view objpath, std::string_view mtlpath)
+	bool MeshResource::init(std::string_view meshPath)
 	{
-		using namespace rapidobj;
+		Assimp::Importer importer;
 
-		Result parsedfile;
-		if (mtlpath.empty())
-			parsedfile = ParseFile(objpath,
-			    MaterialLibrary::Default(Load::Optional)); // no mtl provided
-		else
-			parsedfile = ParseFile(objpath,
-			    MaterialLibrary::SearchPathW(mtlpath)); // mtl provided
+		// Read in mesh file with given flags
+		// NOTE: may need aiProcess_FlipUVs
+		const aiScene* scene = importer.ReadFile(meshPath.data(), aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals);
 
-		if (parsedfile.error)
+		if (!scene)
 		{
-			m_logger.warn("Failed to load obj file at {}", objpath);
+			m_logger.warn("Failed to load mesh at {}. \n {}", meshPath, importer.GetErrorString());
 			return false;
 		}
 
-		bool success = Triangulate(parsedfile);
-		if (!success)
+		m_submeshes.resize(scene->mNumMeshes);
+
+		// Count vertices and indices to reserve space in vectors
+		unsigned int numVertices = 0;
+		unsigned int numIndices = 0;
+
+		for (unsigned int i = 0; i < m_submeshes.size(); i++)
 		{
-			m_logger.warn("Failed to triangulate obj {}", objpath);
-			return false;
+			m_submeshes[i].indexCount = scene->mMeshes[i]->mNumFaces * 3;
+			m_submeshes[i].vertexCount = scene->mMeshes[i]->mNumVertices;
+			m_submeshes[i].indexOffset = numIndices;
+			m_submeshes[i].materialIndex = scene->mMeshes[i]->mMaterialIndex;
+
+			numVertices += scene->mMeshes[i]->mNumVertices;
+			numIndices += m_submeshes[i].indexCount;
 		}
 
-		// reserve space for vertices and indices based on the parsed file
-		size_t totalIndices = 0;
-		for (const auto& shape : parsedfile.shapes)
-		{
-			totalIndices += shape.mesh.indices.size();
-		}
-		m_indices.reserve(totalIndices);
-		m_vertices.reserve(totalIndices);
+		m_indices.reserve(numIndices);
+		m_vertices.reserve(numVertices);
 
-		// Process each shape and unpack indices into vertices
-		for (const auto& shape : parsedfile.shapes)
+		for (unsigned int i = 0; i < m_submeshes.size(); i++)
 		{
-			SubMesh submesh;
-			submesh.indexOffset = static_cast<uint32_t>(m_indices.size());
-			submesh.indexCount = static_cast<uint32_t>(shape.mesh.indices.size());
-			submesh.materialIndex = shape.mesh.material_ids.empty() ? -1 : shape.mesh.material_ids[0];
+			const aiMesh* mesh = scene->mMeshes[i];
 
-			for (const Index& idx : shape.mesh.indices)
+			for (unsigned int j = 0; j < mesh->mNumVertices; j++)
 			{
-				Vertex vertex{};
+				const aiVector3D& vPos = mesh->mVertices[j];
+				const aiVector3D& vNormal = mesh->mNormals[j];
+				const aiVector3D& vUV = mesh->HasTextureCoords(0) ? mesh->mTextureCoords[0][j] : aiVector3D(0.0f, 0.0f, 0.0f);
 
-				// Position
-				if (idx.position_index >= 0)
-				{
-					size_t pos_idx = static_cast<size_t>(idx.position_index) * 3;
-					if (pos_idx + 2 < parsedfile.attributes.positions.size())
-					{
-						vertex.position = glm::vec3(parsedfile.attributes.positions[pos_idx], parsedfile.attributes.positions[pos_idx + 1], parsedfile.attributes.positions[pos_idx + 2]);
-					}
-				}
-
-				// Normal (optional)
-				if (idx.normal_index >= 0)
-				{
-					size_t norm_idx = static_cast<size_t>(idx.normal_index) * 3;
-					if (norm_idx + 2 < parsedfile.attributes.normals.size())
-					{
-						vertex.normal = glm::vec3(parsedfile.attributes.normals[norm_idx], parsedfile.attributes.normals[norm_idx + 1], parsedfile.attributes.normals[norm_idx + 2]);
-					}
-				}
-
-				// Texture coordinates (optional)
-				if (idx.texcoord_index >= 0)
-				{
-					size_t tex_idx = static_cast<size_t>(idx.texcoord_index) * 2;
-					if (tex_idx + 1 < parsedfile.attributes.texcoords.size())
-					{
-						vertex.uv = glm::vec2(parsedfile.attributes.texcoords[tex_idx], parsedfile.attributes.texcoords[tex_idx + 1]);
-					}
-				}
-
-				m_vertices.push_back(vertex);
-				m_indices.push_back(static_cast<uint32_t>(m_vertices.size() - 1));
+				Vertex v;
+				v.position = glm::vec3(vPos.x, vPos.y, vPos.z);
+				v.normal = glm::vec3(vNormal.x, vNormal.y, vNormal.z);
+				v.uv = glm::vec2(vUV.x, vUV.y);
+				m_vertices.push_back(v);
 			}
-
-			m_submeshes.push_back(submesh);
+			for (unsigned int k = 0; k < mesh->mNumFaces; k++)
+			{
+				const aiFace& face = mesh->mFaces[k];
+				m_indices.push_back(face.mIndices[0]);
+				m_indices.push_back(face.mIndices[1]);
+				m_indices.push_back(face.mIndices[2]);
+			}
 		}
 
 		m_logger.info("Loaded mesh: {} vertices, {} indices, {} submeshes", m_vertices.size(), m_indices.size(), m_submeshes.size());

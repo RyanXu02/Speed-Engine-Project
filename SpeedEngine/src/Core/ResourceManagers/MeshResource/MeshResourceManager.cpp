@@ -29,8 +29,8 @@ namespace SE
 		m_logger->info("MeshResourceManager cleared all mesh resources.");
 	}
 
-	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath)
-	{ // asdfhasfhlsadfsakjf
+	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view meshPath)
+	{
 		// Check if mesh resource already exists
 
 		auto it = std::ranges::find_if(m_meshresources,
@@ -45,9 +45,9 @@ namespace SE
 		}
 
 		auto newMesh = std::make_unique<MeshResource>(id, meshName, *m_logger);
-		if (!newMesh->init(objpath, mtlpath))
+		if (!newMesh->init(meshPath))
 		{
-			m_logger->warn("Failed to initialize MeshResource {} from {}", meshName, objpath);
+			m_logger->warn("Failed to initialize MeshResource {} from {}", meshName, meshPath);
 			return 0;
 		}
 

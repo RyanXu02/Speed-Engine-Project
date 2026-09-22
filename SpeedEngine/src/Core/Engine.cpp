@@ -82,6 +82,7 @@ namespace SE
 		uint32_t entityID2 = currentScene->addEntity("conference");
 		Entity* entity2 = currentScene->getEntity(entityID2);
 		entity2->addComponent<MeshComponent>(roommeshId2);
+		entity2->getComponent<Transform>()->setScale(glm::vec3(0.01f));
 
 		// end temp
 

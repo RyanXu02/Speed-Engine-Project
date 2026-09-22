@@ -21,12 +21,10 @@ namespace SE
 		// @brief adds a mesh resource to this manager
 		// @param id The unique ID for the mesh resource
 		// @param meshName The name of the mesh resource shown in the resource browser
-		// @param objpath The file path to the OBJ file
-		// @param mtlpath The file path to the MTL file, optional (can be empty if no
-		// MTL file is used)
+		// @param meshPath The file path to the mesh file
 		// @returns the ID of the newly added mesh resource, or 0 if the mesh resource
 		// could not be added
-		uint32_t addMeshResource(uint32_t id, std::string_view meshName, std::string_view objpath, std::string_view mtlpath = "");
+		uint32_t addMeshResource(uint32_t id, std::string_view meshName, std::string_view meshPath);
 
 		// @brief retrieves a mesh resource from the manager given an id
 		// @param meshResourceId the id of mesh resource to retrieve
