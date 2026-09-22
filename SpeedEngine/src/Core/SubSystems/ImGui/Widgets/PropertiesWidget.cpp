@@ -16,7 +16,6 @@ namespace SE
 		    {
 			    const EntitySelected& entitySelectedEvent = static_cast<const EntitySelected&>(event);
 			    m_selectedEntityId = entitySelectedEvent.id;
-			    m_cachedSelectedEntity = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene()->getEntity(m_selectedEntityId);
 		    });
 		m_ActiveSceneModifiedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified,
 		    [this](const Event& event)
@@ -25,7 +24,6 @@ namespace SE
 			    if (activeSceneModifiedEvent.modifytype == ActiveSceneModified::ModifyType::Remove && activeSceneModifiedEvent.id == m_selectedEntityId)
 			    {
 				    m_selectedEntityId = 0;
-				    m_cachedSelectedEntity = nullptr;
 			    }
 		    });
 		m_SceneChangedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
@@ -33,7 +31,6 @@ namespace SE
 		    {
 			    const SceneChanged& sceneChangedEvent = static_cast<const SceneChanged&>(event);
 			    m_selectedEntityId = 0;
-			    m_cachedSelectedEntity = nullptr;
 		    });
 	}
 
@@ -41,9 +38,13 @@ namespace SE
 	{
 		std::string entityName;
 
-		if (m_cachedSelectedEntity)
+		if (m_selectedEntityId != 0)
 		{
-			entityName = m_cachedSelectedEntity->getComponent<NameComponent>()->name;
+
+			SceneSystem* sceneSystem = Engine::Instance().getSubSystem<SceneSystem>();
+			Scene* currentScene = sceneSystem->getCurrentScene();
+			Entity entity = currentScene->getEntity(m_selectedEntityId);
+			entityName = entity.getComponent<NameComponent>()->name;
 		}
 		else
 		{
@@ -54,7 +55,7 @@ namespace SE
 
 		ImGui::Begin(windowTitle.c_str(), nullptr);
 
-		if (m_cachedSelectedEntity)
+		if (m_selectedEntityId != 0)
 		{
 			//for (const auto& component : m_cachedSelectedEntity->getComponents())
 			//{

@@ -151,6 +151,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
     <ClCompile Include="src\Core\Features\Serializer.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
@@ -194,6 +195,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
     <ClInclude Include="src\Core\Features\Math.h" />
     <ClInclude Include="src\Core\Features\Serializer.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />

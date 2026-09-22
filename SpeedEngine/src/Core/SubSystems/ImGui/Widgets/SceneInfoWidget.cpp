@@ -75,8 +75,8 @@ namespace SE
 			{
 				for (uint32_t id : m_selectedEntities)
 				{
-					Entity* entity = scene->getEntity(id);
-					auto name = entity->getComponent<NameComponent>()->name;
+					Entity entity = scene->getEntity(id);
+					auto name = entity.getComponent<NameComponent>()->name;
 
 					scene->removeEntity(id);
 
@@ -188,9 +188,10 @@ namespace SE
 
 			if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 			{
-				if (Entity* entity = scene->getEntity(id))
+				if (scene->hasEntity(id))
 				{
-					NameComponent* name = entity->getComponent<NameComponent>();
+					Entity entity = scene->getEntity(id); 
+					NameComponent* name = entity.getComponent<NameComponent>();
 					name->name = newName;
 
 					EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
