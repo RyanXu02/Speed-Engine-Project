@@ -152,6 +152,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Features\Math.cpp" />
+    <ClCompile Include="src\Core\Features\MemoryTrackable.cpp" />
+    <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
     <ClCompile Include="src\Core\Features\Serializer.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
@@ -195,6 +197,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\Features\Math.h" />
+    <ClInclude Include="src\Core\Features\MemoryTag.h" />
+    <ClInclude Include="src\Core\Features\MemoryTrackable.h" />
+    <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h" />
     <ClInclude Include="src\Core\Features\Serializer.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
