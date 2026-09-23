@@ -1,18 +1,12 @@
-#include "EntityRegistry.h"
 #include "pch.h"
+
 #include "EntityRegistry.h"
 
 namespace SE
 {
-	EntityRegistry::EntityRegistry() 
-	{
+	EntityRegistry::EntityRegistry() {}
 
-	}
-
-	EntityRegistry::~EntityRegistry() 
-	{
-
-	}
+	EntityRegistry::~EntityRegistry() {}
 
 	uint32_t EntityRegistry::addEntity()
 	{
@@ -49,7 +43,8 @@ namespace SE
 		return true;
 	}
 
-	void EntityRegistry::clear() {
+	void EntityRegistry::clear()
+	{
 		m_registry.clear();
 	}
 

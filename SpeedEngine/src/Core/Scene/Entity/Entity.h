@@ -40,6 +40,5 @@ namespace SE
 	private:
 		uint32_t m_id;
 		EntityRegistry* m_registry;
-
 	};
 } // namespace SE

@@ -11,10 +11,9 @@ namespace SE
 	using MT = ActiveSceneModified::ModifyType;
 
 
-	Entity::Entity(uint32_t id, EntityRegistry* registry) 
-		: m_id(id), m_registry(registry)
-	{
-
-	}
+	Entity::Entity(uint32_t id, EntityRegistry* registry)
+	    : m_id(id),
+	      m_registry(registry)
+	{}
 
 }

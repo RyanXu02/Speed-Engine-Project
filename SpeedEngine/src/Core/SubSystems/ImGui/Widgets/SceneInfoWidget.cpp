@@ -190,7 +190,7 @@ namespace SE
 			{
 				if (scene->hasEntity(id))
 				{
-					Entity entity = scene->getEntity(id); 
+					Entity entity = scene->getEntity(id);
 					NameComponent* name = entity.getComponent<NameComponent>();
 					name->name = newName;
 

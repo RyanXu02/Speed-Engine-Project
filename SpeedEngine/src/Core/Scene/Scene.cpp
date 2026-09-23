@@ -64,7 +64,7 @@ namespace SE
 	}
 
 	bool Scene::hasEntity(uint32_t id)
-	{ 
+	{
 		if (!m_registry.hasEntity(id))
 		{
 			m_logger.warn("there is no entity with given name");

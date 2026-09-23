@@ -1,8 +1,8 @@
 #pragma once
 
+#include <any>
 #include <typeindex>
 #include <unordered_map>
-#include <any>
 
 namespace SE
 {
@@ -62,14 +62,16 @@ namespace SE
 		bool removeComponent(uint32_t entityID)
 		{
 			auto it = m_registry.find(entityID);
-			if (it == m_registry.end()) {
+			if (it == m_registry.end())
+			{
 				return false;
 			}
 
 			ComponentRegistry& components = it->second;
 			auto componentIt = components.find(typeid(T));
 
-			if (componentIt == components.end()) {
+			if (componentIt == components.end())
+			{
 				return false;
 			}
 
@@ -77,16 +79,15 @@ namespace SE
 			return true;
 		}
 
-		
+
 		const Registry::const_iterator begin() const;
 		const Registry::const_iterator end() const;
-	
+
 
 	private:
 		Registry m_registry;
-		std::atomic<uint32_t> m_entityID{ 1 };	// reserve 0 for invalid entity
+		std::atomic<uint32_t> m_entityID{ 1 }; // reserve 0 for invalid entity
 
 		uint32_t _assignID();
-
 	};
 }
