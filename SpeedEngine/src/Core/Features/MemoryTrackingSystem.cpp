@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "MemoryTrackingSystem.h"
+
 #include "../Logger/Logger.h"
 
 
@@ -86,14 +87,12 @@ namespace SE
 			for (const auto& [ptr, record] : records)
 			{
 				categoryMemoryUsage += record.size;
-				m_logger->info("\t{:-<28.28}>Address: {:>14p}, Size: {:>4} bytes, Num: {:>4}",
-					(record.tag ? record.tag->item : "Unknown") + std::string(" "), ptr, record.size, record.num);
+				m_logger->info("\t{:-<28.28}>Address: {:>14p}, Size: {:>4} bytes, Num: {:>4}", (record.tag ? record.tag->item : "Unknown") + std::string(" "), ptr, record.size, record.num);
 			}
 			totalMemoryUsage += categoryMemoryUsage;
 			m_logger->info("\tTotal Memory Usage for {}: {} bytes", category, categoryMemoryUsage);
 		}
 		m_logger->info("Total Memory Usage: {} bytes", totalMemoryUsage);
-		m_logger->info("Tracker Stats: current={} bytes, peak={} bytes, allocs={}, deallocs={}",
-			m_totalAllocatedBytes, m_peakAllocatedBytes, m_totalAllocations, m_totalDeallocations);
+		m_logger->info("Tracker Stats: current={} bytes, peak={} bytes, allocs={}, deallocs={}", m_totalAllocatedBytes, m_peakAllocatedBytes, m_totalAllocations, m_totalDeallocations);
 	}
 } // namespace SE

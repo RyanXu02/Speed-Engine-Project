@@ -2,8 +2,8 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 
-#include "../Widget.h"
 #include "../../../Features/MemoryTrackingSystem.h"
+#include "../Widget.h"
 
 namespace SE
 {
@@ -11,9 +11,8 @@ namespace SE
 	{
 	public:
 		MemoryWidget()
-			: Widget("Memory Panel")
-		{
-		}
+		    : Widget("Memory Panel")
+		{}
 
 		void render() override;
 		void shutdown() override;

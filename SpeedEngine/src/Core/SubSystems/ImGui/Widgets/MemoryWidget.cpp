@@ -2,8 +2,8 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 
-#include "MemoryWidget.h"
 #include "../../../Engine.h"
+#include "MemoryWidget.h"
 
 #include <imgui.h>
 
@@ -31,7 +31,8 @@ namespace SE
 		{
 			snap = Engine::Instance().getSubSystem<MemoryTrackingSystem>()->getSnapshot();
 		}
-		catch (...) {
+		catch (...)
+		{
 			// subsystem might not exist in some builds
 			return;
 		}

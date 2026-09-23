@@ -2,12 +2,13 @@
 
 #include "../SubSystems/SubSystem.h"
 #include "MemoryTag.h"
-#include <mutex>
+
+#include <cstdint>
 #include <map>
+#include <mutex>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
-#include <cstdint>
 
 
 namespace SE
@@ -23,7 +24,7 @@ namespace SE
 
 	private:
 		MemoryTrackingSystem()
-			: SubSystem("MemoryTrackingSystem")
+		    : SubSystem("MemoryTrackingSystem")
 		{}
 
 	public:

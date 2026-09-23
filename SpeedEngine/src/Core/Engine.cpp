@@ -1,8 +1,8 @@
 #include "pch.h"
 
 #include "Engine.h"
-#include "Features/MemoryTrackingSystem.h"
 
+#include "Features/MemoryTrackingSystem.h"
 #include "ResourceManagers/ResourceManager.h"
 #include "SubSystems/Events/EventSubscription.h"
 #include "SubSystems/Events/EventSystem.h"

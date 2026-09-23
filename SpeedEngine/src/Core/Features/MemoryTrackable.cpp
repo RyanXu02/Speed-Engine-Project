@@ -1,22 +1,21 @@
 #include "pch.h"
+
 #include "MemoryTrackable.h"
-#include "MemoryTrackingSystem.h"
 
 #include "../Engine.h"
+#include "MemoryTrackingSystem.h"
 
 namespace SE
 {
 	MemoryTrackable::MemoryTrackable(const MemoryTag* tag)
-		: m_memoryTag(tag)
+	    : m_memoryTag(tag)
 	{
 		try
 		{
 			Engine::Instance().getSubSystem<MemoryTrackingSystem>()->setTag(this, m_memoryTag);
 		}
 		catch (const std::runtime_error&)
-		{
-
-		}
+		{}
 	}
 
 	void* MemoryTrackable::operator new(std::size_t size)

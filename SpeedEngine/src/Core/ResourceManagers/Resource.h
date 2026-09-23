@@ -11,9 +11,9 @@ namespace SE
 
 	public:
 		Resource(uint32_t id, std::string resourceName)
-			: MemoryTrackable(&::SE::tagStorage("Resource", resourceName)),
-			  m_resourceId(id),
-			  m_resourceName(resourceName)
+		    : MemoryTrackable(&::SE::tagStorage("Resource", resourceName)),
+		      m_resourceId(id),
+		      m_resourceName(resourceName)
 		{}
 		~Resource() = default;
 
