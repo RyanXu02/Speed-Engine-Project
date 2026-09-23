@@ -8,6 +8,7 @@
 #include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
 #include "../../../ImGui/Widgets/SceneInfoWidget.h"
 #include "../../../ImGui/Widgets/ScenePreviewWidget.h"
+#include "../../../ImGui/Widgets/MemoryWidget.h"
 #include "../../Window.h"
 #include "ImGuiRenderer.h"
 #include "imgui.h"
@@ -49,6 +50,7 @@ namespace SE
 	{
 		createWidget<MainWidget>();
 		createWidget<ResourceBrowserWidget>();
+		createWidget<MemoryWidget>();
 		// createWidget<ConsoleWidget>();
 		createWidget<ScenePreviewWidget>();
 		createWidget<SceneInfoWidget>();

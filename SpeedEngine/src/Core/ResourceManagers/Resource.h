@@ -1,16 +1,19 @@
 #pragma once
 
+#include "../Features/MemoryTrackable.h"
+
 namespace SE
 {
 	// @brief base class for a generic resource managed by the ResourceManager
-	class Resource
+	class Resource : public MemoryTrackable
 	{
 		friend class ResourceManager;
 
 	public:
 		Resource(uint32_t id, std::string resourceName)
-		    : m_resourceId(id),
-		      m_resourceName(resourceName)
+			: MemoryTrackable(&::SE::tagStorage("Resource", resourceName)),
+			  m_resourceId(id),
+			  m_resourceName(resourceName)
 		{}
 		~Resource() = default;
 

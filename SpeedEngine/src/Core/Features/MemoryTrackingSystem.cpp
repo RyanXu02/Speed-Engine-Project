@@ -29,12 +29,23 @@ namespace SE
 		if (!inserted)
 			throw std::logic_error("Duplicate tracked allocation");
 		++m_allocationNum;
+		// update stats
+		m_totalAllocatedBytes += size;
+		m_totalAllocations += 1;
+		if (m_totalAllocatedBytes > m_peakAllocatedBytes)
+			m_peakAllocatedBytes = m_totalAllocatedBytes;
 	}
 
 	void MemoryTrackingSystem::removeAllocation(void* ptr) noexcept
 	{
 		std::lock_guard lock(m_mutex);
-		m_allocations.erase(reinterpret_cast<std::uintptr_t>(ptr));
+		auto it = m_allocations.find(reinterpret_cast<std::uintptr_t>(ptr));
+		if (it != m_allocations.end())
+		{
+			m_totalAllocatedBytes -= it->second.size;
+			m_totalDeallocations += 1;
+			m_allocations.erase(it);
+		}
 	}
 
 	void MemoryTrackingSystem::setTag(const void* object, const MemoryTag* tag)
@@ -82,5 +93,7 @@ namespace SE
 			m_logger->info("\tTotal Memory Usage for {}: {} bytes", category, categoryMemoryUsage);
 		}
 		m_logger->info("Total Memory Usage: {} bytes", totalMemoryUsage);
+		m_logger->info("Tracker Stats: current={} bytes, peak={} bytes, allocs={}, deallocs={}",
+			m_totalAllocatedBytes, m_peakAllocatedBytes, m_totalAllocations, m_totalDeallocations);
 	}
 } // namespace SE

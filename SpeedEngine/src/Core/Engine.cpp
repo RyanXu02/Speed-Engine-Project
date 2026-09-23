@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "Engine.h"
+#include "Features/MemoryTrackingSystem.h"
 
 #include "ResourceManagers/ResourceManager.h"
 #include "SubSystems/Events/EventSubscription.h"
@@ -35,6 +36,7 @@ namespace SE
 	void Engine::init()
 	{
 		// push back subsystems in order of initialization
+		m_subSystems.push_back(std::unique_ptr<MemoryTrackingSystem>(new MemoryTrackingSystem()));
 		m_subSystems.push_back(std::unique_ptr<EventSystem>(new EventSystem()));
 		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720,
 		    "Speed Engine"))); // has to be BEFORE ResourceManager
