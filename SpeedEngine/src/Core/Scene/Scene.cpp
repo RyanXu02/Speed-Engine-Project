@@ -83,10 +83,13 @@ namespace SE
 
 	bool Scene::removeEntity(uint32_t id)
 	{
-		m_registry.hasEntity(id);
-		m_entitiesToRemove.push_back(id);
+		if (m_registry.hasEntity(id))
+		{
+			m_entitiesToRemove.push_back(id);
+			return true;
+		}
 
-		return true;
+		return false;
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()

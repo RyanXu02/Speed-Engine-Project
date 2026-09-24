@@ -67,14 +67,7 @@ namespace SE
 			}
 
 			ComponentRegistry& components = it->second;
-			auto componentIt = components.find(typeid(T));
-
-			if (componentIt == components.end()) {
-				return false;
-			}
-
-			componentIt.erase(typeid(T));
-			return true;
+			return components.erase(typeid(T));
 		}
 
 		

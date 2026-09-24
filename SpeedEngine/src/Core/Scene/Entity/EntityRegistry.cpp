@@ -38,15 +38,7 @@ namespace SE
 
 	bool EntityRegistry::removeEntity(uint32_t entityID)
 	{
-		auto it = m_registry.find(entityID);
-		if (it == m_registry.end())
-		{
-			return false;
-		}
-
-		m_registry.erase(entityID);
-
-		return true;
+		return m_registry.erase(entityID);
 	}
 
 	void EntityRegistry::clear() {
