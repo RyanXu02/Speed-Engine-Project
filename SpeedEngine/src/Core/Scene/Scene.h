@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../Logger/LoggerProxy.h"
-#include "Entity/EntityRegistry.h"
 #include "Entity/Entity.h"
+#include "Entity/EntityRegistry.h"
 
 namespace SE
 {
@@ -60,6 +60,5 @@ namespace SE
 
 		bool m_isInitialized{ false };
 		bool m_isUpdating{ false };
-
 	};
 } // namespace SE

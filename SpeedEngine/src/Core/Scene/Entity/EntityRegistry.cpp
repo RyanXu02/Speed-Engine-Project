@@ -1,18 +1,12 @@
-#include "EntityRegistry.h"
 #include "pch.h"
+
 #include "EntityRegistry.h"
 
 namespace SE
 {
-	EntityRegistry::EntityRegistry() 
-	{
+	EntityRegistry::EntityRegistry() {}
 
-	}
-
-	EntityRegistry::~EntityRegistry() 
-	{
-
-	}
+	EntityRegistry::~EntityRegistry() {}
 
 	uint32_t EntityRegistry::addEntity()
 	{
@@ -38,10 +32,19 @@ namespace SE
 
 	bool EntityRegistry::removeEntity(uint32_t entityID)
 	{
-		return m_registry.erase(entityID);
+		auto it = m_registry.find(entityID);
+		if (it == m_registry.end())
+		{
+			return false;
+		}
+
+		m_registry.erase(entityID);
+
+		return true;
 	}
 
-	void EntityRegistry::clear() {
+	void EntityRegistry::clear()
+	{
 		m_registry.clear();
 	}
 
