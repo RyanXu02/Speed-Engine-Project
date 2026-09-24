@@ -120,6 +120,12 @@
     <ClCompile Include="src\Core\Features\Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Features\MemoryTrackable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Core\Features\Serializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -243,6 +249,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Features\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\MemoryTag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\MemoryTrackable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Features\Serializer.h">
