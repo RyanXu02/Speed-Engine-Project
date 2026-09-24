@@ -2,6 +2,7 @@
 
 #include "../Logger/LoggerProxy.h"
 #include "Entity/Entity.h"
+#include "Entity/EntityRegistry.h"
 
 namespace SE
 {
@@ -23,19 +24,21 @@ namespace SE
 
 
 		uint32_t addEntity(const std::string& name);
-		Entity* getEntity(uint32_t instanceId);
-		bool removeEntity(uint32_t instanceId);
+		bool hasEntity(uint32_t id);
+		Entity getEntity(uint32_t id);
+		bool removeEntity(uint32_t id);
 
 		template<typename... Ts>
-		std::vector<Entity*> getEntitiesWith()
+		std::vector<Entity> getEntitiesWith()
 		{
-			std::vector<Entity*> entities;
+			std::vector<Entity> entities;
 
-			for (auto& [id, entity] : m_registry)
+			for (auto& [id, components] : m_registry)
 			{
+				Entity entity = getEntity(id);
 				if ((entity.getComponent<Ts>() && ...))
 				{
-					entities.push_back(&entity);
+					entities.push_back(entity);
 				}
 			};
 			return entities;
@@ -51,13 +54,11 @@ namespace SE
 		LoggerProxy m_logger;
 		std::string m_name;
 
-		std::atomic<uint32_t> m_entityID{ 1 }; //reserve 0 for invalid entity
-		std::unordered_map<uint32_t, Entity> m_registry{};
 		std::vector<uint32_t> m_entitiesToRemove{};
+
+		EntityRegistry m_registry;
 
 		bool m_isInitialized{ false };
 		bool m_isUpdating{ false };
-
-		uint32_t assignID();
 	};
 } // namespace SE

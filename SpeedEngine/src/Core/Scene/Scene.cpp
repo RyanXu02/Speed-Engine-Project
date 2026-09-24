@@ -25,13 +25,14 @@ namespace SE
 		{
 			for (uint32_t id : m_entitiesToRemove)
 			{
-				m_registry.erase(id);
+				m_registry.removeEntity(id);
 			}
 			m_entitiesToRemove.clear();
 		}
 
-		for (auto& [id, entity] : m_registry)
+		for (auto& [id, components] : m_registry)
 		{
+			Entity entity = getEntity(id);
 			if (!entity.getComponent<LifeComponent>()->isAlive)
 			{
 				removeEntity(entity.id());
@@ -51,57 +52,52 @@ namespace SE
 
 	uint32_t Scene::addEntity(const std::string& name)
 	{
-		m_registry.try_emplace(m_entityID, Entity(m_entityID));
+		uint32_t entityID = m_registry.addEntity();
+		Entity entity = getEntity(entityID);
 
-		Entity* entity = getEntity(m_entityID);
+		entity.addComponent<Transform>();
+		entity.addComponent<NameComponent>(name);
+		entity.addComponent<LifeComponent>(true);
+		NameComponent* component = entity.getComponent<NameComponent>();
 
-		entity->addComponent<Transform>();
-		entity->addComponent<NameComponent>(name);
-		entity->addComponent<LifeComponent>(true);
-		NameComponent* component = entity->getComponent<NameComponent>();
-
-		return assignID();
+		return entityID;
 	}
 
-	Entity* Scene::getEntity(uint32_t instanceID)
+	bool Scene::hasEntity(uint32_t id)
 	{
-		auto it = m_registry.find(instanceID);
-		if (it == m_registry.end())
+		if (!m_registry.hasEntity(id))
 		{
-			return nullptr;
-		}
-
-		return &it->second;
-	}
-
-	bool Scene::removeEntity(uint32_t instanceId)
-	{
-		auto it = m_registry.find(instanceId);
-		if (it == m_registry.end())
-		{
+			m_logger.warn("there is no entity with given name");
 			return false;
 		}
 
-		Entity* entity = getEntity(m_entityID);
-		if (entity)
-		{
-			entity->getComponent<LifeComponent>()->isAlive = false;
-		}
-		m_entitiesToRemove.push_back(instanceId);
-
-		return true;
+		return m_registry.hasEntity(id);
 	}
 
-	uint32_t Scene::assignID()
+	Entity Scene::getEntity(uint32_t id)
 	{
-		return m_entityID.fetch_add(1, std::memory_order_relaxed);
+		assert(hasEntity(id));
+
+		return Entity(id, &m_registry);
+	}
+
+	bool Scene::removeEntity(uint32_t id)
+	{
+		if (m_registry.hasEntity(id))
+		{
+			m_entitiesToRemove.push_back(id);
+			return true;
+		}
+
+		return false;
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
 	{
 		std::unordered_map<uint32_t, std::string> entityList;
-		for (auto& [id, entity] : m_registry)
+		for (auto& [id, components] : m_registry)
 		{
+			Entity entity = getEntity(id);
 			LifeComponent* life = entity.getComponent<LifeComponent>();
 			if (life && life->isAlive)
 			{

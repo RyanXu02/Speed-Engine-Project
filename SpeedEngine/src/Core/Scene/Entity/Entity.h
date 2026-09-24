@@ -1,47 +1,44 @@
 #pragma once
 
 #include "Component/ComponentStructs.h"
-
-#include <typeindex>
+#include "EntityRegistry.h"
 
 namespace SE
 {
 	class Scene;
 
-	// @brief An entity is a container for components that define its behavior and
-	// appearance in the scene
-	// @brief An entity is owned by a scene, and can be created and destroyed by the
-	// scene
+	// @brief An entity is a just handle, registry owns all entities and component
+	// @brief entity is owned by a scene, and can be created and destroyed by the scene
+
 	class Entity
 	{
 	public:
-		Entity(uint32_t id);
+		Entity(uint32_t id, EntityRegistry* registry);
+
+		operator uint32_t() { return m_id; }
 
 		uint32_t id() const { return m_id; }
 
 		template<typename T, typename... Args>
 		T* addComponent(Args&&... args)
 		{
-			auto [it, status] = m_components.try_emplace(typeid(T), T(std::forward<Args>(args)...));
-
-			return std::any_cast<T>(&it->second);
+			return m_registry->addComponent<T>(m_id, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		T* getComponent()
 		{
-			auto it = m_components.find(typeid(T));
-			if (it == m_components.end())
-			{
-				return nullptr;
-			}
-			return std::any_cast<T>(&it->second);
+			return m_registry->getComponent<T>(m_id);
+		}
+
+		template<typename T>
+		bool removeComponent()
+		{
+			return m_registry->removeComponent<T>(m_id);
 		}
 
 	private:
 		uint32_t m_id;
-
-		//Note: ideally want to use sparse set and dense array but until that becomes an issue, do not touch
-		std::unordered_map<std::type_index, std::any> m_components;
+		EntityRegistry* m_registry;
 	};
 } // namespace SE

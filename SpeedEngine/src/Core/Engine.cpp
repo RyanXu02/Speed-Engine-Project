@@ -78,13 +78,13 @@ namespace SE
 		uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
 
 		uint32_t entityID = currentScene->addEntity("bunny");
-		Entity* entity = currentScene->getEntity(entityID);
-		entity->addComponent<MeshComponent>(bunnymeshId);
+		Entity entity = currentScene->getEntity(entityID);
+		entity.addComponent<MeshComponent>(bunnymeshId);
 
 		uint32_t entityID2 = currentScene->addEntity("conference");
-		Entity* entity2 = currentScene->getEntity(entityID2);
-		entity2->addComponent<MeshComponent>(roommeshId2);
-		entity2->getComponent<Transform>()->setScale(glm::vec3(0.01f));
+		Entity entity2 = currentScene->getEntity(entityID2);
+		entity2.addComponent<MeshComponent>(roommeshId2);
+		entity2.getComponent<Transform>()->setScale(glm::vec3(0.01f));
 
 		// end temp
 

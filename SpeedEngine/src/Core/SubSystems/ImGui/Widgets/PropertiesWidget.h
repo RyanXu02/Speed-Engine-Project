@@ -21,7 +21,6 @@ namespace SE
 		EventSubscription m_SceneChangedSubscription;
 
 		uint32_t m_selectedEntityId{ 0 };
-		Entity* m_cachedSelectedEntity{ nullptr };
 	};
 
 } // namespace SE

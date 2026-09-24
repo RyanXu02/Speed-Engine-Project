@@ -68,9 +68,9 @@ namespace SE
 		auto entities = scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
 		for (auto& entity : entities)
 		{
-			MeshComponent* mesh = entity->getComponent<MeshComponent>();
-			Transform* transform = entity->getComponent<Transform>();
-			NameComponent* name = entity->getComponent<NameComponent>();
+			MeshComponent* mesh = entity.getComponent<MeshComponent>();
+			Transform* transform = entity.getComponent<Transform>();
+			NameComponent* name = entity.getComponent<NameComponent>();
 
 
 			uint32_t meshResourceId = mesh->meshResourceID;
