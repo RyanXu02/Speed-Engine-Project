@@ -6,6 +6,7 @@
 #include "../../Scenes/SceneSystem.h"
 #include "Engine.h"
 #include "MainWidget.h"
+#include "MemoryWidget.h"
 
 #include <imgui.h>
 
@@ -58,6 +59,15 @@ namespace SE
 					ImGui::SliderFloat("DollySpeed", &SR->getCameraDollySpeed(), 1.0f, 40.0f);
 					ImGui::EndMenu();
 				}
+			}
+			if (ImGui::BeginMenu("Window"))
+			{
+				bool vis = MemoryWidget::isVisible();
+				if (ImGui::MenuItem("Memory Panel", nullptr, vis))
+				{
+					MemoryWidget::setVisible(!vis);
+				}
+				ImGui::EndMenu();
 			}
 		}
 		ImGui::EndMainMenuBar();
