@@ -3,6 +3,7 @@ name: MSBuild
 on:
   schedule:
     - cron: '0 0 * * *' 
+      timezone: 'America/Los_Angeles'
   workflow_dispatch: {}
 
 env:
