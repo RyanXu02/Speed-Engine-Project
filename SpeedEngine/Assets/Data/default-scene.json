@@ -1,0 +1,65 @@
+{
+  "entities": [
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/Suzanne.gltf"
+        },
+        "NameComponent": {
+          "name": "play"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            3.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/bunny.obj"
+        },
+        "NameComponent": {
+          "name": "entity"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  ],
+  "scene_name": "default"
+}

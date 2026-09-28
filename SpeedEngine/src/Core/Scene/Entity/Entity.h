@@ -40,5 +40,13 @@ namespace SE
 	private:
 		uint32_t m_id;
 		EntityRegistry* m_registry;
+		typedef std::function<void(Entity)> HookFunction;
+
+		friend class EntityRegistry;
+
+		static HookFunction _onNameComponentAdded();
+		static HookFunction _onNameComponentRemoved();
+		static HookFunction _onMeshComponentAdded();
+		static HookFunction _onMeshComponentRemoved();
 	};
 } // namespace SE

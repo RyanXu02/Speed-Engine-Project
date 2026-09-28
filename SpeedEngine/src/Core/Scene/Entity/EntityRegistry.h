@@ -3,12 +3,13 @@
 #include <any>
 #include <typeindex>
 #include <unordered_map>
+#include <Core/Features/Serializable.h>
 
 namespace SE
 {
 	class Entity;
 
-	class EntityRegistry
+	class EntityRegistry : public Serializable
 	{
 	public:
 		//Note: ideally want to use sparse set and dense array for performance but until that becomes an issue, do not touch
@@ -24,6 +25,10 @@ namespace SE
 		bool hasEntity(uint32_t entityID);
 		bool removeEntity(uint32_t entityID);
 		void clear();
+		bool empty();
+
+		virtual void serialize(nlohmann::json& j) const override;
+		virtual void deserialize(const nlohmann::json& j) override;
 
 		template<typename T, typename... Args>
 		T* addComponent(uint32_t entityID, Args&&... args)
@@ -87,6 +92,9 @@ namespace SE
 	private:
 		Registry m_registry;
 		std::atomic<uint32_t> m_entityID{ 1 }; // reserve 0 for invalid entity
+
+		typedef std::function<void(uint32_t, const nlohmann::json&)> OnComponentAdded;
+		typedef std::function<void(uint32_t, const nlohmann::json&)> OnComponentRemoved;
 
 		uint32_t _assignID();
 	};

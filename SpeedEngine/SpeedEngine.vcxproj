@@ -74,7 +74,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -104,7 +104,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -132,7 +132,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp23</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -151,11 +151,12 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
     <ClCompile Include="src\Core\Features\MemoryTrackable.cpp" />
     <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
-    <ClCompile Include="src\Core\Features\Serializer.cpp" />
+    <ClCompile Include="src\Core\Features\Serializable.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
@@ -198,12 +199,12 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
     <ClInclude Include="src\Core\Features\Math.h" />
+    <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
     <ClInclude Include="src\Core\Features\MemoryTag.h" />
     <ClInclude Include="src\Core\Features\MemoryTrackable.h" />
     <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h" />
-    <ClInclude Include="src\Core\Features\Serializer.h" />
+    <ClInclude Include="src\Core\Features\Serializable.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />

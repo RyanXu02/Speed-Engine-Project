@@ -13,6 +13,11 @@ namespace SE
 	{
 		m_logger.info("Initializing Scene");
 
+		//auto eventSystem = Engine::Instance().getSubSystem<EventSystem>();
+		//auto event = eventSystem->subscribe(EventType::KeyPressed, [](Event& event) {
+
+		//});
+
 
 		m_isInitialized = true;
 	}
@@ -33,7 +38,8 @@ namespace SE
 		for (auto& [id, components] : m_registry)
 		{
 			Entity entity = getEntity(id);
-			if (!entity.getComponent<LifeComponent>()->isAlive)
+			auto* lifeComponent = entity.getComponent<LifeComponent>();
+			if (lifeComponent && !lifeComponent->isAlive)
 			{
 				removeEntity(entity.id());
 			}
@@ -50,12 +56,18 @@ namespace SE
 		m_isInitialized = false;
 	}
 
+	void Scene::reloadScene() 
+	{
+		m_logger.info("Scene reloading");
+		m_registry.clear();
+	}
+
 	uint32_t Scene::addEntity(const std::string& name)
 	{
 		uint32_t entityID = m_registry.addEntity();
 		Entity entity = getEntity(entityID);
 
-		entity.addComponent<Transform>();
+		entity.addComponent<Transform>();			// default values that all entities have
 		entity.addComponent<NameComponent>(name);
 		entity.addComponent<LifeComponent>(true);
 		NameComponent* component = entity.getComponent<NameComponent>();
@@ -76,8 +88,11 @@ namespace SE
 
 	Entity Scene::getEntity(uint32_t id)
 	{
-		assert(hasEntity(id));
-
+		if (!hasEntity(id))
+		{
+			m_logger.warn("retrieving invalid entity");
+			return Entity(0, &m_registry);
+		}
 		return Entity(id, &m_registry);
 	}
 
@@ -90,6 +105,64 @@ namespace SE
 		}
 
 		return false;
+	}
+
+	void Scene::saveScene(std::string_view path)
+	{
+		std::filesystem::path filePath(path);	//make sure parent directory exist
+		std::filesystem::create_directory(filePath.parent_path());
+
+		nlohmann::json sceneJson;
+		serialize(sceneJson);
+		m_logger.info("Scene save success: {}", sceneJson.dump(4));
+
+		std::ofstream out(filePath, std::ios::out | std::ios::trunc);
+		if (!out)
+		{
+			m_logger.error("Stream error: Could not open file at {}", filePath.string());
+		}
+
+		try
+		{
+			out << sceneJson.dump(2) << std::endl;
+			out.flush();
+			if (out.fail())
+			{
+				m_logger.error("Failed writing data to disk for {}", filePath.string());
+			}
+			out.close();
+		}
+		catch (const std::exception& e)
+		{
+			m_logger.error("JSON/File error: {}", e.what());
+		}
+
+		m_logger.info("Scene saved: {} root entities written", sceneJson["entities"].size());
+	}
+
+	void Scene::loadScene(std::string_view path) 
+	{
+		if (!m_registry.empty())
+		{
+			reloadScene();
+		}
+
+		nlohmann::json sceneJson;
+		if (loadJson(path.data(), m_logger, sceneJson))
+		{
+			//TODO: add ifdef option for logging, release should not have log messeage
+			//m_logger.info("Scene load success: {}", sceneJson.dump(4));
+		}
+
+		if (sceneJson.contains("scene_name"))
+		{
+			m_name = sceneJson["scene_name"];
+		}
+
+		if (sceneJson.contains("entities"))
+		{
+			deserialize(sceneJson["entities"]);
+		}
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
@@ -106,4 +179,15 @@ namespace SE
 		}
 		return entityList;
 	}
+
+	void Scene::serialize(nlohmann::json& j) const {
+		j["scene_name"] = m_name;
+
+		m_registry.serialize(j);
+	}
+
+	void Scene::deserialize(const nlohmann::json& j) {
+		m_registry.deserialize(j);
+	}
+
 } // namespace SE

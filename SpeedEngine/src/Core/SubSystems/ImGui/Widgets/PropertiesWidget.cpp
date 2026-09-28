@@ -44,6 +44,12 @@ namespace SE
 			SceneSystem* sceneSystem = Engine::Instance().getSubSystem<SceneSystem>();
 			Scene* currentScene = sceneSystem->getCurrentScene();
 			Entity entity = currentScene->getEntity(m_selectedEntityId);
+			NameComponent* nameComponent = entity.getComponent<NameComponent>();
+			if (!nameComponent)
+			{
+				entityName = "None Selected";
+				return;
+			}
 			entityName = entity.getComponent<NameComponent>()->name;
 		}
 		else

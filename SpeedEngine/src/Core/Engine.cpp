@@ -74,18 +74,21 @@ namespace SE
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { { TextureType::Albedo, "Assets/Textures/cole-foxy.jpg" } };
 		uint32_t matid = getSubSystem<ResourceManager>()->addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
 
-		uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
-		uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
+		//uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
+		//uint32_t entityID = currentScene->addEntity("bunny");
+		//Entity entity = currentScene->getEntity(entityID);
+		//entity.addComponent<MeshComponent>(bunnymeshId);
 
-		uint32_t entityID = currentScene->addEntity("bunny");
-		Entity entity = currentScene->getEntity(entityID);
-		entity.addComponent<MeshComponent>(bunnymeshId);
+		//uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
+		//uint32_t entityID2 = currentScene->addEntity("conference");
+		//Entity entity2 = currentScene->getEntity(entityID2);
+		//entity2.addComponent<MeshComponent>(roommeshId2);
+		//entity2.getComponent<Transform>()->setScale(glm::vec3(0.01f));
 
-		uint32_t entityID2 = currentScene->addEntity("conference");
-		Entity entity2 = currentScene->getEntity(entityID2);
-		entity2.addComponent<MeshComponent>(roommeshId2);
-		entity2.getComponent<Transform>()->setScale(glm::vec3(0.01f));
-
+		//uint32_t suzanemeshId3 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("suzanemesh", "Assets/Meshes/Suzanne.gltf");
+		//uint32_t entityID3 = currentScene->addEntity("suzane");
+		//Entity entity3 = currentScene->getEntity(entityID3);
+		//entity3.addComponent<MeshComponent>(suzanemeshId3);
 		// end temp
 
 

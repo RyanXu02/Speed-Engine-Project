@@ -55,6 +55,15 @@ namespace SE
 			m_spdlogger->warn(fmt::runtime(message), std::forward<Args>(args)...);
 		};
 
+		//@brief error level logging (handled error)
+		//@param message message to log
+		//@param args variables to log in message
+		template<typename... Args>
+		void error(const std::string& message, Args&&... args)
+		{
+			m_spdlogger->error(fmt::runtime(message), std::forward<Args>(args)...);
+		};
+
 		//@brief critical level logging (crashworthy)
 		//@param message message to log
 		//@param args variables to log in message
