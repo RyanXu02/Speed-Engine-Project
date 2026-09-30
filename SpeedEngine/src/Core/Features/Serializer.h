@@ -1,11 +1,12 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-#include <unordered_map>
-#include <typeindex>
-#include <functional>
-#include <string>
 #include "Serializable.h"
+
+#include <functional>
+#include <nlohmann/json.hpp>
+#include <string>
+#include <typeindex>
+#include <unordered_map>
 
 namespace SE
 {

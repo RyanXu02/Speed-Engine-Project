@@ -8,7 +8,8 @@ namespace SE
 	struct NameComponent
 	{
 		NameComponent() = default;
-		NameComponent(std::string_view n) : name(n) {};
+		NameComponent(std::string_view n)
+		    : name(n){};
 
 		std::string name = "Unknown";
 
@@ -18,12 +19,15 @@ namespace SE
 	struct MeshComponent
 	{
 		MeshComponent() = default;
-		MeshComponent(std::string p) : path(p) {};
-		MeshComponent(uint32_t meshId) : meshResourceID(meshId) {}
+		MeshComponent(std::string p)
+		    : path(p){};
+		MeshComponent(uint32_t meshId)
+		    : meshResourceID(meshId)
+		{}
 
 		uint32_t meshResourceID{ 0 };
 		std::string path = "None";
-		
+
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(MeshComponent, path);
 	};
 
@@ -35,7 +39,7 @@ namespace SE
 		{}
 
 		bool isAlive{ true };
-		
+
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(LifeComponent, isAlive);
 	};
 

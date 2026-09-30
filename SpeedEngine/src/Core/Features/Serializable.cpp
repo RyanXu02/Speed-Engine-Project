@@ -51,8 +51,5 @@ namespace SE
 		return name;
 	}
 
-	Serializable::Serializable()
-	{
-
-	}
+	Serializable::Serializable() {}
 }

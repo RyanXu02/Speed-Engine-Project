@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Core/Features/Serializable.h>
 #include <any>
 #include <typeindex>
 #include <unordered_map>
-#include <Core/Features/Serializable.h>
 
 namespace SE
 {

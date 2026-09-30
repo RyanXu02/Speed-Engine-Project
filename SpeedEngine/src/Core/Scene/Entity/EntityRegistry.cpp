@@ -1,33 +1,36 @@
 #include "pch.h"
 
 #include "EntityRegistry.h"
-#include "Entity.h"
+
 #include "Component/ComponentStructs.h"
 #include "Core/Engine.h"
-#include <SubSystems/Scenes/SceneSystem.h>
 #include "Core/Scene/Scene.h"
+#include "Entity.h"
+
+#include <SubSystems/Scenes/SceneSystem.h>
 
 //loadHook determines what needs to be done after a component is loaded
 //unloadHook determines what needs to be done after a component is unloaded
-#define REGISTER_COMPONENT(Type, LoadHook, UnloadHook) \
-    REGISTER_TYPE( \
-        Type, \
-        [this](uint32_t entityID, const nlohmann::json& data) { \
-            addComponent<Type>(entityID, data.get<Type>()); \
-			LoadHook(Entity(entityID, this)); \
-        }, \
-        [this](uint32_t entityID, const nlohmann::json& data) { \
-			/* TODO: add unload unloadfunction if needed */ \
-			UnloadHook(Entity(entityID, this));               \
-	    } \
-    )
-	
+#define REGISTER_COMPONENT(Type, LoadHook, UnloadHook)        \
+	REGISTER_TYPE(                                            \
+	    Type,                                                 \
+	    [this](uint32_t entityID, const nlohmann::json& data) \
+	    {                                                     \
+		    addComponent<Type>(entityID, data.get<Type>());   \
+		    LoadHook(Entity(entityID, this));                 \
+	    },                                                    \
+	    [this](uint32_t entityID, const nlohmann::json& data) \
+	    {                                                     \
+		    /* TODO: add unload unloadfunction if needed */   \
+		    UnloadHook(Entity(entityID, this));               \
+	    })
 
 
 namespace SE
 {
-	EntityRegistry::EntityRegistry() : Serializable() 
-	{ 
+	EntityRegistry::EntityRegistry()
+	    : Serializable()
+	{
 		REGISTER_COMPONENT(NameComponent, Entity::_onNameComponentAdded(), Entity::_onNameComponentRemoved());
 		REGISTER_COMPONENT(LifeComponent);
 		REGISTER_COMPONENT(Transform);
@@ -81,7 +84,7 @@ namespace SE
 		return m_registry.empty();
 	}
 
-	void EntityRegistry::serialize(nlohmann::json& j) const 
+	void EntityRegistry::serialize(nlohmann::json& j) const
 	{
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
 		auto logger = scene->getLogger();
@@ -125,13 +128,13 @@ namespace SE
 		}
 	}
 
-	void EntityRegistry::deserialize(const nlohmann::json& j) 
+	void EntityRegistry::deserialize(const nlohmann::json& j)
 	{
 		assert(j.is_array() && !j.is_null() && !j.is_discarded() && "Registry: failed to deserialize json");
 
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
 		auto logger = scene->getLogger();
-					
+
 		for (const auto& entity : j)
 		{
 			uint32_t entityID = addEntity();
@@ -162,7 +165,6 @@ namespace SE
 				}
 			}
 		}
-
 	}
 
 	const EntityRegistry::Registry::const_iterator EntityRegistry::begin() const
