@@ -50,10 +50,22 @@ namespace SE
 			return;
 		}
 
-		m_requestDelete = false;
-		for (auto& [id, name] : m_entityNameCache)
+		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		if (!scene)
 		{
-			ImGui::PushID(static_cast<int>(id));
+			ImGui::End();
+			return;
+		}
+		auto entities = scene->getEntitiesWith<NameComponent>();
+
+		m_requestDelete = false;
+		for (auto& entity : entities)
+		{
+			NameComponent* nameComponent = entity.getComponent<NameComponent>();
+			std::string name = nameComponent->name;
+
+			int id = entity.id();
+			ImGui::PushID(id);
 			const bool isRenamingThis = m_renameEntityId > 0 && m_renameEntityId == id;
 			if (isRenamingThis)
 			{

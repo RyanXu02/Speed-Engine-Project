@@ -42,6 +42,13 @@ namespace SE
 		}
 
 		template<typename... Args>
+		void error(const std::string& message, Args&&... args) const
+		{
+			std::string prefixed = fmt::format("[{}] {}", m_context, message);
+			m_logger.error(prefixed, std::forward<Args>(args)...);
+		}
+
+		template<typename... Args>
 		void critical(const std::string& message, Args&&... args) const
 		{
 			std::string prefixed = fmt::format("[{}] {}", m_context, message);

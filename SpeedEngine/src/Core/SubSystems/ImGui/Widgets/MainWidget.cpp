@@ -20,6 +20,22 @@ namespace SE
 		{
 			if (ImGui::BeginMenu("File"))
 			{
+				const std::string path = "Assets/Data/default-scene.json"; //TODO: hard code scene path for now
+
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+				{
+					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
+					{
+						scene->saveScene(path);
+					}
+				}
+				if (ImGui::MenuItem("Load", "Ctrl+O"))
+				{
+					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
+					{
+						scene->loadScene(path);
+					}
+				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Edit"))

@@ -44,11 +44,21 @@ namespace SE
 			SceneSystem* sceneSystem = Engine::Instance().getSubSystem<SceneSystem>();
 			Scene* currentScene = sceneSystem->getCurrentScene();
 			Entity entity = currentScene->getEntity(m_selectedEntityId);
-			entityName = entity.getComponent<NameComponent>()->name;
+			NameComponent* nameComponent = entity.getComponent<NameComponent>();
+			if (!nameComponent)
+			{
+				entityName = "None Selected";
+				m_selectedEntityId = 0;
+			}
+			else
+			{
+				entityName = nameComponent->name;
+			}
 		}
 		else
 		{
 			entityName = "None Selected";
+			m_selectedEntityId = 0;
 		}
 
 		std::string windowTitle = std::format("Properties - {}###PropertiesWidget", entityName);

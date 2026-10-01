@@ -2,26 +2,33 @@
 
 #include "Transform.h"
 
-#include <nlohmann/json.hpp>
-#include <string>
 
 namespace SE
 {
 	struct NameComponent
 	{
-		std::string name;
+		NameComponent() = default;
+		NameComponent(std::string_view n)
+		    : name(n){};
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(NameComponent, name)
+		std::string name = "Unknown";
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(NameComponent, name);
 	};
 
 	struct MeshComponent
 	{
 		MeshComponent() = default;
+		MeshComponent(std::string p)
+		    : path(p){};
 		MeshComponent(uint32_t meshId)
 		    : meshResourceID(meshId)
 		{}
 
-		uint32_t meshResourceID{};
+		uint32_t meshResourceID{ 0 };
+		std::string path = "None";
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(MeshComponent, path);
 	};
 
 	struct LifeComponent
@@ -32,6 +39,25 @@ namespace SE
 		{}
 
 		bool isAlive{ true };
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(LifeComponent, isAlive);
+	};
+
+	struct RelationshipComponent
+	{
+		RelationshipComponent() = default;
+
+		uint32_t parent{ 0 };
+		std::vector<uint32_t> children;
+	};
+
+	struct PrefabComponent
+	{
+		PrefabComponent() = default;
+
+		std::string prefabPath = "None";
+
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(PrefabComponent, prefabPath);
 	};
 
 }
