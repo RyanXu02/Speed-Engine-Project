@@ -51,6 +51,11 @@ namespace SE
 		}
 
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		if (!scene)
+		{
+			ImGui::End();
+			return;
+		}
 		auto entities = scene->getEntitiesWith<NameComponent>();
 
 		m_requestDelete = false;

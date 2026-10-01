@@ -32,6 +32,7 @@ namespace SE
 		REGISTER_COMPONENT(LifeComponent);
 		REGISTER_COMPONENT(Transform);
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), Entity::_onMeshComponentRemoved());
+		REGISTER_COMPONENT(PrefabComponent);
 	}
 
 	EntityRegistry::~EntityRegistry() {}
@@ -90,7 +91,10 @@ namespace SE
 
 		for (const auto& [entityID, components] : m_registry)
 		{
+			bool isPrefabEntity = false;
+			std::string prefabPath = "";
 			nlohmann::json componentsJson = nlohmann::json::object();
+
 			for (const auto& [typeID, component] : components)
 			{
 				std::string type = demagleTypeInfo(typeID);
@@ -106,7 +110,15 @@ namespace SE
 				try
 				{
 					nlohmann::json componentAsJson = typeResult.serialize(component);
-					componentsJson[type] = componentAsJson;
+
+					if (type == "PrefabComponent")
+					{
+						isPrefabEntity = true;
+						prefabPath = componentAsJson["PrefabComponent"]["prefab_path"];
+					}
+					else {
+						componentsJson[type] = componentAsJson;
+					}
 				}
 				catch (const nlohmann::json::exception& e)
 				{
@@ -115,13 +127,21 @@ namespace SE
 				}
 			}
 
-			if (!componentsJson.empty())
+			nlohmann::json entityObj;
+			if (isPrefabEntity)
 			{
-				nlohmann::json entityObj;
-				entityObj["components"] = componentsJson; // Adds the "components" wrapper!
+				entityObj["prefab_ref"] = prefabPath;
+				if (!componentsJson.empty())
+				{
+					entityObj["overrides"]["components"] = componentsJson;
+				}
 				j["entities"].push_back(entityObj);
 			}
-			//j["entities"].push_back(componentsJson);
+			else if (!componentsJson.empty())
+			{
+				entityObj["components"] = componentsJson;
+				j["entities"].push_back(entityObj);
+			}
 		}
 	}
 
@@ -140,6 +160,11 @@ namespace SE
 				continue;
 			}
 
+			if (entity.contains("prefab_ref"))
+			{
+				addComponent<PrefabComponent>(entityID, entity["prefab_ref"]);
+			}
+
 			for (auto& [type, json] : entity["components"].items())
 			{
 				auto typeResult = m_typeResolver.Get(type);
@@ -152,6 +177,7 @@ namespace SE
 				// nlohmann throws errors on fail parse which crash the app if left unhandled
 				try
 				{
+
 					typeResult.invoke<ConstructorFunc>(entityID, json);
 				}
 				catch (const nlohmann::json::exception& e)

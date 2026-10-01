@@ -48,13 +48,17 @@ namespace SE
 			if (!nameComponent)
 			{
 				entityName = "None Selected";
-				return;
+				m_selectedEntityId = 0;
 			}
-			entityName = entity.getComponent<NameComponent>()->name;
+			else
+			{
+				entityName = nameComponent->name;
+			}
 		}
 		else
 		{
 			entityName = "None Selected";
+			m_selectedEntityId = 0;
 		}
 
 		std::string windowTitle = std::format("Properties - {}###PropertiesWidget", entityName);

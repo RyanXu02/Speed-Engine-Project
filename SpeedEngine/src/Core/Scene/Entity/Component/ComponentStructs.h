@@ -43,7 +43,7 @@ namespace SE
 	{
 		RelationshipComponent() = default;
 
-		uint32_t parent;
+		uint32_t parent{ 0 };
 		std::vector<uint32_t> children;
 	};
 
