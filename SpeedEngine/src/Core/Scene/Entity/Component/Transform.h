@@ -1,7 +1,7 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
 #include <glm/glm.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 
 
@@ -79,12 +79,7 @@ namespace SE
 		const glm::vec3& getScale() const { return scale; }
 		const glm::mat4& getTransform();
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(
-			Transform, 
-			translate,
-			rotate,
-			scale
-		);
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(Transform, translate, rotate, scale);
 
 	private:
 		bool m_scaleLink{ true };

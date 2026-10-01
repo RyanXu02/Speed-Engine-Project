@@ -1,10 +1,10 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-#include <any>
-#include <typeindex>
-#include <optional>
 #include <Logger/LoggerProxy.h>
+#include <any>
+#include <nlohmann/json.hpp>
+#include <optional>
+#include <typeindex>
 
 namespace SE
 {
@@ -35,18 +35,17 @@ namespace SE
 	typedef std::function<void(uint32_t, const nlohmann::json&)> ConstructorFunc;
 	typedef std::function<void(uint32_t, const nlohmann::json&)> DestructorFunc;
 	typedef std::pair<ConstructorFunc, DestructorFunc> TypeFactory;
-	
+
 	class MetaType
 	{
 	public:
-		MetaType(std::any data, std::any constructor) 
-			: m_serializer(std::move(data)), m_constructor(std::move(constructor)) 
-		{
-
-		}
+		MetaType(std::any data, std::any constructor)
+		    : m_serializer(std::move(data)),
+		      m_constructor(std::move(constructor))
+		{}
 
 		bool isValid() { return m_serializer.has_value(); };
-		
+
 		// manual compile time, object creation from the json, aka: static deserializer, more type safe
 		// but the serializer uses registered invoke function instead as it needs to inspect type at run time
 		template<typename T>
@@ -58,18 +57,19 @@ namespace SE
 				throw std::runtime_error("MetaType cast: Failed to cast to desired type");
 			}
 
-			//using DeserializeFunc = void (*)(void*, const nlohmann::json&);	
+			//using DeserializeFunc = void (*)(void*, const nlohmann::json&);
 			typedef void (*DeserializeFunc)(void*, const nlohmann::json&);
 			auto deserializeFunc = std::any_cast<DeserializeFunc>(serializer->second);
 			assert(deserializeFunc && "MetaType cast: failed to cast deserializer function");
-			
+
 			T instance;
 			deserializeFunc(&instance, j);
 
 			return instance;
 		}
 
-		nlohmann::json serialize(const std::any& instance) {
+		nlohmann::json serialize(const std::any& instance)
+		{
 			auto* serializer = std::any_cast<SerializerPair>(&m_serializer);
 			if (!serializer)
 			{
@@ -79,7 +79,7 @@ namespace SE
 			typedef nlohmann::json (*SerializeFunc)(const std::any&);
 			auto serializeFunc = std::any_cast<SerializeFunc>(serializer->first);
 			assert(serializeFunc && "MetaType cast: failed to cast serialize function");
-			
+
 			return serializeFunc(instance);
 		}
 
@@ -145,11 +145,7 @@ namespace SE
 		template<typename T>
 		void Register(std::string_view name, ConstructorFunc loadFunc, DestructorFunc unloadFunc)
 		{
-			m_typeSerializers.try_emplace(
-				name.data(), 
-				&TypeSerializer<T>::Serialize,
-				&TypeSerializer<T>::Deserialize
-			);
+			m_typeSerializers.try_emplace(name.data(), &TypeSerializer<T>::Serialize, &TypeSerializer<T>::Deserialize);
 			m_typeFactory.try_emplace(name.data(), loadFunc, unloadFunc);
 		}
 
@@ -159,11 +155,7 @@ namespace SE
 	};
 
 
-#define REGISTER_TYPE(Type, ConstructorFunc, DesctructorFunc) \
-	m_typeResolver.Register<Type>(	\
-		#Type, ConstructorFunc, DesctructorFunc\
-	); \
-
+#define REGISTER_TYPE(Type, ConstructorFunc, DesctructorFunc) m_typeResolver.Register<Type>(#Type, ConstructorFunc, DesctructorFunc);
 
 
 	class Serializable
@@ -182,11 +174,11 @@ namespace SE
 		MetaTypeResolver m_typeResolver;
 
 	private:
-
 	};
 
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<Serializable, T>>>
-	void to_json(nlohmann::json& j, const T& object) {
+	void to_json(nlohmann::json& j, const T& object)
+	{
 		object.serialize(j);
 	}
 

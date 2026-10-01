@@ -3,6 +3,7 @@
 #include "../Logger/LoggerProxy.h"
 #include "Entity/Entity.h"
 #include "Entity/EntityRegistry.h"
+
 #include <Core/Features/Serializable.h>
 
 namespace SE
@@ -13,9 +14,9 @@ namespace SE
 	{
 	public:
 		Scene(const std::string& name, Logger& logger)
-		    : m_name(name), 
-			m_logger(logger, fmt::format("Scene: {}", name)), 
-			Serializable()
+		    : m_name(name),
+		      m_logger(logger, fmt::format("Scene: {}", name)),
+		      Serializable()
 		{}
 
 		void initializeScene();

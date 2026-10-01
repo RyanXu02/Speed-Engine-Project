@@ -56,7 +56,7 @@ namespace SE
 		m_isInitialized = false;
 	}
 
-	void Scene::reloadScene() 
+	void Scene::reloadScene()
 	{
 		m_logger.info("Scene reloading");
 		m_registry.clear();
@@ -67,7 +67,7 @@ namespace SE
 		uint32_t entityID = m_registry.addEntity();
 		Entity entity = getEntity(entityID);
 
-		entity.addComponent<Transform>();			// default values that all entities have
+		entity.addComponent<Transform>(); // default values that all entities have
 		entity.addComponent<NameComponent>(name);
 		entity.addComponent<LifeComponent>(true);
 		NameComponent* component = entity.getComponent<NameComponent>();
@@ -109,7 +109,7 @@ namespace SE
 
 	void Scene::saveScene(std::string_view path)
 	{
-		std::filesystem::path filePath(path);	//make sure parent directory exist
+		std::filesystem::path filePath(path); //make sure parent directory exist
 		std::filesystem::create_directory(filePath.parent_path());
 
 		nlohmann::json sceneJson;
@@ -141,7 +141,7 @@ namespace SE
 		m_logger.info("Scene saved: {} root entities written", sceneJson["entities"].size());
 	}
 
-	void Scene::loadScene(std::string_view path) 
+	void Scene::loadScene(std::string_view path)
 	{
 		nlohmann::json sceneJson;
 		if (loadJson(path.data(), m_logger, sceneJson))
@@ -182,13 +182,15 @@ namespace SE
 		return entityList;
 	}
 
-	void Scene::serialize(nlohmann::json& j) const {
+	void Scene::serialize(nlohmann::json& j) const
+	{
 		j["scene_name"] = m_name;
 
 		m_registry.serialize(j);
 	}
 
-	void Scene::deserialize(const nlohmann::json& j) {
+	void Scene::deserialize(const nlohmann::json& j)
+	{
 		m_registry.deserialize(j);
 	}
 

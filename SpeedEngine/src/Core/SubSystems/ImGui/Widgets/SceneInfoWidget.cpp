@@ -61,7 +61,7 @@ namespace SE
 		m_requestDelete = false;
 		for (auto& entity : entities)
 		{
-			NameComponent* nameComponent = entity.getComponent<NameComponent> ();
+			NameComponent* nameComponent = entity.getComponent<NameComponent>();
 			std::string name = nameComponent->name;
 
 			int id = entity.id();
