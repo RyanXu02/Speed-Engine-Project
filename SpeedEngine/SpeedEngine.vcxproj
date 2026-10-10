@@ -151,6 +151,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
@@ -199,6 +200,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsSystem.h" />
     <ClInclude Include="src\Core\Features\Math.h" />
     <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
     <ClInclude Include="src\Core\Features\MemoryTag.h" />
