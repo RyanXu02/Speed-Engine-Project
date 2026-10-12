@@ -23,6 +23,9 @@ namespace SE
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.WindowMenuButtonPosition = ImGuiDir_None; // hide collapse button
 
+		style.FontSizeBase = 4.0f;
+		style.FontScaleDpi = 4.0f;
+
 		ImVec4* colors = style.Colors;
 
 		// Backgrounds
@@ -121,7 +124,7 @@ namespace SE
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 
-		auto* font = io.Fonts->AddFontFromFileTTF("fonts/Quicksand-SemiBold.ttf", 15.0f);
+		auto* font = io.Fonts->AddFontFromFileTTF("fonts/Quicksand-SemiBold.ttf");
 		io.FontDefault = font;
 
 		std::error_code ec;
