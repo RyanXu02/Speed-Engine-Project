@@ -7,6 +7,7 @@
 #include "Engine.h"
 #include "MainWidget.h"
 #include "MemoryWidget.h"
+#include "ConsoleWidget.h"
 
 #include <imgui.h>
 
@@ -82,6 +83,11 @@ namespace SE
 				if (ImGui::MenuItem("Memory Panel", nullptr, vis))
 				{
 					MemoryWidget::setVisible(!vis);
+				}
+				const bool consoleVisible = ConsoleWidget::isVisible();
+				if (ImGui::MenuItem("Console", nullptr, consoleVisible))
+				{
+					ConsoleWidget::setVisible(!consoleVisible);
 				}
 				ImGui::EndMenu();
 			}

@@ -1,18 +1,21 @@
 #include "pch.h"
 
-#if defined(COMPILE_WITH_EDITOR)
-#include "../../../ImGui/Widget.h"
-#include "../../../ImGui/Widgets/ConsoleWidget.h"
-#include "../../../ImGui/Widgets/MainWidget.h"
-#include "../../../ImGui/Widgets/MemoryWidget.h"
-#include "../../../ImGui/Widgets/PropertiesWidget.h"
-#include "../../../ImGui/Widgets/ResourceBrowserWidget.h"
-#include "../../../ImGui/Widgets/SceneInfoWidget.h"
-#include "../../../ImGui/Widgets/ScenePreviewWidget.h"
-#include "../../Window.h"
-#include "ImGuiRenderer.h"
-#include "imgui.h"
+#include "SubSystems/ImGui/Widget.h"
+#include "SubSystems/ImGui/Widgets/ConsoleWidget.h"
 
+#if defined(COMPILE_WITH_EDITOR)
+#include "SubSystems/ImGui/Widgets/MainWidget.h"
+#include "SubSystems/ImGui/Widgets/MemoryWidget.h"
+#include "SubSystems/ImGui/Widgets/PropertiesWidget.h"
+#include "SubSystems/ImGui/Widgets/ResourceBrowserWidget.h"
+#include "SubSystems/ImGui/Widgets/SceneInfoWidget.h"
+#include "SubSystems/ImGui/Widgets/ScenePreviewWidget.h"
+#endif
+
+#include "SubSystems/Graphics/Window.h"
+#include "ImGuiRenderer.h"
+
+#include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
@@ -145,19 +148,21 @@ namespace SE
 		ImGui_ImplOpenGL3_Init();
 
 		SetDarkPastelImGuiStyle();
-		
-        initWidgets();
+
+		initWidgets();
 	}
 
 	void ImGuiRenderer::initWidgets()
 	{
+#if defined(COMPILE_WITH_EDITOR)
 		createWidget<MainWidget>();
 		createWidget<ResourceBrowserWidget>();
 		createWidget<MemoryWidget>();
-		// createWidget<ConsoleWidget>();
 		createWidget<ScenePreviewWidget>();
 		createWidget<SceneInfoWidget>();
 		createWidget<PropertiesWidget>();
+#endif
+		createWidget<ConsoleWidget>();
 		// ...
 	}
 
@@ -190,9 +195,17 @@ namespace SE
 	{
 		m_logger.info("Shutting down");
 
+		for (auto& [id, widget] : m_widgets)
+		{
+			if (widget)
+			{
+				widget->shutdown();
+			}
+		}
+		m_widgets.clear();
+
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
 } // namespace SE
-#endif
