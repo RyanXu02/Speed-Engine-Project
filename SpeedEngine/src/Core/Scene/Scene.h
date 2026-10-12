@@ -33,7 +33,7 @@ namespace SE
 		bool removeEntity(uint32_t id);
 		bool isEntityPendingRemoval(uint32_t id) const
 		{
-			return std::find(m_entitiesToRemove.begin(), m_entitiesToRemove.end(), id) != m_entitiesToRemove.end();
+			return std::ranges::find(m_entitiesToRemove, id) != m_entitiesToRemove.end();
 		}
 		void saveScene(std::string_view path);
 		void loadScene(std::string_view path);
