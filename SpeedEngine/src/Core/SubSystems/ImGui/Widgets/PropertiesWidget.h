@@ -1,6 +1,9 @@
 #pragma once
+#if defined(COMPILE_WITH_EDITOR)
+
 #include "../../Events/EventSubscription.h"
 #include "../Widget.h"
+#include "ComponentInspectorRegistry.h"
 
 
 namespace SE
@@ -21,6 +24,15 @@ namespace SE
 		EventSubscription m_SceneChangedSubscription;
 
 		uint32_t m_selectedEntityId{ 0 };
+
+		ComponentInspectorRegistry m_inspectors;
+		std::string m_meshPathDraft;
+		std::string m_meshPathError;
+		bool m_meshDraftInitialized{ false };
+
 	};
 
+	bool _editComponentJson(const char* label, nlohmann::json& value);
+
 } // namespace SE
+#endif
