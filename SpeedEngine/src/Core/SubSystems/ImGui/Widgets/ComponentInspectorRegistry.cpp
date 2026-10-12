@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "ComponentInspectorRegistry.h"
 
 #include "imgui.h"
@@ -57,11 +58,12 @@ namespace SE
 			}
 		}
 		else if (value.is_array() && value.size() >= 2 && value.size() <= 4 &&
-			// also gotta check if all elements are numbers too:
-			std::ranges::all_of(value, [](const auto& item)
-			{
-				return item.is_number();
-			}))
+		         // also gotta check if all elements are numbers too:
+		         std::ranges::all_of(value,
+		             [](const auto& item)
+		             {
+			             return item.is_number();
+		             }))
 		{
 			// Keep each element's signed/unsigned/floating JSON type
 			ImGui::TextUnformatted(label);
