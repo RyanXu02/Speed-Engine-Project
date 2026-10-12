@@ -31,8 +31,5 @@ namespace SE
 		bool m_meshDraftInitialized{ false };
 
 	};
-
-	bool _editComponentJson(const char* label, nlohmann::json& value);
-
 } // namespace SE
 #endif
