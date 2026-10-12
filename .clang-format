@@ -70,7 +70,7 @@ NamespaceIndentation: All
 PackConstructorInitializers: Never
 PointerAlignment: Left
 ReflowComments: false
-RequiresClausePosition: WithPreceding
+RequiresClausePosition: OwnLine
 SortIncludes: true
 IncludeBlocks: Regroup
 IncludeCategories:
