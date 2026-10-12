@@ -31,10 +31,7 @@ namespace SE
 		bool hasEntity(uint32_t id);
 		Entity getEntity(uint32_t id);
 		bool removeEntity(uint32_t id);
-		bool isEntityPendingRemoval(uint32_t id) const
-		{
-			return std::ranges::find(m_entitiesToRemove, id) != m_entitiesToRemove.end();
-		}
+		bool isEntityPendingRemoval(uint32_t id) const { return std::ranges::find(m_entitiesToRemove, id) != m_entitiesToRemove.end(); }
 		void saveScene(std::string_view path);
 		void loadScene(std::string_view path);
 
