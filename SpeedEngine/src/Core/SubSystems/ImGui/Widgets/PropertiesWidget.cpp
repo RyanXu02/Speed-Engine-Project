@@ -12,7 +12,7 @@
 namespace SE
 {
 	PropertiesWidget::PropertiesWidget()
-	    : Widget("PropertiesWidget")
+		: VisibleWidget("PropertiesWidget")
 	{
 // REGISTER YOUR COMPONENT FOR THE PROPERTIES WIDGET HERE:
 #pragma region RegisterComponentEditors
@@ -119,6 +119,8 @@ namespace SE
 
 	void PropertiesWidget::render()
 	{
+		if (!s_visible) return;
+
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
 		Entity entity{ 0, nullptr };
 		std::string entityName = "None Selected";
@@ -138,7 +140,7 @@ namespace SE
 		}
 		// Window title
 		const std::string windowTitle = std::format("Properties - {}###PropertiesWidget", entityName);
-		if (!ImGui::Begin(windowTitle.c_str(), nullptr))
+		if (!ImGui::Begin(windowTitle.c_str(), &s_visible))
 		{
 			ImGui::End();
 			return;

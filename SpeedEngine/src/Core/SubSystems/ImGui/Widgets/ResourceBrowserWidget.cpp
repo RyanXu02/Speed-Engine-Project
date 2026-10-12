@@ -9,7 +9,7 @@
 namespace SE
 {
 	ResourceBrowserWidget::ResourceBrowserWidget()
-	    : Widget("ResourceBrowserWidget")
+		: VisibleWidget("ResourceBrowserWidget")
 	{
 		m_resourceCache = Engine::Instance().getSubSystem<ResourceManager>()->getInitialRTMap();
 
@@ -29,9 +29,11 @@ namespace SE
 
 	void ResourceBrowserWidget::render()
 	{
+		if (!s_visible) return;
+
 		ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
 
-		if (!ImGui::Begin("Resource Browser"))
+		if (!ImGui::Begin("Resource Browser", &s_visible))
 		{
 			ImGui::End();
 			return;

@@ -8,6 +8,10 @@
 #include "MainWidget.h"
 #include "MemoryWidget.h"
 #include "ConsoleWidget.h"
+#include "PropertiesWidget.h"
+#include "ResourceBrowserWidget.h"
+#include "SceneInfoWidget.h"
+#include "ScenePreviewWidget.h"
 
 #include <imgui.h>
 
@@ -88,6 +92,26 @@ namespace SE
 				if (ImGui::MenuItem("Console", nullptr, consoleVisible))
 				{
 					ConsoleWidget::setVisible(!consoleVisible);
+				}
+				const bool propertiesVisible = PropertiesWidget::isVisible();
+				if (ImGui::MenuItem("Properties", nullptr, propertiesVisible))
+				{
+					PropertiesWidget::setVisible(!propertiesVisible);
+				}
+				const bool resourceBrowserVisible = ResourceBrowserWidget::isVisible();
+				if (ImGui::MenuItem("Resource Browser", nullptr, resourceBrowserVisible))
+				{
+					ResourceBrowserWidget::setVisible(!resourceBrowserVisible);
+				}
+				const bool sceneInfoVisible = SceneInfoWidget::isVisible();
+				if (ImGui::MenuItem("Scene Info", nullptr, sceneInfoVisible))
+				{
+					SceneInfoWidget::setVisible(!sceneInfoVisible);
+				}
+				const bool scenePreviewVisible = ScenePreviewWidget::isVisible();
+				if (ImGui::MenuItem("Scene Preview", nullptr, scenePreviewVisible))
+				{
+					ScenePreviewWidget::setVisible(!scenePreviewVisible);
 				}
 				ImGui::EndMenu();
 			}

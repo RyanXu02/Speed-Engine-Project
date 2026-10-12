@@ -7,7 +7,7 @@
 
 namespace SE
 {
-	class ConsoleWidget : public Widget
+	class ConsoleWidget : public VisibleWidget<ConsoleWidget>
 	{
 	public:
 		using CommandCallback = std::function<void(std::string_view)>;
@@ -16,16 +16,11 @@ namespace SE
 		void render() override;
 		void shutdown() override;
 
-		static void setVisible(bool visible) { s_visible = visible; }
-		static bool isVisible() { return s_visible; }
-
 		void registerCommand(std::string_view name, CommandCallback callback);
 
 	private:
 		static int _textEditCallback(ImGuiInputTextCallbackData* data);
 		void _executeCommand(std::string_view commandLine);
-
-		static inline bool s_visible = true;
 
 		std::unordered_map<std::string, CommandCallback> m_commandRegistry;
 

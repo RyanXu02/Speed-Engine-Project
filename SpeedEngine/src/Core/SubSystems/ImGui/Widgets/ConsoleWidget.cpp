@@ -6,7 +6,7 @@
 namespace SE
 {
 
-	ConsoleWidget::ConsoleWidget() : Widget("ConsoleWidget"), m_autoScroll(true), m_scrollToBottom(false), m_historyPos(-1)
+	ConsoleWidget::ConsoleWidget() : VisibleWidget("ConsoleWidget"), m_autoScroll(true), m_scrollToBottom(false), m_historyPos(-1)
 	{
 		m_logger.init(getName());
 
@@ -122,7 +122,7 @@ namespace SE
 			ImGui::SetNextWindowFocus();
 		}
 
-		if (!ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoFocusOnAppearing))
+		if (!ImGui::Begin("Console", &s_visible, ImGuiWindowFlags_NoFocusOnAppearing))
 		{
 			ImGui::End();
 			return;

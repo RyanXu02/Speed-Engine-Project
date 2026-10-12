@@ -23,4 +23,17 @@ namespace SE
 		std::string m_logmesg{ "" };
 		std::string m_name{ "unnamed widget" };
 	};
+
+	template<typename T, bool InitiallyVisible = true>
+	class VisibleWidget : public Widget
+	{
+	public:
+		using Widget::Widget;
+
+		static void setVisible(bool visible) { s_visible = visible; }
+		static bool isVisible() { return s_visible; }
+
+	protected:
+		static inline bool s_visible = InitiallyVisible;
+	};
 } // namespace SE
