@@ -18,10 +18,7 @@ namespace SE
 		operator uint32_t() { return m_id; }
 
 		uint32_t id() const { return m_id; }
-		const EntityRegistry::ComponentRegistry* getComponentRegistry() const
-		{
-			return m_registry->getComponentRegistry(m_id);
-		}
+		const EntityRegistry::ComponentRegistry* getComponentRegistry() const { return m_registry->getComponentRegistry(m_id); }
 
 		template<typename T, typename... Args>
 		T* addComponent(Args&&... args)

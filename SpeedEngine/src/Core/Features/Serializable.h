@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Logger/LoggerProxy.h"
+
 #include <nlohmann/json.hpp>
 
 namespace SE

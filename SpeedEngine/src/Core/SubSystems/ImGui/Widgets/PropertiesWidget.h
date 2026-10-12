@@ -29,7 +29,6 @@ namespace SE
 		std::string m_meshPathDraft;
 		std::string m_meshPathError;
 		bool m_meshDraftInitialized{ false };
-
 	};
 } // namespace SE
 #endif
