@@ -2,6 +2,9 @@
 #include "PhysicsSystem.h"
 
 using namespace JPH;
+using namespace JPH::literals;
+
+// Using boilerplate code from https://github.com/jrouwe/JoltPhysics/blob/master/HelloWorld/HelloWorld.cpp
 
 namespace Layers
 {
@@ -79,16 +82,16 @@ namespace SE
 
 		Factory::sInstance = new Factory();
 		RegisterTypes();
-		temp_allocator = new TempAllocatorImpl(10 * 1024 * 1024);
-		job_system = new JobSystemThreadPool(cMaxPhysicsJobs, cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1);
+		m_temp_allocator = std::make_unique<TempAllocatorImpl>(10 * 1024 * 1024);
+		m_job_system = std::make_unique<JobSystemThreadPool>(cMaxPhysicsJobs, cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1);
 
 		BPLayerInterfaceImpl broad_phase_layer_interface;
 		ObjectVsBroadPhaseLayerFilterImpl object_vs_broadphase_layer_filter;
 		ObjectLayerPairFilterImpl obj_vs_object_layer_filter;
 
-		physics_system.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface, object_vs_broadphase_layer_filter, obj_vs_object_layer_filter);
+		m_physics_system.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface, object_vs_broadphase_layer_filter, obj_vs_object_layer_filter);
 
-		BodyInterface& body_interface = physics_system.GetBodyInterface();
+		BodyInterface& body_interface = m_physics_system.GetBodyInterface();
 
 	}
 
@@ -96,7 +99,7 @@ namespace SE
 		const int cCollisionSteps = 1; // If stepping physics less that 60hz, do more collision steps per simulation step
 
 		// Step physics simulation
-		physics_system.Update(deltaTime, cCollisionSteps, temp_allocator, job_system);
+		m_physics_system.Update(deltaTime, cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
 	}
 
 	void PhysicsSystem::shutdown() {
@@ -107,5 +110,7 @@ namespace SE
 		UnregisterTypes();
 		delete Factory::sInstance;
 		Factory::sInstance = nullptr;
+		delete m_temp_allocator.get();
+		delete m_job_system.get();
 	}
 }
