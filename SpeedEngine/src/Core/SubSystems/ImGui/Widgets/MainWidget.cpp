@@ -14,6 +14,9 @@
 #include "SceneInfoWidget.h"
 #include "ScenePreviewWidget.h"
 
+//TESTING AUDIO SYSTEM
+#include "Core/SubSystems/Audio/AudioSystem.h"
+
 #include <imgui.h>
 
 namespace SE
@@ -44,6 +47,11 @@ namespace SE
 						scene->loadScene(path);
 						//scene->reloadScene();	
 					}
+				}
+				if (ImGui::MenuItem("shaco death sound lol"))
+				{
+					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
+					AS->PlaySound("Assets/Audio/Shaco_Original_Death_2.wav");
 				}
 				ImGui::EndMenu();
 			}

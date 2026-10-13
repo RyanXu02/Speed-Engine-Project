@@ -13,6 +13,7 @@
 #include "SubSystems/Input/InputSystem.h"
 #include "SubSystems/Scenes/SceneSystem.h"
 #include "SubSystems/Physics/PhysicsSystem.h"
+#include "SubSystems/Audio/AudioSystem.h"
 #include "SubSystems/SubSystem.h"
 
 // temp
@@ -46,6 +47,7 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<PhysicsSystem>(new PhysicsSystem()));
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
+		m_subSystems.push_back(std::unique_ptr<AudioSystem>(new AudioSystem()));
 
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
