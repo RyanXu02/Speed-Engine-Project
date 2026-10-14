@@ -31,15 +31,15 @@ namespace SE
 
 		// @brief Getter for BodyInterface, which is needed to interact with bodies in the physics world 
 		// @returns Reference to the BodyInterface
-		JPH::BodyInterface& getBodyInterface() { return m_physics_system.GetBodyInterface(); }
+		JPH::BodyInterface& getBodyInterface() { return m_physics_system->GetBodyInterface(); }
 
 	private:
 		std::unique_ptr<TempAllocatorImpl> m_temp_allocator;
 		std::unique_ptr<JobSystemThreadPool> m_job_system;
+		std::unique_ptr<JPH::PhysicsSystem> m_physics_system;
 		const uint cMaxBodies = 65536;
 		const uint cNumBodyMutexes = 0;
 		const uint cMaxBodyPairs = 65536;
 		const uint cMaxContactConstraints = 10240;
-		JPH::PhysicsSystem m_physics_system;
 	};
 }

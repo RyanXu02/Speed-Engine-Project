@@ -3,6 +3,7 @@
 
 namespace SE
 {
-	class PhysicsShapeMesh : public PhysicsShape
-	{};
+	/// TODO: mesh shape
+	//class PhysicsShapeMesh : public PhysicsShape
+	//{};
 }

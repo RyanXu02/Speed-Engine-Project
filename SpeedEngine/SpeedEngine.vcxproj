@@ -155,7 +155,6 @@
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeCapsule.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeBox.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeSphere.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShape.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\RigidBody.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
