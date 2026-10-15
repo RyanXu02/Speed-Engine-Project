@@ -164,6 +164,7 @@
     <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
     <ClCompile Include="src\Core\Features\Serializable.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="src\Core\Features\Serializable.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.h" />

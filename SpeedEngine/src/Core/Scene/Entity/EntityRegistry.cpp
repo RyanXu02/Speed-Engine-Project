@@ -6,8 +6,7 @@
 #include "Core/Engine.h"
 #include "Core/Scene/Scene.h"
 #include "Entity.h"
-
-#include <SubSystems/Scenes/SceneSystem.h>
+#include "SubSystems/Scenes/SceneSystem.h"
 
 //loadHook determines what needs to be done after a component is loaded
 //unloadHook determines what needs to be done after a component is unloaded

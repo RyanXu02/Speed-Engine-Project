@@ -4,7 +4,6 @@
 
 #include "Component/ComponentStructs.h"
 #include "Core/SubSystems/Events/EventSystem.h"
-#include "Core/SubSystems/Scenes/SceneSystem.h"
 #include "Engine.h"
 #include "ResourceManagers/ResourceManager.h"
 

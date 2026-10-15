@@ -79,7 +79,7 @@ namespace SE
 	{
 		if (!m_registry.hasEntity(id))
 		{
-			m_logger.warn("there is no entity with given name");
+			// m_logger.warn("there is no entity with given name");
 			return false;
 		}
 

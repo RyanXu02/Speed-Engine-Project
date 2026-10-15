@@ -160,6 +160,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeMesh.cpp">
+    <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -324,6 +331,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

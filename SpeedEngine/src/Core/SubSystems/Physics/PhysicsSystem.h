@@ -18,9 +18,9 @@ namespace SE
 {
 	class PhysicsSystem : public SubSystem
 	{
-	public:
-		PhysicsSystem() : SubSystem("PhysicsSystem") {};
+		friend class Engine;
 
+	public:
 		void init() override;
 
 		// @brief steps physics world one tick
@@ -34,6 +34,9 @@ namespace SE
 		JPH::BodyInterface& getBodyInterface() { return m_physics_system->GetBodyInterface(); }
 
 	private:
+		PhysicsSystem()
+		    : SubSystem("PhysicsSystem") {};
+
 		std::unique_ptr<TempAllocatorImpl> m_temp_allocator;
 		std::unique_ptr<JobSystemThreadPool> m_job_system;
 		std::unique_ptr<JPH::PhysicsSystem> m_physics_system;
