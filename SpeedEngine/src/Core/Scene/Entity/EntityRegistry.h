@@ -1,9 +1,6 @@
 #pragma once
 
-#include <Core/Features/Serializable.h>
-#include <any>
-#include <typeindex>
-#include <unordered_map>
+#include "Core/Features/Serializable.h"
 
 namespace SE
 {
@@ -80,7 +77,7 @@ namespace SE
 				return false;
 			}
 
-			componentIt.erase(typeid(T));
+			components.erase(componentIt);
 			return true;
 		}
 
