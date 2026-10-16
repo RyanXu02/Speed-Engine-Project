@@ -3,6 +3,11 @@
 #include "ConsoleWidget.h"
 #include "Logger/ConsoleSink.h"
 
+#pragma region Commands
+#include "Core/Engine.h"
+#include "Core/Subsystems/Graphics/Window.h"
+#pragma endregion
+
 namespace SE
 {
 
@@ -12,21 +17,57 @@ namespace SE
 
 		m_inputBuf[0] = '\0';
 
-		registerCommand("help", [this](std::string_view) 
+// REGISTER YOUR COMMANDS HERE
+#pragma region RegisterCommands
+		registerCommand("help", [this](CommandArg)
 			{
-				const auto logger = spdlog::get("Console");
-				logger->info("Available commands:");
+				m_logger.info("Available commands:");
 				for (const auto& [name, callback] : m_commandRegistry)
 				{
-					logger->info("  -> {}", name);
+					m_logger.info("  -> {}", name);
 				}
 			});
 
-		registerCommand("clear", [this](std::string_view)
+		registerCommand("clear", [this](CommandArg)
 		    {
 			    auto sink = m_logger.getConsoleSink();
 			    sink->clear();
 		    });
+
+		registerCommand("spawn", [this](CommandArg args)
+		    {
+			    if (args.size() != 1)
+				    m_logger.error("Usage: spawn <arg>");
+			    else
+					m_logger.info("spawn command with arg: {}", args[0]);
+		    });
+
+		registerCommand("resize", [this](CommandArg args)
+		    {
+				if (args.size() != 2)
+				{
+				    m_logger.error("Usage: resize <width> <height>");
+				    return;
+				}
+
+				const auto parseDim = [](std::string_view sv, int& val)
+			    {
+				    const auto result = std::from_chars(sv.data(), sv.data() + sv.size(), val);
+				    return result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range;
+			    };
+
+				int w = 0;
+				int h = 0;
+			    if (parseDim(args[0], w) || parseDim(args[1], h) || w < 800 || h < 600)
+			    {
+				    m_logger.error("Width and height must be positive ints");
+				    return;
+			    }
+
+				Engine::Instance().getSubSystem<Window>()->setSize(w, h);
+				m_logger.info("Resized window to {} {}", args[0], args[1]);
+		    });
+#pragma endregion
 	}
 
 	void ConsoleWidget::registerCommand(std::string_view name, CommandCallback callback)
@@ -69,39 +110,42 @@ namespace SE
 			}
 		m_history.push_back(Strdup(commandLine));
 
-		const auto start = commandLine.find_first_not_of(" \t\r\n");
-		if (start == std::string_view::npos) return;
-		
+		// process the command
+		constexpr std::string_view whitespace = " \t\r\n";
+
+		const auto start = commandLine.find_first_not_of(whitespace);
+		if (start == std::string_view::npos)
+			return;
+
+		m_logger.info("> {}", commandLine);
+		m_scrollToBottom = true;
+
 		commandLine.remove_prefix(start);
-		const auto separator = commandLine.find_first_of(" \t\r\n");
-
-		std::string_view arguments;
-		const auto argumentStart = commandLine.find_first_not_of(" \t\r\n", separator);
-		if (argumentStart != std::string_view::npos)
-			arguments = commandLine.substr(argumentStart);
-
-		static Logger logger = []
-		{
-			Logger result;
-			result.init("Console");
-			return result;
-		}();
-
+		const auto separator = commandLine.find_first_of(whitespace);
 		const std::string name(commandLine.substr(0, separator));
+
+		std::vector<std::string_view> arguments;
+		auto argumentStart = separator;
+		while (argumentStart != std::string_view::npos)
+		{
+			argumentStart = commandLine.find_first_not_of(whitespace, argumentStart);
+			if (argumentStart == std::string_view::npos)
+				break;
+
+			const auto argumentEnd = commandLine.find_first_of(whitespace, argumentStart);
+			arguments.push_back(commandLine.substr(argumentStart, argumentEnd - argumentStart));
+			argumentStart = argumentEnd;
+		}
+
 		const auto command = m_commandRegistry.find(name);
 		if (command == m_commandRegistry.end())
 		{
-			logger.warn("Unknown command: {}", name);
+			m_logger.warn("Unknown command: {}", name);
 			return;
 		}
-		try
-		{
-			command->second(arguments);
-		}
-		catch (const std::exception& error)
-		{
-			logger.error("Command '{}' failed: {}", name, error.what());
-		}
+
+		command->second(arguments);
+
 	}
 
 	// whole lotta code from imgui_demo.cpp

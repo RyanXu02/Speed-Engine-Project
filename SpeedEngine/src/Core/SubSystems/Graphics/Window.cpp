@@ -118,4 +118,9 @@ namespace SE
 	{
 		return glfwGetTime();
 	}
+
+	void Window::setSize(int width, int height)
+	{
+		glfwSetWindowSize(m_window, width, height);
+	}
 } // namespace SE
