@@ -10,15 +10,21 @@
 namespace SE
 {
 	ScenePreviewWidget::ScenePreviewWidget()
-	    : Widget("ScenePreviewWidget")
+		: VisibleWidget("ScenePreviewWidget")
 	{}
 
 	void ScenePreviewWidget::render()
 	{
+		if (!s_visible) return;
+
 		_setStatus("Rendering ScenePreviewWidget");
 
 		ImGuiWindowFlags window_flags = 0; // Default flags allow docking
-		ImGui::Begin("ScenePreviewWidget", nullptr, window_flags);
+		if (!ImGui::Begin("ScenePreviewWidget", &s_visible, window_flags))
+		{
+			ImGui::End();
+			return;
+		}
 
 		// This widget (along with other imgui widgets) receive the imgui viewport,
 		// but we want to display the scene viewport in this widget

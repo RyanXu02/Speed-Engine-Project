@@ -11,7 +11,7 @@ namespace SE
 	using MT = ActiveSceneModified::ModifyType;
 
 	SceneInfoWidget::SceneInfoWidget()
-	    : Widget("Scene Info")
+		: VisibleWidget("Scene Info")
 	{
 		m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified,
 		    [this](Event& event)
@@ -43,8 +43,10 @@ namespace SE
 
 	void SceneInfoWidget::render()
 	{
+		if (!s_visible) return;
+
 		ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
-		if (!ImGui::Begin("Scene Info", nullptr))
+		if (!ImGui::Begin("Scene Info", &s_visible))
 		{
 			ImGui::End();
 			return;

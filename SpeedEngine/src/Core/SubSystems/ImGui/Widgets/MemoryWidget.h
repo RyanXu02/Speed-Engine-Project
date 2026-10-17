@@ -7,22 +7,15 @@
 
 namespace SE
 {
-	class MemoryWidget : public Widget
+	class MemoryWidget : public VisibleWidget<MemoryWidget, false>
 	{
 	public:
 		MemoryWidget()
-		    : Widget("Memory Panel")
+			: VisibleWidget("Memory Panel")
 		{}
 
 		void render() override;
 		void shutdown() override;
-
-		static void setVisible(bool v);
-		static bool isVisible();
-
-	private:
-		// visibility controlled by menu
-		static inline bool s_visible = false;
 	};
 
 } // namespace SE

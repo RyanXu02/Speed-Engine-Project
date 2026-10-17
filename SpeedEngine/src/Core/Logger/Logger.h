@@ -3,6 +3,7 @@
 
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include "ConsoleSink.h"
 #include <spdlog/spdlog.h>
 
 namespace SE
@@ -73,12 +74,20 @@ namespace SE
 			m_spdlogger->critical(fmt::runtime(message), std::forward<Args>(args)...);
 		};
 
+		//@brief gets the console sink
+		//@return pointer to the console sink
+		ConsoleSink* getConsoleSink() const { return s_console_sink.get(); }
+
 	private:
 		std::shared_ptr<spdlog::logger> m_spdlogger;
 
 		// Static shared sinks reused by all loggers
+		#ifdef _DEBUG
 		static std::shared_ptr<spdlog::sinks::basic_file_sink_mt> s_file_sinkd;
 		static std::shared_ptr<spdlog::sinks::basic_file_sink_mt> s_file_sinkv;
+		static std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> s_terminal_sink;
+		#endif
+		static std::shared_ptr<ConsoleSink> s_console_sink;
 		static std::once_flag s_sinks_init_flag; // for use with std::call_once
 
 		// inits 2 static shared sinks
