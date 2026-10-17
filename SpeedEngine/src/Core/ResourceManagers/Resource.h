@@ -29,6 +29,6 @@ namespace SE
 	{
 		Material,
 		Shader,
-		MeshResource,
+		MeshResource
 	};
 } // namespace SE
