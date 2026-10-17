@@ -4,6 +4,17 @@
 
 #include <nlohmann/json.hpp>
 
+#define DEFINE_TYPE(ClassName, ...)				\
+	static const char* getStaticType()			\
+	{											\
+		return #ClassName;						\
+	}											\
+	template <typename Member>					\
+	static void visitFields(Member&& member)	\
+	{											\
+		__VA_ARGS__;							\
+	}
+
 namespace SE
 {
 	template<typename T>
@@ -174,6 +185,7 @@ namespace SE
 	private:
 	};
 
+	//TOOD: rewrite this to overwrite default nlohmann type declaration
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<Serializable, T>>>
 	void to_json(nlohmann::json& j, const T& object)
 	{

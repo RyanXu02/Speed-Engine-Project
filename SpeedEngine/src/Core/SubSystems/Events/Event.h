@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../ResourceManagers/Resource.h"
+#include "core/features/Serializable.h"
 
 // When adding editor-only events, add them at the bottom of this file inside the COMPILE_WITH_EDITOR block
 namespace SE
@@ -46,6 +47,28 @@ namespace SE
 		EventType getEventType() const override { return EventType::WindowClose; }
 		std::string getName() const override { return "WindowClose"; }
 		std::string getDataAsString() const override { return ""; }
+	};
+
+	class MouseMove : public Event
+	{
+	public:
+		double m_x = 0;
+		double m_y = 0;
+
+		MouseMove(double x, double y)
+		    : m_x(x),
+		      m_y(y)
+		{}
+
+		EventType getEventType() const override { return EventType::MouseMoved; }
+		std::string getName() const override { return "MouseMove"; }
+		std::string getDataAsString() const override { return ""; }
+
+		DEFINE_TYPE(
+			MouseMove, 
+			member("m_x", &MouseMove::m_x),
+			member("m_y", &MouseMove::m_y)
+		);
 	};
 
 	// @brief Event that is triggered when the active scene is changed

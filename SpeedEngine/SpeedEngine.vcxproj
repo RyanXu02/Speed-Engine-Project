@@ -151,6 +151,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="src\Core\Logger\Logger.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ScriptingSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
@@ -200,6 +202,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.h" />
     <ClInclude Include="src\Core\Features\Math.h" />
     <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
     <ClInclude Include="src\Core\Features\MemoryTag.h" />
@@ -240,6 +243,7 @@
     <ClInclude Include="src\Core\Engine.h" />
     <ClInclude Include="src\Core\EngineConfig.h" />
     <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ScriptingSystem.h" />
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />

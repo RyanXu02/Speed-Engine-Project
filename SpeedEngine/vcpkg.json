@@ -5,18 +5,20 @@
     "glfw3",
     {
       "name": "glad",
-      "features": ["gl-api-45", "loader"]
+      "features": [ "gl-api-45", "loader" ]
     },
     {
       "name": "imgui",
-      "features": ["docking-experimental", "glfw-binding", "opengl3-binding"]
+      "features": [ "docking-experimental", "glfw-binding", "opengl3-binding" ]
     },
     "glm",
     "nlohmann-json",
     "spdlog",
     "stb",
     "joltphysics",
-    "assimp"
+    "assimp",
+    "lua",
+    "sol2"
   ],
   "builtin-baseline": "0c8f465c549616e897a34b9393054931fda6339c"
 }
