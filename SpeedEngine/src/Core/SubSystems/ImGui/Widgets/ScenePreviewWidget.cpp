@@ -26,14 +26,17 @@ namespace SE
 			return;
 		}
 
-		// This widget (along with other imgui widgets) receive the imgui viewport,
-		// but we want to display the scene viewport in this widget
-		uint32_t fboColorId = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>()->getViewport()->getFBO().getColorTexture();
-
-		ImTextureID imguiTexId = static_cast<ImTextureID>(fboColorId);
+		auto* rendererManager = Engine::Instance().getSubSystem<RendererManager>();
+		ImTextureID imguiTexId = static_cast<ImTextureID>(rendererManager->getFinalSceneTexture());
 		ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-		ImGui::Image(fboColorId, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+		if (viewportSize.x > 0.0f && viewportSize.y > 0.0f)
+		{
+			ImVec2 framebufferScale = ImGui::GetIO().DisplayFramebufferScale;
+			rendererManager->requestSceneResize(static_cast<uint32_t>(viewportSize.x * framebufferScale.x),
+				static_cast<uint32_t>(viewportSize.y * framebufferScale.y));
+			ImGui::Image(imguiTexId, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+		}
 
 		ImGui::End();
 	}

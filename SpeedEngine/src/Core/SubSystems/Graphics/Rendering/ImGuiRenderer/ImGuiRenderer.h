@@ -14,8 +14,8 @@ namespace SE
 	public:
 		void init() override;
 		void initWidgets();
-		void update(double deltaTime) override;
-		void render() const override;
+		void beginFrame();
+		void render(RenderContext& context) const override;
 		void shutdown() override;
 
 		// @brief Creates a widget of the specified type

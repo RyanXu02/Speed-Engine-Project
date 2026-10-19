@@ -7,6 +7,7 @@
 #include "SubSystems/Events/EventSubscription.h"
 #include "SubSystems/Events/EventSystem.h"
 #include "SubSystems/Graphics/Rendering/RendererManager.h"
+#include "SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "SubSystems/Graphics/Window.h"
 #include "SubSystems/Input/InputSystem.h"
 #include "SubSystems/Scenes/SceneSystem.h"
@@ -72,6 +73,7 @@ namespace SE
 		Scene* currentScene = sceneSystem->getCurrentScene();
 
 		uint32_t defaultShaderIid = getSubSystem<ResourceManager>()->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
+		getSubSystem<RendererManager>()->getRenderer<SceneRenderer>()->setDefaultShaderId(defaultShaderIid);
 		std::vector<std::pair<TextureType, std::string_view>> texlist = { { TextureType::Albedo, "Assets/Textures/cole-foxy.jpg" } };
 		uint32_t matid = getSubSystem<ResourceManager>()->addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
 
