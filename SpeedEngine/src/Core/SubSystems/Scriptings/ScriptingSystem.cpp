@@ -14,8 +14,8 @@ namespace SE
 
 		m_luaState.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
 
-		EventToLuaBindings::exportEvents(m_luaState);
-		ComponentToLuaBindings::exportComponents(m_luaState);
+		EventToLuaBindings::exportEvents(m_logger.get(), m_luaState);
+		ComponentToLuaBindings::exportComponents(m_logger.get(), m_luaState);
 
 		sol::table loggerTable = m_luaState.create_named_table("Logger");
 		loggerTable["verbose"] = [&](const std::string& msg) { m_logger->verbose(msg); };
@@ -91,11 +91,31 @@ namespace SE
 	{
 		SubSystem::shutdown();
 
+		// release every lua instance held by script components while EventSystem is still alive
+		Scene* scene = sceneSystem ? sceneSystem->getCurrentScene() : nullptr;
+		if (scene)
+		{
+			auto func = [&](Entity entity) -> void {
+				ScriptComponent* scriptComponent = entity.getComponent<ScriptComponent>();
+				if (scriptComponent->onDestroy)
+				{
+					scriptComponent->onDestroy();
+				}
+				scriptComponent->onInit = []() {};
+				scriptComponent->onUpdate = [](double) {};
+				scriptComponent->onDestroy = []() {};
+				scriptComponent->initilized = false;
+			};
+			scene->forEntitiesWith<ScriptComponent>(func);
+		}
+
 		m_scripts.clear();
 		m_scriptCache.clear();
 
 		m_luaState["Entity"] = sol::nil;
 		m_luaState.collect_garbage();
+		//keep this, apparently some lua projects had to clean twice to fully clear memory... what?
+		//m_luaState.collect_garbage();
 	}
 
 	//load the script and function call details into the script component

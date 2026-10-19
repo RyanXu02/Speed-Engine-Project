@@ -49,25 +49,48 @@ namespace SE
 		std::string getDataAsString() const override { return ""; }
 	};
 
-	class MouseMove : public Event
+	class MouseMovedEvent : public Event
 	{
 	public:
 		double m_x = 0;
 		double m_y = 0;
 
-		MouseMove(double x, double y)
+		MouseMovedEvent(double x, double y)
 		    : m_x(x),
 		      m_y(y)
 		{}
 
 		EventType getEventType() const override { return EventType::MouseMoved; }
-		std::string getName() const override { return "MouseMove"; }
+		std::string getName() const override { return "MouseMovedEvent"; }
 		std::string getDataAsString() const override { return ""; }
 
 		DEFINE_TYPE(
-			MouseMove, 
-			member("m_x", &MouseMove::m_x),
-			member("m_y", &MouseMove::m_y)
+			MouseMovedEvent, 
+			member("m_x", &MouseMovedEvent::m_x),
+			member("m_y", &MouseMovedEvent::m_y)
+		);
+	};
+
+	
+	class KeyPressedEvent : public Event
+	{
+	public:
+		int keyCode = 0;
+		bool isRepeat = false;
+
+		KeyPressedEvent(int keyCode, bool isRepeat = false)
+		    : keyCode(keyCode),
+		      isRepeat(isRepeat)
+		{}
+
+		EventType getEventType() const override { return EventType::KeyPressed; }
+		std::string getName() const override { return "KeyPressedEvent"; }
+		std::string getDataAsString() const override { return ""; }
+
+		DEFINE_TYPE(
+			KeyPressedEvent, 
+			member("keyCode", &KeyPressedEvent::keyCode), 
+			member("isRepeat", &KeyPressedEvent::isRepeat)
 		);
 	};
 

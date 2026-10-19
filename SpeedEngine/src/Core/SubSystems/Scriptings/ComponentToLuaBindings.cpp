@@ -4,7 +4,7 @@
 namespace SE
 {
 
-	void ComponentToLuaBindings::exportComponents(sol::state& luaState) {
+	void ComponentToLuaBindings::exportComponents(Logger* logger, sol::state& luaState) {
 
 		luaState.new_usertype<Entity>("Entity",
 			"id", [] (Entity& self) {

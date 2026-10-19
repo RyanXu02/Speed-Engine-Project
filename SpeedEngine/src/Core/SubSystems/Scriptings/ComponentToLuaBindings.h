@@ -5,10 +5,11 @@
 
 namespace SE
 {
+	class Logger;
 	class ComponentToLuaBindings
 	{
 	public:
-		static void exportComponents(sol::state& luaState);
+		static void exportComponents(Logger* logger, sol::state& luaState);
 
 	private:
 		using ComponentGetter = std::function<sol::object(sol::state_view, Entity)>;
