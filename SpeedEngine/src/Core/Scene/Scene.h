@@ -51,6 +51,19 @@ namespace SE
 			return entities;
 		}
 
+		template<typename... Ts>
+		void forEntitiesWith(std::function<void(Entity)> callback)
+		{
+			for (auto& [id, components] : m_registry)
+			{
+				Entity entity = getEntity(id);
+				if ((entity.getComponent<Ts>() && ...))
+				{
+					callback(entity);
+				}
+			};
+		}
+
 		// @brief For use with UI widget
 		std::unordered_map<uint32_t, std::string> getEntityList();
 

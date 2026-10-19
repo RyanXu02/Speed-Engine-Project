@@ -6,6 +6,7 @@
 
 namespace SE
 {
+	class SceneSystem;
 	class ScriptingSystem : public SubSystem
 	{
 	public:
@@ -20,16 +21,19 @@ namespace SE
 
 		virtual void loadScript(Entity& entity, std::string_view path);
 		virtual void loadScript(std::string_view path);
-		virtual void reloadScript(std::string_view path);
 		virtual void runScript(std::string_view path);
+		virtual void removeScript(std::string_view path);
+		virtual void reloadScript(std::string_view path);
 
 	private:
-		virtual void _reloadScript(const std::string& path);
+		virtual void _initScript(ScriptComponent& scriptComponent);
+
 		std::vector<std::string> m_scriptsToReload;
 
 		sol::state m_luaState;
 		std::unordered_map<std::string, sol::protected_function> m_scripts;
 		std::unordered_map<std::string, sol::table> m_scriptCache;
+		SceneSystem* sceneSystem;
 	};
 
 }

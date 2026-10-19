@@ -13,6 +13,7 @@ namespace SE
 	class Entity
 	{
 	public:
+		Entity(const Entity& other);
 		Entity(uint32_t id, EntityRegistry* registry);
 
 		operator uint32_t() { return m_id; }
@@ -49,5 +50,7 @@ namespace SE
 		static HookFunction _onNameComponentRemoved();
 		static HookFunction _onMeshComponentAdded();
 		static HookFunction _onMeshComponentRemoved();
+		static HookFunction _onScriptComponentAdded();
+		static HookFunction _onScriptComponentRemoved();
 	};
 } // namespace SE

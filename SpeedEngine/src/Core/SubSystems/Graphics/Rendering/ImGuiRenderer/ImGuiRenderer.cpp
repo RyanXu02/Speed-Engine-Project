@@ -4,15 +4,15 @@
 #include "SubSystems/ImGui/Widgets/ConsoleWidget.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "SubSystems/ImGui/Widgets/MainWidget.h"
-#include "SubSystems/ImGui/Widgets/MemoryWidget.h"
-#include "SubSystems/ImGui/Widgets/PropertiesWidget.h"
-#include "SubSystems/ImGui/Widgets/ResourceBrowserWidget.h"
-#include "SubSystems/ImGui/Widgets/SceneInfoWidget.h"
-#include "SubSystems/ImGui/Widgets/ScenePreviewWidget.h"
-#endif
-
-#include "SubSystems/Graphics/Window.h"
+#include "Core/SubSystems/ImGui/Widget.h"
+#include "Core/SubSystems/ImGui/Widgets/ConsoleWidget.h"
+#include "Core/SubSystems/ImGui/Widgets/MainWidget.h"
+#include "Core/SubSystems/ImGui/Widgets/MemoryWidget.h"
+#include "Core/SubSystems/ImGui/Widgets/PropertiesWidget.h"
+#include "Core/SubSystems/ImGui/Widgets/ResourceBrowserWidget.h"
+#include "Core/SubSystems/ImGui/Widgets/SceneInfoWidget.h"
+#include "Core/SubSystems/ImGui/Widgets/ScenePreviewWidget.h"
+#include "Core/SubSystems/Graphics/Window.h"
 #include "ImGuiRenderer.h"
 
 #include <imgui.h>

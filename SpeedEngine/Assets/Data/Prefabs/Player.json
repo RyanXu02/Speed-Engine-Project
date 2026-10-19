@@ -8,6 +8,9 @@
     },
     "MeshComponent": {
       "path": "Assets/Meshes/Suzanne.gltf"
+    },
+    "ScriptComponent": {
+      "path": "Assets/Meshes/player.lua"
     }
   }
 }
