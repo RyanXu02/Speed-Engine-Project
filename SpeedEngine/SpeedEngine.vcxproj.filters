@@ -306,6 +306,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h">
+    <ClInclude Include="src\Core\Logger\ConsoleSink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

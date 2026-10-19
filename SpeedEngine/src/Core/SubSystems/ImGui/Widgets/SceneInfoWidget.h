@@ -5,7 +5,7 @@
 
 namespace SE
 {
-	class SceneInfoWidget : public Widget
+	class SceneInfoWidget : public VisibleWidget<SceneInfoWidget>
 	{
 	public:
 		SceneInfoWidget();

@@ -9,16 +9,6 @@
 
 namespace SE
 {
-	void MemoryWidget::setVisible(bool v)
-	{
-		s_visible = v;
-	}
-
-	bool MemoryWidget::isVisible()
-	{
-		return s_visible;
-	}
-
 	void MemoryWidget::render()
 	{
 		_setStatus("Rendering MemoryWidget");

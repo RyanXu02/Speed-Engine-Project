@@ -10,7 +10,7 @@ namespace SE
 {
 	class Entity;
 
-	class PropertiesWidget : public Widget
+	class PropertiesWidget : public VisibleWidget<PropertiesWidget>
 	{
 	public:
 		PropertiesWidget();

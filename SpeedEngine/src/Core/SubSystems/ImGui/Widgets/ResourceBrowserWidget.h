@@ -6,7 +6,7 @@
 
 namespace SE
 {
-	class ResourceBrowserWidget : public Widget
+	class ResourceBrowserWidget : public VisibleWidget<ResourceBrowserWidget>
 	{
 	public:
 		ResourceBrowserWidget();

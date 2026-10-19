@@ -2,7 +2,7 @@
 #include "../Widget.h"
 namespace SE
 {
-	class ScenePreviewWidget : public Widget
+	class ScenePreviewWidget : public VisibleWidget<ScenePreviewWidget>
 	{
 	public:
 		ScenePreviewWidget();
