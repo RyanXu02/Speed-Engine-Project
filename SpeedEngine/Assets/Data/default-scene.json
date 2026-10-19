@@ -9,7 +9,10 @@
           "path": "Assets/Meshes/Suzanne.gltf"
         },
         "NameComponent": {
-          "name": "play"
+          "name": "player"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/Player.lua"
         },
         "Transform": {
           "rotate": [0.0, 0.0, 0.0],

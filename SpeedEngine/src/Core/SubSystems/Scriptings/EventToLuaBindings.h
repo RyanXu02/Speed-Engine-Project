@@ -19,8 +19,7 @@ namespace SE
 			// create a lua type, match cpp type
 			auto luaType = luaState.new_usertype<T>(T::getStaticType(), sol::base_classes, sol::bases<Event>());
 
-			auto resolver = [&luaType](const char* name, auto memberPtr)
-			{
+			auto resolver = [&luaType](const char* name, auto memberPtr) {
 				luaType.set(name, memberPtr);
 			};
 

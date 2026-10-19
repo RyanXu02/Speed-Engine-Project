@@ -16,7 +16,7 @@
 #include "ResourceManagers/Material/Material.h"
 #include "Scene/Entity/Component/ComponentStructs.h"
 #include "Scene/Entity/Component/Transform.h"
-#include <SubSystems/Scriptings/ScriptingSystem.h>
+#include "SubSystems/Scriptings/ScriptingSystem.h"
 
 namespace SE
 {

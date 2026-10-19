@@ -4,16 +4,39 @@
 
 #include <nlohmann/json.hpp>
 
-#define DEFINE_TYPE(ClassName, ...)				\
-	static const char* getStaticType()			\
-	{											\
-		return #ClassName;						\
-	}											\
-	template <typename Member>					\
-	static void visitFields(Member&& member)	\
-	{											\
-		__VA_ARGS__;							\
+//move away from nlohman intrusive type, use a custom one
+//while maintaining nlohman type registration
+#define DEFINE_TYPE(ClassName, ...)										\
+	static const char* getStaticType()									\
+	{																	\
+		return #ClassName;												\
+	}																	\
+	template <typename Member>											\
+	static void visitFields(Member&& member)							\
+	{																	\
+		__VA_ARGS__;													\
+	}																	\
+	friend void to_json(nlohmann::json& j, const ClassName& obj)		\
+	{																	\
+		j = nlohmann::json::object();									\
+		auto resolver = [&j, &obj](const char* name, auto memberPtr) {	\
+			j[name] = obj.*memberPtr;									\
+		};																\
+		ClassName::visitFields(resolver);								\
+	}																	\
+	friend void from_json(const nlohmann::json& j, ClassName& obj)		\
+	{																	\
+		auto resolver = [&j, &obj](const char* name, auto memberPtr) {	\
+			if (j.contains(name)){										\
+				j.at(name).get_to(obj.*memberPtr);						\
+			}															\
+		};																\
+		ClassName::visitFields(resolver);								\
 	}
+
+// register the behavior of the type on construction and destruction
+#define REGISTER_TYPE(Type, ConstructorFunc, DesctructorFunc)				\
+	m_typeResolver.Register<Type>(#Type, ConstructorFunc, DesctructorFunc);	\
 
 namespace SE
 {
@@ -164,8 +187,6 @@ namespace SE
 	};
 
 
-#define REGISTER_TYPE(Type, ConstructorFunc, DesctructorFunc) m_typeResolver.Register<Type>(#Type, ConstructorFunc, DesctructorFunc);
-
 
 	class Serializable
 	{
@@ -184,17 +205,4 @@ namespace SE
 
 	private:
 	};
-
-	//TOOD: rewrite this to overwrite default nlohmann type declaration
-	template<typename T, typename = std::enable_if_t<std::is_base_of_v<Serializable, T>>>
-	void to_json(nlohmann::json& j, const T& object)
-	{
-		object.serialize(j);
-	}
-
-	template<typename T, typename = std::enable_if_t<std::is_base_of_v<Serializable, T>>>
-	void from_json(const nlohmann::json j, T& object)
-	{
-		object.deserialize(j);
-	}
 }

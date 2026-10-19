@@ -8,6 +8,7 @@
 #include "ResourceManagers/ResourceManager.h"
 #include "imgui.h"
 #include "imgui_stdlib.h"
+#include <SubSystems/Scriptings/ScriptingSystem.h>
 
 namespace SE
 {
@@ -81,6 +82,22 @@ namespace SE
 			    ImGui::Text("Parent ID: %u", component.parent);
 			    for (size_t i = 0; i < component.children.size(); ++i)
 				    ImGui::Text("Child %zu: %u", i, component.children[i]);
+		    });
+
+		m_inspectors.registerComponent<ScriptComponent>("ScriptComponent", false,
+		    [](Entity&, ScriptComponent& component)
+		    {
+			    auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
+			    ImGui::Text(component.path.c_str());
+			    if (ImGui::Button("Test Load Single Time Script", ImVec2(-1.0f, 0.0f)))
+			    {
+				    scriptingSystem->loadScript("Assets/Scripts/sandbox.lua");
+				    scriptingSystem->runScript("Assets/Scripts/sandbox.lua");
+			    }
+				if (ImGui::Button("Reload Script", ImVec2(-1.0f, 0.0f)))
+				{
+				    scriptingSystem->reloadScript(component.path);
+				}
 		    });
 
 #pragma endregion RegisterComponentEditors

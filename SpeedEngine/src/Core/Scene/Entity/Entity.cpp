@@ -6,11 +6,18 @@
 #include "Core/SubSystems/Events/EventSystem.h"
 #include "Engine.h"
 #include "ResourceManagers/ResourceManager.h"
+#include <SubSystems/Scriptings/ScriptingSystem.h>
 
 namespace SE
 {
 	using MT = ActiveSceneModified::ModifyType;
 
+
+	Entity::Entity(const Entity& other) 
+	{
+		m_id = other.m_id;
+		m_registry = other.m_registry;
+	}
 
 	Entity::Entity(uint32_t id, EntityRegistry* registry)
 	    : m_id(id),
@@ -22,7 +29,7 @@ namespace SE
 		HookFunction function = [](Entity entity)
 		{
 			auto* nameComp = entity.getComponent<NameComponent>();
-			printf("nameComponent added: %s", nameComp->name.c_str());
+			//printf("nameComponent added: %s\n", nameComp->name.c_str());
 		};
 		return function;
 	}
@@ -56,6 +63,28 @@ namespace SE
 			auto* meshComponent = entity.getComponent<MeshComponent>();
 			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
 			//meshResourceManager->removeResource(meshComponent->meshResourceID);
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onScriptComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* scriptComponent = entity.getComponent<ScriptComponent>();
+			auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
+			scriptingSystem->loadScript(entity, scriptComponent->path);
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onScriptComponentRemoved()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* scriptComponent = entity.getComponent<ScriptComponent>();
+			auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
+			//scriptingSystem->removeScript(scriptComponent->path);
 		};
 		return function;
 	}

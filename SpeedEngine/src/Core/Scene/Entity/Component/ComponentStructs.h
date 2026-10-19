@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Transform.h"
+#include "Core/features/Serializable.h"
 
 
 namespace SE
@@ -13,7 +14,7 @@ namespace SE
 
 		std::string name = "Unknown";
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(NameComponent, name);
+		DEFINE_TYPE(NameComponent, member("name", &NameComponent::name));
 	};
 
 	struct MeshComponent
@@ -28,7 +29,7 @@ namespace SE
 		uint32_t meshResourceID{ 0 };
 		std::string path = "None";
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(MeshComponent, path);
+		DEFINE_TYPE(MeshComponent, member("path", &MeshComponent::path));
 	};
 
 	struct LifeComponent
@@ -40,7 +41,7 @@ namespace SE
 
 		bool isAlive{ true };
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(LifeComponent, isAlive);
+		DEFINE_TYPE(LifeComponent, member("isAlive", &LifeComponent::isAlive));
 	};
 
 	struct RelationshipComponent
@@ -57,7 +58,21 @@ namespace SE
 
 		std::string prefabPath = "None";
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(PrefabComponent, prefabPath);
+		DEFINE_TYPE(PrefabComponent, member("prefabPath", &PrefabComponent::prefabPath));
 	};
 
+	struct ScriptComponent
+	{
+		ScriptComponent() = default;
+		ScriptComponent(std::string scriptPath)
+		    : path(scriptPath) {};
+
+		std::string path{ "None" };
+		std::function<void()> onInit = []() {};
+		std::function<void(double)> onUpdate = [](double) {};
+		std::function<void()> onDestroy = []() {};
+		bool initilized{ false };
+
+		DEFINE_TYPE(ScriptComponent, member("path", &ScriptComponent::path));
+	};
 }
