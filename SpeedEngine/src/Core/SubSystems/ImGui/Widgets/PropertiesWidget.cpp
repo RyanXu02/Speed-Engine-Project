@@ -91,6 +91,7 @@ namespace SE
 			    ImGui::Text(component.path.c_str());
 			    if (ImGui::Button("Test Load Single Time Script", ImVec2(-1.0f, 0.0f)))
 			    {
+					//TODO: hard code script path for now
 				    scriptingSystem->loadScript("Assets/Scripts/sandbox.lua");
 				    scriptingSystem->runScript("Assets/Scripts/sandbox.lua");
 			    }
@@ -237,7 +238,7 @@ namespace SE
 		}
 
 		// Add component popup
-		if (ImGui::Button("Add Component"))
+		if (ImGui::Button("Add Component", ImVec2(-1.0, 0.0)))
 			ImGui::OpenPopup("AddComponent");
 		if (ImGui::BeginPopup("AddComponent"))
 		{

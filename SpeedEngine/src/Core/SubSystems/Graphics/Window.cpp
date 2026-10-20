@@ -101,6 +101,21 @@ namespace SE
 			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<WindowClose>());
 		    });
 
+		glfwSetCursorPosCallback(m_window,
+		    [](GLFWwindow* window, double x, double y)
+		    {
+			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<MouseMovedEvent>(x, y));
+		    });
+
+		glfwSetKeyCallback(m_window,
+		    [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		    {
+			    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+			    {
+				    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<KeyPressedEvent>(key, action == GLFW_REPEAT));
+			    }
+		    });
+
 		// init glad
 		if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 		{
