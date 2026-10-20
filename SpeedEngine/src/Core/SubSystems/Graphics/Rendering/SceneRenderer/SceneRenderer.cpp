@@ -46,6 +46,8 @@ namespace SE
 			m_logger.critical("Default shader not found, cannot render");
 			return;
 		}
+		// Get default material
+		Material* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
 
 		auto entities = context.scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
 		for (auto& entity : entities)
@@ -69,6 +71,7 @@ namespace SE
 			}
 
 			defaultShader->bind();
+			defaultMaterial->bind();
 
 			// Set camera matrices
 			defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);
@@ -78,7 +81,7 @@ namespace SE
 
 			// Set material properties
 			defaultShader->setVec4("color", glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
-			defaultShader->setBool("useTexture", false);
+			defaultShader->setBool("useTexture", defaultMaterial != nullptr);
 			defaultShader->setFloat("intensity", 1.0f);
 			defaultShader->setInt("frameIndex", 0);
 			defaultShader->setFloat("numRows", 1.0f);
@@ -86,6 +89,7 @@ namespace SE
 
 			context.meshes.draw(meshResourceId, *meshResource);
 
+			defaultMaterial->unbind();
 			defaultShader->unbind();
 		}
 	}

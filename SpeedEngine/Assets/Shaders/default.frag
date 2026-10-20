@@ -17,8 +17,7 @@ uniform float numRows;
 uniform float numCols;
 
 // Textures
-uniform sampler2D diffuse0;
-uniform sampler2D diffuse1;
+uniform sampler2D albedo;
 
 void main()
 {
@@ -31,11 +30,9 @@ void main()
     vec2 finalUV = (TexCoord * uvScale) + uvOffset;
     
     // Sample texture
-    vec4 texColor;
+    vec4 texColor = vec4(1.0);
     if (useTexture) {
-        texColor = texture(diffuse0, finalUV);
-    } else {
-        texColor = texture(diffuse1, finalUV);
+        texColor = texture(albedo, finalUV);
     }
     
     // Simple directional lighting
@@ -50,8 +47,7 @@ void main()
     vec3 lighting = (ambient + diffuse) * intensity;
     
     // Combine texture and color with lighting
-    // vec4 finalColor = texColor *color;
-    vec4 finalColor = color;
+    vec4 finalColor = texColor * color;
     finalColor.rgb *= lighting;
     
     FragColor = finalColor;

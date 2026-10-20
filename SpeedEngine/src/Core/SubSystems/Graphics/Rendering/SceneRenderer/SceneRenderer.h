@@ -17,6 +17,7 @@ namespace SE
 
 		void render(RenderContext& context) const override;
 		void setDefaultShaderId(uint32_t id) { m_defaultShaderId = id; }
+		void setDefaultMaterialId(uint32_t id) { m_defaultMaterialId = id; }
 
 		// @brief get scene preview camera sensitivity
 		// @return reference to camera sensitivity, used for imgui widgets
@@ -31,6 +32,7 @@ namespace SE
 	private:
 		// Default shader for meshes without material
 		uint32_t m_defaultShaderId = 0;
+		uint32_t m_defaultMaterialId = 0;
 
 		// Camera controls
 		void _updateCameraPosition(double deltaTime, CameraFrustum& camera);
