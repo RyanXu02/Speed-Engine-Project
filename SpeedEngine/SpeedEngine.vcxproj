@@ -85,6 +85,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -115,6 +117,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -139,9 +143,10 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Jolt.lib;glfw3dll.lib;spdlog.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -157,6 +162,8 @@
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeSphere.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\RigidBody.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
@@ -191,6 +198,7 @@
     <ClCompile Include="src\Core\Logger\Logger.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ScriptingSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
@@ -213,7 +221,10 @@
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShape.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\RigidBody.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsSystem.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.h" />
     <ClInclude Include="src\Core\Features\Math.h" />
+    <ClInclude Include="src\Core\Logger\ConsoleSink.h" />
     <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
     <ClInclude Include="src\Core\Features\MemoryTag.h" />
     <ClInclude Include="src\Core\Features\MemoryTrackable.h" />
@@ -253,6 +264,7 @@
     <ClInclude Include="src\Core\Engine.h" />
     <ClInclude Include="src\Core\EngineConfig.h" />
     <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ScriptingSystem.h" />
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />

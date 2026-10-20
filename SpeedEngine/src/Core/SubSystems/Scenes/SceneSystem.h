@@ -15,7 +15,6 @@ namespace SE
 		void update(double deltaTime) override;
 		void shutdown() override;
 
-		void addScene(std::unique_ptr<Scene> scene);
 		void newScene(const std::string& name);
 		void unloadScene(Scene* scene);
 

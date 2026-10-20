@@ -74,6 +74,7 @@ namespace SE
 		}
 
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 		// create window
 		m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), NULL, NULL);
 		if (!m_window)
@@ -82,6 +83,7 @@ namespace SE
 			glfwTerminate();
 			return false;
 		}
+
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		m_windowShared = glfwCreateWindow(m_windowWidth, m_windowHeight, m_windowTitle.c_str(), NULL, m_window);
 		if (!m_windowShared)
@@ -97,6 +99,21 @@ namespace SE
 		    [](GLFWwindow* window)
 		    {
 			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<WindowClose>());
+		    });
+
+		glfwSetCursorPosCallback(m_window,
+		    [](GLFWwindow* window, double x, double y)
+		    {
+			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<MouseMovedEvent>(x, y));
+		    });
+
+		glfwSetKeyCallback(m_window,
+		    [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		    {
+			    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+			    {
+				    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<KeyPressedEvent>(key, action == GLFW_REPEAT));
+			    }
 		    });
 
 		// init glad
@@ -115,5 +132,10 @@ namespace SE
 	double Window::getCurrentTime() const
 	{
 		return glfwGetTime();
+	}
+
+	void Window::setSize(int width, int height)
+	{
+		glfwSetWindowSize(m_window, width, height);
 	}
 } // namespace SE

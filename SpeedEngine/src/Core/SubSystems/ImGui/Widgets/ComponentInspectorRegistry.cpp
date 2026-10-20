@@ -1,4 +1,5 @@
 #include "pch.h"
+#if defined(COMPILE_WITH_EDITOR)
 
 #include "ComponentInspectorRegistry.h"
 
@@ -95,3 +96,4 @@ namespace SE
 		return changed;
 	}
 }
+#endif

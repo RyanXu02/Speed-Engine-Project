@@ -37,6 +37,8 @@ namespace SE
 		unsigned int getWidth() const { return m_windowWidth; }
 		unsigned int getHeight() const { return m_windowHeight; }
 
+		void setSize(int width, int height);
+
 		double getFPS() const { return m_fps; }
 		void setFPS(double fps) { m_fps = fps; }
 

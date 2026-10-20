@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../ResourceManagers/Resource.h"
+#include "core/features/Serializable.h"
 
 // When adding editor-only events, add them at the bottom of this file inside the COMPILE_WITH_EDITOR block
 namespace SE
@@ -46,6 +47,51 @@ namespace SE
 		EventType getEventType() const override { return EventType::WindowClose; }
 		std::string getName() const override { return "WindowClose"; }
 		std::string getDataAsString() const override { return ""; }
+	};
+
+	class MouseMovedEvent : public Event
+	{
+	public:
+		double m_x = 0;
+		double m_y = 0;
+
+		MouseMovedEvent(double x, double y)
+		    : m_x(x),
+		      m_y(y)
+		{}
+
+		EventType getEventType() const override { return EventType::MouseMoved; }
+		std::string getName() const override { return "MouseMovedEvent"; }
+		std::string getDataAsString() const override { return ""; }
+
+		DEFINE_TYPE(
+			MouseMovedEvent, 
+			member("m_x", &MouseMovedEvent::m_x),
+			member("m_y", &MouseMovedEvent::m_y)
+		);
+	};
+
+	
+	class KeyPressedEvent : public Event
+	{
+	public:
+		int keyCode = 0;
+		bool isRepeat = false;
+
+		KeyPressedEvent(int keyCode, bool isRepeat = false)
+		    : keyCode(keyCode),
+		      isRepeat(isRepeat)
+		{}
+
+		EventType getEventType() const override { return EventType::KeyPressed; }
+		std::string getName() const override { return "KeyPressedEvent"; }
+		std::string getDataAsString() const override { return ""; }
+
+		DEFINE_TYPE(
+			KeyPressedEvent, 
+			member("keyCode", &KeyPressedEvent::keyCode), 
+			member("isRepeat", &KeyPressedEvent::isRepeat)
+		);
 	};
 
 	// @brief Event that is triggered when the active scene is changed

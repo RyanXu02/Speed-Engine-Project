@@ -1,8 +1,8 @@
 #pragma once
-#include "../Engine.h"
-#include "../Logger/Logger.h"
-#include "../SubSystems/Events/EventSystem.h"
-#include "../SubSystems/SubSystem.h"
+#include "Core/Engine.h"
+#include "Core/Logger/Logger.h"
+#include "Core/SubSystems/Events/EventSystem.h"
+#include "Core/SubSystems/SubSystem.h"
 #include "Manager.h"
 #include "Material/MaterialManager.h"
 #include "MeshResource/MeshResourceManager.h"
@@ -19,6 +19,7 @@ namespace SE
 
 		void init() override;
 		void shutdown() override;
+
 
 		//@brief generates a resource id. atomic and does not reuse ids
 		//@returns an id (uint32)

@@ -8,6 +8,7 @@
 #include "Entity.h"
 #include "SubSystems/Scenes/SceneSystem.h"
 
+
 //loadHook determines what needs to be done after a component is loaded
 //unloadHook determines what needs to be done after a component is unloaded
 #define REGISTER_COMPONENT(Type, LoadHook, UnloadHook)        \
@@ -24,6 +25,7 @@
 		    UnloadHook(Entity(entityID, this));               \
 	    })
 
+#define NO_DEFINE [](Entity entity) {}
 
 namespace SE
 {
@@ -31,10 +33,11 @@ namespace SE
 	    : Serializable()
 	{
 		REGISTER_COMPONENT(NameComponent, Entity::_onNameComponentAdded(), Entity::_onNameComponentRemoved());
-		REGISTER_COMPONENT(LifeComponent);
-		REGISTER_COMPONENT(Transform);
+		REGISTER_COMPONENT(LifeComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(Transform, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), Entity::_onMeshComponentRemoved());
-		REGISTER_COMPONENT(PrefabComponent);
+		REGISTER_COMPONENT(PrefabComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(ScriptComponent, Entity::_onScriptComponentAdded(), Entity::_onScriptComponentRemoved());
 	}
 
 	EntityRegistry::~EntityRegistry() {}

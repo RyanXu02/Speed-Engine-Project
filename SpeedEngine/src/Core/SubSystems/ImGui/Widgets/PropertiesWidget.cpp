@@ -8,11 +8,12 @@
 #include "ResourceManagers/ResourceManager.h"
 #include "imgui.h"
 #include "imgui_stdlib.h"
+#include <SubSystems/Scriptings/ScriptingSystem.h>
 
 namespace SE
 {
 	PropertiesWidget::PropertiesWidget()
-	    : Widget("PropertiesWidget")
+		: VisibleWidget("PropertiesWidget")
 	{
 // REGISTER YOUR COMPONENT FOR THE PROPERTIES WIDGET HERE:
 #pragma region RegisterComponentEditors
@@ -83,6 +84,23 @@ namespace SE
 				    ImGui::Text("Child %zu: %u", i, component.children[i]);
 		    });
 
+		m_inspectors.registerComponent<ScriptComponent>("ScriptComponent", false,
+		    [](Entity&, ScriptComponent& component)
+		    {
+			    auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
+			    ImGui::Text(component.path.c_str());
+			    if (ImGui::Button("Test Load Single Time Script", ImVec2(-1.0f, 0.0f)))
+			    {
+					//TODO: hard code script path for now
+				    scriptingSystem->loadScript("Assets/Scripts/sandbox.lua");
+				    scriptingSystem->runScript("Assets/Scripts/sandbox.lua");
+			    }
+				if (ImGui::Button("Reload Script", ImVec2(-1.0f, 0.0f)))
+				{
+				    scriptingSystem->reloadScript(component.path);
+				}
+		    });
+
 #pragma endregion RegisterComponentEditors
 
 
@@ -119,6 +137,8 @@ namespace SE
 
 	void PropertiesWidget::render()
 	{
+		if (!s_visible) return;
+
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
 		Entity entity{ 0, nullptr };
 		std::string entityName = "None Selected";
@@ -138,7 +158,7 @@ namespace SE
 		}
 		// Window title
 		const std::string windowTitle = std::format("Properties - {}###PropertiesWidget", entityName);
-		if (!ImGui::Begin(windowTitle.c_str(), nullptr))
+		if (!ImGui::Begin(windowTitle.c_str(), &s_visible))
 		{
 			ImGui::End();
 			return;
@@ -218,7 +238,7 @@ namespace SE
 		}
 
 		// Add component popup
-		if (ImGui::Button("Add Component"))
+		if (ImGui::Button("Add Component", ImVec2(-1.0, 0.0)))
 			ImGui::OpenPopup("AddComponent");
 		if (ImGui::BeginPopup("AddComponent"))
 		{

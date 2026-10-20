@@ -41,11 +41,6 @@ namespace SE
 		m_currentScene = nullptr;
 	}
 
-	void SceneSystem::addScene(std::unique_ptr<Scene> scene)
-	{
-		m_scenes.push_back(std::move(scene));
-	}
-
 	void SceneSystem::newScene(const std::string& name)
 	{
 		m_logger->info("Creating new scene: {}", name);

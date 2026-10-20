@@ -17,6 +17,7 @@
 #include "ResourceManagers/Material/Material.h"
 #include "Scene/Entity/Component/ComponentStructs.h"
 #include "Scene/Entity/Component/Transform.h"
+#include "SubSystems/Scriptings/ScriptingSystem.h"
 
 namespace SE
 {
@@ -39,13 +40,13 @@ namespace SE
 		// push back subsystems in order of initialization
 		m_subSystems.push_back(std::unique_ptr<MemoryTrackingSystem>(new MemoryTrackingSystem()));
 		m_subSystems.push_back(std::unique_ptr<EventSystem>(new EventSystem()));
-		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720,
-		    "Speed Engine"))); // has to be BEFORE ResourceManager
+		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720, "Speed Engine"))); // has to be BEFORE ResourceManager
 		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem()));
 		m_subSystems.push_back(std::unique_ptr<ResourceManager>(new ResourceManager()));
 		m_subSystems.push_back(std::unique_ptr<RendererManager>(new RendererManager(*getSubSystem<Window>())));
 		m_subSystems.push_back(std::unique_ptr<PhysicsSystem>(new PhysicsSystem()));
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
+		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
 
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
