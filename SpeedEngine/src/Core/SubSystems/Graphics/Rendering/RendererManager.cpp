@@ -4,6 +4,7 @@
 
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/SubSystems/Scenes/SceneSystem.h"
+#include "Core/SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/Engine.h"
 
@@ -50,8 +51,12 @@ namespace SE
 
 		// Configure your targets, execution order, outputs, and clears here
 		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{});
+
 		auto& sceneRenderer = addRenderer<SceneRenderer>();
 		addPass({ sceneRenderer, sceneColor, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
+
+		auto& debugRenderer = addRenderer<DebugRenderer>();
+		addPass({ debugRenderer, sceneColor, 0 });
 
 		setFinalSceneOutput("SceneColor");
 

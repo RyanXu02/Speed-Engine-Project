@@ -69,6 +69,9 @@
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -207,6 +210,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h">

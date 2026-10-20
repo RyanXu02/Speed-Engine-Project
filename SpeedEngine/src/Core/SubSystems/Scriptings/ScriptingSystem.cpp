@@ -15,7 +15,7 @@ namespace SE
 
 	void SE::ScriptingSystem::update(double deltaTime)
 	{
-		m_logger->info("script updating");
+		m_logger->verbose("script updating");
 
 	}
 

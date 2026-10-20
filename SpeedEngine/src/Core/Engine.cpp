@@ -6,6 +6,7 @@
 #include "ResourceManagers/ResourceManager.h"
 #include "SubSystems/Events/EventSubscription.h"
 #include "SubSystems/Events/EventSystem.h"
+#include "SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
 #include "SubSystems/Graphics/Rendering/RendererManager.h"
 #include "SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "SubSystems/Graphics/Window.h"
@@ -14,9 +15,6 @@
 #include "SubSystems/SubSystem.h"
 
 // temp
-#include "ResourceManagers/Material/Material.h"
-#include "Scene/Entity/Component/ComponentStructs.h"
-#include "Scene/Entity/Component/Transform.h"
 #include <SubSystems/Scriptings/ScriptingSystem.h>
 
 namespace SE
@@ -63,41 +61,22 @@ namespace SE
 	void Engine::start()
 	{
 		m_isRunning = true;
-	}
-	void Engine::run()
-	{
-		// temp
 		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
 		sceneSystem->newScene("TestScene");
 		sceneSystem->setCurrentScene("TestScene");
 		Scene* currentScene = sceneSystem->getCurrentScene();
+		currentScene->loadScene("Assets/Data/default-scene.json");
 
 		uint32_t defaultShaderIid = getSubSystem<ResourceManager>()->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		getSubSystem<RendererManager>()->getRenderer<SceneRenderer>()->setDefaultShaderId(defaultShaderIid);
-		std::vector<std::pair<TextureType, std::string_view>> texlist = { { TextureType::Albedo, "Assets/Textures/cole-foxy.jpg" } };
-		uint32_t matid = getSubSystem<ResourceManager>()->addResource<ResourceType::Material>(defaultShaderIid, texlist, "testMaterial");
-
-		//uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
-		//uint32_t entityID = currentScene->addEntity("bunny");
-		//Entity entity = currentScene->getEntity(entityID);
-		//entity.addComponent<MeshComponent>(bunnymeshId);
-
-		//uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
-		//uint32_t entityID2 = currentScene->addEntity("conference");
-		//Entity entity2 = currentScene->getEntity(entityID2);
-		//entity2.addComponent<MeshComponent>(roommeshId2);
-		//entity2.getComponent<Transform>()->setScale(glm::vec3(0.01f));
-
-		//uint32_t suzanemeshId3 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("suzanemesh", "Assets/Meshes/Suzanne.gltf");
-		//uint32_t entityID3 = currentScene->addEntity("suzane");
-		//Entity entity3 = currentScene->getEntity(entityID3);
-		//entity3.addComponent<MeshComponent>(suzanemeshId3);
-		// end temp
-
-
+	}
+	void Engine::run()
+	{
 		// get subsystems used in loop
 		auto* window = getSubSystem<Window>();
 		auto* rendererManager = getSubSystem<RendererManager>();
+
+		auto* debugRenderer = rendererManager->getRenderer<DebugRenderer>(); // temp
 
 		// init time
 		double lastTime = window->getCurrentTime();
@@ -115,6 +94,9 @@ namespace SE
 			{
 				subSystem->update(m_deltaTime);
 			}
+
+			// temp
+			debugRenderer->drawLine(glm::vec3(-2.0f, 1.0f, 0.0f), glm::vec3(2.0f, 1.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 			// render
 			rendererManager->render();

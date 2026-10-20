@@ -179,6 +179,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
@@ -263,6 +265,8 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\debug.frag" />
+    <None Include="Assets\Shaders\debug.vert" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
   </ItemGroup>
