@@ -146,7 +146,9 @@ namespace SE
 		int width = 0;
 		int height = 0;
 		glfwGetFramebufferSize(m_window->getWindow(), &width, &height);
+#if !defined(COMPILE_WITH_EDITOR)
 		requestSceneResize(width, height);
+#endif
 		_applySceneResize();
 
 		m_sceneViewport->updateMatrices();
