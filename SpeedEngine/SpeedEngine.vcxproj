@@ -156,6 +156,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
@@ -209,6 +210,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h" />
     <ClInclude Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.h" />
     <ClInclude Include="src\Core\Features\Math.h" />
     <ClInclude Include="src\Core\Logger\ConsoleSink.h" />

@@ -6,12 +6,15 @@
 
 namespace SE
 {
+	class Logger;
 	class EventToLuaBindings
 	{
 	public:
-		static void exportEvents(sol::state& luaState);
+		static void exportEvents(Logger* logger, sol::state& luaState);
 
 	private:
+		static void _exportKeyCodes(Logger* logger, sol::state& luaState);
+
 		// automatically resolve cpp Event types to export to lua
 		template<typename T> requires std::derived_from<T, Event>
 		static void _registerEvent(sol::state& luaState)
@@ -19,8 +22,7 @@ namespace SE
 			// create a lua type, match cpp type
 			auto luaType = luaState.new_usertype<T>(T::getStaticType(), sol::base_classes, sol::bases<Event>());
 
-			auto resolver = [&luaType](const char* name, auto memberPtr)
-			{
+			auto resolver = [&luaType](const char* name, auto memberPtr) {
 				luaType.set(name, memberPtr);
 			};
 

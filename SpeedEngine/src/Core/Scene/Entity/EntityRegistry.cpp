@@ -37,6 +37,7 @@ namespace SE
 		REGISTER_COMPONENT(Transform, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), Entity::_onMeshComponentRemoved());
 		REGISTER_COMPONENT(PrefabComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(ScriptComponent, Entity::_onScriptComponentAdded(), Entity::_onScriptComponentRemoved());
 	}
 
 	EntityRegistry::~EntityRegistry() {}

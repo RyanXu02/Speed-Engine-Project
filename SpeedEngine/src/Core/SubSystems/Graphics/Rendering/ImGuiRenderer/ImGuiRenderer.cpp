@@ -1,8 +1,5 @@
 #include "pch.h"
 
-#include "SubSystems/ImGui/Widget.h"
-#include "SubSystems/ImGui/Widgets/ConsoleWidget.h"
-
 #if defined(COMPILE_WITH_EDITOR)
 #include "SubSystems/ImGui/Widgets/MainWidget.h"
 #include "SubSystems/ImGui/Widgets/MemoryWidget.h"
@@ -12,6 +9,7 @@
 #include "SubSystems/ImGui/Widgets/ScenePreviewWidget.h"
 #endif
 
+#include "Core/SubSystems/ImGui/Widgets/ConsoleWidget.h"
 #include "SubSystems/Graphics/Window.h"
 #include "ImGuiRenderer.h"
 
