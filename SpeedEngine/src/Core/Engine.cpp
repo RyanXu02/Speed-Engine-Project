@@ -44,8 +44,8 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem()));
 		m_subSystems.push_back(std::unique_ptr<ResourceManager>(new ResourceManager()));
 		m_subSystems.push_back(std::unique_ptr<RendererManager>(new RendererManager(*getSubSystem<Window>())));
-		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		m_subSystems.push_back(std::unique_ptr<PhysicsSystem>(new PhysicsSystem()));
+		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)

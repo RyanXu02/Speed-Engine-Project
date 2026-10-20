@@ -3,6 +3,8 @@
 #include "Core/SubSystems/Physics/PhysicsShape/PhysicsShape.h"
 
 #include <glm/glm.hpp>
+#include <Jolt/Physics/Body/MotionType.h>
+#include <Jolt/Physics/Body/BodyInterface.h>
 
 namespace SE
 {
@@ -10,16 +12,65 @@ namespace SE
 	class RigidBody
 	{
 	public:
-		RigidBody() = default;
-		~RigidBody() = default;
+		RigidBody();
+		~RigidBody();
 
-		uint32_t getBodyID() const { return m_bodyID; }
+		JPH::BodyID getBodyID() const;
+		bool isCreated() const;
+		void createBody();
+
+		JPH::EMotionType getMotionType() const { return m_motionType; };
+		void setMotionType(JPH::EMotionType motionType);
+		
 		PhysicsShape* getShape() const { return m_shape; }
 		void setShape(PhysicsShape* shape);
+		
+		glm::vec3 getOffset() const { return m_offset; }
+		void setOffset(const glm::vec3& offset) { m_offset = offset; };
+
+		glm::vec3 getLinearVelocity() const;
+		void setLinearVelocity(const glm::vec3& velocity);
+		glm::vec3 getAngularVelocity() const;
+		void setAngularVelocity(const glm::vec3& velocity);
+		glm::vec3 getPosition() const;
+		void setPosition(const glm::vec3& position);
+		glm::quat getRotation() const;
+		void setRotation(const glm::quat& rotation);
+		glm::mat4 getTransform() const;
+
+		void addForce(const glm::vec3& force);
+		void addTorque(const glm::vec3& torque);
+		void addImpulse(const glm::vec3& impulse);
+		void addAngularImpulse(const glm::vec3& impulse);
+
+		void activateBody();
+		void deactivateBody();
+		bool isActive() const;
+
+		float getMaxLinearVelocity() const { return m_maxLinearVelocity; }
+		void setMaxLinearVelocity(float maxVelocity);
+		float getMaxAngularVelocity() const { return m_maxAngularVelocity; }
+		void setMaxAngularVelocity(float maxVelocity);
+
+		float getRestitution() const { return m_restitution; }
+		void setRestitution(float restitution);
+		float getFriction() const { return m_friction; }
+		void setFriction(float friction);
+		float getGravityFactor() const { return m_gravityFactor; }
+		void setGravityFactor(float factor);
 
 	private:
-		glm::vec3 m_offset{ 0.0f, 0.0f, 0.0f };
-		uint32_t m_bodyID{ 0 };
 		PhysicsShape* m_shape{ nullptr };
+		JPH::BodyInterface* m_bodyInterface{ nullptr };
+		JPH::Body* m_body{ nullptr };
+
+		// Properties
+		JPH::EMotionType m_motionType{ JPH::EMotionType::Dynamic };
+		glm::vec3 m_offset{ 0.0f, 0.0f, 0.0f };
+		float m_maxLinearVelocity{ 500.0f };
+		float m_maxAngularVelocity{ 15.0f * 3.14159f };
+		float m_restitution{ 0.0f };
+		float m_friction{ 0.2f };
+		float m_gravityFactor{ 1.0f };
 	};
 }

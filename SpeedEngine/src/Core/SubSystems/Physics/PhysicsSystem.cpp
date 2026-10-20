@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "PhysicsSystem.h"
 
+#include "Engine.h"
+#include "Core/Scene/Scene.h"
+#include "Core/SubSystems/Scenes/SceneSystem.h"
+#include "Core/Scene/Entity/Component/Transform.h"
+#include "Core/Scene/Entity/Component/RigidBody.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 using namespace JPH;
 using namespace JPH::literals;
 
@@ -77,6 +86,8 @@ public:
 namespace SE
 {
 	void PhysicsSystem::init() {
+		SubSystem::init();
+
 		// Allocation hook, can connect this to custom memory control if needed (see Jolt/Core/Memory.h)
 		RegisterDefaultAllocator();
 
@@ -93,7 +104,32 @@ namespace SE
 		m_physics_system->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface, object_vs_broadphase_layer_filter, obj_vs_object_layer_filter);
 
 		BodyInterface& body_interface = m_physics_system->GetBodyInterface();
+	}
 
+	void PhysicsSystem::createAndAddComponents() {
+		// Initialize all uninitialized RigidBody components at once and add them to the physics world
+		// Update initial rigidbody transforms to match entities
+		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		auto entities = scene->getEntitiesWith<Transform, RigidBody>();
+		std::vector<BodyID> ioBodies;
+		for (auto& entity : entities)
+		{
+			RigidBody* rigidBody = entity.getComponent<RigidBody>();
+			Transform* transform = entity.getComponent<Transform>();
+
+			// Only add if not already created/added
+			if (!rigidBody->isCreated())
+			{
+				rigidBody->createBody();
+				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
+				rigidBody->setRotation(glm::quat(transform->getRotation()));
+				ioBodies.push_back(rigidBody->getBodyID());
+			}
+		}
+		// Batch add all bodies for better performance
+		BodyInterface::AddState addState = getBodyInterface()->AddBodiesPrepare(ioBodies.data(), ioBodies.size());
+		getBodyInterface()->AddBodiesFinalize(ioBodies.data(), ioBodies.size(), addState, EActivation::Activate);
+		m_physics_system->OptimizeBroadPhase();
 	}
 
 	void PhysicsSystem::step(double deltaTime) {
@@ -101,12 +137,41 @@ namespace SE
 
 		// Step physics simulation
 		m_physics_system->Update(deltaTime, cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
+
+		// Update entity transforms
+		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		auto entities = scene->getEntitiesWith<Transform, RigidBody>();
+		for (auto& entity : entities)
+		{
+			RigidBody* rigidBody = entity.getComponent<RigidBody>();
+			Transform* transform = entity.getComponent<Transform>();
+
+			if (!rigidBody->isCreated())
+			{
+				// Any new bodies will be added to the system
+				// Note: this is inefficient if many new entities are being created at once,
+				// In that case use createAndAddComponents to do it in a batch
+				rigidBody->createBody();
+				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
+				rigidBody->setRotation(glm::quat(transform->getRotation()));
+				getBodyInterface()->AddBody(rigidBody->getBodyID(), EActivation::Activate);
+			}
+			else if (rigidBody->getMotionType() != EMotionType::Static)
+			{
+				/// Ideal
+				///transform->setTransform(rigidBody->getTransform());
+				transform->setPosition(rigidBody->getPosition());
+				glm::quat rotationQ = rigidBody->getRotation();
+				float rotationPitch = glm::pitch(rotationQ);
+				float rotationYaw = glm::yaw(rotationQ);
+				float rotationRoll = glm::roll(rotationQ);
+				transform->setRotation(glm::vec3(rotationPitch, rotationYaw, rotationRoll));
+			}
+		}
 	}
 
 	void PhysicsSystem::shutdown() {
-		// Remove and Destroy all bodies
-		// ...
-		
+		SubSystem::shutdown();
 		// Shut down physics system
 		UnregisterTypes();
 		delete Factory::sInstance;

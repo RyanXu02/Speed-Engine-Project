@@ -23,6 +23,10 @@ namespace SE
 	public:
 		void init() override;
 
+		// @brief initializes the RigidBody components, creating them as Jolt objects and adding them to the physics world.
+		//  Also sets the initial transform of the RigidBody to that of the connected Transform component.
+		void createAndAddComponents();
+
 		// @brief steps physics world one tick
 		// @param deltaTime fixed time step
 		void step(double deltaTime);
@@ -31,7 +35,7 @@ namespace SE
 
 		// @brief Getter for BodyInterface, which is needed to interact with bodies in the physics world 
 		// @returns Reference to the BodyInterface
-		JPH::BodyInterface& getBodyInterface() { return m_physics_system->GetBodyInterface(); }
+		JPH::BodyInterface* getBodyInterface() { return &m_physics_system->GetBodyInterface(); }
 
 	private:
 		PhysicsSystem()
