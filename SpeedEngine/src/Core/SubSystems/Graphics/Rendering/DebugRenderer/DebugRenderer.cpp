@@ -85,13 +85,13 @@ namespace SE
 		m_triangles.clear();
 	}
 
-	void DebugRenderer::_draw(const std::vector<DebugVertex>& vertices, unsigned int mode) const
+	void DebugRenderer::_draw(std::span<const DebugVertex> vertices, unsigned int mode) const
 	{
 		if (vertices.empty())
 			return;
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(DebugVertex), vertices.data(), GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), vertices.data(), GL_STREAM_DRAW);
 		glDrawArrays(mode, 0, static_cast<GLsizei>(vertices.size()));
 	}
 

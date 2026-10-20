@@ -4,8 +4,11 @@
 
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/SubSystems/Scenes/SceneSystem.h"
+
 #include "Core/SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
+
 #include "Core/Engine.h"
 
 #include <glad/glad.h>
@@ -49,16 +52,77 @@ namespace SE
 		m_sceneViewport = std::make_unique<Viewport>(std::max(1, width), std::max(1, height));
 		m_meshes = std::make_unique<MeshGPUCache>(*m_logger);
 
-		// Configure your targets, execution order, outputs, and clears here
+		// Configure your targets, execution order, outputs, and clears here		
+#pragma region RenderPasses
 		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{});
-
 		auto& sceneRenderer = addRenderer<SceneRenderer>();
-		addPass({ sceneRenderer, sceneColor, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
+		addPass(RenderPass{ 
+			.renderer = sceneRenderer, 
+			.output = sceneColor, 
+			.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
 
+		// Example:
+		// A render pass that draws on top of SceneColor
 		auto& debugRenderer = addRenderer<DebugRenderer>();
-		addPass({ debugRenderer, sceneColor, 0 });
+		addPass(RenderPass{
+			.renderer = debugRenderer, 
+			.output = sceneColor, 
+			.clearMask = 0 });
 
-		setFinalSceneOutput("SceneColor");
+		// Example:
+		// A render pass that samples "SceneColor" and output to a new "Grayscale" target
+		Descriptor grayscaleDescriptor{ 
+			.colors = { Attachment{} }, 
+			.depth = std::nullopt };
+		FBO& grayscale = createRenderTarget("Grayscale", grayscaleDescriptor);
+		auto& grayscaleRenderer = addRenderer<GrayscaleRenderer>("SceneColor"); // make your own renderer that consumes some target
+		addPass(RenderPass{ 
+			.renderer = grayscaleRenderer, 
+			.output = grayscale, 
+			.clearMask = GL_COLOR_BUFFER_BIT });
+
+		// Example:
+		// What an AO pass could look like:
+		/*
+			// Compute AO mask
+			Descriptor aoDescriptor{
+				.colors = { 
+					Attachment{
+						.internalFormat = GL_R8,
+						.format = GL_RED,
+						.type = GL_UNSIGNED_BYTE 
+					}
+				},
+				.depth = std::nullopt
+			};
+			aoDescriptor.depth.reset();
+			aoDescriptor.colors.emplace_back(Attachment{ GL_R8, GL_RED, GL_UNSIGNED_BYTE });
+			FBO& ao = createRenderTarget("AO", aoDescriptor);
+			// Sample SceneColor's depth attachment
+			auto& aoRenderer = addRenderer<SSAORenderer>("SceneColor");
+			addPass(RenderPass{ 
+				.renderer = aoRenderer, 
+				.output = ao, 
+				.clearMask = GL_COLOR_BUFFER_BIT, 
+				.clearColor = glm::vec4(1.0f) });
+
+			// Combine the scene color with the AO mask.
+			Descriptor compositeDescriptor;
+			compositeDescriptor.depth.reset();
+			FBO& sceneWithAO = createRenderTarget("SceneWithAO", compositeDescriptor);
+			// Sample both input targets
+			auto& compositeRenderer = addRenderer<AOCompositeRenderer>("SceneColor", "AO");
+			addPass(RenderPass{ 
+				.renderer = compositeRenderer, 
+				.output = sceneWithAO, 
+				.clearMask = GL_COLOR_BUFFER_BIT });
+
+			setFinalSceneOutput("SceneWithAO");
+		*/
+
+		// change this to set the final output to a specific target
+		setFinalSceneOutput("Grayscale");
+#pragma endregion
 
 		// imgui always presents after the scene pipeline on the default framebuffer
 		m_imguiRenderer = std::unique_ptr<ImGuiRenderer>(new ImGuiRenderer(*m_logger, *m_window));
@@ -92,7 +156,7 @@ namespace SE
 		for (const auto& pass : m_passes)
 		{
 			resetPassState();
-			pass.output.bind();
+			pass.output.bind(); // bind the pass's output
 			glViewport(0, 0, pass.output.getWidth(), pass.output.getHeight());
 			glClearColor(pass.clearColor.r, pass.clearColor.g, pass.clearColor.b, pass.clearColor.a);
 			glClearDepth(pass.clearDepth);
@@ -108,7 +172,7 @@ namespace SE
 		glClearDepth(1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Show final scene output to the default framebuffer (window) if not in editor mode
+		// Show final scene output to the default framebuffer if not in editor mode
 #if !defined(COMPILE_WITH_EDITOR)
 		if (width > 0 && height > 0)
 		{
@@ -123,6 +187,7 @@ namespace SE
 		m_imguiRenderer->beginFrame();
 		m_imguiRenderer->render(context);
 		m_imguiRenderer->finalizeFrame();
+
 		m_window->swapBuffers();
 	}
 
@@ -169,12 +234,14 @@ namespace SE
 			return;
 
 		m_sceneViewport->resize(width, height);
-		for (auto& [name, target] : m_targets)
+		for (auto& target : m_targets | std::views::values)
 		{
 			if (target.size.followSceneViewport)
 			{
-				target.framebuffer->resize(std::max(1u, static_cast<uint32_t>(width * target.size.scale)),
-					std::max(1u, static_cast<uint32_t>(height * target.size.scale)));
+				target.framebuffer->resize(
+					std::max(1u, static_cast<uint32_t>(width * target.size.scale)),
+					std::max(1u, static_cast<uint32_t>(height * target.size.scale))
+				);
 			}
 		}
 	}

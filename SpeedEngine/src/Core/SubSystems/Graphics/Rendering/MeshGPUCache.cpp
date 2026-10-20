@@ -80,7 +80,7 @@ namespace SE
 
 	void MeshGPUCache::clear()
 	{
-		for (auto& [id, data] : m_meshes)
+		for (auto& data : m_meshes | std::views::values)
 			_destroy(data);
 		m_meshes.clear();
 	}

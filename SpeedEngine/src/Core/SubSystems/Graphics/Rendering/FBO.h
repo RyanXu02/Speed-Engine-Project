@@ -4,6 +4,16 @@
 
 namespace SE
 {
+	// @brief A texture attachment for an FBO
+	// @brief Defaults to a RGBA8 texture
+	// @param internalFormat The internal format of the texture
+	// @param format The format of the texture
+	// @param type The type of the texture
+	// @param minFilter The minification filter of the texture
+	// @param magFilter The magnification filter of the texture
+	// @param wrapS The wrapping mode for the S coordinate
+	// @param wrapT The wrapping mode for the T coordinate
+	// @param borderColor The border color of the texture
 	struct Attachment
 	{
 		GLint internalFormat = GL_RGBA8;
@@ -17,13 +27,19 @@ namespace SE
 	};
 
 	// @brief Descriptor for creating an FBO
-	// @brief Specifies the size, color attachments, and depth attachment of the FBO
+	// @param width The width of the FBO
+	// @param height The height of the FBO
+	// @param colors The color attachments of the FBO
+	// @param depth The depth attachment of the FBO
 	struct Descriptor
 	{
 		uint32_t width = 1;
 		uint32_t height = 1;
 		std::vector<Attachment> colors{ Attachment{} };
-		std::optional<Attachment> depth = Attachment{ GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT };
+		std::optional<Attachment> depth = Attachment{ 
+			.internalFormat = GL_DEPTH_COMPONENT24, 
+			.format = GL_DEPTH_COMPONENT, 
+			.type = GL_FLOAT };
 	};
 
 	// @brief An FBO for offscreen rendering

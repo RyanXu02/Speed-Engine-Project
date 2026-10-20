@@ -27,7 +27,7 @@ namespace SE
 			glm::vec4 color;
 		};
 
-		void _draw(const std::vector<DebugVertex>& vertices, unsigned int mode) const;
+		void _draw(std::span<const DebugVertex> vertices, unsigned int mode) const;
 
 		unsigned int m_VAO = 0;
 		unsigned int m_VBO = 0;

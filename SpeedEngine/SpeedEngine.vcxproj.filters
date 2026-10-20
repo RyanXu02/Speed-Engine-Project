@@ -72,6 +72,9 @@
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ExamplePostProcessRenderer\ExamplePostProcessRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -224,6 +227,9 @@
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ExamplePostProcessRenderer\ExamplePostProcessRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -317,6 +323,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\example-post-process.vert" />
+    <None Include="Assets\Shaders\example-post-process.frag" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
   </ItemGroup>

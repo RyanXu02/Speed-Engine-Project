@@ -9,6 +9,11 @@ namespace SE
 {
 	// @brief Use this to define a render pass
 	// @brief A render pass is a single rendering operation that uses a specific renderer and outputs to a specific FBO
+	// @param renderer The renderer to use for this pass
+	// @param output The FBO to render to
+	// @param clearMask What to clear the current bound FBO to, default is GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+	// @param clearColor The color to clear the output FBO to, default is (0.1, 0.1, 0.1, 1.0)
+	// @param clearDepth The depth to clear the output FBO to, default is 1.0
 	struct RenderPass
 	{
 		Renderer& renderer;
@@ -58,6 +63,9 @@ namespace SE
 		FBO& createRenderTarget(const std::string& name, Descriptor descriptor, RenderTargetSize size = {});
 		FBO& getRenderTarget(const std::string& name) const { return *m_targets.at(name).framebuffer; }
 
+		// @brief Adds a render pass to the renderer manager
+		// @param pass The render pass to add
+		// @param 
 		void addPass(RenderPass pass) { m_passes.push_back(pass); }
 
 		// @brief Sets the final scene output to be presented to the window
