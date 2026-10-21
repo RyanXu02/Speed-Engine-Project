@@ -79,7 +79,7 @@ namespace SE
 
 		// @brief Gets the scene viewport, which defines the size and camera of the scene being rendered
 		// @return A reference to the scene viewport
-		Viewport& getSceneViewport() const { return *m_sceneViewport; }
+		const Viewport& getSceneViewport() const { return *m_sceneViewport; }
 
 		void requestSceneResize(uint32_t width, uint32_t height);
 

@@ -74,7 +74,7 @@ namespace SE
 		sceneRenderer->setDefaultShaderId(defaultShaderId);
 		
 		const std::pair<TextureType, std::string_view> defaultTextures[] = {
-			{ TextureType::Albedo, "Assets/Textures/default-texture-512.png" }
+			{ TextureType::Albedo, "Assets/Textures/default-texture-128.png" }
 		};
 		uint32_t defaultMaterialId = resourceManager->addResource<ResourceType::Material>(defaultShaderId, defaultTextures, "defaultMaterial");
 		sceneRenderer->setDefaultMaterialId(defaultMaterialId);

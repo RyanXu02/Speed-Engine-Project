@@ -41,26 +41,40 @@ namespace SE
 		return m_ids.fetch_add(1, std::memory_order_relaxed);
 	}
 
-	std::string ResourceManager::getString(std::string_view filePath)
+	const std::string* ResourceManager::getString(std::string_view filePath)
 	{
+		std::string path(filePath);
+
 		// find in cache
-		auto it = m_stringCache.find(filePath.data());
+		auto it = m_stringCache.find(path);
 		if (it != m_stringCache.end())
 		{
-			return it->second;
+			return &it->second;
 		}
 		// open file
-		std::ifstream file(filePath.data());
+		std::ifstream file(path, std::ios::in | std::ios::binary);
 		if (!file.is_open())
 		{
-			m_logger->warn("Failed to open file: {}", filePath);
-			return "";
+			m_logger->warn("Failed to open file: {}", path);
+			return nullptr;
 		}
-		std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		std::error_code e;
+		const auto size = std::filesystem::file_size(path, e);
+		if (e)
+		{
+			m_logger->warn("Failed to get file size: {}. Error: {}", path, e.message());
+			return nullptr;
+		}
+		std::string contents(size, '\0');
+		if (size > 0 && !file.read(contents.data(), size))
+		{
+			m_logger->warn("Failed to read file: {}", path);
+			return nullptr;
+		}
 		file.close();
 
-		m_stringCache[filePath.data()] = contents;
-		return contents;
+		auto [it2, _] = m_stringCache.emplace(std::move(path), std::move(contents));
+		return &it2->second;
 	}
 
 	Resource* ResourceManager::getResource(uint32_t id)

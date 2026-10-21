@@ -15,7 +15,7 @@ namespace SE
 		void init() override;
 		void initWidgets();
 		void beginFrame();
-		void render(RenderContext& context) const override;
+		void render(RenderContext& context) override;
 		void shutdown() override;
 
 		// @brief Creates a widget of the specified type

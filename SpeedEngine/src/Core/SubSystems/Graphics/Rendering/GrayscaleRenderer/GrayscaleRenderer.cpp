@@ -21,9 +21,9 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		std::string vertexSource = resources->getString("Assets/Shaders/grayscale.vert");
-		std::string fragmentSource = resources->getString("Assets/Shaders/grayscale.frag");
-		GLCompStatus status = m_shader.init(vertexSource, fragmentSource);
+		const std::string* vertexSource = resources->getString("Assets/Shaders/grayscale.vert");
+		const std::string* fragmentSource = resources->getString("Assets/Shaders/grayscale.frag");
+		GLCompStatus status = m_shader.init(*vertexSource, *fragmentSource);
 		if (!status.success)
 		{
 			m_shader.destroy();
@@ -37,7 +37,7 @@ namespace SE
 		}
 	}
 
-	void GrayscaleRenderer::render(RenderContext& context) const
+	void GrayscaleRenderer::render(RenderContext& context)
 	{
 		// from scene renderer pass
 		const FBO& input = context.getRenderTarget(m_inputTarget);
