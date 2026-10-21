@@ -34,8 +34,15 @@ namespace SE
 	typedef std::vector<UniquePtrSound> SfxLibrary;
 	
 	//helpers not in SE namespace
-	namespace
+	namespace Helpers
 	{
+		enum class LoadState
+		{
+			READY,
+			LOADING,
+			FAILED
+		};
+
 		//init a sound from file with parameters. returns nullptr if failure or UniquePtrSound if success
 		UniquePtrSound makeSoundFromFile(ma_engine* engine, const std::string& filepath, ma_uint32 flags, ma_sound_group* group) {
 			std::unique_ptr<ma_sound> raw(new ma_sound());
@@ -56,6 +63,19 @@ namespace SE
 				return nullptr;
 			}
 			return UniquePtrSound(raw.release());
+		}
+
+		LoadState getSoundLoadState(const ma_sound* sound)
+		{
+			auto& soundDataSrcPtr = sound->pResourceManagerDataSource;
+			//technically should check if nullptr here but ts is only set for sounds created from file (which all of ones in this system are)
+			ma_result result = ma_resource_manager_data_source_result(soundDataSrcPtr);
+			switch (result) 
+			{ 
+			case MA_SUCCESS: return LoadState::READY;
+			case MA_BUSY: return LoadState::LOADING;
+			default: return LoadState::FAILED;
+			}
 		}
 	}
 
@@ -172,10 +192,10 @@ namespace SE
 		if (type == NONGAME_SFX)
 		{
 			//fully decode + NO SPATIALIZATION BECAUSE THESE ARE UI/OTHER SFX
-			ma_uint32 flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION;
+			ma_uint32 flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_NO_SPATIALIZATION;
 
 			//init sound in nongame sfx group
-			sound = makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxNonGameGrp);
+			sound = Helpers::makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxNonGameGrp);
 			if (!sound)
 			{
 				m_logger->warn("Failed to init NONGAME_SFX sound from {}", filepath);
@@ -185,10 +205,10 @@ namespace SE
 		else //GAME_SFX
 		{
 			//fully decode. spatialization is on by default so no no_spatialization flag here
-			ma_uint32 flags = MA_SOUND_FLAG_DECODE;
+			ma_uint32 flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC;
 
 			//init sound in game sfx group
-			sound = makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxGameGrp);
+			sound = Helpers::makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxGameGrp);
 			if (!sound)
 			{
 				m_logger->warn("Failed to init GAME_SFX sound from {}", filepath);
@@ -222,8 +242,25 @@ namespace SE
 			m_logger->warn("Cannot play SFX id {} due to max active SFX cap", id.index);
 			return InstanceHandle{ 0xFFFFFFFF, 0 }; //uint32 max index and 0 generation is invalid instance handle.
 		}
-		if (id.index > m_imp->sfxLibrary.size())
-			return InstanceHandle{ 0xFFFFFFFF, 0 }; //invalid instance handle because invalid SFXid
+		if (id.index >= m_imp->sfxLibrary.size() || isMuted)
+			return InstanceHandle{ 0xFFFFFFFF, 0 }; //invalid instance handle because invalid SFXid OR the engine is muted
+
+		//check load state of sound
+		switch (Helpers::getSoundLoadState(m_imp->sfxLibrary[id.index].get()))
+		{ 
+		case Helpers::LoadState::LOADING:
+			{
+				m_logger->warn("Template sound for id {} is still loading, dropping sound", id.index);
+				return InstanceHandle{ 0xFFFFFFFF, 0 };
+			}
+		case Helpers::LoadState::FAILED:
+			{
+				m_logger->warn("Template sound for id {} failed to load", id.index);
+				return InstanceHandle{ 0xFFFFFFFF, 0 };
+			}
+		case Helpers::LoadState::READY: break;
+		}
+		//here means template sound is loaded, can continue to copy
 
 		UniquePtrSound sfx;
 		if (id.type == NONGAME_SFX)
@@ -232,7 +269,7 @@ namespace SE
 			ma_uint32 flags = MA_SOUND_FLAG_NO_SPATIALIZATION;
 
 			//create sound copy from the template at id.index in sfxLibrary
-			sfx = makeSoundCopy(&m_imp->engine, m_imp->sfxLibrary[id.index].get(), flags, &m_imp->sfxNonGameGrp);
+			sfx = Helpers::makeSoundCopy(&m_imp->engine, m_imp->sfxLibrary[id.index].get(), flags, &m_imp->sfxNonGameGrp);
 			if (!sfx)
 				m_logger->warn("Failure to copy NONGAME_SFX sound id {} from template", id.index);
 			//ANY OTHE RTHINGS HERE....
@@ -243,7 +280,7 @@ namespace SE
 			ma_uint32 flags = 0;
 
 			//create sound copy from the template at id.index in sfxLibrary
-			sfx = makeSoundCopy(&m_imp->engine, m_imp->sfxLibrary[id.index].get(), flags, &m_imp->sfxGameGrp);
+			sfx = Helpers::makeSoundCopy(&m_imp->engine, m_imp->sfxLibrary[id.index].get(), flags, &m_imp->sfxGameGrp);
 			if (!sfx)
 				m_logger->warn("Failure to copy GAME_SFX sound id {} from template", id.index);
 			//ANY OTHE RTHINGS HERE....
@@ -279,7 +316,7 @@ namespace SE
 	void AudioSystem::PlayMusic(MusicId id) {
 		//stream music and NO SPATIALIZATION. looping is there cuz usually game music loops
 		ma_uint32 flags = MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_LOOPING;
-		UniquePtrSound track = makeSoundFromFile(&m_imp->engine, m_imp->musicLibrary[id.index], flags, &m_imp->musicGrp);
+		UniquePtrSound track = Helpers::makeSoundFromFile(&m_imp->engine, m_imp->musicLibrary[id.index], flags, &m_imp->musicGrp);
 		if (!track)
 		{
 			m_logger->warn("Failure to init MUSIC sound id {}", id.index);
@@ -293,7 +330,7 @@ namespace SE
 		if (!isMuted)
 		{
 			//kill and uninit active sfx instances
-			for (size_t i = 0; i < MAX_ACTIVE_SFX; ++i)
+			for (size_t i = 0; i < sfxList.size(); ++i)
 			{
 				auto& item = sfxList[i];
 				if (item.inUse)
