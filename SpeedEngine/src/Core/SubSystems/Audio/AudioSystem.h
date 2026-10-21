@@ -23,6 +23,8 @@ namespace SE
 		uint32_t index;
 	};
 
+	constexpr uint8_t MAX_ACTIVE_SFX = 100;
+
 	class AudioSystem : public SubSystem
 	{
 		friend class Engine;
@@ -45,14 +47,16 @@ namespace SE
 		MusicId registerMusic(const std::string& filepath);
 		void toggleMute();
 
-		void PlaySFX(SFXId id);
+		InstanceHandle PlaySFX(SFXId id);
+		void StopSFX(InstanceHandle handle);
 		void PlayMusic(MusicId id);
 
 		void play3DSound();
 
 		void PlaySound(std::string_view path);
 
-		SFXId temptestid{};
+		SFXId testsfxid{};
+		MusicId testmusicid{};
 	private:
 		AudioSystem();
 		
@@ -75,6 +79,13 @@ namespace SE
 		std::vector<uint32_t> freeSlots;
 
 		bool _initSfxGroups();
+
+		//frees a sound slot @ index i. 
+		//specifically, releases audio memory, increments generation, resets inUse flag, and puts idx back on free list
+		void _freeSoundSlot(SoundSlot& s, size_t i);
+
+		//checks if a handle is still valid in the sfx slots list
+		bool _validateHandle(InstanceHandle handle);
 	};
 } //namespace SE
 

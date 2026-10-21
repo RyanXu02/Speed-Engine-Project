@@ -25,12 +25,39 @@ namespace SE
 		}
 	};
 
+
 	//typedefs
 	//since ma_sound is a struct, need to provide custom deleter so memory doesnt leak everywhere
 	typedef std::unique_ptr<ma_sound, ma_sound_Deleter> UniquePtrSound;
 	//"template" library of sounds. these sounds will never get played. copies will be made with generational handle setup
 	//to actually play sfx sounds
 	typedef std::vector<UniquePtrSound> SfxLibrary;
+	
+	//helpers not in SE namespace
+	namespace
+	{
+		//init a sound from file with parameters. returns nullptr if failure or UniquePtrSound if success
+		UniquePtrSound makeSoundFromFile(ma_engine* engine, const std::string& filepath, ma_uint32 flags, ma_sound_group* group) {
+			std::unique_ptr<ma_sound> raw(new ma_sound());
+			ma_result result = ma_sound_init_from_file(engine, filepath.c_str(), flags, group, nullptr, raw.get());
+			if (result != MA_SUCCESS)
+			{
+				return nullptr;
+			}
+			return UniquePtrSound(raw.release());
+		}
+
+		//init a sound from copy with parameters. returns nullptr if failure or UniquePtrSound if success
+		UniquePtrSound makeSoundCopy(ma_engine* engine, const ma_sound* src, ma_uint32 flags, ma_sound_group* group) {
+			std::unique_ptr<ma_sound> raw(new ma_sound());
+			ma_result result = ma_sound_init_copy(engine, src, flags, group, raw.get());
+			if (result != MA_SUCCESS)
+			{
+				return nullptr;
+			}
+			return UniquePtrSound(raw.release());
+		}
+	}
 
 	//pimpl idiom (pointer implementation)
 	//allows for the big ass miniaudio.h to only need including in this file, all audio-related needs
@@ -41,18 +68,16 @@ namespace SE
 		ma_sound_group musicGrp{}, sfxGrp{}, sfxNonGameGrp{}, sfxGameGrp{};
 		SfxLibrary sfxLibrary;
 		std::vector<std::string> musicLibrary;
+		UniquePtrSound currentMusic; //IF WE WANT MULTIPLE SONGS PLAYING AT ONCE, THIS CAN BE CHANGED TO A VECTOR
 		bool initialized = false;
-		std::vector<UniquePtrSound> test;
 	};
 
 	struct AudioSystem::SoundSlot 
 	{
 		UniquePtrSound sound;
-		uint32_t generation;
-		bool inUse;
+		uint32_t generation = 1; //generation of 0 is invalid
+		bool inUse = false;
 	};
-
-	
 
 	AudioSystem::AudioSystem()
 	    : SubSystem("AudioSystem"),
@@ -89,11 +114,30 @@ namespace SE
 			return;
 		}
 
+		//init generational handle setup
+		freeSlots.reserve(MAX_ACTIVE_SFX); //probably way too many lol (50) but whatever its fine for now.
+		sfxList.reserve(MAX_ACTIVE_SFX);
+		//put all indices on free list. push back in reverse order so pop_back will get index @ front of sfxList
+		for (uint32_t i = MAX_ACTIVE_SFX; i != 0; --i)
+			freeSlots.push_back(i-1);
+		//populate sfxList with empty sound slots
+		for (int i = 0; i < MAX_ACTIVE_SFX; ++i)
+			sfxList.push_back(SoundSlot());
 		m_imp->initialized = true;
 	}
 
 	void AudioSystem::update(double dt) {
-		//empty for now, idk what will go here
+		//walk sfxList. for each item, if its inUse, check if the sound has ended.
+		//if ended, free the slot.
+		for (size_t i = 0; i < sfxList.size(); ++i)
+		{
+			auto& item = sfxList[i];
+			if (!item.inUse)
+				continue;
+			//item is in use, poll sound
+			if (ma_sound_at_end(item.sound.get()) == MA_TRUE)
+				_freeSoundSlot(item, i);
+		}
 	}
 
 	void AudioSystem::shutdown() {
@@ -103,8 +147,10 @@ namespace SE
 		if (m_imp->initialized)
 		{
 			//cleanup ma_sounds here. MUST USE vector.clear() OR ELSE DOUBLE FREE WILL HAPPEN ON ENGINE SHUTDOWN
+			m_imp->currentMusic.reset();
 			m_imp->sfxLibrary.clear();
-			m_imp->test.clear();
+			sfxList.clear();
+
 			ma_sound_group_uninit(&m_imp->musicGrp);
 			ma_sound_group_uninit(&m_imp->sfxNonGameGrp);
 			ma_sound_group_uninit(&m_imp->sfxGameGrp);
@@ -122,14 +168,15 @@ namespace SE
 			return SFXId{ id, type };
 		}
 
-		UniquePtrSound sound(new ma_sound());
+		UniquePtrSound sound;
 		if (type == NONGAME_SFX)
 		{
 			//fully decode + NO SPATIALIZATION BECAUSE THESE ARE UI/OTHER SFX
 			ma_uint32 flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION;
+
 			//init sound in nongame sfx group
-			ma_result result = ma_sound_init_from_file(&m_imp->engine, filepath.c_str(), flags, &m_imp->sfxNonGameGrp, nullptr, sound.get());
-			if (result != MA_SUCCESS)
+			sound = makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxNonGameGrp);
+			if (!sound)
 			{
 				m_logger->warn("Failed to init NONGAME_SFX sound from {}", filepath);
 				return SFXId{ 0xFFFFFFFF, NONGAME_SFX }; //uint32 max, error return value
@@ -139,9 +186,10 @@ namespace SE
 		{
 			//fully decode. spatialization is on by default so no no_spatialization flag here
 			ma_uint32 flags = MA_SOUND_FLAG_DECODE;
+
 			//init sound in game sfx group
-			ma_result result = ma_sound_init_from_file(&m_imp->engine, filepath.c_str(), flags, &m_imp->sfxGameGrp, nullptr, sound.get());
-			if (result != MA_SUCCESS)
+			sound = makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxGameGrp);
+			if (!sound)
 			{
 				m_logger->warn("Failed to init GAME_SFX sound from {}", filepath);
 				return SFXId{ 0xFFFFFFFF, GAME_SFX }; //uint32 max, error return value
@@ -164,37 +212,82 @@ namespace SE
 		pathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry
 		m_imp->musicLibrary.push_back(filepath);
 
-		return MusicId{ 0 };
+		return MusicId{ returnId };
 	}
 
-	void AudioSystem::PlaySFX(SFXId id) {
-		UniquePtrSound sfx(new ma_sound());
+	InstanceHandle AudioSystem::PlaySFX(SFXId id) {
+		//check if active sfx cap is reached
+		if (freeSlots.empty())
+		{
+			m_logger->warn("Cannot play SFX id {} due to max active SFX cap", id.index);
+			return InstanceHandle{ 0xFFFFFFFF, 0 }; //uint32 max index and 0 generation is invalid instance handle.
+		}
+		if (id.index > m_imp->sfxLibrary.size())
+			return InstanceHandle{ 0xFFFFFFFF, 0 }; //invalid instance handle because invalid SFXid
+
+		UniquePtrSound sfx;
 		if (id.type == NONGAME_SFX)
 		{
 			//NO SPATIALIZATION AS THIS IS NOT A GAME SFX
 			ma_uint32 flags = MA_SOUND_FLAG_NO_SPATIALIZATION;
+
 			//create sound copy from the template at id.index in sfxLibrary
-			ma_result result = ma_sound_init_copy(&m_imp->engine, m_imp->sfxLibrary.at(id.index).get(), flags, &m_imp->sfxNonGameGrp, sfx.get());
-			if (result != MA_SUCCESS)
-			{
+			sfx = makeSoundCopy(&m_imp->engine, m_imp->sfxLibrary[id.index].get(), flags, &m_imp->sfxNonGameGrp);
+			if (!sfx)
 				m_logger->warn("Failure to copy NONGAME_SFX sound id {} from template", id.index);
-			}
 			//ANY OTHE RTHINGS HERE....
 		}
 		else //id.type == GAME_SFX
 		{
 			//yes spatialization as this is a game sfx
 			ma_uint32 flags = 0;
+
 			//create sound copy from the template at id.index in sfxLibrary
-			ma_result result = ma_sound_init_copy(&m_imp->engine, m_imp->sfxLibrary.at(id.index).get(), flags, &m_imp->sfxGameGrp, sfx.get());
-			if (result != MA_SUCCESS)
-			{
+			sfx = makeSoundCopy(&m_imp->engine, m_imp->sfxLibrary[id.index].get(), flags, &m_imp->sfxGameGrp);
+			if (!sfx)
 				m_logger->warn("Failure to copy GAME_SFX sound id {} from template", id.index);
-			}
 			//ANY OTHE RTHINGS HERE....
 		}
-		m_imp->test.push_back(std::move(sfx));
-		ma_sound_start(m_imp->test.back().get());
+		if (!sfx)
+			return InstanceHandle{ 0xFFFFFFFF, 0 }; //uint32 max index and 0 generation is invalid instance handle.
+
+		//pop free slot from free list
+		uint32_t freeIdx = freeSlots.back();
+		freeSlots.pop_back();
+		sfxList[freeIdx].sound = std::move(sfx); //give the copy ptr to the sfxList
+		sfxList[freeIdx].inUse = true;
+		ma_sound_start(sfxList[freeIdx].sound.get());
+
+		//return an instance handle with the retrieved idx and the associated slot's generation so the ticket and slot match (VERY IMPORTANT)
+		return InstanceHandle{ freeIdx, sfxList[freeIdx].generation };
+		//m_imp->test.push_back(std::move(sfx));
+		//ma_sound_start(m_imp->test.back().get());
+	}
+
+	void AudioSystem::StopSFX(InstanceHandle handle) {
+		//validate the handle (coat check ticket)
+		//if its valid, then proceed with stopping the sfx and freeing the slot.
+		bool isValid = _validateHandle(handle);
+		if (isValid)
+		{
+			auto& item = sfxList[handle.index];
+			ma_result result = ma_sound_stop(item.sound.get());
+			_freeSoundSlot(item, handle.index);
+		}
+	}
+
+	void AudioSystem::PlayMusic(MusicId id)
+	{
+		//stream music and NO SPATIALIZATION. looping is there cuz usually game music loops
+		ma_uint32 flags = MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_LOOPING;
+		UniquePtrSound track = makeSoundFromFile(&m_imp->engine, m_imp->musicLibrary[id.index], flags, &m_imp->musicGrp);
+		if (!track)
+		{
+			m_logger->warn("Failure to init MUSIC sound id {}", id.index);
+			return;
+		}
+		m_imp->currentMusic = std::move(track);
+		ma_sound_start(m_imp->currentMusic.get());
 	}
 
 	void AudioSystem::PlaySound(std::string_view path) {
@@ -238,5 +331,24 @@ namespace SE
 			return false;
 		}
 		return true;
+	}
+
+	void AudioSystem::_freeSoundSlot(SoundSlot& s, size_t i) {
+		s.sound.reset(); //free sound. reset() will get the custom deleter to free the ma_sound
+		++s.generation;
+		s.inUse = false;
+		freeSlots.push_back(static_cast<uint32_t>(i));
+	}
+
+	bool AudioSystem::_validateHandle(InstanceHandle handle) {
+		//check if handle is invalid, return false
+		if (handle.index >= sfxList.size())
+			return false;
+		//for the slot specified by the handle's index:
+		// if it is in use AND its generation matches the handle's generation, we are good
+		auto& item = sfxList[handle.index];
+		if (item.inUse && handle.generation == item.generation)
+			return true;
+		return false;
 	}
 } //namespace SE

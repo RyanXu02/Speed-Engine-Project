@@ -52,7 +52,12 @@ namespace SE
 				{
 					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
 					//AS->PlaySound("Assets/Audio/Shaco_Original_Death_2.wav");
-					AS->PlaySFX(AS->temptestid);
+					AS->PlaySFX(AS->testsfxid);
+				}
+				if (ImGui::MenuItem("funkytown music test"))
+				{
+					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
+					AS->PlayMusic(AS->testmusicid);
 				}
 				ImGui::EndMenu();
 			}

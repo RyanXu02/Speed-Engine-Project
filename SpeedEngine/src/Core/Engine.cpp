@@ -85,10 +85,13 @@ namespace SE
 
 		//audio system test code
 		AudioSystem* as = getSubSystem<AudioSystem>();
-		as->temptestid = as->registerSFX("Assets/Audio/Shaco_Original_Death_2.wav", NONGAME_SFX);
+		as->testsfxid = as->registerSFX("Assets/Audio/Shaco_Original_Death_2.wav", NONGAME_SFX);
+		as->testmusicid = as->registerMusic("Assets/Audio/funkytown.wav");
 	}
 	void Engine::run()
 	{
+		
+
 		//uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
 		//uint32_t entityID = currentScene->addEntity("bunny");
 		//Entity entity = currentScene->getEntity(entityID);
