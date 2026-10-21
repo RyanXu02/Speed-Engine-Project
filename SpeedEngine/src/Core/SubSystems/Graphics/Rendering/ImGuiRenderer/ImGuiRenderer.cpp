@@ -164,7 +164,7 @@ namespace SE
 		// ...
 	}
 
-	void ImGuiRenderer::update(double deltaTime)
+	void ImGuiRenderer::beginFrame()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -172,7 +172,7 @@ namespace SE
 		// ImGui::ShowDemoWindow(); // Don't show demo window! :(
 	}
 
-	void ImGuiRenderer::render() const
+	void ImGuiRenderer::render(RenderContext& context)
 	{
 		for (const auto& [id, widget] : m_widgets)
 		{

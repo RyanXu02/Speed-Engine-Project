@@ -1,5 +1,4 @@
 #pragma once
-#include "FBO.h"
 #include "glm/glm.hpp"
 
 namespace SE
@@ -71,22 +70,28 @@ namespace SE
 	{
 	public:
 		Viewport(uint32_t width, uint32_t height)
-		    : m_FBO(std::make_unique<FBO>(width, height)),
+			: m_width(width),
+			  m_height(height),
 		      m_cameraFrustum(),
 		      m_isActive(true)
 		{}
 
-		FBO& getFBO() { return *m_FBO; }
+		void resize(uint32_t width, uint32_t height);
+		void updateMatrices();
+
+		uint32_t getWidth() const { return m_width; }
+		uint32_t getHeight() const { return m_height; }
 
 		CameraFrustum& getCameraFrustum() { return m_cameraFrustum; }
+		const CameraFrustum& getCameraFrustum() const { return m_cameraFrustum; }
 		void setCameraFrustum(const CameraFrustum& frustum) { m_cameraFrustum = frustum; }
 
 		void setActive(bool active) { m_isActive = active; }
 		bool isActive() const { return m_isActive; }
 
 	private:
-		std::unique_ptr<FBO> m_FBO; // Viewport owns FBO
-
+		uint32_t m_width;
+		uint32_t m_height;
 		CameraFrustum m_cameraFrustum;
 		bool m_isActive;
 	};

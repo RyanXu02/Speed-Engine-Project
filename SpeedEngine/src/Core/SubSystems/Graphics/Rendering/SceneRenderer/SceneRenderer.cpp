@@ -2,18 +2,20 @@
 
 #include "SceneRenderer.h"
 
-#include "../../../../ResourceManagers/Material/Material.h"
-#include "../../../../ResourceManagers/ResourceManager.h"
-#include "../../../../ResourceManagers/Shader/Shader.h"
-#include "../../../../Scene/Entity/Component/Transform.h"
-#include "../../../../Scene/Entity/Entity.h"
-#include "../../../Input/InputSystem.h"
-#include "../../../Scenes/SceneSystem.h"
-#include "../RendererManager.h"
+#include "Core/ResourceManagers/ResourceManager.h"
+#include "Core/ResourceManagers/Shader/Shader.h"
+
+#include "Core/Scene/Entity/Component/Transform.h"
+#include "Core/Scene/Entity/Entity.h"
+#include "Core/Scene/Scene.h"
+
+#include "Core/SubSystems/Input/InputSystem.h"
+
+#include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
+
 #include "Engine.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <glad/glad.h>
 
 namespace SE
 {
@@ -25,47 +27,29 @@ namespace SE
 	{
 		m_logger.info("Shutting down");
 	}
-	void SceneRenderer::update(double deltaTime)
+	void SceneRenderer::update(double deltaTime, RenderContext& context)
 	{
-		FBO& fbo = m_viewport->getFBO();
-		CameraFrustum& camera = m_viewport->getCameraFrustum();
-		_updateCamera(deltaTime, camera, fbo);
+		_updateCamera(deltaTime, context.viewport.getCameraFrustum());
 	}
 
-	void SceneRenderer::render() const
+	void SceneRenderer::render(RenderContext& context)
 	{
-		// get viewport stuff
-		FBO& fbo = m_viewport->getFBO();
-		CameraFrustum& camera = m_viewport->getCameraFrustum();
+		if (!context.scene)
+			return;
 
-		// bind fbo
-		fbo.bind();
-
-		// clear framebuffer
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// enable depth test
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-
-		// Enable backface culling
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glFrontFace(GL_CCW);
+		const CameraFrustum& camera = context.viewport.getCameraFrustum();
 
 		// Get default shader
-		Shader* defaultShader = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_defaultShaderId);
+		Shader* defaultShader = context.resources.getResource<Shader>(m_defaultShaderId);
 		if (!defaultShader)
 		{
 			m_logger.critical("Default shader not found, cannot render");
-			fbo.unbind();
 			return;
 		}
+		// Get default material
+		Material* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
 
-		ResourceManager* resourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
-		auto entities = scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
+		auto entities = context.scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
 		for (auto& entity : entities)
 		{
 			MeshComponent* mesh = entity.getComponent<MeshComponent>();
@@ -79,150 +63,35 @@ namespace SE
 				continue;
 			}
 
-			MeshResource* meshResource = resourceManager->getResource<MeshResource>(meshResourceId);
+			MeshResource* meshResource = context.resources.getResource<MeshResource>(meshResourceId);
 			if (!meshResource)
 			{
 				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, name->name);
 				continue;
 			}
 
-			const std::vector<Vertex>& positions = meshResource->getVertices();
-			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
-			const std::vector<uint32_t>& indices = meshResource->getIndices();
-			if (indices.empty() || positions.empty())
-			{
-				continue;
-			}
-
-			auto it = m_meshCache.find(meshResourceId);
-			if (it == m_meshCache.end() || it->second.needsUpdate)
-			{
-				uploadMeshToGPU(meshResourceId, positions, subMeshes, indices);
-			}
-
-			const MeshGPUData& gpuData = m_meshCache[meshResourceId];
-			if (gpuData.VAO == 0)
-			{
-				continue;
-			}
-
 			defaultShader->bind();
+			defaultMaterial->bind();
 
 			// Set camera matrices
 			defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);
 
-			// Set model matrix (use transform if available, otherwise identity)
-			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			if (transform)
-			{
-				modelMatrix = transform->getTransform();
-			}
-			defaultShader->setMat4("model", modelMatrix);
+			// Set transform
+			defaultShader->setMat4("model", transform->getTransform());
 
-			// Set default material properties
+			// Set material properties
 			defaultShader->setVec4("color", glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
-			defaultShader->setBool("useTexture", false);
+			defaultShader->setBool("useTexture", defaultMaterial != nullptr);
 			defaultShader->setFloat("intensity", 1.0f);
 			defaultShader->setInt("frameIndex", 0);
 			defaultShader->setFloat("numRows", 1.0f);
 			defaultShader->setFloat("numCols", 1.0f);
 
-			// Bind VAO and draw
-			glBindVertexArray(gpuData.VAO);
+			context.meshes.draw(meshResourceId, *meshResource);
 
-			int vertices = 0;
-			for (unsigned int i = 0; i < subMeshes.size(); i++)
-			{
-				glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMeshes[i].indexCount), GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * subMeshes[i].indexOffset), vertices);
-
-				vertices += subMeshes[i].vertexCount;
-			}
-
-			glBindVertexArray(0);
-
+			defaultMaterial->unbind();
 			defaultShader->unbind();
 		}
-
-		// unbind fbo
-		fbo.unbind();
-	}
-
-	void SceneRenderer::uploadMeshToGPU(uint32_t meshId, const std::vector<Vertex>& positions, const std::vector<SubMesh>& subMeshes, const std::vector<uint32_t>& indices) const
-	{
-		MeshGPUData& gpuData = m_meshCache[meshId];
-
-		// Delete old buffers if they exist
-		if (gpuData.VAO != 0)
-		{
-			cleanupMeshGPU(meshId);
-		}
-
-		// Generate buffers
-		glGenVertexArrays(1, &gpuData.VAO);
-		glGenBuffers(1, &gpuData.VBO);
-		glGenBuffers(1, &gpuData.EBO);
-
-		// Bind VAO
-		glBindVertexArray(gpuData.VAO);
-
-		// Upload vertex data
-		glBindBuffer(GL_ARRAY_BUFFER, gpuData.VBO);
-		glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(Vertex), positions.data(), GL_STATIC_DRAW);
-
-		// Upload index data
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpuData.EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
-
-		// Set vertex attributes
-		// Position attribute (location = 0)
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-
-		// Normal attribute (location = 2, matching shader)
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-
-		// UV attribute (location = 1, matching shader)
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
-
-		// Unbind
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		// Update cache
-		gpuData.indexCount = indices.size();
-		gpuData.needsUpdate = false;
-
-		m_logger.info("Uploaded mesh {} to GPU: {} vertices, {} indices", meshId, positions.size(), indices.size());
-	}
-
-	void SceneRenderer::cleanupMeshGPU(uint32_t meshId) const
-	{
-		auto it = m_meshCache.find(meshId);
-		if (it == m_meshCache.end())
-			return;
-
-		MeshGPUData& gpuData = it->second;
-
-		if (gpuData.EBO != 0)
-		{
-			glDeleteBuffers(1, &gpuData.EBO);
-			gpuData.EBO = 0;
-		}
-		if (gpuData.VBO != 0)
-		{
-			glDeleteBuffers(1, &gpuData.VBO);
-			gpuData.VBO = 0;
-		}
-		if (gpuData.VAO != 0)
-		{
-			glDeleteVertexArrays(1, &gpuData.VAO);
-			gpuData.VAO = 0;
-		}
-
-		m_logger.info("Cleaned up GPU data for mesh {}", meshId);
 	}
 
 	void SceneRenderer::_updateCameraPosition(double deltaTime, CameraFrustum& camera)
@@ -299,7 +168,7 @@ namespace SE
 		}
 	}
 
-	void SceneRenderer::_updateCamera(double deltaTime, CameraFrustum& camera, FBO& fbo)
+	void SceneRenderer::_updateCamera(double deltaTime, CameraFrustum& camera)
 	{
 		auto IS = Engine::Instance().getSubSystem<InputSystem>();
 		if (IS->isKeyRising(KeyCodes::KEY_LEFT_SHIFT))
@@ -314,14 +183,5 @@ namespace SE
 		}
 		_updateCameraPosition(deltaTime, camera);
 		_updateCameraTarget(deltaTime, camera);
-		if (camera.isDirty)
-		{
-			camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(),
-			    WORLD_UP); // 0,1,0 is up vector
-			float aspectRatio = static_cast<float>(fbo.getWidth()) / static_cast<float>(fbo.getHeight());
-			camera.projectionMatrix = glm::perspective(glm::radians(camera.getFOV()), aspectRatio, camera.getNearPlane(), camera.getFarPlane());
-			camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
-			camera.isDirty = false;
-		}
 	}
 } // namespace SE
