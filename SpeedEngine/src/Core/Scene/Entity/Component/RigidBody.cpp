@@ -64,7 +64,7 @@ namespace SE
 		
 		JPH::BodyCreationSettings bodySettings;
 
-		bodySettings.SetShape(m_shape->getShape());
+		bodySettings.SetShape(m_shape);
 		bodySettings.mMotionType = m_motionType;
 		bodySettings.mFriction = m_friction;
 		bodySettings.mRestitution = m_restitution;
@@ -80,10 +80,14 @@ namespace SE
 			m_bodyInterface->SetMotionType(getBodyID(), motionType, JPH::EActivation::Activate);
 	}
 
-	void RigidBody::setShape(PhysicsShape* shape) {
+	void RigidBody::setShape(JPH::Ref<JPH::Shape> shape)
+	{
+		if (shape = m_shape)
+			return;
+
 		m_shape = shape;
 		if (m_body)
-			m_bodyInterface->SetShape(getBodyID(), shape->getShape(), true, JPH::EActivation::Activate);
+			m_bodyInterface->SetShape(getBodyID(), shape, true, JPH::EActivation::Activate);
 	}
 
 	glm::vec3 RigidBody::getLinearVelocity() const {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Transform.h"
+#include "RigidBody.h"
 #include "Core/features/Serializable.h"
 
 

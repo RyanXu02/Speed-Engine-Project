@@ -2,7 +2,8 @@
 
 #include "Scene.h"
 
-#include "../SubSystems/Events/EventSystem.h"
+#include "Core/SubSystems/Events/EventSystem.h"
+#include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 
 namespace SE
@@ -164,6 +165,8 @@ namespace SE
 		if (sceneJson.contains("entities"))
 		{
 			deserialize(sceneJson["entities"]);
+			// Batch add physics components to jolt world
+			Engine::Instance().getSubSystem<PhysicsSystem>()->createAndAddComponents();
 		}
 	}
 

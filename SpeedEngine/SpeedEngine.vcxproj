@@ -156,10 +156,10 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeMesh.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeCapsule.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeBox.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeSphere.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\RigidBody.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp" />
@@ -214,11 +214,11 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeMesh.h" />
-    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeCapsule.h" />
-    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeBox.h" />
-    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeSphere.h" />
-    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShape.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShape.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\RigidBody.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h" />

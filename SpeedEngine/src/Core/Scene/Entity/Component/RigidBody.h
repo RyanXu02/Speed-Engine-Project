@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Core/SubSystems/Physics/PhysicsShape/PhysicsShape.h"
-
 #include <glm/glm.hpp>
 #include <Jolt/Physics/Body/MotionType.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
 
 namespace SE
 {
@@ -22,8 +21,8 @@ namespace SE
 		JPH::EMotionType getMotionType() const { return m_motionType; };
 		void setMotionType(JPH::EMotionType motionType);
 		
-		PhysicsShape* getShape() const { return m_shape; }
-		void setShape(PhysicsShape* shape);
+		JPH::Ref<JPH::Shape> getShape() const { return m_shape; }
+		void setShape(JPH::Ref<JPH::Shape> shape);
 		
 		glm::vec3 getOffset() const { return m_offset; }
 		void setOffset(const glm::vec3& offset) { m_offset = offset; };
@@ -60,7 +59,7 @@ namespace SE
 		void setGravityFactor(float factor);
 
 	private:
-		PhysicsShape* m_shape{ nullptr };
+		JPH::Ref<JPH::Shape> m_shape{ nullptr };
 		JPH::BodyInterface* m_bodyInterface{ nullptr };
 		JPH::Body* m_body{ nullptr };
 

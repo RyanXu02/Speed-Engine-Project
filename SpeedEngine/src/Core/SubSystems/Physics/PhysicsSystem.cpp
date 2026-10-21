@@ -6,6 +6,11 @@
 #include "Core/SubSystems/Scenes/SceneSystem.h"
 #include "Core/Scene/Entity/Component/Transform.h"
 #include "Core/Scene/Entity/Component/RigidBody.h"
+#include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShape.h"
+#include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeBox.h"
+#include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeCapsule.h"
+#include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeSphere.h"
+#include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeMesh.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -116,10 +121,17 @@ namespace SE
 		{
 			RigidBody* rigidBody = entity.getComponent<RigidBody>();
 			Transform* transform = entity.getComponent<Transform>();
+			PhysicsShape* shape = nullptr;
+			shape = entity.getComponent<PhysicsShapeBox>();
+			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
+			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
+			///if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
 
-			// Only add if not already created/added
-			if (!rigidBody->isCreated())
+
+			// Only add if not already created/added and if it has a collider shape component
+			if (!rigidBody->isCreated() && shape)
 			{
+				rigidBody->setShape(shape->getShape());
 				rigidBody->createBody();
 				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
 				rigidBody->setRotation(glm::quat(transform->getRotation()));
@@ -145,6 +157,16 @@ namespace SE
 		{
 			RigidBody* rigidBody = entity.getComponent<RigidBody>();
 			Transform* transform = entity.getComponent<Transform>();
+			PhysicsShape* shape = nullptr;
+			// Check for each type of physics shape component
+			shape = entity.getComponent<PhysicsShapeBox>();
+			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
+			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
+			///if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
+			if (shape)
+			{
+				rigidBody->setShape(shape->getShape());
+			}
 
 			if (!rigidBody->isCreated())
 			{
