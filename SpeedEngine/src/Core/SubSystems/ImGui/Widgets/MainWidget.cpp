@@ -51,7 +51,8 @@ namespace SE
 				if (ImGui::MenuItem("shaco death sound lol"))
 				{
 					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
-					AS->PlaySound("Assets/Audio/Shaco_Original_Death_2.wav");
+					//AS->PlaySound("Assets/Audio/Shaco_Original_Death_2.wav");
+					AS->PlaySFX(AS->temptestid);
 				}
 				ImGui::EndMenu();
 			}
