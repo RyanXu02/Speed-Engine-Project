@@ -25,7 +25,6 @@ namespace SE
 		}
 	};
 
-
 	//typedefs
 	//since ma_sound is a struct, need to provide custom deleter so memory doesnt leak everywhere
 	typedef std::unique_ptr<ma_sound, ma_sound_Deleter> UniquePtrSound;
@@ -92,6 +91,7 @@ namespace SE
 		//reusing PendingSound, so for music, index can be either 0x0 (not loading), 0x1 (loading), or 0xFFFFFFFF (load failed). init with 0x12345678 lol
 		PendingSound currMusicLoadState = { "", 0x12345678 };
 		bool initialized = false;
+		std::vector<UniquePtrSound> test;
 	};
 
 	struct AudioSystem::SoundSlot 
