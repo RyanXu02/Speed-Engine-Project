@@ -45,15 +45,17 @@ namespace SE
 		//VERY IMPORTANT: since music library only holds strings (not ma_sound ptrs), all this func does is add filepath to the library.
 		//ma_sound gets created in PlayMusic because we have to stream from disk
 		MusicId registerMusic(const std::string& filepath);
-		void toggleMute();
 
 		InstanceHandle PlaySFX(SFXId id);
 		void StopSFX(InstanceHandle handle);
 		void PlayMusic(MusicId id);
 
-		void play3DSound();
-
-		void PlaySound(std::string_view path);
+		void toggleMute();
+		void changeNonGameSFXVolume(float volume);
+		void changeGameSFXVolume(float volume);
+		void changeMusicSFXVolume(float volume);
+		void changeMasterSFXVolume(float volume);
+		void changeMasterVolume(float volume);
 
 		SFXId testsfxid{};
 		MusicId testmusicid{};

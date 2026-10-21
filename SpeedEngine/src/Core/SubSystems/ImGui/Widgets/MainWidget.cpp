@@ -59,6 +59,11 @@ namespace SE
 					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
 					AS->PlayMusic(AS->testmusicid);
 				}
+				if (ImGui::MenuItem("mute test"))
+				{
+					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
+					AS->toggleMute();
+				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Edit"))

@@ -276,8 +276,7 @@ namespace SE
 		}
 	}
 
-	void AudioSystem::PlayMusic(MusicId id)
-	{
+	void AudioSystem::PlayMusic(MusicId id) {
 		//stream music and NO SPATIALIZATION. looping is there cuz usually game music loops
 		ma_uint32 flags = MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_LOOPING;
 		UniquePtrSound track = makeSoundFromFile(&m_imp->engine, m_imp->musicLibrary[id.index], flags, &m_imp->musicGrp);
@@ -290,25 +289,46 @@ namespace SE
 		ma_sound_start(m_imp->currentMusic.get());
 	}
 
-	void AudioSystem::PlaySound(std::string_view path) {
-		ma_engine_play_sound(&m_imp->engine, path.data(), nullptr);
-	}
-
 	void AudioSystem::toggleMute() {
-		if (isMuted)
+		if (!isMuted)
 		{
 			//kill and uninit active sfx instances
-			//ma_engine_stop(&m_imp->engine)
+			for (size_t i = 0; i < MAX_ACTIVE_SFX; ++i)
+			{
+				auto& item = sfxList[i];
+				if (item.inUse)
+					_freeSoundSlot(item, i);
+			}
+			ma_engine_stop(&m_imp->engine);
 		}
 		else
 		{
-			//ma_engine_start(&m_imp->engine)
+			ma_engine_start(&m_imp->engine);
 		}
 		isMuted = !isMuted;
 	}
 
-	bool AudioSystem::_initSfxGroups()
-	{
+	void AudioSystem::changeNonGameSFXVolume(float volume) {
+		ma_sound_group_set_volume(&m_imp->sfxNonGameGrp, volume);
+	}
+
+	void AudioSystem::changeGameSFXVolume(float volume) {
+		ma_sound_group_set_volume(&m_imp->sfxGameGrp, volume);
+	}
+
+	void AudioSystem::changeMusicSFXVolume(float volume) {
+		ma_sound_group_set_volume(&m_imp->musicGrp, volume);
+	}
+
+	void AudioSystem::changeMasterSFXVolume(float volume) {
+		ma_sound_group_set_volume(&m_imp->sfxGrp, volume);
+	}
+
+	void AudioSystem::changeMasterVolume(float volume) {
+		ma_engine_set_volume(&m_imp->engine, volume);
+	}
+
+	bool AudioSystem::_initSfxGroups() {
 		//init sfx parent group
 		if (ma_sound_group_init(&m_imp->engine, 0, nullptr, &m_imp->sfxGrp) != MA_SUCCESS)
 		{
