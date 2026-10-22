@@ -50,7 +50,7 @@ namespace SE
 				return nlohmann::json::object();
 			}
 			//return nlohmann::json(*static_cast<const T*>(instance));
-			return nlohmann::json(std::any_cast<T>(instance));
+			return nlohmann::json(std::any_cast<const T&>(instance));
 		}
 		static void Deserialize(void* instance, const nlohmann::json& j)
 		{

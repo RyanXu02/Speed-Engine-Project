@@ -1,6 +1,11 @@
 #pragma once
 
 #include "Transform.h"
+#include "RigidBody.h"
+#include "PhysicsShape/PhysicsShapeBox.h"
+#include "PhysicsShape/PhysicsShapeCapsule.h"
+#include "PhysicsShape/PhysicsShapeSphere.h"
+//#include "PhysicsShape/PhysicsShapeMesh.h"
 #include "Core/features/Serializable.h"
 
 

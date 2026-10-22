@@ -12,6 +12,7 @@
 #include "SubSystems/Graphics/Window.h"
 #include "SubSystems/Input/InputSystem.h"
 #include "SubSystems/Scenes/SceneSystem.h"
+#include "SubSystems/Physics/PhysicsSystem.h"
 #include "SubSystems/SubSystem.h"
 
 // temp
@@ -42,6 +43,7 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem()));
 		m_subSystems.push_back(std::unique_ptr<ResourceManager>(new ResourceManager()));
 		m_subSystems.push_back(std::unique_ptr<RendererManager>(new RendererManager(*getSubSystem<Window>())));
+		m_subSystems.push_back(std::unique_ptr<PhysicsSystem>(new PhysicsSystem()));
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
 
@@ -84,6 +86,7 @@ namespace SE
 		// get subsystems used in loop
 		auto* window = getSubSystem<Window>();
 		auto* rendererManager = getSubSystem<RendererManager>();
+		auto* physicsSystem = getSubSystem<PhysicsSystem>();
 
 		auto* debugRenderer = rendererManager->getRenderer<DebugRenderer>(); // temp
 
@@ -93,15 +96,29 @@ namespace SE
 		double fpsTimer = 0.0;
 		double currentFPS = 0.0;
 		const double targetFrameTime = 1.0 / window->getFPS();
+
+		double accumulator = 0.0;
+		const double physicsFrameTime = 1.0 / 60.0; // fixed 60 fps physics
 		while (m_isRunning)
 		{
 			m_currentTime = window->getCurrentTime();
 			m_deltaTime = m_currentTime - m_lastTime;
+			// Cap dt
+			if (m_deltaTime > 0.2)
+				m_deltaTime = 0.2;
 			m_lastTime = m_currentTime;
 
 			for (auto& subSystem : m_subSystems)
 			{
 				subSystem->update(m_deltaTime);
+			}
+
+			accumulator += m_deltaTime;
+			while (accumulator >= physicsFrameTime)
+			{
+				//physics step
+				physicsSystem->step(physicsFrameTime);
+				accumulator -= physicsFrameTime;
 			}
 
 			// temp
