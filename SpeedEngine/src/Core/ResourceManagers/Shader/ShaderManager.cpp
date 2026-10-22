@@ -63,10 +63,12 @@ namespace SE
 		// Load shader source code from file
 		auto shader = std::make_unique<Shader>(id, std::string(programName));
 
-		std::string vertexSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.first);
-		std::string fragmentSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.second);
+		const std::string* vertexSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.first);
+		const std::string* fragmentSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.second);
+		if (!vertexSource || !fragmentSource)
+			return 0;
 
-		GLCompStatus status = shader->init(vertexSource, fragmentSource);
+		GLCompStatus status = shader->init(*vertexSource, *fragmentSource);
 		if (!status.success)
 		{
 			m_logger->critical("Shader compilation failed for {}: {}", programName, status.log);

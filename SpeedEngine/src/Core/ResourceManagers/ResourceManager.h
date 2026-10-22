@@ -27,8 +27,8 @@ namespace SE
 
 		//@brief retrieves the contents of a text file
 		//@param filePath file to open and retrieve contents
-		//@returns filePath's entire contents
-		std::string getString(std::string_view filePath);
+		//@returns pointer to filePath's entire contents	
+		const std::string* getString(std::string_view filePath);
 
 		//@brief adds a resource to the Resource Manager
 		//@param type the type of resource being added

@@ -6,10 +6,7 @@
 
 namespace SE
 {
-	FBO::FBO(uint32_t width, uint32_t height, bool includeDepth)
-	    : m_width(width),
-	      m_height(height),
-	      m_includeDepth(includeDepth)
+	FBO::FBO(const Descriptor& descriptor) : m_descriptor(descriptor)
 	{
 		_create();
 	}
@@ -19,58 +16,20 @@ namespace SE
 		_destroy();
 	}
 
-	FBO::FBO(FBO&& other) noexcept
-	    : m_fboID(other.m_fboID),
-	      m_colorTexture(other.m_colorTexture),
-	      m_depthTexture(other.m_depthTexture),
-	      m_width(other.m_width),
-	      m_height(other.m_height),
-	      m_includeDepth(other.m_includeDepth)
-	{
-		other.m_fboID = 0;
-		other.m_colorTexture = 0;
-		other.m_depthTexture = 0;
-		other.m_width = 0;
-		other.m_height = 0;
-		other.m_includeDepth = true;
-	}
-	FBO& FBO::operator=(FBO&& other) noexcept
-	{
-		if (this != &other)
-		{
-			_destroy();
-			m_fboID = other.m_fboID;
-			m_colorTexture = other.m_colorTexture;
-			m_depthTexture = other.m_depthTexture;
-			m_width = other.m_width;
-			m_height = other.m_height;
-			m_includeDepth = other.m_includeDepth;
-			other.m_fboID = 0;
-			other.m_colorTexture = 0;
-			other.m_depthTexture = 0;
-			other.m_width = 0;
-			other.m_height = 0;
-			other.m_includeDepth = true;
-		}
-		return *this;
-	}
-
-	void FBO::bind()
+	void FBO::bind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fboID);
-		glViewport(0, 0, m_width, m_height);
-	}
-	void FBO::unbind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void FBO::resize(uint32_t width, uint32_t height)
 	{
-		if (width != m_width || height != m_height)
+		if (width == 0 || height == 0)
+			throw std::invalid_argument("Framebuffer dimensions must be nonzero");
+
+		if (width != getWidth() || height != getHeight())
 		{
-			m_width = width;
-			m_height = height;
+			m_descriptor.width = width;
+			m_descriptor.height = height;
 			_destroy();
 			_create();
 		}
@@ -78,49 +37,79 @@ namespace SE
 
 	void FBO::_create()
 	{
-		// create frame buffer
+		if (getWidth() == 0 || getHeight() == 0)
+			throw std::invalid_argument("Framebuffer dimensions must be nonzero");
+
+		GLint maxColors = 0;
+		GLint maxDrawBuffers = 0;
+		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColors);
+		glGetIntegerv(GL_MAX_DRAW_BUFFERS, &maxDrawBuffers);
+		if (m_descriptor.colors.size() > static_cast<size_t>(std::min(maxColors, maxDrawBuffers)))
+			throw std::invalid_argument("Framebuffer color attachment count exceeds OpenGL limits");
+
+		GLint previousDraw = 0;
+		GLint previousRead = 0;
+		GLint previousTexture = 0;
+		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &previousDraw);
+		glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previousRead);
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+
+		m_colorTextures.resize(m_descriptor.colors.size());
+		std::vector<GLenum> drawBuffers(m_colorTextures.size());
 		glGenFramebuffers(1, &m_fboID);
+		if (!m_fboID)
+			throw std::runtime_error("Failed to create OpenGL framebuffer");
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fboID);
 
-		// create color texture
-		glGenTextures(1, &m_colorTexture);
-		glBindTexture(GL_TEXTURE_2D, m_colorTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
-
-		// depth if flag
-		if (m_includeDepth)
+		auto createAttachment = [&](uint32_t& texture, const Attachment& attachment, GLenum point)
 		{
-			glGenTextures(1, &m_depthTexture);
-			glBindTexture(GL_TEXTURE_2D, m_depthTexture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
+			glGenTextures(1, &texture);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(GL_TEXTURE_2D, 0, attachment.internalFormat, getWidth(), getHeight(), 0, attachment.format, attachment.type, nullptr);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, attachment.minFilter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, attachment.magFilter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, attachment.wrapS);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, attachment.wrapT);
+			glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, attachment.borderColor.data());
+			glFramebufferTexture2D(GL_FRAMEBUFFER, point, GL_TEXTURE_2D, texture, 0);
+		};
+
+		for (size_t i = 0; i < m_colorTextures.size(); ++i)
+		{
+			drawBuffers[i] = GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(i);
+			createAttachment(m_colorTextures[i], m_descriptor.colors[i], drawBuffers[i]);
+		}
+		if (m_descriptor.depth)
+			createAttachment(m_depthTexture, *m_descriptor.depth, GL_DEPTH_ATTACHMENT);
+
+		if (drawBuffers.empty())
+		{
+			glDrawBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
+		}
+		else
+		{
+			glDrawBuffers(static_cast<GLsizei>(drawBuffers.size()), drawBuffers.data());
+			glReadBuffer(GL_COLOR_ATTACHMENT0);
 		}
 
-		// Check framebuffer completeness
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		{
-			// Framebuffer is not complete - could log error here
-		}
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		glBindTexture(GL_TEXTURE_2D, previousTexture);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, previousDraw);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, previousRead);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			_destroy();
+			throw std::runtime_error(std::format("Framebuffer {}x{} ({} colors, depth={}): incomplete, OpenGL status 0x{:X}",
+				getWidth(), getHeight(), m_descriptor.colors.size(), m_descriptor.depth.has_value(), status));
+		}
 	}
 
 	void FBO::_destroy()
 	{
-		if (m_colorTexture)
-		{
-			glDeleteTextures(1, &m_colorTexture);
-			m_colorTexture = 0;
-		}
+		glDeleteTextures(static_cast<GLsizei>(m_colorTextures.size()), m_colorTextures.data());
+		m_colorTextures.clear();
 		if (m_depthTexture)
 		{
 			glDeleteTextures(1, &m_depthTexture);
