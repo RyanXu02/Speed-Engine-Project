@@ -172,7 +172,7 @@ namespace SE
 		// ImGui::ShowDemoWindow(); // Don't show demo window! :(
 	}
 
-	void ImGuiRenderer::render(RenderContext& context) const
+	void ImGuiRenderer::render(RenderContext& context)
 	{
 		for (const auto& [id, widget] : m_widgets)
 		{

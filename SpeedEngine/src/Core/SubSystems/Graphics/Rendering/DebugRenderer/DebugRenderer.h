@@ -14,7 +14,7 @@ namespace SE
 
 		void init() override;
 		void shutdown() override;
-		void render(RenderContext& context) const override;
+		void render(RenderContext& context) override;
 
 		void drawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color);
 		// Not sure what castShadow is for?...
@@ -31,9 +31,9 @@ namespace SE
 
 		unsigned int m_VAO = 0;
 		unsigned int m_VBO = 0;
-		mutable Shader m_shader;
+		Shader m_shader;
 		// These are consumed each frame
-		mutable std::vector<DebugVertex> m_lines;
-		mutable std::vector<DebugVertex> m_triangles;
+		std::vector<DebugVertex> m_lines;
+		std::vector<DebugVertex> m_triangles;
 	};
 } // namespace SE

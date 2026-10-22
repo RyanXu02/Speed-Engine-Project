@@ -15,7 +15,7 @@ namespace SE
 		void shutdown() override;
 		void update(double deltaTime, RenderContext& context) override;
 
-		void render(RenderContext& context) const override;
+		void render(RenderContext& context) override;
 		void setDefaultShaderId(uint32_t id) { m_defaultShaderId = id; }
 		void setDefaultMaterialId(uint32_t id) { m_defaultMaterialId = id; }
 

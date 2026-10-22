@@ -12,12 +12,12 @@ namespace SE
 		GrayscaleRenderer(Logger& logger, std::string inputTarget);
 
 		void init() override;
-		void render(RenderContext& context) const override;
+		void render(RenderContext& context) override;
 		void shutdown() override;
 
 	private:
 		std::string m_inputTarget;
-		mutable Shader m_shader;
+		Shader m_shader;
 		unsigned int m_VAO = 0;
 	};
 } // namespace SE

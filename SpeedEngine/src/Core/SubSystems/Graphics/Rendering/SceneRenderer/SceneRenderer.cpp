@@ -32,7 +32,7 @@ namespace SE
 		_updateCamera(deltaTime, context.viewport.getCameraFrustum());
 	}
 
-	void SceneRenderer::render(RenderContext& context) const
+	void SceneRenderer::render(RenderContext& context)
 	{
 		if (!context.scene)
 			return;

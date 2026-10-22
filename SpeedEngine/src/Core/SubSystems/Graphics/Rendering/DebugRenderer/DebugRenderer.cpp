@@ -14,9 +14,9 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		std::string vertexSource = resources->getString("Assets/Shaders/debug.vert");
-		std::string fragmentSource = resources->getString("Assets/Shaders/debug.frag");
-		GLCompStatus status = m_shader.init(vertexSource, fragmentSource);
+		const std::string* vertexSource = resources->getString("Assets/Shaders/debug.vert");
+		const std::string* fragmentSource = resources->getString("Assets/Shaders/debug.frag");
+		GLCompStatus status = m_shader.init(*vertexSource, *fragmentSource);
 		if (!status.success)
 		{
 			m_shader.destroy();
@@ -54,7 +54,7 @@ namespace SE
 		m_triangles.push_back({ v3, color });
 	}
 
-	void DebugRenderer::render(RenderContext& context) const
+	void DebugRenderer::render(RenderContext& context)
 	{
 		if (m_lines.empty() && m_triangles.empty())
 			return;

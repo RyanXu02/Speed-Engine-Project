@@ -23,7 +23,7 @@ namespace SE
 		virtual void init() = 0;
 		virtual void shutdown() = 0;
 		virtual void update(double deltaTime, RenderContext& context) {}
-		virtual void render(RenderContext& context) const = 0;
+		virtual void render(RenderContext& context) = 0;
 
 	protected:
 		LoggerProxy m_logger;
