@@ -46,5 +46,5 @@ end
 
 -- required for every class script
 function Player:onDestroy()
-
+	self.mouseSubscription.unsubscribe()
 end

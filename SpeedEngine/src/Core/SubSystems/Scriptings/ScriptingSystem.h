@@ -24,6 +24,7 @@ namespace SE
 		virtual void runScript(std::string_view path);
 		virtual void removeScript(std::string_view path);
 		virtual void reloadScript(std::string_view path);
+		virtual void reset();
 
 	private:
 		virtual void _initScript(ScriptComponent& scriptComponent);

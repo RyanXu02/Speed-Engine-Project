@@ -84,7 +84,7 @@ namespace SE
 		{
 			auto* scriptComponent = entity.getComponent<ScriptComponent>();
 			auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
-			//scriptingSystem->removeScript(scriptComponent->path);
+			scriptingSystem->removeScript(scriptComponent->path);
 		};
 		return function;
 	}
