@@ -77,6 +77,8 @@ namespace SE
 		bodySettings.mRestitution = m_restitution;
 		bodySettings.mMaxLinearVelocity = m_maxLinearVelocity;
 		bodySettings.mMaxAngularVelocity = m_maxAngularVelocity;
+		bodySettings.mGravityFactor = m_gravityFactor;
+		bodySettings.mAllowDynamicOrKinematic = true;
 
 		m_body = m_bodyInterface->CreateBody(bodySettings);
 	}
