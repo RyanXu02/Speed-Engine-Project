@@ -72,13 +72,21 @@ namespace SE
 		//maps filepaths->id for registry caching
 		//currently, both sfx and music use this registery. THIS CAN BE CHANGED IN THE FUTURE
 		//SO SFX AND MUSIC HAVE SEPARATE PATH REGISTRIES.
-		std::unordered_map<std::string, uint32_t> pathRegistry;
+		std::unordered_map<std::string, uint32_t> m_pathRegistry;
+
+		struct PendingSound
+		{
+			std::string filepath;
+			uint32_t index;
+		};
+		std::vector<PendingSound> m_loadPendingList;
+		//TODO: if we need to, will add an areAssetsLoaded-esque function to make sure all sounds are loaded before we start simulating
 		
 		//generational handle setup
 		//used for short-life sounds (sfx)
 		struct SoundSlot;
-		std::vector<SoundSlot> sfxList;
-		std::vector<uint32_t> freeSlots;
+		std::vector<SoundSlot> m_sfxList;
+		std::vector<uint32_t> m_freeSlots;
 
 		bool _initSfxGroups();
 

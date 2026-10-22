@@ -89,6 +89,8 @@ namespace SE
 		SfxLibrary sfxLibrary;
 		std::vector<std::string> musicLibrary;
 		UniquePtrSound currentMusic; //IF WE WANT MULTIPLE SONGS PLAYING AT ONCE, THIS CAN BE CHANGED TO A VECTOR
+		//reusing PendingSound, so for music, index can be either 0x0 (not loading), 0x1 (loading), or 0xFFFFFFFF (load failed). init with 0x12345678 lol
+		PendingSound currMusicLoadState = { "", 0x12345678 };
 		bool initialized = false;
 	};
 
@@ -135,23 +137,52 @@ namespace SE
 		}
 
 		//init generational handle setup
-		freeSlots.reserve(MAX_ACTIVE_SFX); //probably way too many lol (50) but whatever its fine for now.
-		sfxList.reserve(MAX_ACTIVE_SFX);
-		//put all indices on free list. push back in reverse order so pop_back will get index @ front of sfxList
+		m_freeSlots.reserve(MAX_ACTIVE_SFX); //probably way too many lol (50) but whatever its fine for now.
+		m_sfxList.reserve(MAX_ACTIVE_SFX);
+		//put all indices on free list. push back in reverse order so pop_back will get index @ front of m_sfxList
 		for (uint32_t i = MAX_ACTIVE_SFX; i != 0; --i)
-			freeSlots.push_back(i-1);
-		//populate sfxList with empty sound slots
+			m_freeSlots.push_back(i-1);
+		//populate m_sfxList with empty sound slots
 		for (int i = 0; i < MAX_ACTIVE_SFX; ++i)
-			sfxList.push_back(SoundSlot());
+			m_sfxList.push_back(SoundSlot());
 		m_imp->initialized = true;
 	}
 
 	void AudioSystem::update(double dt) {
-		//walk sfxList. for each item, if its inUse, check if the sound has ended.
-		//if ended, free the slot.
-		for (size_t i = 0; i < sfxList.size(); ++i)
+		//check pending list for sound that are done being loaded
+		for (auto it = m_loadPendingList.begin(); it != m_loadPendingList.end();)
 		{
-			auto& item = sfxList[i];
+			auto state = Helpers::getSoundLoadState(m_imp->sfxLibrary[(*it).index].get());
+			if (state == Helpers::LoadState::READY)
+			{
+				it = m_loadPendingList.erase(it);
+			}
+			else if (state == Helpers::LoadState::FAILED)
+			{
+				m_logger->warn("SFX file {} with id {} failed to async load", (*it).filepath, (*it).index);
+				it = m_loadPendingList.erase(it);
+			}
+			else
+				++it;
+		}
+		//check current music load state as well
+		if (m_imp->currMusicLoadState.index == 0x1) //sound is supposedly still loading, go check ts
+		{
+			auto musicState = Helpers::getSoundLoadState(m_imp->currentMusic.get());
+			if (musicState == Helpers::LoadState::READY)
+				m_imp->currMusicLoadState.index = 0; //no longer loading
+			else if (musicState == Helpers::LoadState::FAILED)
+			{
+				m_logger->warn("Current music track {} failed to load, track is being dropped", m_imp->currMusicLoadState.filepath);
+				m_imp->currMusicLoadState.index = 0xFFFFFFFF;
+			}
+		}
+
+		//walk m_sfxList. for each item, if its inUse, check if the sound has ended.
+		//if ended, free the slot.
+		for (size_t i = 0; i < m_sfxList.size(); ++i)
+		{
+			auto& item = m_sfxList[i];
 			if (!item.inUse)
 				continue;
 			//item is in use, poll sound
@@ -169,7 +200,7 @@ namespace SE
 			//cleanup ma_sounds here. MUST USE vector.clear() OR ELSE DOUBLE FREE WILL HAPPEN ON ENGINE SHUTDOWN
 			m_imp->currentMusic.reset();
 			m_imp->sfxLibrary.clear();
-			sfxList.clear();
+			m_sfxList.clear();
 
 			ma_sound_group_uninit(&m_imp->musicGrp);
 			ma_sound_group_uninit(&m_imp->sfxNonGameGrp);
@@ -182,9 +213,9 @@ namespace SE
 
 	SFXId AudioSystem::registerSFX(const std::string& filepath, SFXType type) {
 		//filepath exists in registry, meaning we already have template in library
-		if (pathRegistry.contains(filepath))
+		if (m_pathRegistry.contains(filepath))
 		{
-			uint32_t id = pathRegistry.find(filepath)->second;
+			uint32_t id = m_pathRegistry.find(filepath)->second;
 			return SFXId{ id, type };
 		}
 
@@ -216,20 +247,21 @@ namespace SE
 			}
 		}
 		uint32_t returnId = static_cast<uint32_t>(m_imp->sfxLibrary.size()); //new sfx will always go @ back, size gives correct index before we push_back
-		pathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry lol
+		m_loadPendingList.push_back({ filepath, returnId }); //immediately put in pending list
+		m_pathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry lol
 		m_imp->sfxLibrary.push_back(std::move(sound));
 
 		return SFXId{ returnId, type };
 	}
 
 	MusicId AudioSystem::registerMusic(const std::string& filepath) {
-		if (pathRegistry.contains(filepath))
+		if (m_pathRegistry.contains(filepath))
 		{
-			uint32_t id = pathRegistry.find(filepath)->second;
+			uint32_t id = m_pathRegistry.find(filepath)->second;
 			return MusicId{ id };
 		}
 		uint32_t returnId = static_cast<uint32_t>(m_imp->musicLibrary.size()); //new music will always go @ back, size gives correct index before we push_back
-		pathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry
+		m_pathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry
 		m_imp->musicLibrary.push_back(filepath);
 
 		return MusicId{ returnId };
@@ -237,7 +269,7 @@ namespace SE
 
 	InstanceHandle AudioSystem::PlaySFX(SFXId id) {
 		//check if active sfx cap is reached
-		if (freeSlots.empty())
+		if (m_freeSlots.empty())
 		{
 			m_logger->warn("Cannot play SFX id {} due to max active SFX cap", id.index);
 			return InstanceHandle{ 0xFFFFFFFF, 0 }; //uint32 max index and 0 generation is invalid instance handle.
@@ -289,14 +321,14 @@ namespace SE
 			return InstanceHandle{ 0xFFFFFFFF, 0 }; //uint32 max index and 0 generation is invalid instance handle.
 
 		//pop free slot from free list
-		uint32_t freeIdx = freeSlots.back();
-		freeSlots.pop_back();
-		sfxList[freeIdx].sound = std::move(sfx); //give the copy ptr to the sfxList
-		sfxList[freeIdx].inUse = true;
-		ma_sound_start(sfxList[freeIdx].sound.get());
+		uint32_t freeIdx = m_freeSlots.back();
+		m_freeSlots.pop_back();
+		m_sfxList[freeIdx].sound = std::move(sfx); //give the copy ptr to the m_sfxList
+		m_sfxList[freeIdx].inUse = true;
+		ma_sound_start(m_sfxList[freeIdx].sound.get());
 
 		//return an instance handle with the retrieved idx and the associated slot's generation so the ticket and slot match (VERY IMPORTANT)
-		return InstanceHandle{ freeIdx, sfxList[freeIdx].generation };
+		return InstanceHandle{ freeIdx, m_sfxList[freeIdx].generation };
 		//m_imp->test.push_back(std::move(sfx));
 		//ma_sound_start(m_imp->test.back().get());
 	}
@@ -307,32 +339,34 @@ namespace SE
 		bool isValid = _validateHandle(handle);
 		if (isValid)
 		{
-			auto& item = sfxList[handle.index];
-			ma_result result = ma_sound_stop(item.sound.get());
+			auto& item = m_sfxList[handle.index];
+			ma_sound_stop(item.sound.get());
 			_freeSoundSlot(item, handle.index);
 		}
 	}
 
 	void AudioSystem::PlayMusic(MusicId id) {
+		if (id.index >= m_imp->musicLibrary.size() || isMuted)
+			return; //early return because invalid MusicId OR the engine is muted
+
 		//stream music and NO SPATIALIZATION. looping is there cuz usually game music loops
-		ma_uint32 flags = MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_LOOPING;
-		UniquePtrSound track = Helpers::makeSoundFromFile(&m_imp->engine, m_imp->musicLibrary[id.index], flags, &m_imp->musicGrp);
-		if (!track)
-		{
-			m_logger->warn("Failure to init MUSIC sound id {}", id.index);
-			return;
-		}
+		ma_uint32 flags = MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_LOOPING;
+		std::string filepath = m_imp->musicLibrary[id.index];
+		UniquePtrSound track = Helpers::makeSoundFromFile(&m_imp->engine, filepath.c_str(), flags, &m_imp->musicGrp);
+		m_imp->currMusicLoadState = { filepath, 1 }; //index = 1 is loading, index = 0 is not loading. set to 1 cuz track is loading right now
 		m_imp->currentMusic = std::move(track);
+
 		ma_sound_start(m_imp->currentMusic.get());
 	}
 
+	//TODO: currently rips out looping sounds as well, will have to change this later
 	void AudioSystem::toggleMute() {
 		if (!isMuted)
 		{
 			//kill and uninit active sfx instances
-			for (size_t i = 0; i < sfxList.size(); ++i)
+			for (size_t i = 0; i < m_sfxList.size(); ++i)
 			{
-				auto& item = sfxList[i];
+				auto& item = m_sfxList[i];
 				if (item.inUse)
 					_freeSoundSlot(item, i);
 			}
@@ -394,16 +428,16 @@ namespace SE
 		s.sound.reset(); //free sound. reset() will get the custom deleter to free the ma_sound
 		++s.generation;
 		s.inUse = false;
-		freeSlots.push_back(static_cast<uint32_t>(i));
+		m_freeSlots.push_back(static_cast<uint32_t>(i));
 	}
 
 	bool AudioSystem::_validateHandle(InstanceHandle handle) {
 		//check if handle is invalid, return false
-		if (handle.index >= sfxList.size())
+		if (handle.index >= m_sfxList.size())
 			return false;
 		//for the slot specified by the handle's index:
 		// if it is in use AND its generation matches the handle's generation, we are good
-		auto& item = sfxList[handle.index];
+		auto& item = m_sfxList[handle.index];
 		if (item.inUse && handle.generation == item.generation)
 			return true;
 		return false;
