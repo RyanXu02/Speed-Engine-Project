@@ -76,12 +76,13 @@ namespace SE
 	private:
 		LoggerProxy m_logger;
 		std::string m_name;
+		std::string m_path;
 
 		std::vector<uint32_t> m_entitiesToRemove{};
 
 		EntityRegistry m_registry;
 
 		bool m_isInitialized{ false };
-		bool m_isUpdating{ false };
+		bool m_reloadRequested{ false };
 	};
 } // namespace SE

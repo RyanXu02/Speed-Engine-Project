@@ -338,6 +338,13 @@ namespace SE
 		m_luaState.collect_garbage();
 	}
 
+	void ScriptingSystem::reset() 
+	{
+		m_scripts.clear();
+		m_scriptCache.clear();
+		m_luaState.collect_garbage();
+	}
+
 	void ScriptingSystem::_initScript(ScriptComponent& scriptComponent) {
 		if (!scriptComponent.initilized)
 		{

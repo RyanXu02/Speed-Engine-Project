@@ -38,7 +38,9 @@ namespace SE
 				{
 					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
-						scene->loadScene(path);
+						// load scene does not defer to next frame so it will crash running systems on null references
+						// reload does defer request so use it for now //scene->loadScene(path);
+						scene->reloadScene();	
 					}
 				}
 				ImGui::EndMenu();
