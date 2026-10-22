@@ -4,6 +4,7 @@
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "../../Scenes/SceneSystem.h"
+#include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 #include "MainWidget.h"
 #include "MemoryWidget.h"
@@ -112,6 +113,24 @@ namespace SE
 				if (ImGui::MenuItem("Scene Preview", nullptr, scenePreviewVisible))
 				{
 					ScenePreviewWidget::setVisible(!scenePreviewVisible);
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Physics"))
+			{
+				if (ImGui::MenuItem("Run Physics", nullptr))
+				{
+					if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
+					{
+						physicsSystem->resume();
+					}
+				}
+				if (ImGui::MenuItem("Pause Physics", nullptr))
+				{
+					if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
+					{
+						physicsSystem->pause();
+					}
 				}
 				ImGui::EndMenu();
 			}

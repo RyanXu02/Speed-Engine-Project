@@ -101,6 +101,94 @@ namespace SE
 				}
 		    });
 
+		m_inspectors.registerComponent<RigidBody>("RigidBody", true,
+		    [](Entity&, RigidBody& component)
+		    {
+			    auto motionType = component.getMotionType();
+			    unsigned int typeIndex = 0;
+			    if (motionType == JPH::EMotionType::Kinematic)
+				    typeIndex = 1;
+			    else if (motionType == JPH::EMotionType::Static)
+				    typeIndex = 2;
+
+			    const char* motionTypes[] = { "Dynamic", "Kinematic", "Static" };
+			    if (ImGui::BeginCombo("Motion Type", motionTypes[typeIndex]))
+				{
+					for (unsigned int i = 0; i < IM_COUNTOF(motionTypes); ++i)
+					{
+					    const bool isSelected = typeIndex == i;
+					    if (ImGui::Selectable(motionTypes[i], isSelected))
+					    {
+						    if (i == 0)
+							    component.setMotionType(JPH::EMotionType::Dynamic);
+						    else if (i == 1)
+							    component.setMotionType(JPH::EMotionType::Kinematic);
+						    else
+							    component.setMotionType(JPH::EMotionType::Static);
+						}
+					    if (isSelected)
+						    ImGui::SetItemDefaultFocus();
+					}
+				    ImGui::EndCombo();
+				}
+
+				auto offset = component.getOffset();
+			    if (ImGui::DragFloat3("Offset", &offset.x, 0.1f))
+				    component.setOffset(offset);
+
+				auto isActive = component.isActive();
+				if (ImGui::Checkbox("Active", &isActive))
+				{
+				    if (isActive)
+					    component.activateBody();
+				    else
+					    component.deactivateBody();
+				}
+
+				auto maxLinearVelocity = component.getMaxLinearVelocity();
+			    if (ImGui::DragFloat("Max Linear Velocity", &maxLinearVelocity, 0.1f))
+				    component.setMaxLinearVelocity(maxLinearVelocity);
+			    auto maxAngularVelocity = component.getMaxAngularVelocity();
+			    if (ImGui::DragFloat("Max Angular Velocity", &maxAngularVelocity, 0.1f))
+				    component.setMaxAngularVelocity(maxAngularVelocity);
+			    auto restitution = component.getRestitution();
+			    if (ImGui::DragFloat("Restitution", &restitution, 0.1f))
+				    component.setRestitution(restitution);
+			    auto friction = component.getFriction();
+			    if (ImGui::DragFloat("Friction", &friction, 0.1f))
+				    component.setFriction(friction);
+			    auto gravityFactor = component.getGravityFactor();
+			    if (ImGui::DragFloat("Gravity Factor", &gravityFactor, 0.1f))
+				    component.setGravityFactor(gravityFactor);
+		    });
+
+		m_inspectors.registerComponent<PhysicsShapeBox>("PhysicsShapeBox", false,
+		    [](Entity&, PhysicsShapeBox& component)
+		    {
+			    auto halfExtents = component.getHalfExtents();
+			    if (ImGui::DragFloat3("Half Extents", &halfExtents.x, 0.1f))
+				    component.setHalfExtents(halfExtents);
+		    });
+
+		m_inspectors.registerComponent<PhysicsShapeCapsule>("PhysicsShapeCapsule", false,
+		    [](Entity&, PhysicsShapeCapsule& component)
+		    {
+			    auto halfHeight = component.getHalfHeight();
+			    if (ImGui::DragFloat("Half Height", &halfHeight, 0.1f))
+				    component.setHalfHeight(halfHeight);
+			    auto radius = component.getRadius();
+			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
+				    component.setRadius(radius);
+		    });
+
+		m_inspectors.registerComponent<PhysicsShapeSphere>("PhysicsShapeSphere", false,
+		    [](Entity&, PhysicsShapeSphere& component)
+		    {
+			    auto radius = component.getRadius();
+			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
+				    component.setRadius(radius);
+		    });
+
 #pragma endregion RegisterComponentEditors
 
 

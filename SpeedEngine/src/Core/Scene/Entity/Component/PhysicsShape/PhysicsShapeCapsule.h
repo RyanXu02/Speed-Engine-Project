@@ -17,6 +17,8 @@ namespace SE
 		float getRadius() const;
 		void setRadius(float radius);
 
+		DEFINE_TYPE(PhysicsShapeCapsule, member("halfHeight", &PhysicsShapeCapsule::m_halfHeight), member("radius", &PhysicsShapeCapsule::m_radius));
+
 	private:
 		void createShape() override;
 

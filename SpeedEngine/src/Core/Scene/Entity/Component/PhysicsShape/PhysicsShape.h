@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/features/Serializable.h"
+
 #include <glm/glm.hpp>
 
 #include <Jolt/Core/Reference.h>

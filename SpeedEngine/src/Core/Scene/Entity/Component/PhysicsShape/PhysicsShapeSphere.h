@@ -15,6 +15,8 @@ namespace SE
 		float getRadius() const;
 		void setRadius(float radius);
 
+		DEFINE_TYPE(PhysicsShapeSphere, member("radius", &PhysicsShapeSphere::m_radius));
+
 	private:
 		void createShape() override;
 

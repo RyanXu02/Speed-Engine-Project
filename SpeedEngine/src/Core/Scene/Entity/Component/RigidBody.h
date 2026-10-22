@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/features/Serializable.h"
+
 #include <glm/glm.hpp>
 #include <Jolt/Physics/Body/MotionType.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
@@ -16,7 +18,7 @@ namespace SE
 
 		JPH::BodyID getBodyID() const;
 		bool isCreated() const;
-		void createBody();
+		void createBody(); 
 
 		JPH::EMotionType getMotionType() const { return m_motionType; };
 		void setMotionType(JPH::EMotionType motionType);
@@ -58,6 +60,16 @@ namespace SE
 		float getGravityFactor() const { return m_gravityFactor; }
 		void setGravityFactor(float factor);
 
+		DEFINE_TYPE(RigidBody,
+			member("motionType", &RigidBody::m_motionType),
+			//member("offset", &RigidBody::m_offset), 
+			member("isActive", &RigidBody::m_isActive),
+			member("maxLinearVelocity", &RigidBody::m_maxLinearVelocity),
+		    member("maxAngularVelocity", &RigidBody::m_maxAngularVelocity),
+			member("restitution", &RigidBody::m_restitution),
+			member("friction", &RigidBody::m_friction),
+			member("gravityFactor", &RigidBody::m_gravityFactor));
+
 	private:
 		JPH::Ref<JPH::Shape> m_shape{ nullptr };
 		JPH::BodyInterface* m_bodyInterface{ nullptr };
@@ -66,6 +78,7 @@ namespace SE
 		// Properties
 		JPH::EMotionType m_motionType{ JPH::EMotionType::Dynamic };
 		glm::vec3 m_offset{ 0.0f, 0.0f, 0.0f };
+		bool m_isActive{ false };
 		float m_maxLinearVelocity{ 500.0f };
 		float m_maxAngularVelocity{ 15.0f * 3.14159f };
 		float m_restitution{ 0.0f };

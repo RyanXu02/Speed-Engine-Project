@@ -42,8 +42,11 @@ namespace SE
 
 	RigidBody::~RigidBody()
 	{
-		m_bodyInterface->RemoveBody(getBodyID());
-		m_bodyInterface->DestroyBody(getBodyID());
+		if (m_body)
+		{
+			m_bodyInterface->RemoveBody(getBodyID());
+			m_bodyInterface->DestroyBody(getBodyID());
+		}
 	}
 
 	JPH::BodyID RigidBody::getBodyID() const
@@ -66,6 +69,10 @@ namespace SE
 
 		bodySettings.SetShape(m_shape);
 		bodySettings.mMotionType = m_motionType;
+		if (m_motionType == JPH::EMotionType::Static)
+			bodySettings.mObjectLayer = 0;
+		else
+			bodySettings.mObjectLayer = 1;
 		bodySettings.mFriction = m_friction;
 		bodySettings.mRestitution = m_restitution;
 		bodySettings.mMaxLinearVelocity = m_maxLinearVelocity;
@@ -77,17 +84,23 @@ namespace SE
 	void RigidBody::setMotionType(JPH::EMotionType motionType) {
 		m_motionType = motionType;
 		if (m_body)
-			m_bodyInterface->SetMotionType(getBodyID(), motionType, JPH::EActivation::Activate);
+		{
+			m_bodyInterface->SetMotionType(getBodyID(), motionType, JPH::EActivation::DontActivate);
+			if (m_motionType == JPH::EMotionType::Static)
+				m_bodyInterface->SetObjectLayer(getBodyID(), 0);
+			else
+				m_bodyInterface->SetObjectLayer(getBodyID(), 1);
+		}
 	}
 
 	void RigidBody::setShape(JPH::Ref<JPH::Shape> shape)
 	{
-		if (shape = m_shape)
+		if (shape == m_shape)
 			return;
 
 		m_shape = shape;
 		if (m_body)
-			m_bodyInterface->SetShape(getBodyID(), shape, true, JPH::EActivation::Activate);
+			m_bodyInterface->SetShape(getBodyID(), shape, true, JPH::EActivation::DontActivate);
 	}
 
 	glm::vec3 RigidBody::getLinearVelocity() const {
@@ -120,7 +133,7 @@ namespace SE
 	}
 	void RigidBody::setPosition(const glm::vec3& position) {
 		if (m_body)
-			m_bodyInterface->SetPosition(getBodyID(), toJPH(position), JPH::EActivation::Activate);
+			m_bodyInterface->SetPosition(getBodyID(), toJPH(position), JPH::EActivation::DontActivate);
 	}
 
 	glm::quat RigidBody::getRotation() const {
@@ -131,7 +144,7 @@ namespace SE
 	}
 	void RigidBody::setRotation(const glm::quat& rotation) {
 		if (m_body)
-			m_bodyInterface->SetRotation(getBodyID(), toJPH(rotation), JPH::EActivation::Activate);
+			m_bodyInterface->SetRotation(getBodyID(), toJPH(rotation), JPH::EActivation::DontActivate);
 	}
 
 	glm::mat4 RigidBody::getTransform() const {
@@ -162,11 +175,13 @@ namespace SE
 	}
 
 	void RigidBody::activateBody() {
+		m_isActive = true;
 		if (m_body)
 			m_bodyInterface->ActivateBody(getBodyID());
 	}
 
 	void RigidBody::deactivateBody() {
+		m_isActive = false;
 		if (m_body)
 			m_bodyInterface->DeactivateBody(getBodyID());
 	}
@@ -175,32 +190,37 @@ namespace SE
 		if (m_body)
 			return m_bodyInterface->IsActive(getBodyID());
 		else
-			return false;
+			return m_isActive;
 	}
 
 	void RigidBody::setMaxLinearVelocity(float maxVelocity)
 	{
+		m_maxLinearVelocity = maxVelocity;
 		if (m_body)
 			m_bodyInterface->SetMaxLinearVelocity(getBodyID(), maxVelocity);
 	}
 
 	void RigidBody::setMaxAngularVelocity(float maxVelocity)
 	{
+		m_maxAngularVelocity = maxVelocity;
 		if (m_body)
 			m_bodyInterface->SetMaxAngularVelocity(getBodyID(), maxVelocity);
 	}
 
 	void RigidBody::setRestitution(float restitution) {
+		m_restitution = restitution;
 		if (m_body)
 			m_bodyInterface->SetRestitution(getBodyID(), restitution);
 	}
 
 	void RigidBody::setFriction(float friction) {
+		m_friction = friction;
 		if (m_body)
 			m_bodyInterface->SetFriction(getBodyID(), friction);
 	}
 
 	void RigidBody::setGravityFactor(float factor) {
+		m_gravityFactor = factor;
 		if (m_body)
 			m_bodyInterface->SetGravityFactor(getBodyID(), factor);
 	}
