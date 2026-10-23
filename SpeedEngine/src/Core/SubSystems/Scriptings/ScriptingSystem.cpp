@@ -343,6 +343,7 @@ namespace SE
 		m_scripts.clear();
 		m_scriptCache.clear();
 		m_luaState.collect_garbage();
+		m_luaState.collect_garbage();
 	}
 
 	void ScriptingSystem::_initScript(ScriptComponent& scriptComponent) {
