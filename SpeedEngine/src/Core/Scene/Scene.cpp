@@ -155,10 +155,6 @@ namespace SE
 
 	void Scene::loadScene(std::string_view path)
 	{
-		if (m_reloadRequested)
-		{
-			return;
-		}
 		nlohmann::json sceneJson;
 		if (loadJson(path.data(), m_logger, sceneJson))
 		{
