@@ -367,8 +367,6 @@ namespace SE
 
 		//return an instance handle with the retrieved idx and the associated slot's generation so the ticket and slot match (VERY IMPORTANT)
 		return InstanceHandle{ freeIdx, m_sfxList[freeIdx].generation };
-		//m_imp->test.push_back(std::move(sfx));
-		//ma_sound_start(m_imp->test.back().get());
 	}
 
 	void AudioSystem::StopSFX(InstanceHandle handle) {

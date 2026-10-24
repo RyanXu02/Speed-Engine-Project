@@ -96,9 +96,6 @@ namespace SE
 	private:
 		AudioSystem();
 		
-		//TODO: NEED A WAY OF SERIALIZING AUDIO SYSTEM(?) TO MAKE MUTE + VOLUME SETTINGS PERSISTENT.
-		//may have to create sound group volume member vars for this, but should be pretty easy future work lol
-		bool isMuted;
 
 		//pimpl idiom
 		struct AudioImpl;
@@ -123,6 +120,10 @@ namespace SE
 		std::vector<SoundSlot> m_sfxList;
 		std::vector<uint32_t> m_freeSlots;
 
+		//TODO: NEED A WAY OF SERIALIZING AUDIO SYSTEM(?) TO MAKE MUTE + VOLUME SETTINGS PERSISTENT.
+		//may have to create sound group volume member vars for this, but should be pretty easy future work lol
+		bool isMuted;
+
 		bool _initSfxGroups();
 
 		//frees a sound slot @ index i. 
@@ -133,20 +134,3 @@ namespace SE
 		bool _validateHandle(InstanceHandle handle);
 	};
 } //namespace SE
-
-/* sound init for sfxgame pass no 3d flag, 3d by default
-* sound init for sfxnongame + music, pass no_spatialization flag
-*/
-//update spatial sounds
-//auto* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
-//auto func = [&](Entity entity) -> void
-//{
-//	AudioSFXComponent* sfxComponent = entity.getComponent<AudioSFXComponent>();
-//	if (sfxComponent->isGameSFX())
-//	{
-//		//get transform from the entity, and pass the position to audio system
-//		glm::vec3 pos = entity.getComponent<Transform>()->getTranslation();
-//	}
-//};
-//
-//scene->forEntitiesWith<AudioSFXComponent>(func);
