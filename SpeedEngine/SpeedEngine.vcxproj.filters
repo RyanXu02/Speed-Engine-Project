@@ -1,136 +1,395 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\RigidBody.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Audio\AudioSystem.cpp" />
-    <ClCompile Include="src\Core\Features\Math.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
-    <ClCompile Include="src\Core\Features\MemoryTrackable.cpp" />
-    <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
-    <ClCompile Include="src\Core\Features\Serializable.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
-    <ClCompile Include="src\Core\Scene\Scene.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Events\Event.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Resource.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
-    <ClCompile Include="src\Core\Logger\Logger.cpp" />
-    <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Scriptings\ScriptingSystem.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
-    <ClCompile Include="ThirdParty\pch.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
-    <ClCompile Include="AudioComponents.cpp" />
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShape.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\RigidBody.h" />
-    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsSystem.h" />
-    <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h" />
-    <ClInclude Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.h" />
-    <ClInclude Include="src\Core\SubSystems\Audio\AudioSystem.h" />
-    <ClInclude Include="src\Core\Features\Math.h" />
-    <ClInclude Include="src\Core\Logger\ConsoleSink.h" />
-    <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
-    <ClInclude Include="src\Core\Features\MemoryTag.h" />
-    <ClInclude Include="src\Core\Features\MemoryTrackable.h" />
-    <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h" />
-    <ClInclude Include="src\Core\Features\Serializable.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
-    <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.h" />
-    <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResource.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\Input\KeyCodes.h" />
-    <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
-    <ClInclude Include="src\Core\Scene\Scene.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
-    <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
-    <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
-    <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h" />
-    <ClInclude Include="src\Core\SubSystems\Events\Event.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Manager.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Resource.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h" />
-    <ClInclude Include="src\Core\Logger\Logger.h" />
-    <ClInclude Include="src\Core\Engine.h" />
-    <ClInclude Include="src\Core\EngineConfig.h" />
-    <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h" />
-    <ClInclude Include="src\Core\SubSystems\Scriptings\ScriptingSystem.h" />
-    <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />
-    <ClInclude Include="ThirdParty\pch.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
-    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h" />
-    <ClInclude Include="AudioComponents.h" />
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logger\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\SubSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\Resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Events\Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ExamplePostProcessRenderer\ExamplePostProcessRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Features\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Features\MemoryTrackable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Features\Serializable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\Component\RigidBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeCapsule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ScriptingSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Audio\AudioSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.cpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\debug.frag" />
-    <None Include="Assets\Shaders\debug.vert" />
-    <None Include="Assets\Shaders\grayscale.vert" />
-    <None Include="Assets\Shaders\grayscale.frag" />
+    <ClInclude Include="ThirdParty\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Logger\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\EngineConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\SubSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\Material\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Events\Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Logger\LoggerProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ExamplePostProcessRenderer\ExamplePostProcessRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Input\KeyCodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\MemoryTag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\MemoryTrackable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Features\Serializable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\RigidBody.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeCapsule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ScriptingSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Logger\ConsoleSink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Audio\AudioSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\example-post-process.vert" />
+    <None Include="Assets\Shaders\example-post-process.frag" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
   </ItemGroup>
