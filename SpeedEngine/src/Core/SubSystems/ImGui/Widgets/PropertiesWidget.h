@@ -26,9 +26,9 @@ namespace SE
 		uint32_t m_selectedEntityId{ 0 };
 
 		ComponentInspectorRegistry m_inspectors;
-		std::string m_meshPathDraft, m_soundPathDraft;
-		std::string m_meshPathError, m_soundPathError;
-		bool m_meshDraftInitialized{ false }, m_soundDraftInitialized{ false };
+		std::string m_meshPathDraft;
+		std::string m_meshPathError;
+		bool m_meshDraftInitialized{ false };
 
 	};
 } // namespace SE

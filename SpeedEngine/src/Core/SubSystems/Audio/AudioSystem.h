@@ -56,6 +56,7 @@ namespace SE
 		InstanceHandle PlaySFX(SFXId id);
 		void StopSFX(InstanceHandle handle);
 		void PlayMusic(MusicId id);
+		void StopCurrentMusic();
 
 		void toggleMute();
 		void changeNonGameSFXVolume(float volume);

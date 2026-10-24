@@ -82,11 +82,6 @@ namespace SE
 		};
 		uint32_t defaultMaterialId = resourceManager->addResource<ResourceType::Material>(defaultShaderId, defaultTextures, "defaultMaterial");
 		sceneRenderer->setDefaultMaterialId(defaultMaterialId);
-
-		//audio system test code
-		AudioSystem* as = getSubSystem<AudioSystem>();
-		as->testsfxid = as->registerSFX("Assets/Audio/shaco_death.wav", NONGAME_SFX);
-		as->testmusicid = as->registerMusic("Assets/Audio/funkytown.wav");
 	}
 	void Engine::run()
 	{

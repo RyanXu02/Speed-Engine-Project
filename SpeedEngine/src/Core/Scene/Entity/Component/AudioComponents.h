@@ -46,7 +46,9 @@ namespace SE
 
 		bool createTrack(const std::string& filepath);
 		void PlayMyTrack();
-		//void StopMyTrack() const;
+		void StopMyTrack() const;
+
+		const std::string& getFilepath() { return m_filepath; }
 
 		DEFINE_TYPE(AudioMusicComponent, member("filepath", &AudioMusicComponent::m_filepath));
 

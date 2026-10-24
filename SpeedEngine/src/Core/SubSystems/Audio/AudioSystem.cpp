@@ -387,6 +387,12 @@ namespace SE
 		ma_sound_start(m_imp->currentMusic.get());
 	}
 
+	//subject to change if we decide to have multiple tracks playing at once.
+	void AudioSystem::StopCurrentMusic() {
+		ma_sound_stop(m_imp->currentMusic.get());
+		m_imp->currentMusic.reset();
+	}
+
 	//TODO: currently rips out looping sounds as well, will have to change this later
 	void AudioSystem::toggleMute() {
 		if (!isMuted)

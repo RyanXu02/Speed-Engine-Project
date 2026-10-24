@@ -227,8 +227,48 @@ namespace SE
 			    {
 				    component.PlayMySound();
 			    }
-			}
-			);
+			    if (ImGui::Button("Stop Sound", ImVec2(-1.0f, 0.0f)))
+			    {
+				    component.StopMySound();
+			    }
+			});
+
+		m_inspectors.registerComponent<AudioMusicComponent>("AudioMusicComponent", true,
+		    [](Entity&, AudioMusicComponent& component)
+		    {
+			    const std::string path = component.getFilepath();
+			    if (!component.drafInitialized)
+			    {
+				    component.pathDraft = path;
+				    component.drafInitialized = true;
+			    }
+			    const bool enter = ImGui::InputText("Path", &component.pathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
+			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+			    // user confirmed a new path
+			    if ((enter || deactivated) && component.pathDraft != path)
+			    {
+				    if (!component.pathDraft.empty())
+				    {
+					    if (!component.createTrack(component.pathDraft))
+						    component.pathDraft = path;
+					    component.pathError.clear();
+				    }
+				    else
+					    component.pathError = "Track could not be loaded; previous sound source retained.";
+			    }
+			    if (!component.pathError.empty())
+				    ImGui::TextWrapped("%s", component.pathError.c_str());
+
+			    //for testing
+			    if (ImGui::Button("Play Track", ImVec2(-1.0f, 0.0f)))
+			    {
+				    component.PlayMyTrack();
+			    }
+			    if (ImGui::Button("Stop Track", ImVec2(-1.0f, 0.0f)))
+			    {
+				    component.StopMyTrack();
+			    }
+		    });
 
 #pragma endregion RegisterComponentEditors
 

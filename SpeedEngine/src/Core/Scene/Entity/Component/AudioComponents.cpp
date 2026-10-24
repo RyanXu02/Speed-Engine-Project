@@ -28,6 +28,7 @@ namespace SE
 		//will only implement this if needed, but we dont really want sounds lingering in template library
 		//if there is nothing using them in the engine. orphan sounds should be fine for now though.
 		//Here is where we would remove a sound from template library, but would need dedicated func in AudioSystem
+		//or actually this would probably happen in an Entity::_onSFXComponentRemoved func.
 	}
 
 	bool AudioSFXComponent::createSound(const std::string& filepath, bool isGameSFX)
@@ -74,5 +75,9 @@ namespace SE
 
 	void AudioMusicComponent::PlayMyTrack() {
 		Engine::Instance().getSubSystem<AudioSystem>()->PlayMusic(m_myId);
+	}
+
+	void AudioMusicComponent::StopMyTrack() const {
+		Engine::Instance().getSubSystem<AudioSystem>()->StopCurrentMusic();
 	}
 } //namespace
