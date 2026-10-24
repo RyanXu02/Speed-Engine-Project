@@ -7,11 +7,6 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
-/* TYPE EQUIVALENTS FOR STD CPP <-> MINIAUDIO
-*  uint32_t = ma_uint32
-*  
-*/
-
 namespace SE
 {
 	//needed for use of ma_sound with std::unique_ptr
@@ -26,7 +21,6 @@ namespace SE
 			}
 		}
 	};
-
 
 	//typedefs
 	//since ma_sound is a struct, need to provide custom deleter so memory doesnt leak everywhere
