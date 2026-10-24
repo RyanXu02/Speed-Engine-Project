@@ -60,6 +60,8 @@ namespace SE
 		//checks if all sounds being asynchronously loaded are done loading. returns false if >0 sounds still loading
 		bool areSoundsLoaded() const;
 
+		//initialPos is so sound starts playing in correct location instead of suddenly teleporting to the right location from next position update
+		//is only relevant for game sfx. does nothing for nongame sfx
 		InstanceHandle PlaySFX(SFXId id, const glm::vec3& initialPos);
 		void StopSFX(InstanceHandle handle);
 		void PlayMusic(MusicId id);
