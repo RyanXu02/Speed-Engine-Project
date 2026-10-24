@@ -40,11 +40,18 @@ namespace SE
 		//registers a sfx sound into the sfx template library. returns an SFXId. If initing sound failed, returns 0xFFFFFFFF as SFXId.index
 		//type parameter is also stored in SFXId for use in PlaySFX
 		SFXId registerSFX(const std::string& filepath, SFXType type);
+		//void unregisterSFX(const std::string& filepath);
 
 		//registers a music sound into the music library. returns a MusicId
 		//VERY IMPORTANT: since music library only holds strings (not ma_sound ptrs), all this func does is add filepath to the library.
 		//ma_sound gets created in PlayMusic because we have to stream from disk
 		MusicId registerMusic(const std::string& filepath);
+		//void unregisterMusic(const std::string& filepath);
+
+		//clears all sound libraries. stops active sfx and clears loading sfx. DOES NOT STOP CURRENT MUSIC PLAYING (this can be changed later easily)
+		void clearSoundLibraries();
+		//checks if all sounds being asynchronously loaded are done loading. returns false if >0 sounds still loading
+		bool areSoundsLoaded() const;
 
 		InstanceHandle PlaySFX(SFXId id);
 		void StopSFX(InstanceHandle handle);
@@ -62,6 +69,8 @@ namespace SE
 	private:
 		AudioSystem();
 		
+		//TODO: NEED A WAY OF SERIALIZING AUDIO SYSTEM(?) TO MAKE MUTE + VOLUME SETTINGS PERSISTENT.
+		//may have to create sound group volume member vars for this, but should be pretty easy future work lol
 		bool isMuted;
 
 		//pimpl idiom
@@ -70,9 +79,8 @@ namespace SE
 		//sfx library inside AudioImpl
 
 		//maps filepaths->id for registry caching
-		//currently, both sfx and music use this registery. THIS CAN BE CHANGED IN THE FUTURE
-		//SO SFX AND MUSIC HAVE SEPARATE PATH REGISTRIES.
-		std::unordered_map<std::string, uint32_t> m_pathRegistry;
+		std::unordered_map<std::string, uint32_t> m_sfxPathRegistry;
+		std::unordered_map<std::string, uint32_t> m_musicPathRegistry;
 
 		struct PendingSound
 		{

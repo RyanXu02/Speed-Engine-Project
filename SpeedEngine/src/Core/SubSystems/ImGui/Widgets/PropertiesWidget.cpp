@@ -9,6 +9,7 @@
 #include "imgui.h"
 #include "imgui_stdlib.h"
 #include <SubSystems/Scriptings/ScriptingSystem.h>
+//#include <SubSystems/Audio/AudioSystem.h>
 
 namespace SE
 {
@@ -188,6 +189,46 @@ namespace SE
 			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
 				    component.setRadius(radius);
 		    });
+
+		m_inspectors.registerComponent<AudioSFXComponent>("AudioSFXComponent", true, 
+			[](Entity&, AudioSFXComponent& component) {
+			    const std::string path = component.getFilepath();
+			    if (!component.drafInitialized)
+			    {
+				    component.pathDraft = path;
+				    component.drafInitialized = true;
+			    }
+			    const bool enter = ImGui::InputText("Path", &component.pathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
+			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+			    // user confirmed a new path
+			    if ((enter || deactivated) && component.pathDraft != path)
+			    {
+				    if (!component.pathDraft.empty())
+				    {
+					    if (!component.createSound(component.pathDraft, component.isGameSFX()))
+							component.pathDraft = path;
+					    component.pathError.clear();
+				    }
+				    else
+					    component.pathError = "Sound could not be loaded; previous sound source retained.";
+			    }
+			    if (!component.pathError.empty())
+				    ImGui::TextWrapped("%s", component.pathError.c_str());
+
+			    bool isGameSFX = component.isGameSFX();
+				ImGui::BeginDisabled(path.empty());
+			    if (ImGui::Checkbox("Is Game SFX", &isGameSFX))
+			    {
+				    component.createSound(component.getFilepath(), isGameSFX);
+			    }
+			    ImGui::EndDisabled();
+				//for testing 
+			    if (ImGui::Button("Play Sound", ImVec2(-1.0f, 0.0f)))
+			    {
+				    component.PlayMySound();
+			    }
+			}
+			);
 
 #pragma endregion RegisterComponentEditors
 

@@ -213,9 +213,9 @@ namespace SE
 
 	SFXId AudioSystem::registerSFX(const std::string& filepath, SFXType type) {
 		//filepath exists in registry, meaning we already have template in library
-		if (m_pathRegistry.contains(filepath))
+		if (m_sfxPathRegistry.contains(filepath))
 		{
-			uint32_t id = m_pathRegistry.find(filepath)->second;
+			uint32_t id = m_sfxPathRegistry.find(filepath)->second;
 			return SFXId{ id, type };
 		}
 
@@ -224,6 +224,9 @@ namespace SE
 		{
 			//fully decode + NO SPATIALIZATION BECAUSE THESE ARE UI/OTHER SFX
 			ma_uint32 flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_NO_SPATIALIZATION;
+#ifdef COMPILE_WITH_EDITOR
+			flags |= MA_SOUND_FLAG_WAIT_INIT; //force synchronous loading with editor only
+#endif
 
 			//init sound in nongame sfx group
 			sound = Helpers::makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxNonGameGrp);
@@ -237,6 +240,9 @@ namespace SE
 		{
 			//fully decode. spatialization is on by default so no no_spatialization flag here
 			ma_uint32 flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_ASYNC;
+#ifdef COMPILE_WITH_EDITOR
+			flags |= MA_SOUND_FLAG_WAIT_INIT; //force synchronous loading with editor only
+#endif
 
 			//init sound in game sfx group
 			sound = Helpers::makeSoundFromFile(&m_imp->engine, filepath, flags, &m_imp->sfxGameGrp);
@@ -248,23 +254,45 @@ namespace SE
 		}
 		uint32_t returnId = static_cast<uint32_t>(m_imp->sfxLibrary.size()); //new sfx will always go @ back, size gives correct index before we push_back
 		m_loadPendingList.push_back({ filepath, returnId }); //immediately put in pending list
-		m_pathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry lol
+		m_sfxPathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry lol
 		m_imp->sfxLibrary.push_back(std::move(sound));
 
 		return SFXId{ returnId, type };
 	}
 
 	MusicId AudioSystem::registerMusic(const std::string& filepath) {
-		if (m_pathRegistry.contains(filepath))
+		if (m_musicPathRegistry.contains(filepath))
 		{
-			uint32_t id = m_pathRegistry.find(filepath)->second;
+			uint32_t id = m_musicPathRegistry.find(filepath)->second;
 			return MusicId{ id };
 		}
 		uint32_t returnId = static_cast<uint32_t>(m_imp->musicLibrary.size()); //new music will always go @ back, size gives correct index before we push_back
-		m_pathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry
+		m_musicPathRegistry.emplace(filepath, returnId); //make sure to add filepath to registry
 		m_imp->musicLibrary.push_back(filepath);
 
 		return MusicId{ returnId };
+	}
+
+	void AudioSystem::clearSoundLibraries() {
+		//clear every in-use slot
+		for (size_t i = 0; i < m_sfxList.size(); ++i)
+		{
+			auto& item = m_sfxList[i];
+			if (item.inUse)
+				_freeSoundSlot(item, i);
+		}
+		//clear the pending sounds list, sfx library, music library
+		m_loadPendingList.clear();
+		m_imp->sfxLibrary.clear();
+		m_imp->musicLibrary.clear();
+		//clear path registries
+		m_sfxPathRegistry.clear();
+		m_musicPathRegistry.clear();
+	}
+
+	bool AudioSystem::areSoundsLoaded() const {
+		//if pending sound list is empty, then all sounds were successfully fully loaded into memory
+		return m_loadPendingList.empty();
 	}
 
 	InstanceHandle AudioSystem::PlaySFX(SFXId id) {

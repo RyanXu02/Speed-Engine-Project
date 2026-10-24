@@ -156,6 +156,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Scene\Entity\Component\AudioComponents.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
@@ -218,6 +219,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.h" />

@@ -6,6 +6,7 @@
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 #include <SubSystems/Scriptings/ScriptingSystem.h>
+#include <SubSystems/Audio/AudioSystem.h>
 
 namespace SE
 {
@@ -175,6 +176,9 @@ namespace SE
 		{
 			m_registry.clear();
 		}
+
+		//DOES NOT RESET ACTIVE MUSIC lol. but this can easily be changed in future.
+		Engine::Instance().getSubSystem<AudioSystem>()->clearSoundLibraries();
 
 		if (sceneJson.contains("entities"))
 		{

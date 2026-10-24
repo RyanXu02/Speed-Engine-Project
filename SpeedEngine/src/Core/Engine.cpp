@@ -85,7 +85,7 @@ namespace SE
 
 		//audio system test code
 		AudioSystem* as = getSubSystem<AudioSystem>();
-		as->testsfxid = as->registerSFX("Assets/Audio/Shaco_Original_Death_2.wav", NONGAME_SFX);
+		as->testsfxid = as->registerSFX("Assets/Audio/shaco_death.wav", NONGAME_SFX);
 		as->testmusicid = as->registerMusic("Assets/Audio/funkytown.wav");
 	}
 	void Engine::run()
