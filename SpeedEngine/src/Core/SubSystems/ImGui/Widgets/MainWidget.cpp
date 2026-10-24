@@ -48,17 +48,6 @@ namespace SE
 						scene->reloadScene();
 					}
 				}
-				if (ImGui::MenuItem("shaco death sound lol"))
-				{
-					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
-					//AS->PlaySound("Assets/Audio/Shaco_Original_Death_2.wav");
-					AS->PlaySFX(AS->testsfxid);
-				}
-				if (ImGui::MenuItem("funkytown music test"))
-				{
-					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
-					AS->PlayMusic(AS->testmusicid);
-				}
 				if (ImGui::MenuItem("mute test"))
 				{
 					auto AS = Engine::Instance().getSubSystem<AudioSystem>();

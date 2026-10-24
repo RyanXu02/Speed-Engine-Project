@@ -42,9 +42,9 @@ namespace SE
 		return true;
 	}
 
-	void AudioSFXComponent::PlayMySound()
+	void AudioSFXComponent::PlayMySound(const glm::vec3& initialPos)
 	{
-		m_myHandle = Engine::Instance().getSubSystem<AudioSystem>()->PlaySFX(m_myId);
+		m_myHandle = Engine::Instance().getSubSystem<AudioSystem>()->PlaySFX(m_myId, initialPos);
 	}
 
 	void AudioSFXComponent::StopMySound() const
@@ -52,7 +52,11 @@ namespace SE
 		Engine::Instance().getSubSystem<AudioSystem>()->StopSFX(m_myHandle);
 	}
 
-	//AUDIO MUSIC COMPONENT
+	void AudioSFXComponent::updateMyPosition(const glm::vec3& pos) { 
+		Engine::Instance().getSubSystem<AudioSystem>()->SetSFXPosition(m_myHandle, pos);
+	}
+
+// ======= AUDIO MUSIC COMPONENT =======================================================================================================================================
 	AudioMusicComponent::AudioMusicComponent()
 	    : m_filepath(""),
 	      m_myId({ 0xFFFFFFFF })

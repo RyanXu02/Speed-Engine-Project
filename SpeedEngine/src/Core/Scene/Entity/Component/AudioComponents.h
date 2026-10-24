@@ -14,8 +14,10 @@ namespace SE
 
 		//create sound with audio system
 		bool createSound(const std::string& filepath, bool isGameSFX);
-		void PlayMySound();
+		void PlayMySound(const glm::vec3& initialPos);
 		void StopMySound() const;
+
+		void updateMyPosition(const glm::vec3& pos);
 
 		bool isGameSFX() const { return m_isGameSFX; }
 		const std::string& getFilepath() { return m_filepath; }

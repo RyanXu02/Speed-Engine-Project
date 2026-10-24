@@ -52,6 +52,15 @@ namespace SE
 			{
 				removeEntity(entity.id());
 			}
+
+			//update all sfx components on entities
+			auto* sfxComponent = entity.getComponent<AudioSFXComponent>();
+			if (sfxComponent && sfxComponent->isGameSFX())
+			{
+				//do the position setting here....
+				const glm::vec3 pos = entity.getComponent<Transform>()->getTranslation();
+				sfxComponent->updateMyPosition(pos);
+			}
 		}
 
 	}

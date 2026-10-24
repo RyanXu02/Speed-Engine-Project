@@ -191,7 +191,7 @@ namespace SE
 		    });
 
 		m_inspectors.registerComponent<AudioSFXComponent>("AudioSFXComponent", true, 
-			[](Entity&, AudioSFXComponent& component) {
+			[](Entity& e, AudioSFXComponent& component) {
 			    const std::string path = component.getFilepath();
 			    if (!component.drafInitialized)
 			    {
@@ -225,7 +225,8 @@ namespace SE
 				//for testing 
 			    if (ImGui::Button("Play Sound", ImVec2(-1.0f, 0.0f)))
 			    {
-				    component.PlayMySound();
+				    const glm::vec3 initPos = e.getComponent<Transform>()->getTranslation();
+				    component.PlayMySound(initPos);
 			    }
 			    if (ImGui::Button("Stop Sound", ImVec2(-1.0f, 0.0f)))
 			    {

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "AudioSystem.h"
+#include "Engine.h"
 #include "Core/Logger/Logger.h"
+#include "SubSystems/Scenes/SceneSystem.h"
 
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
@@ -115,6 +117,7 @@ namespace SE
 		ma_engine_config engineConfig = ma_engine_config_init();
 		engineConfig.channels = 0; //use system default
 		engineConfig.sampleRate = 0; //use system default
+		engineConfig.listenerCount = 1; //will only have 1 listener, the player. thus listener index will be 0
 		//ANY OTHER ENGINE CONFIG THINGS THAT WANT TO BE CHANGED GO HERE
 		//.....
 		if (ma_engine_init(&engineConfig, &m_imp->engine) != MA_SUCCESS) {
@@ -211,6 +214,9 @@ namespace SE
 		}
 	}
 
+	//functions used to register sounds with the Audio System
+#pragma region RegistrationFunctions
+
 	SFXId AudioSystem::registerSFX(const std::string& filepath, SFXType type) {
 		//filepath exists in registry, meaning we already have template in library
 		if (m_sfxPathRegistry.contains(filepath))
@@ -273,6 +279,8 @@ namespace SE
 		return MusicId{ returnId };
 	}
 
+#pragma endregion RegistrationFunctions
+
 	void AudioSystem::clearSoundLibraries() {
 		//clear every in-use slot
 		for (size_t i = 0; i < m_sfxList.size(); ++i)
@@ -295,7 +303,10 @@ namespace SE
 		return m_loadPendingList.empty();
 	}
 
-	InstanceHandle AudioSystem::PlaySFX(SFXId id) {
+	//nontrivial functions that other parts of the engine (e.g. components) call to interact with the Audio System
+#pragma region CrucialInteractionFunctions
+
+	InstanceHandle AudioSystem::PlaySFX(SFXId id, const glm::vec3& initialPos) {
 		//check if active sfx cap is reached
 		if (m_freeSlots.empty())
 		{
@@ -344,6 +355,11 @@ namespace SE
 			if (!sfx)
 				m_logger->warn("Failure to copy GAME_SFX sound id {} from template", id.index);
 			//ANY OTHE RTHINGS HERE....
+			//set initial position of game sfx. attenuation model is inverse by default for spatialized sounds. still need to set min/max atten dist's
+			ma_sound_set_position(sfx.get(), initialPos.x, initialPos.y, initialPos.z);
+			ma_sound_set_min_distance(sfx.get(), GLOBAL_MIN_ATTEN_DIST);
+			ma_sound_set_max_distance(sfx.get(), GLOBAL_MAX_ATTEN_DIST);
+			//possibly rollof here as well
 		}
 		if (!sfx)
 			return InstanceHandle{ 0xFFFFFFFF, 0 }; //uint32 max index and 0 generation is invalid instance handle.
@@ -393,6 +409,37 @@ namespace SE
 		m_imp->currentMusic.reset();
 	}
 
+	void AudioSystem::SetListener(const glm::vec3& pos, const glm::vec3& forward, const glm::vec3& up) {
+		auto engine = &m_imp->engine;
+		ma_engine_listener_set_position(engine, 0, pos.x, pos.y, pos.z);
+		ma_engine_listener_set_direction(engine, 0, forward.x, forward.y, forward.z);
+		//this one might change. idk if player moving over uneven terrain will make their upvec change.
+		//if we don't have upvec change when going up sloped surfaces or something, then this func call can be moved to init()
+		ma_engine_listener_set_world_up(engine, 0, up.x, up.y, up.z); // or 0,1,0 if static upvec
+		//ma_engine_listener_set_velocity() //this is only used for doppler effect. i dont think we are going to have ts?
+	}
+
+	void AudioSystem::SetListenerCone(float innerAngleDegrees, float outerAngleDegrees, float outerGain)
+	{
+		ma_engine_listener_set_cone(&m_imp->engine, 0, glm::radians(innerAngleDegrees), glm::radians(outerAngleDegrees), glm::clamp(outerGain, 0.f, 1.f));
+	}
+
+	bool AudioSystem::SetSFXPosition(InstanceHandle handle, const glm::vec3& pos) {
+		bool isValid = _validateHandle(handle);
+		if (isValid)
+		{
+			auto& slot = m_sfxList[handle.index];
+			ma_sound_set_position(slot.sound.get(), pos.x, pos.y, pos.z);
+			return true;
+		}
+		return false;
+	}
+
+#pragma endregion CrucialInteractionFunctions
+
+	//functions used in menus to control Audio System. Basically just volume control lol
+#pragma region MenuControlFunctions
+
 	//TODO: currently rips out looping sounds as well, will have to change this later
 	void AudioSystem::toggleMute() {
 		if (!isMuted)
@@ -433,6 +480,8 @@ namespace SE
 		ma_engine_set_volume(&m_imp->engine, volume);
 	}
 
+#pragma endregion MenuControlFunctions
+
 	bool AudioSystem::_initSfxGroups() {
 		//init sfx parent group
 		if (ma_sound_group_init(&m_imp->engine, 0, nullptr, &m_imp->sfxGrp) != MA_SUCCESS)
@@ -455,6 +504,10 @@ namespace SE
 			m_imp->initialized = false;
 			return false;
 		}
+		//groups are explicitly for volume control, spatialization is done on per-sound basis
+		ma_sound_group_set_spatialization_enabled(&m_imp->sfxGameGrp, false);
+		ma_sound_group_set_spatialization_enabled(&m_imp->sfxNonGameGrp, false);
+
 		return true;
 	}
 

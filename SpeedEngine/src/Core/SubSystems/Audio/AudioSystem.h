@@ -1,6 +1,9 @@
 #pragma once
 #include "Core/SubSystems/Subsystem.h"
 
+//for vec3
+#include "glm/vec3.hpp"
+
 namespace SE
 {
 	enum SFXType
@@ -24,6 +27,10 @@ namespace SE
 	};
 
 	constexpr uint8_t MAX_ACTIVE_SFX = 100;
+	//these are temp values for now, will probably need to add min/max attenuation distance params to sfx component eventually
+	constexpr float GLOBAL_MIN_ATTEN_DIST = 1.f;
+	constexpr float GLOBAL_MAX_ATTEN_DIST = 15.f;
+
 
 	class AudioSystem : public SubSystem
 	{
@@ -53,10 +60,30 @@ namespace SE
 		//checks if all sounds being asynchronously loaded are done loading. returns false if >0 sounds still loading
 		bool areSoundsLoaded() const;
 
-		InstanceHandle PlaySFX(SFXId id);
+		InstanceHandle PlaySFX(SFXId id, const glm::vec3& initialPos);
 		void StopSFX(InstanceHandle handle);
 		void PlayMusic(MusicId id);
 		void StopCurrentMusic();
+
+		//sets the listener data.
+		//@param pos the position of the listener
+		//@param forward the forward vector of the listener
+		//@param the up vector of the listener. see comment inside func def about this one
+		void SetListener(const glm::vec3& pos, const glm::vec3& forward, const glm::vec3& up);
+
+		//sets the listener's directional attenuation cone. innerAngleDegrees determines the inner cone angle and outerAngleDegrees
+		// the outer cone angle, centered on the listener's forward vector. outerGain is the gain sounds outside the outer cone will have
+		// Ex: SetListenerCone(90.f,180.f,0.3f) will set the inner cone to 90 deg and outer cone to 180 deg, so 45 deg and 90 deg will be on either side of the listener's
+		// forward vector respectively. What this means is that sounds within the inner cone will have full gain, sounds outside outer cone will have outerGain level of gain,
+		// and sounds in between inner and outer cone will blend between the two accordingly.
+		//@param innerAngleDegrees inner cone angle in degrees, centered on listener forward vec
+		//@param outerAngleDegrees outer cone angle in degrees, centered on listener forward vec
+		//@param outerGain gain sounds will have outside outer cone. clamped from 0.f to 1.f
+		void SetListenerCone(float innerAngleDegrees, float outerAngleDegrees, float outerGain);
+
+		//sets the position of the sound referenced by the instance handle to pos.
+		//@returns true if success, false if failed. Will only fail if the handle is stale
+		bool SetSFXPosition(InstanceHandle handle, const glm::vec3& pos);
 
 		void toggleMute();
 		void changeNonGameSFXVolume(float volume);
@@ -64,9 +91,6 @@ namespace SE
 		void changeMusicSFXVolume(float volume);
 		void changeMasterSFXVolume(float volume);
 		void changeMasterVolume(float volume);
-
-		SFXId testsfxid{};
-		MusicId testmusicid{};
 	private:
 		AudioSystem();
 		
@@ -111,3 +135,16 @@ namespace SE
 /* sound init for sfxgame pass no 3d flag, 3d by default
 * sound init for sfxnongame + music, pass no_spatialization flag
 */
+//update spatial sounds
+//auto* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+//auto func = [&](Entity entity) -> void
+//{
+//	AudioSFXComponent* sfxComponent = entity.getComponent<AudioSFXComponent>();
+//	if (sfxComponent->isGameSFX())
+//	{
+//		//get transform from the entity, and pass the position to audio system
+//		glm::vec3 pos = entity.getComponent<Transform>()->getTranslation();
+//	}
+//};
+//
+//scene->forEntitiesWith<AudioSFXComponent>(func);
