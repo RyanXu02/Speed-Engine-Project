@@ -4,6 +4,7 @@
 #include "Core/SubSystems/Graphics/Rendering/ImGuiRenderer/ImGuiRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
 #include "Core/SubSystems/Graphics/Rendering/Renderer.h"
+#include "Core/SubSystems/Graphics/Rendering/DebugRenderer/PhysicsDebugRenderer.h"
 
 namespace SE
 {

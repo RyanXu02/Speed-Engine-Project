@@ -15,7 +15,10 @@
     "nlohmann-json",
     "spdlog",
     "stb",
-    "joltphysics",
+    {
+      "name": "joltphysics",
+      "features": ["debugrenderer"]
+    },
     "assimp",
     "lua",
     "sol2"

@@ -9,6 +9,8 @@
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 
+#include "Core/SubSystems/Physics/PhysicsSystem.h"
+
 #include "Core/Engine.h"
 
 #include <glad/glad.h>
@@ -68,6 +70,7 @@ namespace SE
 			.renderer = debugRenderer, 
 			.output = sceneColor, 
 			.clearMask = 0 });
+		Engine::Instance().getSubSystem<PhysicsSystem>()->setDebugRendererImpl(debugRenderer);
 
 		// Example:
 		// A render pass that samples "SceneColor" and output to a new "Grayscale" target
@@ -139,6 +142,9 @@ namespace SE
 			renderer->update(deltaTime, context);
 
 		m_sceneViewport->updateMatrices();
+
+		// Update camera position in physics debug renderer (used by Jolt for LOD rendering)
+		Engine::Instance().getSubSystem<PhysicsSystem>()->debugUpdateCameraPos(m_sceneViewport->getCameraFrustum().getPosition());
 	}
 
 	void RendererManager::render()

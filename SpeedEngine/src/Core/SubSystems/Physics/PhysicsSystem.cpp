@@ -14,6 +14,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <Jolt/Physics/Body/BodyManager.h>
+#include <Jolt/Renderer/DebugRenderer.h>
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -22,9 +24,6 @@ namespace SE
 {
 	void PhysicsSystem::init() {
 		SubSystem::init();
-
-		// Allocation hook, can connect this to custom memory control if needed (see Jolt/Core/Memory.h)
-		RegisterDefaultAllocator();
 
 		Factory::sInstance = new Factory();
 		RegisterTypes();
@@ -65,8 +64,8 @@ namespace SE
 			}
 		}
 		// Batch add all bodies for better performance
-		BodyInterface::AddState addState = getBodyInterface()->AddBodiesPrepare(ioBodies.data(), ioBodies.size());
-		getBodyInterface()->AddBodiesFinalize(ioBodies.data(), ioBodies.size(), addState, EActivation::Activate);
+		BodyInterface::AddState addState = getBodyInterface()->AddBodiesPrepare(ioBodies.data(), static_cast<int>(ioBodies.size()));
+		getBodyInterface()->AddBodiesFinalize(ioBodies.data(), static_cast<int>(ioBodies.size()), addState, EActivation::Activate);
 		m_physics_system->OptimizeBroadPhase();
 	}
 
@@ -75,7 +74,7 @@ namespace SE
 
 		// Step physics simulation
 		if (m_running)
-			m_physics_system->Update(deltaTime, cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
+			m_physics_system->Update(static_cast<float>(deltaTime), cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
 
 		// Update entity transforms
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
@@ -121,8 +120,25 @@ namespace SE
 	void PhysicsSystem::shutdown() {
 		SubSystem::shutdown();
 		// Shut down physics system
+		delete m_physicsDebugRenderer;
 		UnregisterTypes();
 		delete Factory::sInstance;
 		Factory::sInstance = nullptr;
+	}
+
+	void PhysicsSystem::setDebugRendererImpl(SE::DebugRenderer& renderer) {
+		if (!m_physicsDebugRenderer)
+			m_physicsDebugRenderer = new PhysicsDebugRenderer(renderer);
+	}
+
+	void PhysicsSystem::debugDrawBodies() {
+		BodyManager::DrawSettings drawSettings;
+		drawSettings.mDrawShape = true;
+		drawSettings.mDrawShapeWireframe = true;
+		m_physics_system->DrawBodies(drawSettings, JPH::DebugRenderer::sInstance);
+	}
+
+	void PhysicsSystem::debugUpdateCameraPos(const glm::vec3& pos) {
+		static_cast<PhysicsDebugRenderer*>(JPH::DebugRenderer::sInstance)->SetCameraPos(JPH::Vec3(pos.x, pos.y, pos.z));
 	}
 }
