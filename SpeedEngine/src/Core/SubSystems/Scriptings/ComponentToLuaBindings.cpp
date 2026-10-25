@@ -32,6 +32,15 @@ namespace SE
 			}
 		);
 
+		//camer acomponent has custom fields that the reflection does not support os manually bind it
+		luaState.new_usertype<CameraComponent>("CameraComponent",
+			"frustum", &CameraComponent::frustum,	//this need to be registered too, done in the scripting system
+			"fov", &CameraComponent::fov,
+			"nearPlane", &CameraComponent::nearPlane,
+			"farPlane", &CameraComponent::farPlane,
+			"isPrimary", &CameraComponent::isPrimary
+		);
+
 		_registerComponent<NameComponent>(luaState);
 	}
 }

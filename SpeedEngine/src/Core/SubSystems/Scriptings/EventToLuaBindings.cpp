@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "EventToLuaBindings.h"
 #include "Engine.h"
+#include "Core/Features/CameraFrustum.h"
 #include "SubSystems/Events/EventSystem.h"
 #include "SubSystems/Events/EventSubscription.h"
 #include "SubSystems/Input/KeyCodes.h"
@@ -29,7 +30,8 @@ namespace SE
 			"MouseMoved", EventType::MouseMoved,
 			"MouseScrolled", EventType::MouseScrolled,
 			"SceneChanged", EventType::SceneChanged,
-			"ActiveSceneModified", EventType::ActiveSceneModified
+			"ActiveSceneModified", EventType::ActiveSceneModified,
+            "CameraSwitched", EventType::CameraSwitched
 			// "EntitySelected", EventType::EntitySelected 
 			// "ResourceChanged", EventType::ResourceChanged
 		);
@@ -70,6 +72,11 @@ namespace SE
 	
 		_registerEvent<MouseMovedEvent>(luaState);
 		_registerEvent<KeyPressedEvent>(luaState);
+		_registerEvent<SwitchCameraEvent>(luaState);
+
+        // custom pointer type event is not supported through the macro so require manual register
+		sol::usertype<SwitchCameraEvent> switchCameraType = luaState["SwitchCameraEvent"];
+		switchCameraType["camera"] = sol::readonly(&SwitchCameraEvent::camera);
 	}
 	void EventToLuaBindings::_exportKeyCodes(Logger* logger, sol::state& luaState)
 	{

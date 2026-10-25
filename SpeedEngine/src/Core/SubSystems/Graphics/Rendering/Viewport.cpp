@@ -3,29 +3,40 @@
 #include "Viewport.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include "Core/EngineStates.h"
 
 namespace SE
 {
+	Viewport::Viewport(uint32_t width, uint32_t height)
+	    : m_width(width),
+	      m_height(height),
+	      m_cameraFrustum(EngineStates::getCamera()),
+	      m_isActive(true)
+	{
+
+	}
+
 	void Viewport::resize(uint32_t width, uint32_t height)
 	{
 		if (width != m_width || height != m_height)
 		{
 			m_width = width;
 			m_height = height;
-			m_cameraFrustum.isDirty = true;
+			m_cameraFrustum->isDirty = true;
 		}
 	}
 
 	void Viewport::updateMatrices()
 	{
-		if (!m_cameraFrustum.isDirty)
+		if (!m_cameraFrustum->isDirty)
+		{
 			return;
+		}
 
-		auto& camera = m_cameraFrustum;
-		camera.viewMatrix = glm::lookAt(camera.getPosition(), camera.getTarget(), WORLD_UP);
+		m_cameraFrustum->viewMatrix = glm::lookAt(m_cameraFrustum->getPosition(), m_cameraFrustum->getTarget(), WORLD_UP);
 		float aspectRatio = static_cast<float>(m_width) / static_cast<float>(m_height);
-		camera.projectionMatrix = glm::perspective(glm::radians(camera.getFOV()), aspectRatio, camera.getNearPlane(), camera.getFarPlane());
-		camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
-		camera.isDirty = false;
+		m_cameraFrustum->projectionMatrix = glm::perspective(glm::radians(m_cameraFrustum->getFOV()), aspectRatio, m_cameraFrustum->getNearPlane(), m_cameraFrustum->getFarPlane());
+		m_cameraFrustum->viewProjectionMatrix = m_cameraFrustum->projectionMatrix * m_cameraFrustum->viewMatrix;
+		m_cameraFrustum->isDirty = false;
 	}
 } // namespace SE

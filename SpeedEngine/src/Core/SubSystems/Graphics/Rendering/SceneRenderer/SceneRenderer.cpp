@@ -104,14 +104,14 @@ namespace SE
 		cameraLookDir.y = 0.0f;
 		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraLookDir, WORLD_UP));
 		glm::vec3 CameraMoveDir(0.0f);
-		if (IS->isKeyDown(KeyCodes::KEY_W))
-			CameraMoveDir += cameraLookDir;
-		if (IS->isKeyDown(KeyCodes::KEY_S))
-			CameraMoveDir += -cameraLookDir;
-		if (IS->isKeyDown(KeyCodes::KEY_A))
-			CameraMoveDir += -cameraRight;
-		if (IS->isKeyDown(KeyCodes::KEY_D))
-			CameraMoveDir += cameraRight;
+		//if (IS->isKeyDown(KeyCodes::KEY_W))
+		//	CameraMoveDir += cameraLookDir;
+		//if (IS->isKeyDown(KeyCodes::KEY_S))
+		//	CameraMoveDir += -cameraLookDir;
+		//if (IS->isKeyDown(KeyCodes::KEY_A))
+		//	CameraMoveDir += -cameraRight;
+		//if (IS->isKeyDown(KeyCodes::KEY_D))
+		//	CameraMoveDir += cameraRight;
 
 		if (glm::length(CameraMoveDir) > 0.0f)
 		{

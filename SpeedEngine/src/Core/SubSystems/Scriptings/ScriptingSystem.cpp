@@ -5,6 +5,7 @@
 #include "SubSystems/Scenes/SceneSystem.h"
 #include "Core/Engine.h"
 #include "Core/Scene/Entity/Entity.h"
+#include "Core/Features/CameraFrustum.h"
 
 namespace SE
 {
@@ -56,7 +57,19 @@ namespace SE
 		);
 
 
-
+		m_luaState.new_usertype<CameraFrustum>("CameraFrustum",
+			"move", &CameraFrustum::move,
+			"getPosition", &CameraFrustum::getPosition,
+			"setPosition", &CameraFrustum::setPosition,
+			"getTarget", &CameraFrustum::getTarget,
+			"setTarget", &CameraFrustum::setTarget,
+			"getFOV", &CameraFrustum::getFOV,
+			"setFOV", &CameraFrustum::setFOV,
+			"getNearPlane", &CameraFrustum::getNearPlane,
+			"setNearPlane", &CameraFrustum::setNearPlane,
+			"getFarPlane", &CameraFrustum::getFarPlane,
+			"setFarPlane", &CameraFrustum::setFarPlane
+		);
 	}
 
 	void SE::ScriptingSystem::update(double deltaTime)

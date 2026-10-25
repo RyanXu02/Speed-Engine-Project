@@ -1,20 +1,32 @@
 #pragma once
-class EngineStates
+
+#include "Core/Features/CameraFrustum.h"
+
+namespace SE
 {
-public:
-	enum class State
+	class EngineStates
 	{
-		Play,
-		Pause
+	public:
+		enum class State
+		{
+			Play,
+			Pause
+		};
+
+		static void play() { s_state = State::Play; }
+		static void pause() { s_state = State::Pause; }
+
+		static State getState() { return s_state; }
+		static bool isPlaying() { return s_state == State::Play; }
+		static bool isPaused() { return s_state == State::Pause; }
+		static CameraFrustum* getCamera() { return s_appCamera; }
+		static CameraFrustum* setCamera(CameraFrustum* camera) { return s_appCamera = camera; }
+
+	private:
+		// engine has their own default editor camera, this can be reassigned to an in game authored scriptcamera
+		// the renderer context do not own the engine camera, it only reference it
+		static inline CameraFrustum s_editorCamera;
+		static inline State s_state{ State::Pause };
+		static inline CameraFrustum* s_appCamera{ &s_editorCamera };
 	};
-
-	static void play() { s_state = State::Play; }
-	static void pause() { s_state = State::Pause; }
-
-	static State getState() { return s_state; }
-	static bool isPlaying() { return s_state == State::Play; }
-	static bool isPaused() { return s_state == State::Pause; }
-
-private:
-	static State s_state;
-};
+}
