@@ -13,6 +13,7 @@
 #include "SubSystems/Input/InputSystem.h"
 #include "SubSystems/Scenes/SceneSystem.h"
 #include "SubSystems/Physics/PhysicsSystem.h"
+#include "SubSystems/Audio/AudioSystem.h"
 #include "SubSystems/SubSystem.h"
 
 // temp
@@ -46,6 +47,7 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<PhysicsSystem>(new PhysicsSystem()));
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
+		m_subSystems.push_back(std::unique_ptr<AudioSystem>(new AudioSystem()));
 
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
@@ -83,6 +85,26 @@ namespace SE
 	}
 	void Engine::run()
 	{
+		
+
+		//uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
+		//uint32_t entityID = currentScene->addEntity("bunny");
+		//Entity entity = currentScene->getEntity(entityID);
+		//entity.addComponent<MeshComponent>(bunnymeshId);
+
+		//uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
+		//uint32_t entityID2 = currentScene->addEntity("conference");
+		//Entity entity2 = currentScene->getEntity(entityID2);
+		//entity2.addComponent<MeshComponent>(roommeshId2);
+		//entity2.getComponent<Transform>()->setScale(glm::vec3(0.01f));
+
+		//uint32_t suzanemeshId3 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("suzanemesh", "Assets/Meshes/Suzanne.gltf");
+		//uint32_t entityID3 = currentScene->addEntity("suzane");
+		//Entity entity3 = currentScene->getEntity(entityID3);
+		//entity3.addComponent<MeshComponent>(suzanemeshId3);
+		// end temp
+
+
 		// get subsystems used in loop
 		auto* window = getSubSystem<Window>();
 		auto* rendererManager = getSubSystem<RendererManager>();

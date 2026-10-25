@@ -7,6 +7,7 @@
 #include "PhysicsShape/PhysicsShapeSphere.h"
 //#include "PhysicsShape/PhysicsShapeMesh.h"
 #include "Core/features/Serializable.h"
+#include "AudioComponents.h"
 
 
 namespace SE

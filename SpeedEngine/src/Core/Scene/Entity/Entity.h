@@ -52,5 +52,7 @@ namespace SE
 		static HookFunction _onMeshComponentRemoved();
 		static HookFunction _onScriptComponentAdded();
 		static HookFunction _onScriptComponentRemoved();
+		static HookFunction _onSFXComponentAdded();
+		static HookFunction _onMusicComponentAdded();
 	};
 } // namespace SE

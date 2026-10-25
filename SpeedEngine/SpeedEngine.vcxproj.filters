@@ -166,6 +166,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsShape\PhysicsShapeMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -184,6 +186,12 @@
     <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\SubSystems\Audio\AudioSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.cpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThirdParty\pch.h">
@@ -367,7 +375,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core\Logger\ConsoleSink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\SubSystems\Audio\AudioSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

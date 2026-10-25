@@ -156,6 +156,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Scene\Entity\Component\AudioComponents.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Core\Features\Math.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
@@ -217,6 +219,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.h" />
@@ -226,6 +229,7 @@
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h" />
     <ClInclude Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.h" />
+    <ClInclude Include="src\Core\SubSystems\Audio\AudioSystem.h" />
     <ClInclude Include="src\Core\Features\Math.h" />
     <ClInclude Include="src\Core\Logger\ConsoleSink.h" />
     <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
