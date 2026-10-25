@@ -389,6 +389,10 @@ namespace SE
 		ma_uint32 flags = MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_LOOPING;
 		std::string filepath = m_imp->musicLibrary[id.index];
 		UniquePtrSound track = Helpers::makeSoundFromFile(&m_imp->engine, filepath.c_str(), flags, &m_imp->musicGrp);
+		if (!track)
+		{
+			return;
+		}
 		m_imp->currMusicLoadState = { filepath, 1 }; //index = 1 is loading, index = 0 is not loading. set to 1 cuz track is loading right now
 		m_imp->currentMusic = std::move(track);
 
@@ -399,6 +403,7 @@ namespace SE
 	void AudioSystem::StopCurrentMusic() {
 		ma_sound_stop(m_imp->currentMusic.get());
 		m_imp->currentMusic.reset();
+		m_imp->currMusicLoadState = { "", 0x12345678 }; 
 	}
 
 	void AudioSystem::SetListener(const glm::vec3& pos, const glm::vec3& forward, const glm::vec3& up) {

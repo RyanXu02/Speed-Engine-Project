@@ -34,9 +34,10 @@ namespace SE
 	bool AudioSFXComponent::createSound(const std::string& filepath, bool isGameSFX)
 	{
 		//register sound with audio system and give back an SFXId
-		m_myId = Engine::Instance().getSubSystem<AudioSystem>()->registerSFX(filepath, isGameSFX ? GAME_SFX : NONGAME_SFX);
-		if (m_myId.index == 0xFFFFFFFF) //load failed
+		SFXId temp = Engine::Instance().getSubSystem<AudioSystem>()->registerSFX(filepath, isGameSFX ? GAME_SFX : NONGAME_SFX);
+		if (temp.index == 0xFFFFFFFF) //load failed
 			return false;
+		m_myId = temp;
 		m_filepath = filepath;
 		m_isGameSFX = isGameSFX;
 		return true;
@@ -44,7 +45,9 @@ namespace SE
 
 	void AudioSFXComponent::PlayMySound(const glm::vec3& initialPos)
 	{
-		m_myHandle = Engine::Instance().getSubSystem<AudioSystem>()->PlaySFX(m_myId, initialPos);
+		auto* audio = Engine::Instance().getSubSystem<AudioSystem>();
+		audio->StopSFX(m_myHandle); //no-op if the handle is stale (generation check)
+		m_myHandle = audio->PlaySFX(m_myId, initialPos);
 	}
 
 	void AudioSFXComponent::StopMySound() const
@@ -70,9 +73,10 @@ namespace SE
 
 	bool AudioMusicComponent::createTrack(const std::string& filepath) {
 		//register sound with audio system and give back an SFXId
-		m_myId = Engine::Instance().getSubSystem<AudioSystem>()->registerMusic(filepath);
-		if (m_myId.index == 0xFFFFFFFF) //load failed
+		MusicId temp = Engine::Instance().getSubSystem<AudioSystem>()->registerMusic(filepath);
+		if (temp.index == 0xFFFFFFFF) //load failed
 			return false;
+		m_myId = temp;
 		m_filepath = filepath;
 		return true;
 	}

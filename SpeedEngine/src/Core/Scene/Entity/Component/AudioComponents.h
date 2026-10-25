@@ -4,7 +4,10 @@
 
 namespace SE
 {
-	//@brief Represents an audio component for SFX that can be attached to an entity
+	//@brief Represents an audio component for SFX that can be attached to an entity.
+	//Each SFX component has its own sound, so calling PlayMySound while its sound is 
+	//active restarts it. Can be changed to deal with multiple handles in the future 
+	//(i.e. with an automatic weapon or something with a similar audio playback pattern)
 	class AudioSFXComponent
 	{
 	public:
