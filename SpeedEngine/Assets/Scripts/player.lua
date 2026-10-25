@@ -1,50 +1,37 @@
-Player = {}				--create a table that acts as the class blueprint for all player objects
-Player.__index = Player --lua prototype instance
+Player = {}
+Player.__index = Player
 
--- cosntructor required for every class script
 function Player.new(EntityWrapper)
-	-- isntance's member values are defined here
-	local instance = {	
+	local instance = {
 		entity = EntityWrapper,
-		mouseSubscription = nil,
-		keySubscription = nil
+		moveSpeed = 4.0
 	}
 
 	return setmetatable(instance, Player)
 end
 
--- required for every class script
 function Player:onInit()
-	self.mouseSubscription = EventSystem.subscribe(EventType.MouseMoved, function(event)
-		local mouseEvent = as_MouseMovedEvent(event)
-		if mouseEvent == nil then
-			Logger.error("as_MouseMovedEvent cast failed")
-			return
-		end
-		Logger.info("mouse x: " .. mouseEvent.m_x .. " mouse y: " .. mouseEvent.m_y)
-	end)
-	self.keySubscription = EventSystem.subscribe(EventType.KeyPressed, function(event)
-		local keyEvent = as_KeyPressedEvent(event)
-		if keyEvent == nil then
-			Logger.error("as_KeyPressedEvent cast failed")
-			return
-		end
-		Logger.info("key pressed: " .. keyEvent.keyCode)
-	end)
 end
 
--- required for every class script
-function Player:onUpdate()
-    -- local nameComponent = self.entity:getComponent("NameComponent") 
-    
-    -- if(nameComponent == nil) then
-    --     Logger.error("name component failed to retrieve from playerscript")
-    -- else
-    --     Logger.info(nameComponent.name)
-    -- end
+function Player:onUpdate(dt)
+	if not Engine.isPlaying() then
+		return
+	end
+
+	local dx, dz = 0.0, 0.0
+	if Input.isKeyDown(KeyCodes.KEY_W) then dz = dz - 1.0 end
+	if Input.isKeyDown(KeyCodes.KEY_S) then dz = dz + 1.0 end
+	if Input.isKeyDown(KeyCodes.KEY_A) then dx = dx - 1.0 end
+	if Input.isKeyDown(KeyCodes.KEY_D) then dx = dx + 1.0 end
+
+	if dx == 0.0 and dz == 0.0 then
+		return
+	end
+
+	local transform = self.entity:getComponent("Transform")
+	local p = transform:getPosition()
+	transform:setPosition(vec3(p.x + dx * self.moveSpeed * dt, p.y, p.z + dz * self.moveSpeed * dt))
 end
 
--- required for every class script
 function Player:onDestroy()
-	self.mouseSubscription.unsubscribe()
 end

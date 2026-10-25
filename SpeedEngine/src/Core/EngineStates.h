@@ -19,8 +19,9 @@ namespace SE
 		static State getState() { return s_state; }
 		static bool isPlaying() { return s_state == State::Play; }
 		static bool isPaused() { return s_state == State::Pause; }
-		static CameraFrustum* getCamera() { return s_appCamera; }
-		static CameraFrustum* setCamera(CameraFrustum* camera) { return s_appCamera = camera; }
+		static CameraFrustum* setCamera(CameraFrustum* camera) { return s_appCamera = camera ? camera : &s_editorCamera; }
+		static CameraFrustum* getActiveCamera() { return isPlaying() ? s_appCamera : &s_editorCamera; }
+		static bool isEditorCameraActive() { return getActiveCamera() == &s_editorCamera; }
 
 	private:
 		// engine has their own default editor camera, this can be reassigned to an in game authored scriptcamera

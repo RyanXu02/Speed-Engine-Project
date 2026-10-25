@@ -14,6 +14,7 @@
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
 
 #include "Engine.h"
+#include "EngineStates.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -29,7 +30,10 @@ namespace SE
 	}
 	void SceneRenderer::update(double deltaTime, RenderContext& context)
 	{
-		_updateCamera(deltaTime, context.viewport.getCameraFrustum());
+		if (EngineStates::isEditorCameraActive())
+		{
+			_updateCamera(deltaTime, context.viewport.getCameraFrustum());
+		}
 	}
 
 	void SceneRenderer::render(RenderContext& context)
@@ -104,14 +108,17 @@ namespace SE
 		cameraLookDir.y = 0.0f;
 		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraLookDir, WORLD_UP));
 		glm::vec3 CameraMoveDir(0.0f);
-		//if (IS->isKeyDown(KeyCodes::KEY_W))
-		//	CameraMoveDir += cameraLookDir;
-		//if (IS->isKeyDown(KeyCodes::KEY_S))
-		//	CameraMoveDir += -cameraLookDir;
-		//if (IS->isKeyDown(KeyCodes::KEY_A))
-		//	CameraMoveDir += -cameraRight;
-		//if (IS->isKeyDown(KeyCodes::KEY_D))
-		//	CameraMoveDir += cameraRight;
+		if (EngineStates::isEditorCameraActive())
+		{
+			if (IS->isKeyDown(KeyCodes::KEY_W))
+				CameraMoveDir += cameraLookDir;
+			if (IS->isKeyDown(KeyCodes::KEY_S))
+				CameraMoveDir += -cameraLookDir;
+			if (IS->isKeyDown(KeyCodes::KEY_A))
+				CameraMoveDir += -cameraRight;
+			if (IS->isKeyDown(KeyCodes::KEY_D))
+				CameraMoveDir += cameraRight;
+		}
 
 		if (glm::length(CameraMoveDir) > 0.0f)
 		{

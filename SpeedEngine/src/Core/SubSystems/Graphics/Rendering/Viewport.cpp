@@ -10,7 +10,7 @@ namespace SE
 	Viewport::Viewport(uint32_t width, uint32_t height)
 	    : m_width(width),
 	      m_height(height),
-	      m_cameraFrustum(EngineStates::getCamera()),
+	      m_cameraFrustum(EngineStates::getActiveCamera()),
 	      m_isActive(true)
 	{
 
@@ -28,6 +28,14 @@ namespace SE
 
 	void Viewport::updateMatrices()
 	{
+		//update the camera if last frame camera is not the same as this frame due to editor, game mode
+		CameraFrustum* activeCamera = EngineStates::getActiveCamera();
+		if (m_cameraFrustum != activeCamera)
+		{
+			m_cameraFrustum = activeCamera;
+			m_cameraFrustum->isDirty = true;
+		}
+
 		if (!m_cameraFrustum->isDirty)
 		{
 			return;

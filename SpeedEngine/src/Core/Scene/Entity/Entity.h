@@ -52,5 +52,6 @@ namespace SE
 		static HookFunction _onMeshComponentRemoved();
 		static HookFunction _onScriptComponentAdded();
 		static HookFunction _onScriptComponentRemoved();
+		static HookFunction _onCameraComponentAdded();
 	};
 } // namespace SE

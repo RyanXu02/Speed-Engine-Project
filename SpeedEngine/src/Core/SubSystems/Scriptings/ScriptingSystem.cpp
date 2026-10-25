@@ -2,10 +2,13 @@
 #include "ScriptingSystem.h"
 #include "EventToLuaBindings.h"
 #include "ComponentToLuaBindings.h"
+#include "MathToLuaBindings.h"
 #include "SubSystems/Scenes/SceneSystem.h"
 #include "Core/Engine.h"
 #include "Core/Scene/Entity/Entity.h"
 #include "Core/Features/CameraFrustum.h"
+#include "Core/EngineStates.h"
+#include "SubSystems/Input/InputSystem.h"
 
 namespace SE
 {
@@ -15,6 +18,7 @@ namespace SE
 
 		m_luaState.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
 
+		MathToLuaBindings::exportMath(m_luaState);
 		EventToLuaBindings::exportEvents(m_logger.get(), m_luaState);
 		ComponentToLuaBindings::exportComponents(m_logger.get(), m_luaState);
 
@@ -56,6 +60,23 @@ namespace SE
 			"isEntityPendingRemoval", &Scene::isEntityPendingRemoval
 		);
 
+		sol::table inputTable = m_luaState.create_named_table("Input");
+		inputTable["isKeyDown"] = [](KeyCodes key) {
+			return Engine::Instance().getSubSystem<InputSystem>()->isKeyDown(key);
+		};
+		inputTable["isMouseDown"] = [](MouseCodes button) {
+			return Engine::Instance().getSubSystem<InputSystem>()->isMouseDown(button);
+		};
+		inputTable["getMouseDelta"] = []() {
+			const MousePos& delta = Engine::Instance().getSubSystem<InputSystem>()->getMouseDelta();
+			return std::make_tuple(delta.x, delta.y);
+		};
+
+		sol::table engineTable = m_luaState.create_named_table("Engine");
+		engineTable["isPlaying"] = []() {
+			return EngineStates::isPlaying();
+		};
+
 
 		m_luaState.new_usertype<CameraFrustum>("CameraFrustum",
 			"move", &CameraFrustum::move,
@@ -74,6 +95,10 @@ namespace SE
 
 	void SE::ScriptingSystem::update(double deltaTime)
 	{
+		if (EngineStates::isPaused())
+		{
+			return;
+		}
 
 		if (!m_scriptsToReload.empty())
 		{
@@ -231,8 +256,12 @@ namespace SE
 				if (scriptComponent->initilized) {
 					scriptComponent->initilized = false;
 				}
-				scriptComponent->onInit = [luaInstance, initFunc]() mutable{
-					initFunc(luaInstance);
+				scriptComponent->onInit = [luaInstance, initFunc, this]() mutable{
+					auto result = initFunc(luaInstance);
+					if (!result.valid()) {
+						sol::error err = result;
+						m_logger->error("Lua script init error: {}", err.what());
+					}
 				};
 			}
 			else // fail check if script doesnt have onInit, store an empty lambda
@@ -375,6 +404,7 @@ namespace SE
 	void ScriptingSystem::reset() 
 	{
 		_destroyAllScripts();
+		EngineStates::setCamera(nullptr);
 		m_scripts.clear();
 		m_scriptCache.clear();
 		m_luaState.collect_garbage();

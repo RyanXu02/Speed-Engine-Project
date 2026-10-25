@@ -42,11 +42,15 @@ namespace SE
 			"getName", &Event::getName
 		);
 
+        // NOTE: this doesnt work due to the design of publish that require a unique pointer
+        // passed in, event need to manually register it
 		sol::table eventSystem = luaState.create_named_table("EventSystem");
-		eventSystem["publish"] = [](std::unique_ptr<Event>& event)
+		
+
+		eventSystem["publishSwitchCamera"] = [](CameraFrustum* camera)
 		{
 			auto eventSystem = Engine::Instance().getSubSystem<EventSystem>();
-			eventSystem->publish(std::move(event));
+			eventSystem->publish(std::make_unique<SwitchCameraEvent>(camera));
 		};
 
 		eventSystem.new_usertype<EventSubscription>("EventSubscription",

@@ -2,6 +2,42 @@
   "entities": [
     {
       "components": {
+        "CameraComponent": {
+          "farPlane": 1000.0,
+          "fov": 70.0,
+          "isPrimary": true,
+          "nearPlane": 0.1
+        },
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "NameComponent": {
+          "name": "camera"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/Camera.lua"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "components": {
         "LifeComponent": {
           "isAlive": true
         },
