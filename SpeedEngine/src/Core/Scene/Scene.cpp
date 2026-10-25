@@ -6,6 +6,7 @@
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 #include <SubSystems/Scriptings/ScriptingSystem.h>
+#include <SubSystems/Audio/AudioSystem.h>
 
 namespace SE
 {
@@ -50,6 +51,15 @@ namespace SE
 			if (lifeComponent && !lifeComponent->isAlive)
 			{
 				removeEntity(entity.id());
+			}
+
+			//update all sfx components on entities
+			auto* sfxComponent = entity.getComponent<AudioSFXComponent>();
+			if (sfxComponent && sfxComponent->isGameSFX())
+			{
+				//do the position setting here....
+				const glm::vec3 pos = entity.getComponent<Transform>()->getTranslation();
+				sfxComponent->updateMyPosition(pos);
 			}
 		}
 
@@ -154,10 +164,6 @@ namespace SE
 
 	void Scene::loadScene(std::string_view path)
 	{
-		if (m_reloadRequested)
-		{
-			return;
-		}
 		nlohmann::json sceneJson;
 		if (loadJson(path.data(), m_logger, sceneJson))
 		{
@@ -175,6 +181,9 @@ namespace SE
 		{
 			m_registry.clear();
 		}
+
+		//DOES NOT RESET ACTIVE MUSIC lol. but this can easily be changed in future.
+		Engine::Instance().getSubSystem<AudioSystem>()->clearSoundLibraries();
 
 		if (sceneJson.contains("entities"))
 		{
