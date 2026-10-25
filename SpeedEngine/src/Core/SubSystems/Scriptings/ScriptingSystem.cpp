@@ -338,8 +338,30 @@ namespace SE
 		m_luaState.collect_garbage();
 	}
 
+	void ScriptingSystem::_destroyAllScripts()
+	{
+		Scene* scene = sceneSystem ? sceneSystem->getCurrentScene() : nullptr;
+		if (!scene)
+		{
+			return;
+		}
+
+		scene->forEntitiesWith<ScriptComponent>([](Entity entity) {
+			ScriptComponent* scriptComponent = entity.getComponent<ScriptComponent>();
+			if (scriptComponent->onDestroy)
+			{
+				scriptComponent->onDestroy();
+			}
+			scriptComponent->onInit = []() {};
+			scriptComponent->onUpdate = [](double) {};
+			scriptComponent->onDestroy = []() {};
+			scriptComponent->initilized = false;
+		});
+	}
+
 	void ScriptingSystem::reset() 
 	{
+		_destroyAllScripts();
 		m_scripts.clear();
 		m_scriptCache.clear();
 		m_luaState.collect_garbage();
