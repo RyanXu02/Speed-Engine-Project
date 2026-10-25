@@ -104,7 +104,13 @@ namespace SE
 				rigidBody->setRotation(glm::quat(transform->getRotation()));
 				getBodyInterface()->AddBody(rigidBody->getBodyID(), rigidBody->isActive() ? EActivation::Activate : EActivation::DontActivate);
 			}
-			else if (rigidBody->getMotionType() != EMotionType::Static)
+			else if (rigidBody->getMotionType() == EMotionType::Static || !m_running)
+			{
+				// Allows for transform to be changed while physics is paused (or for static objects)
+				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
+				rigidBody->setRotation(glm::quat(transform->getRotation()));
+			}
+			else
 			{
 				///transform->setTransform(rigidBody->getTransform()); IDEAL
 				transform->setPosition(rigidBody->getPosition() - rigidBody->getOffset());
@@ -112,7 +118,7 @@ namespace SE
 				float rotationPitch = glm::pitch(rotationQ);
 				float rotationYaw = glm::yaw(rotationQ);
 				float rotationRoll = glm::roll(rotationQ);
-				transform->setRotation(glm::vec3(rotationPitch, rotationYaw, rotationRoll));
+				transform->setRotation(glm::vec3(rotationYaw, rotationPitch, rotationRoll));
 			}
 		}
 	}
