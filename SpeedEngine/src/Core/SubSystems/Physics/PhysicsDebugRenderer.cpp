@@ -31,7 +31,7 @@ namespace SE
 			m_frame->addDebugLine(
 				glm::vec3(from.GetX(), from.GetY(), from.GetZ()),
 				glm::vec3(to.GetX(), to.GetY(), to.GetZ()),
-				glm::vec4(color.r, color.g, color.b, color.a));
+				glm::vec4(color.r, color.g, color.b, color.a)/255.0f);
 	}
 
 	void PhysicsDebugRenderer::DrawTriangle(JPH::RVec3Arg a, JPH::RVec3Arg b, JPH::RVec3Arg c, JPH::ColorArg color, ECastShadow)
@@ -41,7 +41,7 @@ namespace SE
 				glm::vec3(a.GetX(), a.GetY(), a.GetZ()),
 				glm::vec3(b.GetX(), b.GetY(), b.GetZ()),
 				glm::vec3(c.GetX(), c.GetY(), c.GetZ()),
-				glm::vec4(color.r, color.g, color.b, color.a));
+				glm::vec4(color.r, color.g, color.b, color.a)/255.0f);
 	}
 
 	void PhysicsDebugRenderer::DrawText3D(JPH::RVec3Arg, const std::string_view&, JPH::ColorArg, float)

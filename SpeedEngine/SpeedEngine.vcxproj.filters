@@ -2,9 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\Core\Features\CameraController.cpp" />
+    <ClCompile Include="src\Core\Memory\FrameSlot.cpp" />
+    <ClCompile Include="src\Core\Threading\FrameExchange.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.cpp" />
     <ClInclude Include="src\Core\Features\CameraState.h" />
     <ClInclude Include="src\Core\Features\CameraController.h" />
+    <ClInclude Include="src\Core\Memory\FrameSlot.h" />
+    <ClInclude Include="src\Core\Threading\FrameExchange.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.h" />

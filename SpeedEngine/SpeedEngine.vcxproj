@@ -158,6 +158,8 @@
   <ItemGroup>
     <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
     <ClCompile Include="src\Core\Features\CameraController.cpp" />
+    <ClCompile Include="src\Core\Memory\FrameSlot.cpp" />
+    <ClCompile Include="src\Core\Threading\FrameExchange.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.cpp" />
     <ClCompile Include="src\Core\EngineStates.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.cpp" />
@@ -229,6 +231,8 @@
     <ClInclude Include="src\Core\Features\CameraFrustum.h" />
     <ClInclude Include="src\Core\Features\CameraState.h" />
     <ClInclude Include="src\Core\Features\CameraController.h" />
+    <ClInclude Include="src\Core\Memory\FrameSlot.h" />
+    <ClInclude Include="src\Core\Threading\FrameExchange.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
     <ClInclude Include="src\Core\EngineStates.h" />

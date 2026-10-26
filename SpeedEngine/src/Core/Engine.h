@@ -5,6 +5,7 @@
 namespace SE
 {
 	class SubSystem;
+	class FrameExchange;
 
 	class Engine
 	{
@@ -55,6 +56,7 @@ namespace SE
 
 		std::vector<std::unique_ptr<SubSystem>> m_subSystems;
 		CameraController m_cameraController;
+		std::unique_ptr<FrameExchange> m_frameExchange;
 
 		EventSubscription m_windowCloseEvent;
 		EventSubscription m_cameraSwitchEvent;

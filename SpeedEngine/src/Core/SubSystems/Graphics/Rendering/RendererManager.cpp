@@ -120,7 +120,7 @@ namespace SE
 		*/
 
 		// change this to set the final output to a specific target
-		setFinalSceneOutput("Grayscale");
+		setFinalSceneOutput("SceneColor");
 #pragma endregion
 
 		// imgui always presents after the scene pipeline on the default framebuffer

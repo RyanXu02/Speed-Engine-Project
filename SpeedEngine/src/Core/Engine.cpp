@@ -16,6 +16,7 @@
 #include "SubSystems/Audio/AudioSystem.h"
 #include "SubSystems/SubSystem.h"
 #include "EngineStates.h"
+#include "Threading/FrameExchange.h"
 
 // temp
 #include <SubSystems/Scriptings/ScriptingSystem.h>
@@ -35,6 +36,7 @@ namespace SE
 	      m_deltaTime(0.0),
 	      m_currentTime(0.0),
 	      m_lastTime(0.0),
+		  m_frameExchange(std::make_unique<FrameExchange>()),
 	      m_windowCloseEvent()
 	{}
 	Engine::~Engine() {}
@@ -136,17 +138,27 @@ namespace SE
 			if (EngineStates::isEditorCameraActive())
 				m_cameraController.update(EngineStates::getEditorCamera(), *inputSystem, m_deltaTime);
 
-			RenderFrame frame;
-			frameBuilder.build(frame, sceneSystem->getCurrentScene(), *physicsSystem);
-			// temp
-			frame.addDebugLine(glm::vec3(-2.0f, 1.0f, 0.0f), glm::vec3(2.0f, 1.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			{
+				auto write = m_frameExchange->beginWrite();
+				if (!write)
+					break;
+
+				RenderFrame& frame = write.frame();
+				frameBuilder.build(frame, sceneSystem->getCurrentScene(), *physicsSystem);
+				// temp
+				frame.addDebugLine(glm::vec3(-2.0f, 1.0f, 0.0f), glm::vec3(2.0f, 1.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+				if (!write.publish())
+					break;
+			}
 
 			// render
-			rendererManager->render(frame);
+			if (auto read = m_frameExchange->tryAcquireReady())
+				rendererManager->render(read.frame());
 		}
 	}
 	void Engine::stop()
 	{
+		m_frameExchange->close();
 		for (auto& subSystem : m_subSystems | std::views::reverse)
 		{
 			subSystem->shutdown();
