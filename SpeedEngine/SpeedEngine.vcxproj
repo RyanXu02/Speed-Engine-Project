@@ -160,6 +160,7 @@
     <ClCompile Include="src\Core\EngineStates.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\PhysicsDebugRenderer.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\AudioComponents.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="src\Core\EngineStates.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\PhysicsDebugRenderer.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.h" />

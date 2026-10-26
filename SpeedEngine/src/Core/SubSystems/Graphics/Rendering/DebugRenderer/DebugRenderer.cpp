@@ -4,6 +4,7 @@
 #include "Core/Engine.h"
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
+#include "Core/SubSystems/Physics/PhysicsSystem.h"
 
 #include <glad/glad.h>
 
@@ -56,6 +57,9 @@ namespace SE
 
 	void DebugRenderer::render(RenderContext& context)
 	{
+		// "draw" physics bodies, which hooks back into DebugRenderer with drawLine
+		Engine::Instance().getSubSystem<PhysicsSystem>()->debugDrawBodies();
+
 		if (m_lines.empty() && m_triangles.empty())
 			return;
 

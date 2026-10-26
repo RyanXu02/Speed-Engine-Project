@@ -20,6 +20,8 @@
 // temp
 #include <SubSystems/Scriptings/ScriptingSystem.h>
 
+#include <Jolt/Core/Memory.h>
+
 namespace SE
 {
 	Engine& Engine::Instance()
@@ -38,6 +40,9 @@ namespace SE
 	Engine::~Engine() {}
 	void Engine::init()
 	{
+		// Allocation hook for Jolt, can connect this to custom memory control if needed (see Jolt/Core/Memory.h)
+		JPH::RegisterDefaultAllocator();
+
 		// push back subsystems in order of initialization
 		m_subSystems.push_back(std::unique_ptr<MemoryTrackingSystem>(new MemoryTrackingSystem()));
 		m_subSystems.push_back(std::unique_ptr<EventSystem>(new EventSystem()));
