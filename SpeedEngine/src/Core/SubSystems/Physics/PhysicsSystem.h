@@ -1,6 +1,9 @@
 #pragma once
 #include "Core/SubSystems/SubSystem.h"
 
+#include "Core/SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/DebugRenderer/PhysicsDebugRenderer.h"
+
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -101,6 +104,15 @@ namespace SE
 
 		void shutdown() override;
 
+		// @brief calls the jolt debug renderer for debug drawing physics bodies.
+		void debugDrawBodies();
+		
+		// @brief updates the camera position for the physics debug renderer (used by Jolt for LOD stuff)
+		void debugUpdateCameraPos(const glm::vec3& pos);
+
+		// @brief creates an instance of the physics debug renderer using a given renderer hook
+		void setDebugRendererImpl(SE::DebugRenderer& renderer);
+
 		void pause() { m_running = false; }
 		void resume() { m_running = true; }
 
@@ -115,6 +127,7 @@ namespace SE
 		std::unique_ptr<TempAllocatorImpl> m_temp_allocator;
 		std::unique_ptr<JobSystemThreadPool> m_job_system;
 		std::unique_ptr<JPH::PhysicsSystem> m_physics_system;
+		JPH::DebugRenderer* m_physicsDebugRenderer{ nullptr };
 		BPLayerInterfaceImpl m_broad_phase_layer_interface;
 		ObjectVsBroadPhaseLayerFilterImpl m_object_vs_broadphase_layer_filter;
 		ObjectLayerPairFilterImpl m_obj_vs_object_layer_filter;
