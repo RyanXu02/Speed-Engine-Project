@@ -11,5 +11,5 @@
 
 namespace SE
 {
-
+	inline constexpr glm::vec3 WORLD_UP{ 0.0f, 1.0f, 0.0f };
 }

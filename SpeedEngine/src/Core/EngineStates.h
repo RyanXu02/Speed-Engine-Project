@@ -22,10 +22,15 @@ namespace SE
 		static CameraFrustum* setCamera(CameraFrustum* camera) { return s_appCamera = camera ? camera : &s_editorCamera; }
 		static CameraFrustum* getActiveCamera() { return isPlaying() ? s_appCamera : &s_editorCamera; }
 		static bool isEditorCameraActive() { return getActiveCamera() == &s_editorCamera; }
+		static CameraFrustum& getEditorCamera() { return s_editorCamera; }
+		static void releaseCamera(const CameraFrustum* camera)
+		{
+			if (s_appCamera == camera)
+				setCamera(nullptr);
+		}
 
 	private:
-		// engine has their own default editor camera, this can be reassigned to an in game authored scriptcamera
-		// the renderer context do not own the engine camera, it only reference it
+		// Simulation owns camera selection
 		static inline CameraFrustum s_editorCamera;
 		static inline State s_state{ State::Play };
 		static inline CameraFrustum* s_appCamera{ &s_editorCamera };

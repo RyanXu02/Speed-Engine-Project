@@ -4,7 +4,6 @@
 #include "Core/SubSystems/Graphics/Rendering/ImGuiRenderer/ImGuiRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
 #include "Core/SubSystems/Graphics/Rendering/Renderer.h"
-#include "Core/SubSystems/Graphics/Rendering/DebugRenderer/PhysicsDebugRenderer.h"
 
 namespace SE
 {
@@ -85,10 +84,9 @@ namespace SE
 		void requestSceneResize(uint32_t width, uint32_t height);
 
 		void init() override;
-		void update(double deltaTime) override;
 		void shutdown() override;
 
-		void render();
+		void render(const RenderFrame& frame);
 
 	private:
 		explicit RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window){};

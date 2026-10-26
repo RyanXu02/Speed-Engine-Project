@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="src\Core\Features\CameraController.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.cpp" />
+    <ClInclude Include="src\Core\Features\CameraState.h" />
+    <ClInclude Include="src\Core\Features\CameraController.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.h" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
@@ -56,7 +63,7 @@
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\PhysicsDebugRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

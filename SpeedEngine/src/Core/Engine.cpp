@@ -6,8 +6,8 @@
 #include "ResourceManagers/ResourceManager.h"
 #include "SubSystems/Events/EventSubscription.h"
 #include "SubSystems/Events/EventSystem.h"
-#include "SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
 #include "SubSystems/Graphics/Rendering/RendererManager.h"
+#include "SubSystems/Graphics/Rendering/RenderFrameBuilder.h"
 #include "SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "SubSystems/Graphics/Window.h"
 #include "SubSystems/Input/InputSystem.h"
@@ -98,39 +98,16 @@ namespace SE
 	}
 	void Engine::run()
 	{
-		
-
-		//uint32_t bunnymeshId = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("bunnymesh", "Assets/Meshes/bunny.obj");
-		//uint32_t entityID = currentScene->addEntity("bunny");
-		//Entity entity = currentScene->getEntity(entityID);
-		//entity.addComponent<MeshComponent>(bunnymeshId);
-
-		//uint32_t roommeshId2 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("conferencemesh", "Assets/Meshes/conference.obj");
-		//uint32_t entityID2 = currentScene->addEntity("conference");
-		//Entity entity2 = currentScene->getEntity(entityID2);
-		//entity2.addComponent<MeshComponent>(roommeshId2);
-		//entity2.getComponent<Transform>()->setScale(glm::vec3(0.01f));
-
-		//uint32_t suzanemeshId3 = getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>("suzanemesh", "Assets/Meshes/Suzanne.gltf");
-		//uint32_t entityID3 = currentScene->addEntity("suzane");
-		//Entity entity3 = currentScene->getEntity(entityID3);
-		//entity3.addComponent<MeshComponent>(suzanemeshId3);
-		// end temp
-
-
 		// get subsystems used in loop
 		auto* window = getSubSystem<Window>();
 		auto* rendererManager = getSubSystem<RendererManager>();
 		auto* physicsSystem = getSubSystem<PhysicsSystem>();
-
-		auto* debugRenderer = rendererManager->getRenderer<DebugRenderer>(); // temp
+		auto* sceneSystem = getSubSystem<SceneSystem>();
+		auto* inputSystem = getSubSystem<InputSystem>();
+		const RenderFrameBuilder frameBuilder;
 
 		// init time
-		double lastTime = window->getCurrentTime();
-		int frameCounter = 0;
-		double fpsTimer = 0.0;
-		double currentFPS = 0.0;
-		const double targetFrameTime = 1.0 / window->getFPS();
+		m_lastTime = window->getCurrentTime();
 
 		double accumulator = 0.0;
 		const double physicsFrameTime = 1.0 / 60.0; // fixed 60 fps physics
@@ -156,11 +133,16 @@ namespace SE
 				accumulator -= physicsFrameTime;
 			}
 
+			if (EngineStates::isEditorCameraActive())
+				m_cameraController.update(EngineStates::getEditorCamera(), *inputSystem, m_deltaTime);
+
+			RenderFrame frame;
+			frameBuilder.build(frame, sceneSystem->getCurrentScene(), *physicsSystem);
 			// temp
-			debugRenderer->drawLine(glm::vec3(-2.0f, 1.0f, 0.0f), glm::vec3(2.0f, 1.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+			frame.addDebugLine(glm::vec3(-2.0f, 1.0f, 0.0f), glm::vec3(2.0f, 1.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 			// render
-			rendererManager->render();
+			rendererManager->render(frame);
 		}
 	}
 	void Engine::stop()

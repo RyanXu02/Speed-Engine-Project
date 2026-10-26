@@ -3,13 +3,10 @@
 #include "RendererManager.h"
 
 #include "Core/ResourceManagers/ResourceManager.h"
-#include "Core/SubSystems/Scenes/SceneSystem.h"
 
 #include "Core/SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
-
-#include "Core/SubSystems/Physics/PhysicsSystem.h"
 
 #include "Core/Engine.h"
 
@@ -70,7 +67,6 @@ namespace SE
 			.renderer = debugRenderer, 
 			.output = sceneColor, 
 			.clearMask = 0 });
-		Engine::Instance().getSubSystem<PhysicsSystem>()->setDebugRendererImpl(debugRenderer);
 
 		// Example:
 		// A render pass that samples "SceneColor" and output to a new "Grayscale" target
@@ -132,22 +128,7 @@ namespace SE
 		m_imguiRenderer->init();
 	}
 
-	void RendererManager::update(double deltaTime)
-	{
-		SubSystem::update(deltaTime);
-		RenderContext context{ Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene(),
-			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets };
-
-		for (auto& renderer : m_renderers)
-			renderer->update(deltaTime, context);
-
-		m_sceneViewport->updateMatrices();
-
-		// Update camera position in physics debug renderer (used by Jolt for LOD rendering)
-		Engine::Instance().getSubSystem<PhysicsSystem>()->debugUpdateCameraPos(m_sceneViewport->getCameraFrustum().getPosition());
-	}
-
-	void RendererManager::render()
+	void RendererManager::render(const RenderFrame& frame)
 	{
 		int width = 0;
 		int height = 0;
@@ -157,8 +138,9 @@ namespace SE
 #endif
 		_applySceneResize();
 
+		m_sceneViewport->setCamera(frame.camera);
 		m_sceneViewport->updateMatrices();
-		RenderContext context{ Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene(),
+		RenderContext context{ frame,
 			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets };
 
 		for (const auto& pass : m_passes)

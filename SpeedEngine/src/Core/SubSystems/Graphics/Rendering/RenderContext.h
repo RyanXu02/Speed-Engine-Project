@@ -1,12 +1,12 @@
 #pragma once
 #include "FBO.h"
 #include "MeshGPUCache.h"
+#include "RenderFrame.h"
 #include "Viewport.h"
 
 namespace SE
 {
 	class ResourceManager;
-	class Scene;
 
 	// @brief Describes the size of a render target, either following the scene viewport or using a fixed scale
 	struct RenderTargetSize
@@ -23,10 +23,10 @@ namespace SE
 
 	using RenderTargets = std::unordered_map<std::string, RenderTarget>;
 
-	// @brief Borrows the manager's resources for an update or rendering pass.
+	// @brief Borrows the completed frame and the manager's rendering resources.
 	struct RenderContext
 	{
-		Scene* scene;
+		const RenderFrame& frame;
 		Viewport& viewport;
 		ResourceManager& resources;
 		MeshGPUCache& meshes;
