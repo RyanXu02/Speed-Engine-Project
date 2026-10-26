@@ -79,6 +79,7 @@ namespace SE
 		const glm::vec3& getScale() const { return scale; }
 		const glm::mat4& getTransform();
 
+		//this is fine for now, the script needs custom functionality anyway so manually define it in script
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(Transform, translate, rotate, scale);
 
 	private:

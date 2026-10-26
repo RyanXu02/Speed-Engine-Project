@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "EventToLuaBindings.h"
 #include "Engine.h"
+#include "Core/Features/CameraFrustum.h"
 #include "SubSystems/Events/EventSystem.h"
 #include "SubSystems/Events/EventSubscription.h"
 #include "SubSystems/Input/KeyCodes.h"
@@ -29,7 +30,8 @@ namespace SE
 			"MouseMoved", EventType::MouseMoved,
 			"MouseScrolled", EventType::MouseScrolled,
 			"SceneChanged", EventType::SceneChanged,
-			"ActiveSceneModified", EventType::ActiveSceneModified
+			"ActiveSceneModified", EventType::ActiveSceneModified,
+            "CameraSwitched", EventType::CameraSwitched
 			// "EntitySelected", EventType::EntitySelected 
 			// "ResourceChanged", EventType::ResourceChanged
 		);
@@ -40,11 +42,15 @@ namespace SE
 			"getName", &Event::getName
 		);
 
+        // NOTE: this doesnt work due to the design of publish that require a unique pointer
+        // passed in, event need to manually register it
 		sol::table eventSystem = luaState.create_named_table("EventSystem");
-		eventSystem["publish"] = [](std::unique_ptr<Event>& event)
+		
+
+		eventSystem["publishSwitchCamera"] = [](CameraFrustum* camera)
 		{
 			auto eventSystem = Engine::Instance().getSubSystem<EventSystem>();
-			eventSystem->publish(std::move(event));
+			eventSystem->publish(std::make_unique<SwitchCameraEvent>(camera));
 		};
 
 		eventSystem.new_usertype<EventSubscription>("EventSubscription",
@@ -70,6 +76,11 @@ namespace SE
 	
 		_registerEvent<MouseMovedEvent>(luaState);
 		_registerEvent<KeyPressedEvent>(luaState);
+		_registerEvent<SwitchCameraEvent>(luaState);
+
+        // custom pointer type event is not supported through the macro so require manual register
+		sol::usertype<SwitchCameraEvent> switchCameraType = luaState["SwitchCameraEvent"];
+		switchCameraType["camera"] = sol::readonly(&SwitchCameraEvent::camera);
 	}
 	void EventToLuaBindings::_exportKeyCodes(Logger* logger, sol::state& luaState)
 	{

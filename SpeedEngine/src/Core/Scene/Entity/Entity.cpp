@@ -89,6 +89,17 @@ namespace SE
 		return function;
 	}
 
+	Entity::HookFunction Entity::_onCameraComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* cameraComponent = entity.getComponent<CameraComponent>();
+			cameraComponent->frustum.setFOV(cameraComponent->fov);
+			cameraComponent->frustum.setNearPlane(cameraComponent->nearPlane);
+			cameraComponent->frustum.setFarPlane(cameraComponent->farPlane);
+		};
+		return function;
+	}
 	Entity::HookFunction Entity::_onSFXComponentAdded()
 	{
 		HookFunction function = [](Entity entity)

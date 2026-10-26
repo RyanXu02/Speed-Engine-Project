@@ -1,5 +1,6 @@
 #pragma once
 #include "../Renderer.h"
+#include "Core/Features/CameraFrustum.h"
 
 namespace SE
 {

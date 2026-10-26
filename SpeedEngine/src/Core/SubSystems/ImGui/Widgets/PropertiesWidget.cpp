@@ -101,6 +101,11 @@ namespace SE
 				    scriptingSystem->reloadScript(component.path);
 				}
 		    });
+		m_inspectors.registerComponent<CameraComponent>("CameraComponent", false,
+		    [](Entity&, CameraComponent& component)
+		    {
+			    
+		    });
 
 		m_inspectors.registerComponent<RigidBody>("RigidBody", true,
 		    [](Entity&, RigidBody& component)

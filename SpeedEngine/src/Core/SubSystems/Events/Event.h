@@ -2,10 +2,14 @@
 
 #include "../../ResourceManagers/Resource.h"
 #include "core/features/Serializable.h"
+#include "glm/glm.hpp"
+
 
 // When adding editor-only events, add them at the bottom of this file inside the COMPILE_WITH_EDITOR block
 namespace SE
 {
+	struct CameraFrustum;
+
 	enum class EventType
 	{
 		None = 0,
@@ -23,6 +27,7 @@ namespace SE
 		MouseScrolled,
 		SceneChanged, // Active scene has been changed
 		ActiveSceneModified, // Active scene has been modified (entity added, removed, renamed)
+		CameraSwitched,
 #if defined(COMPILE_WITH_EDITOR)
 		EntitySelected, // An entity has been selected in the SceneInfoWidget
 		ResourceChanged, // A resource in the resource manager has been added or removed
@@ -68,6 +73,24 @@ namespace SE
 			MouseMovedEvent, 
 			member("m_x", &MouseMovedEvent::m_x),
 			member("m_y", &MouseMovedEvent::m_y)
+		);
+	};
+
+	class SwitchCameraEvent : public Event
+	{
+	public:
+		CameraFrustum* camera;
+
+		SwitchCameraEvent(CameraFrustum* other)
+		    : camera(other)
+		{}
+
+		EventType getEventType() const override { return EventType::CameraSwitched; }
+		std::string getName() const override { return "SwitchCameraEvent"; }
+		std::string getDataAsString() const override { return ""; }
+
+		DEFINE_TYPE(
+			SwitchCameraEvent
 		);
 	};
 

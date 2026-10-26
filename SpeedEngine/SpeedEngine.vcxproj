@@ -77,7 +77,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
     </ClCompile>
@@ -109,7 +109,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
     </ClCompile>
@@ -140,7 +140,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,6 +156,10 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
+    <ClCompile Include="src\Core\EngineStates.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\PhysicsDebugRenderer.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\AudioComponents.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
@@ -220,6 +224,10 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\Features\CameraFrustum.h" />
+    <ClInclude Include="src\Core\EngineStates.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\PhysicsDebugRenderer.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.h" />

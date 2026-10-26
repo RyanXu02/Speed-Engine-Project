@@ -15,6 +15,7 @@
 #include "SubSystems/Physics/PhysicsSystem.h"
 #include "SubSystems/Audio/AudioSystem.h"
 #include "SubSystems/SubSystem.h"
+#include "EngineStates.h"
 
 // temp
 #include <SubSystems/Scriptings/ScriptingSystem.h>
@@ -54,6 +55,7 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
 		m_subSystems.push_back(std::unique_ptr<AudioSystem>(new AudioSystem()));
 
+
 		// init all subsystems
 		for (auto& subSystem : m_subSystems)
 		{
@@ -65,6 +67,12 @@ namespace SE
 		    [this](const Event& event)
 		    {
 			    m_isRunning = false;
+		    });
+		m_cameraSwitchEvent = getSubSystem<EventSystem>()->subscribe(EventType::CameraSwitched,
+		    [this](const Event& event)
+		    {
+			    const SwitchCameraEvent& cameraEvent = static_cast<const SwitchCameraEvent&>(event);
+			    EngineStates::setCamera(cameraEvent.camera);
 		    });
 	}
 	void Engine::start()

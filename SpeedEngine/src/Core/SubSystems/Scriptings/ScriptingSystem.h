@@ -28,6 +28,7 @@ namespace SE
 
 	private:
 		virtual void _initScript(ScriptComponent& scriptComponent);
+		virtual void _destroyAllScripts();
 
 		std::vector<std::string> m_scriptsToReload;
 

@@ -38,6 +38,7 @@ namespace SE
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), Entity::_onMeshComponentRemoved());
 		REGISTER_COMPONENT(PrefabComponent, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(ScriptComponent, Entity::_onScriptComponentAdded(), Entity::_onScriptComponentRemoved());
+		REGISTER_COMPONENT(CameraComponent, Entity::_onCameraComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(RigidBody, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeBox, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeCapsule, NO_DEFINE, NO_DEFINE);

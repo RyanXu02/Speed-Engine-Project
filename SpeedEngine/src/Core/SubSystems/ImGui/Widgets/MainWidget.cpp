@@ -9,6 +9,7 @@
 #include "MainWidget.h"
 #include "MemoryWidget.h"
 #include "ConsoleWidget.h"
+#include "EngineStateWidget.h"
 #include "PropertiesWidget.h"
 #include "ResourceBrowserWidget.h"
 #include "SceneInfoWidget.h"
@@ -119,6 +120,11 @@ namespace SE
 				if (ImGui::MenuItem("Scene Info", nullptr, sceneInfoVisible))
 				{
 					SceneInfoWidget::setVisible(!sceneInfoVisible);
+				}
+				const bool engineStateVisible = EngineStateWidget::isVisible();
+				if (ImGui::MenuItem("Engine State", nullptr, engineStateVisible))
+				{
+					EngineStateWidget::setVisible(!engineStateVisible);
 				}
 				const bool scenePreviewVisible = ScenePreviewWidget::isVisible();
 				if (ImGui::MenuItem("Scene Preview", nullptr, scenePreviewVisible))

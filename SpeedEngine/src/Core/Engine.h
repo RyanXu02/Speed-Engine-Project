@@ -56,5 +56,6 @@ namespace SE
 		std::vector<std::unique_ptr<SubSystem>> m_subSystems;
 
 		EventSubscription m_windowCloseEvent;
+		EventSubscription m_cameraSwitchEvent;
 	};
 } // namespace SE

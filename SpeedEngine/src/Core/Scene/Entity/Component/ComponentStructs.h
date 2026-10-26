@@ -7,6 +7,7 @@
 #include "PhysicsShape/PhysicsShapeSphere.h"
 //#include "PhysicsShape/PhysicsShapeMesh.h"
 #include "Core/features/Serializable.h"
+#include "Core/features/CameraFrustum.h"
 #include "AudioComponents.h"
 
 
@@ -80,5 +81,26 @@ namespace SE
 		bool initilized{ false };
 
 		DEFINE_TYPE(ScriptComponent, member("path", &ScriptComponent::path));
+	};
+
+	
+	struct CameraComponent
+	{
+		CameraComponent() = default;
+
+		CameraFrustum frustum;
+
+		float fov{ 90.0f };
+		float nearPlane{ 0.1f };
+		float farPlane{ 1000.0f };
+		bool isPrimary{ false };
+
+		DEFINE_TYPE(
+			CameraComponent,
+			member("fov", &CameraComponent::fov),
+			member("nearPlane", &CameraComponent::nearPlane),
+			member("farPlane", &CameraComponent::farPlane),
+			member("isPrimary", &CameraComponent::isPrimary)
+		);
 	};
 }
