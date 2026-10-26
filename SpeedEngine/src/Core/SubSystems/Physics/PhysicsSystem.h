@@ -118,7 +118,7 @@ namespace SE
 		BPLayerInterfaceImpl m_broad_phase_layer_interface;
 		ObjectVsBroadPhaseLayerFilterImpl m_object_vs_broadphase_layer_filter;
 		ObjectLayerPairFilterImpl m_obj_vs_object_layer_filter;
-		bool m_running = false;
+		bool m_running = true;
 		const uint cMaxBodies = 65536;
 		const uint cNumBodyMutexes = 0;
 		const uint cMaxBodyPairs = 65536;

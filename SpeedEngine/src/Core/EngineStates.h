@@ -27,7 +27,7 @@ namespace SE
 		// engine has their own default editor camera, this can be reassigned to an in game authored scriptcamera
 		// the renderer context do not own the engine camera, it only reference it
 		static inline CameraFrustum s_editorCamera;
-		static inline State s_state{ State::Pause };
+		static inline State s_state{ State::Play };
 		static inline CameraFrustum* s_appCamera{ &s_editorCamera };
 	};
 }
