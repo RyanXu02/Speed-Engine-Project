@@ -38,6 +38,10 @@
     },
     {
       "components": {
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death.wav",
+          "isGameSFX": true
+        },
         "LifeComponent": {
           "isAlive": true
         },
@@ -62,8 +66,8 @@
             1.0
           ],
           "translate": [
-            3.0,
-            0.0,
+            -2.4000000953674316,
+            1.899999976158142,
             0.0
           ]
         }
@@ -71,6 +75,9 @@
     },
     {
       "components": {
+        "AudioMusicComponent": {
+          "filepath": "Assets/Audio/funkytown.wav"
+        },
         "LifeComponent": {
           "isAlive": true
         },
@@ -95,8 +102,8 @@
         "Transform": {
           "rotate": [
             0.0,
-            -0.0,
-            0.0
+            0.0,
+            -2.624213933944702
           ],
           "scale": [
             1.0,
@@ -104,8 +111,8 @@
             1.0
           ],
           "translate": [
-            -1.399999976158142,
-            0.25,
+            -30.22134780883789,
+            -34869.046875,
             0.0
           ]
         }
@@ -113,6 +120,10 @@
     },
     {
       "components": {
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death_nongame.wav",
+          "isGameSFX": false
+        },
         "LifeComponent": {
           "isAlive": true
         },
@@ -178,9 +189,9 @@
         },
         "Transform": {
           "rotate": [
-            0.0,
-            -0.0,
-            0.0
+            -0.2591325640678406,
+            -0.46823322772979736,
+            -2.295701026916504
           ],
           "scale": [
             1.0,
@@ -188,9 +199,9 @@
             1.0
           ],
           "translate": [
-            0.6000000238418579,
-            0.25,
-            0.0
+            28.045745849609375,
+            -34818.7109375,
+            -7.276470184326172
           ]
         }
       }
@@ -220,9 +231,9 @@
         },
         "Transform": {
           "rotate": [
-            0.0,
-            -0.0,
-            0.0
+            0.16952857375144958,
+            -0.5837404727935791,
+            2.6957247257232666
           ],
           "scale": [
             1.0,
@@ -230,9 +241,9 @@
             1.0
           ],
           "translate": [
-            0.0,
-            -3.3499999046325684,
-            0.20000000298023224
+            -9.93838119506836,
+            -34784.375,
+            3.1703803539276123
           ]
         }
       }

@@ -53,5 +53,7 @@ namespace SE
 		static HookFunction _onScriptComponentAdded();
 		static HookFunction _onScriptComponentRemoved();
 		static HookFunction _onCameraComponentAdded();
+		static HookFunction _onSFXComponentAdded();
+		static HookFunction _onMusicComponentAdded();
 	};
 } // namespace SE

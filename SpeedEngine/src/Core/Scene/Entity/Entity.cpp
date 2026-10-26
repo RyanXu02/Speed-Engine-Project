@@ -100,5 +100,24 @@ namespace SE
 		};
 		return function;
 	}
+	Entity::HookFunction Entity::_onSFXComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* sfxComponent = entity.getComponent<AudioSFXComponent>();
+			sfxComponent->createSound(sfxComponent->getFilepath(), sfxComponent->isGameSFX());
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onMusicComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* sfxComponent = entity.getComponent<AudioMusicComponent>();
+			sfxComponent->createTrack(sfxComponent->getFilepath());
+		};
+		return function;
+	}
 
 }

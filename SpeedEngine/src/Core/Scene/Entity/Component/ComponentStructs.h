@@ -8,6 +8,7 @@
 //#include "PhysicsShape/PhysicsShapeMesh.h"
 #include "Core/features/Serializable.h"
 #include "Core/features/CameraFrustum.h"
+#include "AudioComponents.h"
 
 
 namespace SE

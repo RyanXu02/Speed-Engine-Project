@@ -44,6 +44,9 @@ namespace SE
 		REGISTER_COMPONENT(PhysicsShapeCapsule, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeSphere, NO_DEFINE, NO_DEFINE);
 		//REGISTER_COMPONENT(PhysicsShapeMesh, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(AudioSFXComponent, Entity::_onSFXComponentAdded(), NO_DEFINE);
+		REGISTER_COMPONENT(AudioMusicComponent, Entity::_onMusicComponentAdded(), NO_DEFINE);
+
 	}
 
 	EntityRegistry::~EntityRegistry() {}

@@ -15,6 +15,9 @@
 #include "SceneInfoWidget.h"
 #include "ScenePreviewWidget.h"
 
+//TESTING AUDIO SYSTEM
+#include "Core/SubSystems/Audio/AudioSystem.h"
+
 #include <imgui.h>
 
 namespace SE
@@ -45,6 +48,11 @@ namespace SE
 						//scene->loadScene(path);
 						scene->reloadScene();
 					}
+				}
+				if (ImGui::MenuItem("mute test"))
+				{
+					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
+					AS->toggleMute();
 				}
 				ImGui::EndMenu();
 			}
