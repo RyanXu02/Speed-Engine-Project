@@ -50,7 +50,7 @@ namespace SE
 			shape = entity.getComponent<PhysicsShapeBox>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
-			///if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
+			if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
 
 
 			// Only add if not already created/added and if it has a collider shape component
@@ -88,7 +88,7 @@ namespace SE
 			shape = entity.getComponent<PhysicsShapeBox>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
-			///if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
+			if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
 			if (shape)
 			{
 				rigidBody->setShape(shape->getShape());
