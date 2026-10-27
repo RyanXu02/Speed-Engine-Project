@@ -5,6 +5,7 @@
 namespace SE
 {
 	struct CameraFrustum;
+	class MeshResource;
 
 	// @brief SceneRenderer is responsible for rendering all drawable entities in the scene
 	class SceneRenderer : public Renderer
@@ -34,6 +35,9 @@ namespace SE
 		// Default shader for meshes without material
 		uint32_t m_defaultShaderId = 0;
 		uint32_t m_defaultMaterialId = 0;
+
+		std::unordered_map<uint32_t, std::vector<uint32_t>> m_meshMaterials;
+		const std::vector<uint32_t>& _getMeshMaterials(RenderContext& context, uint32_t meshResourceId, const MeshResource& meshResource);
 
 		// Camera controls
 		void _updateCameraPosition(double deltaTime, CameraFrustum& camera);

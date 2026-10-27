@@ -75,27 +75,92 @@ namespace SE
 			}
 
 			defaultShader->bind();
-			defaultMaterial->bind();
 
-			// Set camera matrices
-			defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);
+			defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);	// Set camera matrices
+			defaultShader->setVec3("viewPos", camera.getPosition());
+			defaultShader->setMat4("model", transform->getTransform());	// Set transform
 
-			// Set transform
-			defaultShader->setMat4("model", transform->getTransform());
-
-			// Set material properties
-			defaultShader->setVec4("color", glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
-			defaultShader->setBool("useTexture", defaultMaterial != nullptr);
 			defaultShader->setFloat("intensity", 1.0f);
 			defaultShader->setInt("frameIndex", 0);
 			defaultShader->setFloat("numRows", 1.0f);
 			defaultShader->setFloat("numCols", 1.0f);
 
-			context.meshes.draw(meshResourceId, *meshResource);
+			// each submesh can have different set of material so get material for each mesh
+			const std::vector<uint32_t>& meshMaterials = _getMeshMaterials(context, meshResourceId, *meshResource);
+			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
+			for (size_t i = 0; i < subMeshes.size(); ++i)
+			{
+				const int32_t materialIndex = subMeshes[i].materialIndex;
+				const bool hasPBR = materialIndex >= 0 && static_cast<size_t>(materialIndex) < meshMaterials.size();
+				const PBRMaterial* pbr = hasPBR ? &meshResource->getMaterials()[materialIndex] : nullptr;
 
-			defaultMaterial->unbind();
+				Material* material = hasPBR ? context.resources.getResource<Material>(meshMaterials[materialIndex]) : nullptr;
+				if (!material)
+					material = defaultMaterial;
+
+				// Set material properties
+				defaultShader->setVec4("color", pbr ? pbr->albedoFactor : glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+				defaultShader->setVec3("emissiveFactor", pbr ? pbr->emissiveFactor : glm::vec3(0.0f));
+				defaultShader->setFloat("roughnessFactor", pbr ? pbr->roughnessFactor : 1.0f);
+				defaultShader->setFloat("metallicFactor", pbr ? pbr->metallicFactor : 0.0f);
+				defaultShader->setFloat("aoStrength", pbr ? pbr->aoStrength : 1.0f);
+				defaultShader->setFloat("normalScale", pbr ? pbr->normalScale : 1.0f);
+
+				if (material) {
+					material->bind();
+				}
+
+				context.meshes.draw(meshResourceId, *meshResource, i);
+
+				if (material) {
+					material->unbind();
+				}
+			}
+
 			defaultShader->unbind();
 		}
+	}
+
+	const std::vector<uint32_t>& SceneRenderer::_getMeshMaterials(RenderContext& context, uint32_t meshResourceId, const MeshResource& meshResource)
+	{
+		auto [it, inserted] = m_meshMaterials.try_emplace(meshResourceId);
+		if (!inserted) {
+			return it->second;
+		}
+
+		const std::vector<PBRMaterial>& pbrMaterials = meshResource.getMaterials();
+		it->second.reserve(pbrMaterials.size());
+		for (size_t i = 0; i < pbrMaterials.size(); ++i)
+		{
+			const PBRMaterial& pbr = pbrMaterials[i];
+
+			std::vector<std::pair<TextureType, std::string_view>> textures;
+			const std::pair<TextureType, const std::string&> candidates[] = {
+				{ TextureType::Albedo, pbr.albedoPath },
+				{ TextureType::Normal, pbr.normalPath },
+				{ TextureType::AmbOcc, pbr.aoPath },
+				{ TextureType::Emissive, pbr.emissivePath },
+				{ TextureType::Roughness, pbr.roughnessPath },
+				{ TextureType::Metallic, pbr.metallicPath },
+			};
+			for (const auto& [type, path] : candidates)
+			{
+				if (!path.empty()) {
+					textures.emplace_back(type, path);
+				}
+			}
+
+			uint32_t materialId = 0;
+			if (!textures.empty())
+			{
+				std::string materialName = fmt::format("{}_{}_{}", meshResource.getResourceName(), i, pbr.name);
+				materialId = context.resources.addResource<ResourceType::Material>(m_defaultShaderId, std::span<const std::pair<TextureType, std::string_view>>(textures), materialName);
+			}
+			it->second.push_back(materialId);
+		}
+
+		m_logger.info("Created {} materials for mesh resource {}", it->second.size(), meshResource.getResourceName());
+		return it->second;
 	}
 
 	void SceneRenderer::_updateCameraPosition(double deltaTime, CameraFrustum& camera)

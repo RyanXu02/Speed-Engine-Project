@@ -18,6 +18,8 @@ namespace SE
 		case TextureType::Height: name = "heightmap"; break;
 		case TextureType::AmbOcc: name = "ambientOcc"; break;
 		case TextureType::Roughness: name = "roughness"; break;
+		case TextureType::Emissive: name = "emissive"; break;
+		case TextureType::Metallic: name = "metallic"; break;
 		default: break;
 		}
 	}
@@ -49,8 +51,7 @@ namespace SE
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-			    GL_REPEAT); // tiles texture
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // tiles texture
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 			glBindTexture(GL_TEXTURE_2D, 0);
@@ -60,6 +61,26 @@ namespace SE
 		}
 	}
 
+	//for default texture fallback
+	void Texture::initSolid(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+	{
+		const unsigned char pixel[4] = { r, g, b, a };
+		width = 1;
+		height = 1;
+		format = GL_RGBA;
+
+		glGenTextures(1, &glTextureId);
+		glBindTexture(GL_TEXTURE_2D, glTextureId);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, pixel);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	//@brief deletes texture data
 	void Texture::destroy()
 	{
@@ -67,6 +88,39 @@ namespace SE
 		{
 			glDeleteTextures(1, &glTextureId);
 			glTextureId = 0;
+		}
+	}
+
+	//return the default fallback texture based on the type enum
+	Texture& Texture::getDefault(TextureType type)
+	{
+		auto& tex = s_defaults[static_cast<size_t>(type)];
+		if (!tex)
+		{
+			tex = std::make_unique<Texture>(type);
+			switch (type)
+			{
+				case TextureType::Albedo: tex->initSolid(255, 255, 255, 255); break;
+				case TextureType::Normal: tex->initSolid(128, 128, 255, 255); break;
+				case TextureType::Height: tex->initSolid(0, 0, 0, 255); break;
+				case TextureType::AmbOcc: tex->initSolid(255, 255, 255, 255); break;
+				case TextureType::Roughness: tex->initSolid(255, 255, 255, 255); break;
+				case TextureType::Emissive: tex->initSolid(255, 255, 255, 255); break;
+				case TextureType::Metallic: tex->initSolid(255, 255, 255, 255); break;
+				default: tex->initSolid(255, 255, 255, 255); break;
+			}
+		}
+		return *tex;
+	}
+
+	void Texture::destroyDefaults()
+	{
+		for (auto& tex : s_defaults)
+		{
+			if (tex) {
+				tex->destroy();
+			}
+			tex.reset();
 		}
 	}
 } // namespace SE

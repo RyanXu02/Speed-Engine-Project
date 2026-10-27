@@ -20,6 +20,7 @@ namespace SE
 			material.get()->destroy();
 		}
 		m_materials.clear();
+		Texture::destroyDefaults();
 
 		m_logger->info("MaterialManager cleared all materials");
 	}
