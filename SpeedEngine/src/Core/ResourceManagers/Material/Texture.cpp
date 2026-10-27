@@ -13,13 +13,13 @@ namespace SE
 	{
 		switch (m_type)
 		{
-		case TextureType::Albedo: name = "albedo"; break;
-		case TextureType::Normal: name = "normalmap"; break;
-		case TextureType::Height: name = "heightmap"; break;
-		case TextureType::AmbOcc: name = "ambientOcc"; break;
-		case TextureType::Roughness: name = "roughness"; break;
-		case TextureType::Emissive: name = "emissive"; break;
-		case TextureType::Metallic: name = "metallic"; break;
+		case TextureType::Albedo: name = "albedoMap"; break;
+		case TextureType::Normal: name = "normalMap"; break;
+		case TextureType::Height: name = "heightMap"; break;
+		case TextureType::AmbOcc: name = "aoMap"; break;
+		case TextureType::Roughness: name = "roughnessMap"; break;
+		case TextureType::Emissive: name = "emissiveMap"; break;
+		case TextureType::Metallic: name = "metallicMap"; break;
 		default: break;
 		}
 	}

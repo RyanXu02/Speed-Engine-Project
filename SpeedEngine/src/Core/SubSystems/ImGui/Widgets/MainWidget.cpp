@@ -94,6 +94,24 @@ namespace SE
 					ImGui::EndMenu();
 				}
 			}
+			if (ImGui::BeginMenu("Lighting"))
+			{
+				auto* SR = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
+				if (SR)
+				{
+					LightingSettings& settings = SR->getLightingSettings();
+					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f);
+					ImGui::SliderFloat("Gamma", &settings.gamma, 1.0f, 3.0f);
+
+					ImGui::SeparatorText("Sun");
+					DirectionalLight& sun = Engine::Instance().getSubSystem<RendererManager>()->getSun();
+					ImGui::Checkbox("Enabled", &sun.enabled);
+					ImGui::DragFloat3("Direction", &sun.direction.x, 0.01f, -1.0f, 1.0f);
+					ImGui::ColorEdit3("Color", &sun.color.x);
+					ImGui::DragFloat("Intensity", &sun.intensity, 0.05f, 0.0f, 100.0f);
+				}
+				ImGui::EndMenu();
+			}
 			if (ImGui::BeginMenu("Window"))
 			{
 				bool vis = MemoryWidget::isVisible();

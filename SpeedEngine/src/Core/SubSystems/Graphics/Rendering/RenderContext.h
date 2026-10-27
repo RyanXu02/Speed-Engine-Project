@@ -23,6 +23,15 @@ namespace SE
 
 	using RenderTargets = std::unordered_map<std::string, RenderTarget>;
 
+	// only the sun is a directional light
+	struct DirectionalLight
+	{
+		bool enabled = true;
+		glm::vec3 direction{ -0.3f, -1.0f, -0.5f };
+		glm::vec3 color{ 1.0f };
+		float intensity = 3.0f;
+	};
+
 	// @brief Borrows the manager's resources for an update or rendering pass.
 	struct RenderContext
 	{
@@ -31,6 +40,7 @@ namespace SE
 		ResourceManager& resources;
 		MeshGPUCache& meshes;
 		const RenderTargets& targets;
+		const DirectionalLight& sun;
 		FBO* output = nullptr;
 
 		const FBO& getRenderTarget(const std::string& name) const
