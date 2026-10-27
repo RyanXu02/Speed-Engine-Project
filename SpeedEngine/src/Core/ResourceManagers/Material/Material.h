@@ -27,8 +27,7 @@ namespace SE
 		void destroy();
 
 		// @brief Adds a texture to the material
-		// @param type The type of the texture (Albedo, Normal, Height, AmbOcc,
-		// Roughness)
+		// @param type The type of the texture (Albedo, Normal, Height, AmbOcc, Roughness, Emissive, Metallic)
 		// @param filePath The file path of the texture file
 		bool addTexture(TextureType type, std::string_view filePath);
 

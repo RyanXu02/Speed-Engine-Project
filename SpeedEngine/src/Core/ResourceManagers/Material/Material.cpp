@@ -10,7 +10,6 @@
 
 namespace SE
 {
-
 	bool Material::init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures)
 	{
 		m_shaderId = shaderId;
@@ -54,27 +53,28 @@ namespace SE
 	}
 
 	// slot 0 = albedo, slot 1 = normal, slot 2 = height, slot 3 = ambient
-	// occlusion, slot 4 = roughness
+	// occlusion, slot 4 = roughness, slot 5 = emissive, slot 6 = metallic
+	// slots without a texture get the shared 1x1 fallback texture
 	void Material::bind()
 	{
-		for (auto& t : m_textures)
+		std::array<Texture*, NUM_TEXTURE_TYPES> slots{};
+		for (auto& texture : m_textures)
 		{
-			if (!t->isLoaded())
-				continue;
-			switch (t->getType())
-			{
-			case TextureType::Albedo: _bindTexture(0, *t); break;
-			case TextureType::Normal: _bindTexture(1, *t); break;
-			case TextureType::Height: _bindTexture(2, *t); break;
-			case TextureType::AmbOcc: _bindTexture(3, *t); break;
-			case TextureType::Roughness: _bindTexture(4, *t); break;
+			if (texture->isLoaded()) {
+				slots[static_cast<size_t>(texture->getType())] = texture.get();
 			}
+		}
+
+		for (size_t slot = 0; slot < slots.size(); ++slot)
+		{
+			Texture* texture = slots[slot] ? slots[slot] : &Texture::getDefault(static_cast<TextureType>(slot));
+			_bindTexture(static_cast<unsigned int>(slot), *texture);
 		}
 	}
 
 	void Material::unbind()
 	{
-		for (unsigned int slot = 0; slot < 5; ++slot)
+		for (unsigned int slot = 0; slot < static_cast<unsigned int>(NUM_TEXTURE_TYPES); ++slot)
 		{
 			glActiveTexture(GL_TEXTURE0 + slot);
 			glBindTexture(GL_TEXTURE_2D, 0);

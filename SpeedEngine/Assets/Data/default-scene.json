@@ -46,7 +46,7 @@
           "isAlive": true
         },
         "MeshComponent": {
-          "path": "Assets/Meshes/Suzanne.gltf"
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
         "NameComponent": {
           "name": "player"
@@ -111,8 +111,8 @@
             1.0
           ],
           "translate": [
-            -30.22134780883789,
-            -34869.046875,
+            0,
+            5,
             0.0
           ]
         }
@@ -199,9 +199,9 @@
             1.0
           ],
           "translate": [
-            28.045745849609375,
-            -34818.7109375,
-            -7.276470184326172
+            5.0,
+            5.0,
+            0.276470184326172
           ]
         }
       }
@@ -241,9 +241,9 @@
             1.0
           ],
           "translate": [
-            -9.93838119506836,
-            -34784.375,
-            3.1703803539276123
+            0,
+            10,
+            0
           ]
         }
       }
