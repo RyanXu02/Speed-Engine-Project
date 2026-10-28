@@ -55,7 +55,7 @@ namespace SE
 		// @brief Runs platform updates and rendering on the main thread
 		void runMainLoop();
 		// @brief Runs the simulation loop of the engine, which updates the simulation state and produces render frames
-		void runSimulation();
+		void runSimulation(std::stop_token stopToken);
 
 		// @brief Updates the simulation state of the engine
 		// @param deltaTime The time elapsed since the last update

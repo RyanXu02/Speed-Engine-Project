@@ -133,9 +133,9 @@ namespace SE
 	void Engine::runThreaded()
 	{
 		m_simulationThread = std::jthread(
-		    [this]
+		    [this](std::stop_token stopToken)
 		    {
-			    runSimulation();
+			    runSimulation(stopToken);
 		    });
 		runMainLoop();
 		stopSimulation();
@@ -165,15 +165,17 @@ namespace SE
 		}
 	}
 
-	void Engine::runSimulation()
+	void Engine::runSimulation(std::stop_token stopToken)
 	{
 		using Clock = std::chrono::steady_clock;
 		const auto interval = std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(simulationDeltaTime));
 		auto nextTick = Clock::now();
 
-		while (!m_shutdownRequested.load())
+		while (!stopToken.stop_requested())
 		{
 			std::this_thread::sleep_until(nextTick);
+			if (stopToken.stop_requested())
+				break;
 			updateSimulation(simulationDeltaTime, 1);
 			m_frameBuilder.captureSimulation(*getSubSystem<SceneSystem>()->getCurrentScene(), nextTick);
 			produceRenderFrame();
@@ -211,7 +213,10 @@ namespace SE
 	{
 		m_shutdownRequested.store(true);
 		if (m_simulationThread.joinable())
+		{
+			m_simulationThread.request_stop();
 			m_simulationThread.join();
+		}
 	}
 
 	void Engine::stop()

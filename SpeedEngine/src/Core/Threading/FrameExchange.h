@@ -93,6 +93,5 @@ namespace SE
 		std::size_t m_readyCount = 0;
 
 		std::mutex m_mutex;
-		// shortcut: the engine joins the worker before destruction; no concurrent-close handling.
 	};
 } // namespace SE
