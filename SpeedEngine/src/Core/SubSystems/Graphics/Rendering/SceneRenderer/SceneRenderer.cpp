@@ -61,7 +61,7 @@ namespace SE
 			defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);
 
 			// Set transform
-			defaultShader->setMat4("model", draw.modelMatrix);
+			defaultShader->setMat4("model", interpolateTransform(draw.previous, draw.current, context.t));
 
 			// Set material properties
 			defaultShader->setVec4("color", glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));

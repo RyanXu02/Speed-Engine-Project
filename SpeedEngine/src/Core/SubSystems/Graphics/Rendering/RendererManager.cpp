@@ -128,7 +128,7 @@ namespace SE
 		m_imguiRenderer->init();
 	}
 
-	void RendererManager::render(const RenderFrame& frame)
+	void RendererManager::render(const RenderFrame& frame, float t)
 	{
 		int width = 0;
 		int height = 0;
@@ -138,10 +138,10 @@ namespace SE
 #endif
 		_applySceneResize();
 
-		m_sceneViewport->setCamera(frame.camera);
+		m_sceneViewport->setCamera(interpolateCamera(frame.camera.previous, frame.camera.current, t));
 		m_sceneViewport->updateMatrices();
 		RenderContext context{ frame,
-			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets };
+			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, t };
 
 		for (const auto& pass : m_passes)
 		{
