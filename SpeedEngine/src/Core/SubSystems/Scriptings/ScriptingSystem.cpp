@@ -110,6 +110,8 @@ namespace SE
 		}
 
 		Scene* scene = sceneSystem->getCurrentScene();
+		if (!scene)
+			return;
 
 		auto func = [&](Entity entity) -> void {
 			ScriptComponent* scriptComponent = entity.getComponent<ScriptComponent>();
@@ -147,6 +149,7 @@ namespace SE
 			scene->forEntitiesWith<ScriptComponent>(func);
 		}
 
+		EngineStates::setCamera(nullptr);
 		m_scripts.clear();
 		m_scriptCache.clear();
 

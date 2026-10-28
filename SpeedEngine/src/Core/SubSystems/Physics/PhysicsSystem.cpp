@@ -32,6 +32,7 @@ namespace SE
 
 		m_physics_system = std::make_unique<JPH::PhysicsSystem>();
 		m_physics_system->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, m_broad_phase_layer_interface, m_object_vs_broadphase_layer_filter, m_obj_vs_object_layer_filter);
+		m_physicsDebugRenderer = std::make_unique<PhysicsDebugRenderer>();
 
 		BodyInterface& body_interface = m_physics_system->GetBodyInterface();
 	}
@@ -40,6 +41,8 @@ namespace SE
 		// Initialize all uninitialized RigidBody components at once and add them to the physics world
 		// Update initial rigidbody transforms to match entities
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		if (!scene)
+			return;
 		auto entities = scene->getEntitiesWith<Transform, RigidBody>();
 		std::vector<BodyID> ioBodies;
 		for (auto& entity : entities)
@@ -78,6 +81,8 @@ namespace SE
 
 		// Update entity transforms
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		if (!scene)
+			return;
 		auto entities = scene->getEntitiesWith<Transform, RigidBody>();
 		for (auto& entity : entities)
 		{
@@ -126,25 +131,17 @@ namespace SE
 	void PhysicsSystem::shutdown() {
 		SubSystem::shutdown();
 		// Shut down physics system
-		delete m_physicsDebugRenderer;
+		m_physics_system.reset();
+		m_physicsDebugRenderer.reset();
+		m_job_system.reset();
+		m_temp_allocator.reset();
 		UnregisterTypes();
 		delete Factory::sInstance;
 		Factory::sInstance = nullptr;
 	}
 
-	void PhysicsSystem::setDebugRendererImpl(SE::DebugRenderer& renderer) {
-		if (!m_physicsDebugRenderer)
-			m_physicsDebugRenderer = new PhysicsDebugRenderer(renderer);
-	}
-
-	void PhysicsSystem::debugDrawBodies() {
-		BodyManager::DrawSettings drawSettings;
-		drawSettings.mDrawShape = true;
-		drawSettings.mDrawShapeWireframe = true;
-		m_physics_system->DrawBodies(drawSettings, JPH::DebugRenderer::sInstance);
-	}
-
-	void PhysicsSystem::debugUpdateCameraPos(const glm::vec3& pos) {
-		static_cast<PhysicsDebugRenderer*>(JPH::DebugRenderer::sInstance)->SetCameraPos(JPH::Vec3(pos.x, pos.y, pos.z));
+	void PhysicsSystem::appendDebugGeometry(RenderFrame& frame, const glm::vec3& cameraPosition) {
+		if (m_physics_system && m_physicsDebugRenderer)
+			m_physicsDebugRenderer->appendGeometry(frame, *m_physics_system, cameraPosition);
 	}
 }

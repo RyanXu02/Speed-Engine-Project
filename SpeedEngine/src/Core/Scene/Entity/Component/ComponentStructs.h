@@ -8,6 +8,7 @@
 #include "PhysicsShape/PhysicsShapeMesh.h"
 #include "Core/features/Serializable.h"
 #include "Core/features/CameraFrustum.h"
+#include "Core/EngineStates.h"
 #include "AudioComponents.h"
 
 
@@ -87,6 +88,7 @@ namespace SE
 	struct CameraComponent
 	{
 		CameraComponent() = default;
+		~CameraComponent() { EngineStates::releaseCamera(&frustum); }
 
 		CameraFrustum frustum;
 
