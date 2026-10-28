@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Math.h"
+#include "CameraState.h"
 
 namespace SE
 {
@@ -56,6 +57,8 @@ namespace SE
 			farPlane = f;
 			isDirty = true;
 		}
+
+		CameraState getState() const { return { position, target, fov, nearPlane, farPlane }; }
 
 		// TODO: make these private, add getter for them
 		bool isDirty = true;
