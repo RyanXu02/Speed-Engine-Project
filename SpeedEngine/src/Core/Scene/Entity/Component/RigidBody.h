@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/features/Serializable.h"
+#include "Core/Scene/Entity/Component/Transform.h"
 
 #include <glm/glm.hpp>
 #include <Jolt/Physics/Body/MotionType.h>
@@ -24,8 +25,10 @@ namespace SE
 		void setMotionType(JPH::EMotionType motionType);
 		
 		JPH::Ref<JPH::Shape> getShape() const { return m_shape; }
-		void setShape(JPH::Ref<JPH::Shape> shape);
+		void setShape(JPH::Ref<JPH::Shape> shape, bool needsMassOverride);
 		
+		bool getNeedsMassOverride() const { return m_needsMassOverride; }
+
 		glm::vec3 getOffset() const { return m_offset; }
 		void setOffset(const glm::vec3& offset) { m_offset = offset; };
 
@@ -62,13 +65,14 @@ namespace SE
 
 		DEFINE_TYPE(RigidBody,
 			member("motionType", &RigidBody::m_motionType),
-			//member("offset", &RigidBody::m_offset), 
+			member("offset", &RigidBody::m_offset), 
 			member("isActive", &RigidBody::m_isActive),
 			member("maxLinearVelocity", &RigidBody::m_maxLinearVelocity),
 		    member("maxAngularVelocity", &RigidBody::m_maxAngularVelocity),
 			member("restitution", &RigidBody::m_restitution),
 			member("friction", &RigidBody::m_friction),
-			member("gravityFactor", &RigidBody::m_gravityFactor));
+			member("gravityFactor", &RigidBody::m_gravityFactor),
+			member("needsMassOverride", &RigidBody::m_needsMassOverride));
 
 	private:
 		JPH::Ref<JPH::Shape> m_shape{ nullptr };
@@ -84,5 +88,6 @@ namespace SE
 		float m_restitution{ 0.0f };
 		float m_friction{ 0.2f };
 		float m_gravityFactor{ 1.0f };
+		bool m_needsMassOverride{ false };
 	};
 }

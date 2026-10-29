@@ -22,6 +22,8 @@ namespace SE
 		JPH::BodyManager::DrawSettings settings;
 		settings.mDrawShape = true;
 		settings.mDrawShapeWireframe = true;
+		settings.mDrawVelocity = true;
+		settings.mDrawGetSupportingFace = true;
 		physics.DrawBodies(settings, this);
 	}
 

@@ -46,6 +46,7 @@ namespace SE
 		{
 			m_bodyInterface->RemoveBody(getBodyID());
 			m_bodyInterface->DestroyBody(getBodyID());
+			m_body = nullptr;
 		}
 	}
 
@@ -62,7 +63,7 @@ namespace SE
 	}
 
 	void RigidBody::createBody() { 
-		if (!m_shape)
+		if (!m_shape || m_body)
 			return;
 		
 		JPH::BodyCreationSettings bodySettings;
@@ -79,6 +80,12 @@ namespace SE
 		bodySettings.mMaxAngularVelocity = m_maxAngularVelocity;
 		bodySettings.mGravityFactor = m_gravityFactor;
 		bodySettings.mAllowDynamicOrKinematic = true;
+		if (m_needsMassOverride)
+		{
+			bodySettings.mOverrideMassProperties = EOverrideMassProperties::MassAndInertiaProvided;
+			bodySettings.mMassPropertiesOverride.mMass = 1.0f;
+			bodySettings.mMassPropertiesOverride.mInertia = JPH::Mat44::sIdentity();
+		}
 
 		m_body = m_bodyInterface->CreateBody(bodySettings);
 	}
@@ -95,14 +102,27 @@ namespace SE
 		}
 	}
 
-	void RigidBody::setShape(JPH::Ref<JPH::Shape> shape)
+	void RigidBody::setShape(JPH::Ref<JPH::Shape> shape, bool needsMassOverride)
 	{
 		if (shape == m_shape)
 			return;
 
 		m_shape = shape;
+		bool massOverrideChanged = m_needsMassOverride != needsMassOverride;
+		m_needsMassOverride = needsMassOverride;
 		if (m_body)
-			m_bodyInterface->SetShape(getBodyID(), shape, true, JPH::EActivation::DontActivate);
+		{
+			if (massOverrideChanged)
+			{
+				m_bodyInterface->RemoveBody(getBodyID());
+				m_bodyInterface->DestroyBody(getBodyID());
+				m_body = nullptr;
+			}
+			else
+			{
+				m_bodyInterface->SetShape(getBodyID(), shape, true, JPH::EActivation::DontActivate);
+			}
+		}
 	}
 
 	glm::vec3 RigidBody::getLinearVelocity() const {

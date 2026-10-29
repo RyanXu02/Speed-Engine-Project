@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -32,6 +34,19 @@ namespace glm
 		j.at(3).get_to(v.w);
 	}
 
+	inline void to_json(nlohmann::json& j, const glm::quat& q)
+	{
+		j = nlohmann::json{ q.x, q.y, q.z, q.w };
+	}
+
+	inline void from_json(const nlohmann::json& j, glm::quat& q)
+	{
+		j.at(0).get_to(q.x);
+		j.at(1).get_to(q.y);
+		j.at(2).get_to(q.z);
+		j.at(3).get_to(q.w);
+	}
+
 	inline void to_json(nlohmann::json& j, const glm::mat4& m)
 	{
 		j = nlohmann::json{ m[0], m[1], m[2], m[3] };
@@ -55,7 +70,7 @@ namespace SE
 		Transform() = default;
 
 		glm::vec3 translate{ 0.0f, 0.0f, 0.0f };
-		glm::vec3 rotate{ 0.0f, 0.0f, 0.0f };
+		glm::quat rotate{1.0, 0.0f, 0.0f, 0.0f };
 		glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
 
 		void setPosition(const glm::vec3& p)
@@ -63,9 +78,14 @@ namespace SE
 			translate = p;
 			m_isDirty = true;
 		}
-		void setRotation(const glm::vec3& r)
+		void setRotationQuat(const glm::quat& q) 
+		{ 
+			rotate = q;
+			m_isDirty = true;
+		}
+		void setRotation(const glm::vec3& eulerAngles)
 		{
-			rotate = r;
+			rotate = glm::quat(eulerAngles);
 			m_isDirty = true;
 		}
 		void setScale(const glm::vec3& s)
@@ -75,7 +95,8 @@ namespace SE
 		}
 
 		const glm::vec3& getTranslation() const { return translate; }
-		const glm::vec3& getRotation() const { return rotate; }
+		const glm::vec3& getRotation() const { return glm::eulerAngles(rotate); }
+		const glm::quat& getRotationQuat() const { return rotate; }
 		const glm::vec3& getScale() const { return scale; }
 		const glm::mat4& getTransform();
 
