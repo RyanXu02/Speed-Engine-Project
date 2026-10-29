@@ -66,8 +66,8 @@ namespace SE
 			{
 				rigidBody->setShape(shape->getShape(), needsMassOverride);
 				rigidBody->createBody();
-				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
-				rigidBody->setRotation(glm::quat(transform->getRotation()));
+				rigidBody->setPosition(transform->getTranslation() + (-rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
+				rigidBody->setRotation(transform->getRotationQuat());
 				ioBodies.push_back(rigidBody->getBodyID());
 			}
 		}
@@ -117,24 +117,19 @@ namespace SE
 				// In that case use createAndAddComponents to do it in a batch
 				rigidBody->createBody();
 				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
-				rigidBody->setRotation(glm::quat(transform->getRotation()));
+				rigidBody->setRotation(transform->getRotationQuat());
 				getBodyInterface()->AddBody(rigidBody->getBodyID(), rigidBody->isActive() ? EActivation::Activate : EActivation::DontActivate);
 			}
 			else if (rigidBody->getMotionType() == EMotionType::Static || !m_running)
 			{
 				// Allows for transform to be changed while physics is paused (or for static objects)
-				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
-				rigidBody->setRotation(glm::quat(transform->getRotation()));
+				rigidBody->setPosition(transform->getTranslation() + (rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
+				rigidBody->setRotation(transform->getRotationQuat());
 			}
 			else
 			{
-				///transform->setTransform(rigidBody->getTransform()); IDEAL
-				transform->setPosition(rigidBody->getPosition() - rigidBody->getOffset());
-				glm::quat rotationQ = rigidBody->getRotation();
-				float rotationPitch = glm::pitch(rotationQ);
-				float rotationYaw = glm::yaw(rotationQ);
-				float rotationRoll = glm::roll(rotationQ);
-				transform->setRotation(glm::vec3(rotationPitch, rotationYaw, rotationRoll));
+				transform->setPosition(rigidBody->getPosition() + (-rigidBody->getOffset() * glm::conjugate(rigidBody->getRotation())));
+				transform->setRotationQuat(rigidBody->getRotation());
 			}
 		}
 	}
