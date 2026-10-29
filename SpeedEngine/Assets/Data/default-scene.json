@@ -6,7 +6,7 @@
           "farPlane": 1000.0,
           "fov": 70.0,
           "isPrimary": true,
-          "nearPlane": 0.1
+          "nearPlane": 0.10000000149011612
         },
         "LifeComponent": {
           "isAlive": true
@@ -51,12 +51,30 @@
         "NameComponent": {
           "name": "player"
         },
+        "PhysicsShapeMesh": {
+          "path": "Assets/Meshes/Suzanne.gltf"
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": true,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
         "ScriptComponent": {
           "path": "Assets/Scripts/Player.lua"
         },
         "Transform": {
           "rotate": [
-            0.0,
+            -0.0,
             0.0,
             0.0
           ],
@@ -66,8 +84,8 @@
             1.0
           ],
           "translate": [
-            -2.4000000953674316,
-            1.899999976158142,
+            0.10000000149011612,
+            1.0,
             0.0
           ]
         }
@@ -97,6 +115,12 @@
           "maxAngularVelocity": 47.12385177612305,
           "maxLinearVelocity": 500.0,
           "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
           "restitution": 0.0
         },
         "Transform": {
@@ -111,9 +135,9 @@
             1.0
           ],
           "translate": [
-            -1.2000000476837158,
             0.0,
-            0.0
+            2.5,
+            -0.10000000149011612
           ]
         }
       }
@@ -134,7 +158,11 @@
           "name": "static_entity"
         },
         "PhysicsShapeBox": {
-          "halfExtents": 0.0
+          "halfExtents": [
+            9.199999809265137,
+            0.6000000238418579,
+            9.399999618530273
+          ]
         },
         "RigidBody": {
           "friction": 0.20000000298023224,
@@ -143,6 +171,12 @@
           "maxAngularVelocity": 47.12385177612305,
           "maxLinearVelocity": 500.0,
           "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
           "restitution": 0.0
         },
         "Transform": {
@@ -185,11 +219,17 @@
           "maxAngularVelocity": 47.12385177612305,
           "maxLinearVelocity": 500.0,
           "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
           "restitution": 0.0
         },
         "Transform": {
           "rotate": [
-            0.0,
+            -0.0,
             0.0,
             0.0
           ],
@@ -200,7 +240,7 @@
           ],
           "translate": [
             0.0,
-            1.600000023841858,
+            4.28000020980835,
             0.0
           ]
         }
@@ -227,11 +267,17 @@
           "maxAngularVelocity": 47.12385177612305,
           "maxLinearVelocity": 500.0,
           "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
           "restitution": 0.0
         },
         "Transform": {
           "rotate": [
-            0.0,
+            -0.0,
             0.0,
             0.0
           ],
@@ -242,7 +288,7 @@
           ],
           "translate": [
             0.8999999761581421,
-            -0.10000000149011612,
+            2.4800000190734863,
             0.6000000238418579
           ]
         }

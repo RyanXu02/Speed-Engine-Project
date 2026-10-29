@@ -49,17 +49,22 @@ namespace SE
 		{
 			RigidBody* rigidBody = entity.getComponent<RigidBody>();
 			Transform* transform = entity.getComponent<Transform>();
+			bool needsMassOverride = false;
 			PhysicsShape* shape = nullptr;
 			shape = entity.getComponent<PhysicsShapeBox>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
-			if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
 
+			if (!shape)
+			{
+				shape = entity.getComponent<PhysicsShapeMesh>();
+				if (shape) needsMassOverride = true;
+			}
 
 			// Only add if not already created/added and if it has a collider shape component
 			if (!rigidBody->isCreated() && shape)
 			{
-				rigidBody->setShape(shape->getShape());
+				rigidBody->setShape(shape->getShape(), needsMassOverride);
 				rigidBody->createBody();
 				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
 				rigidBody->setRotation(glm::quat(transform->getRotation()));
@@ -88,15 +93,21 @@ namespace SE
 		{
 			RigidBody* rigidBody = entity.getComponent<RigidBody>();
 			Transform* transform = entity.getComponent<Transform>();
+			bool needsMassOverride = false;
 			PhysicsShape* shape = nullptr;
 			// Check for each type of physics shape component
 			shape = entity.getComponent<PhysicsShapeBox>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
 			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
-			if (!shape) shape = entity.getComponent<PhysicsShapeMesh>();
+			if (!shape)
+			{
+				shape = entity.getComponent<PhysicsShapeMesh>();
+				if (shape) needsMassOverride = true;
+			}
+
 			if (shape)
 			{
-				rigidBody->setShape(shape->getShape());
+				rigidBody->setShape(shape->getShape(), needsMassOverride);
 			}
 
 			if (!rigidBody->isCreated())
@@ -123,7 +134,7 @@ namespace SE
 				float rotationPitch = glm::pitch(rotationQ);
 				float rotationYaw = glm::yaw(rotationQ);
 				float rotationRoll = glm::roll(rotationQ);
-				transform->setRotation(glm::vec3(rotationYaw, rotationPitch, rotationRoll));
+				transform->setRotation(glm::vec3(rotationPitch, rotationYaw, rotationRoll));
 			}
 		}
 	}
