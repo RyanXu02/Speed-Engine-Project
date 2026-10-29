@@ -42,7 +42,8 @@ namespace SE
 		// Construct triangle list from mesh
 		auto indices = meshResource->getIndices();
 		auto vertices = meshResource->getVertices();
-		JPH::TriangleList triangleList(indices.size() / 3);
+		JPH::TriangleList triangleList;
+		triangleList.reserve(indices.size() / 3);
 		
 		for (unsigned int i = 0; i < indices.size() / 3; ++i)
 		{

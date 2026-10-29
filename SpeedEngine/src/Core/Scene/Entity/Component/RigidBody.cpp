@@ -84,6 +84,7 @@ namespace SE
 		{
 			bodySettings.mOverrideMassProperties = EOverrideMassProperties::MassAndInertiaProvided;
 			bodySettings.mMassPropertiesOverride.mMass = 1.0f;
+			bodySettings.mMassPropertiesOverride.mInertia = JPH::Mat44::sIdentity();
 		}
 
 		m_body = m_bodyInterface->CreateBody(bodySettings);

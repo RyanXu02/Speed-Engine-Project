@@ -66,7 +66,7 @@ namespace SE
 			{
 				rigidBody->setShape(shape->getShape(), needsMassOverride);
 				rigidBody->createBody();
-				rigidBody->setPosition(transform->getTranslation() + (-rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
+				rigidBody->setPosition(transform->getTranslation() + (rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
 				rigidBody->setRotation(transform->getRotationQuat());
 				ioBodies.push_back(rigidBody->getBodyID());
 			}
@@ -116,7 +116,7 @@ namespace SE
 				// Note: this is inefficient if many new entities are being created at once,
 				// In that case use createAndAddComponents to do it in a batch
 				rigidBody->createBody();
-				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
+				rigidBody->setPosition(transform->getTranslation() + (rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
 				rigidBody->setRotation(transform->getRotationQuat());
 				getBodyInterface()->AddBody(rigidBody->getBodyID(), rigidBody->isActive() ? EActivation::Activate : EActivation::DontActivate);
 			}
