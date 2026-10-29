@@ -18,6 +18,9 @@ namespace SE
 			~ResetOutput() { output = nullptr; }
 		} reset{ m_frame };
 
+		frame.debugLines.reserve(m_debugLineCapacity);
+		frame.debugTriangles.reserve(m_debugTriangleCapacity);
+
 		SetCameraPos(JPH::RVec3(cameraPosition.x, cameraPosition.y, cameraPosition.z));
 		JPH::BodyManager::DrawSettings settings;
 		settings.mDrawShape = true;
@@ -25,6 +28,11 @@ namespace SE
 		settings.mDrawVelocity = true;
 		settings.mDrawGetSupportingFace = true;
 		physics.DrawBodies(settings, this);
+
+		if (frame.debugLines.capacity() > m_debugLineCapacity)
+			m_debugLineCapacity = frame.debugLines.capacity();
+		if (frame.debugTriangles.capacity() > m_debugTriangleCapacity)
+			m_debugTriangleCapacity = frame.debugTriangles.capacity();
 	}
 
 	void PhysicsDebugRenderer::DrawLine(JPH::RVec3Arg from, JPH::RVec3Arg to, JPH::ColorArg color)

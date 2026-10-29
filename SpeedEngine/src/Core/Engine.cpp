@@ -25,21 +25,16 @@
 
 namespace SE
 {
+	inline constexpr double simulationDeltaTime = 1.0 / 60.0;
+
 	Engine& Engine::Instance()
 	{
 		static Engine instance;
 		return instance;
 	}
 
-	Engine::Engine()
-	    : m_isRunning(false),
-	      m_deltaTime(0.0),
-	      m_currentTime(0.0),
-	      m_lastTime(0.0),
-		  m_frameExchange(std::make_unique<FrameExchange>()),
-	      m_windowCloseEvent()
-	{}
-	Engine::~Engine() {}
+	Engine::~Engine() { stopSimulation(); }
+
 	void Engine::init()
 	{
 		// Allocation hook for Jolt, can connect this to custom memory control if needed (see Jolt/Core/Memory.h)
@@ -49,7 +44,7 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<MemoryTrackingSystem>(new MemoryTrackingSystem()));
 		m_subSystems.push_back(std::unique_ptr<EventSystem>(new EventSystem()));
 		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720, "Speed Engine"))); // has to be BEFORE ResourceManager
-		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem()));
+		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem(getSubSystem<Window>()->inputEvents())));
 		m_subSystems.push_back(std::unique_ptr<ResourceManager>(new ResourceManager()));
 		m_subSystems.push_back(std::unique_ptr<RendererManager>(new RendererManager(*getSubSystem<Window>())));
 		m_subSystems.push_back(std::unique_ptr<PhysicsSystem>(new PhysicsSystem()));
@@ -68,7 +63,7 @@ namespace SE
 		m_windowCloseEvent = getSubSystem<EventSystem>()->subscribe(EventType::WindowClose,
 		    [this](const Event& event)
 		    {
-			    m_isRunning = false;
+				m_shutdownRequested.store(true);
 		    });
 		m_cameraSwitchEvent = getSubSystem<EventSystem>()->subscribe(EventType::CameraSwitched,
 		    [this](const Event& event)
@@ -79,7 +74,8 @@ namespace SE
 	}
 	void Engine::start()
 	{
-		m_isRunning = true;
+		m_shutdownRequested.store(false);
+
 		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
 		sceneSystem->newScene("TestScene");
 		sceneSystem->setCurrentScene("TestScene");
@@ -98,67 +94,134 @@ namespace SE
 		uint32_t defaultMaterialId = resourceManager->addResource<ResourceType::Material>(defaultShaderId, defaultTextures, "defaultMaterial");
 		sceneRenderer->setDefaultMaterialId(defaultMaterialId);
 	}
+
 	void Engine::run()
 	{
-		// get subsystems used in loop
+#if defined(COMPILE_WITH_EDITOR)
+		runSingleThreaded();
+#else
+		runThreaded();
+#endif
+	}
+
+	void Engine::runSingleThreaded()
+	{
+		using Clock = std::chrono::steady_clock;
+		auto lastTime = Clock::now();
+		double physicsAccumulator = 0.0;
 		auto* window = getSubSystem<Window>();
-		auto* rendererManager = getSubSystem<RendererManager>();
-		auto* physicsSystem = getSubSystem<PhysicsSystem>();
-		auto* sceneSystem = getSubSystem<SceneSystem>();
-		auto* inputSystem = getSubSystem<InputSystem>();
-		const RenderFrameBuilder frameBuilder;
-
-		// init time
-		m_lastTime = window->getCurrentTime();
-
-		double accumulator = 0.0;
-		const double physicsFrameTime = 1.0 / 60.0; // fixed 60 fps physics
-		while (m_isRunning)
+		auto* renderer = getSubSystem<RendererManager>();
+		while (!m_shutdownRequested.load() && !window->shouldClose())
 		{
-			m_currentTime = window->getCurrentTime();
-			m_deltaTime = m_currentTime - m_lastTime;
-			// Cap dt
-			if (m_deltaTime > 0.2)
-				m_deltaTime = 0.2;
-			m_lastTime = m_currentTime;
+			window->update(0.0);
+			const auto now = Clock::now();
+			const double deltaTime = std::chrono::duration<double>(now - lastTime).count();
+			lastTime = now;
 
-			for (auto& subSystem : m_subSystems)
-			{
-				subSystem->update(m_deltaTime);
-			}
+			physicsAccumulator += deltaTime;
+			const int physicsSteps = static_cast<int>(physicsAccumulator / simulationDeltaTime);
+			physicsAccumulator -= physicsSteps * simulationDeltaTime;
+			updateSimulation(deltaTime, physicsSteps);
+			m_frameBuilder.captureSimulation(*getSubSystem<SceneSystem>()->getCurrentScene(), now);
+			produceRenderFrame();
 
-			accumulator += m_deltaTime;
-			while (accumulator >= physicsFrameTime)
-			{
-				//physics step
-				physicsSystem->step(physicsFrameTime);
-				accumulator -= physicsFrameTime;
-			}
-
-			if (EngineStates::isEditorCameraActive())
-				m_cameraController.update(EngineStates::getEditorCamera(), *inputSystem, m_deltaTime);
-
-			{
-				auto write = m_frameExchange->beginWrite();
-				if (!write)
-					break;
-
-				RenderFrame& frame = write.frame();
-				frameBuilder.build(frame, sceneSystem->getCurrentScene(), *physicsSystem);
-				// temp
-				frame.addDebugLine(glm::vec3(-2.0f, 1.0f, 0.0f), glm::vec3(2.0f, 1.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-				if (!write.publish())
-					break;
-			}
-
-			// render
-			if (auto read = m_frameExchange->tryAcquireReady())
-				rendererManager->render(read.frame());
+			auto read = m_frameExchange.tryAcquireReady();
+			renderer->render(read.frame(), 1.0f);
 		}
 	}
+
+	void Engine::runThreaded()
+	{
+		m_simulationThread = std::jthread(
+		    [this](std::stop_token stopToken)
+		    {
+			    runSimulation(stopToken);
+		    });
+		runMainLoop();
+		stopSimulation();
+	}
+
+
+	void Engine::updateSimulation(double deltaTime, int physicsSteps)
+	{
+		getSubSystem<InputSystem>()->update(deltaTime);
+		getSubSystem<EventSystem>()->update(deltaTime);
+		getSubSystem<SceneSystem>()->update(deltaTime);
+		getSubSystem<ScriptingSystem>()->update(deltaTime);
+		for (int step = 0; step < physicsSteps; ++step)
+			getSubSystem<PhysicsSystem>()->step(simulationDeltaTime);
+		getSubSystem<AudioSystem>()->update(deltaTime);
+		if (EngineStates::isEditorCameraActive())
+			m_cameraController.update(EngineStates::getEditorCamera(), *getSubSystem<InputSystem>(), deltaTime);
+	}
+
+	void Engine::produceRenderFrame()
+	{
+		if (auto write = m_frameExchange.tryBeginWrite())
+		{
+			RenderFrame& frame = write.frame();
+			m_frameBuilder.build(frame, *getSubSystem<PhysicsSystem>());
+			write.publish();
+		}
+	}
+
+	void Engine::runSimulation(std::stop_token stopToken)
+	{
+		using Clock = std::chrono::steady_clock;
+		const auto interval = std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(simulationDeltaTime));
+		auto nextTick = Clock::now();
+
+		while (!stopToken.stop_requested())
+		{
+			std::this_thread::sleep_until(nextTick);
+			if (stopToken.stop_requested())
+				break;
+			updateSimulation(simulationDeltaTime, 1);
+			m_frameBuilder.captureSimulation(*getSubSystem<SceneSystem>()->getCurrentScene(), nextTick);
+			produceRenderFrame();
+			nextTick += interval;
+		}
+		getSubSystem<InputSystem>()->update(0.0);
+		getSubSystem<EventSystem>()->update(0.0);
+	}
+
+	void Engine::runMainLoop()
+	{
+		auto* window = getSubSystem<Window>();
+		auto* renderer = getSubSystem<RendererManager>();
+		std::optional<FrameExchange::ReadHandle> displayed; // The currently displayed frame
+		while (!m_shutdownRequested.load() && !window->shouldClose())
+		{
+			window->update(0.0);
+			if (auto next = m_frameExchange.tryAcquireReady())
+				displayed.emplace(std::move(next));
+			if (displayed)
+			{
+				const RenderFrame& frame = displayed->frame();
+				const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - frame.tickTime).count();
+				const float t = static_cast<float>(elapsed / simulationDeltaTime);
+				renderer->render(frame, t);
+			}
+			// no frame ready, don't busy wait
+			else
+				window->waitForEvents(0.002);
+		}
+	}
+
+
+	void Engine::stopSimulation()
+	{
+		m_shutdownRequested.store(true);
+		if (m_simulationThread.joinable())
+		{
+			m_simulationThread.request_stop();
+			m_simulationThread.join();
+		}
+	}
+
 	void Engine::stop()
 	{
-		m_frameExchange->close();
+		stopSimulation();
 		for (auto& subSystem : m_subSystems | std::views::reverse)
 		{
 			subSystem->shutdown();

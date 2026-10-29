@@ -26,8 +26,7 @@ namespace SE
 			RenderFrame& frame();
 
 			// @brief Publish the written frame, makes it available for reading, ends write ownership
-			// @return true if the frame was published, false if the exchange is closed and the frame was discarded
-			bool publish();
+			void publish();
 
 		private:
 			friend class FrameExchange;
@@ -68,23 +67,20 @@ namespace SE
 		FrameExchange(FrameExchange&&) = delete;
 		FrameExchange& operator=(FrameExchange&&) = delete;
 
-		// @brief Begin writing a new RenderFrame. Blocks until a free slot is available or the exchange is closed.
-		// @return A WriteHandle for the new frame, or an empty handle if the exchange is closed.
-		WriteHandle beginWrite();
+		// @brief Try to begin writing a new RenderFrame. Returns an empty handle if no slot is available for writing.
+		// @return A WriteHandle for the new frame, or an empty handle if no slot is available for writing.
+		WriteHandle tryBeginWrite();
 		// @brief Try to acquire a ready RenderFrame for reading. Returns an empty handle if no frame is ready.
 		// @return A ReadHandle for the ready frame, or an empty handle if no frame is ready.
 		ReadHandle tryAcquireReady();
-
-		// @brief Close the exchange. Does not revoke active handles. All users must stop before exchange destruction.
-		void close();
 
 	private:
 		enum class FrameSlotState { Free, Writing, Ready, Reading };
 
 		// @brief Publish a written frame, makes it available for reading, ends write ownership
-		bool _publish(std::size_t index);
+		void _publish(std::size_t index);
 		// @brief Free a slot after reading or writing, ends ownership
-		void _freeSlot(std::size_t index, FrameSlotState expectedState);
+		void _freeSlot(std::size_t index);
 		
 		// Just double buffer for now, can be extended to more if we need
 		std::array<FrameSlot, 2> m_slots;
@@ -97,9 +93,5 @@ namespace SE
 		std::size_t m_readyCount = 0;
 
 		std::mutex m_mutex;
-		std::condition_variable m_freeSlotAvailable;
-		
-		// Once closed, no new frames can be written, and all waiting writers will be unblocked with an empty handle
-		bool m_closed = false;
 	};
 } // namespace SE

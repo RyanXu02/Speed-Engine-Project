@@ -2,9 +2,7 @@
 
 #include "Window.h"
 
-#include "../../Logger/Logger.h"
-#include "../Events/EventSystem.h"
-#include "Engine.h"
+#include "Core/Logger/Logger.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -44,6 +42,16 @@ namespace SE
 	void Window::swapBuffers() const
 	{
 		glfwSwapBuffers(m_window);
+	}
+
+	bool Window::shouldClose() const
+	{
+		return glfwWindowShouldClose(m_window) != 0;
+	}
+
+	void Window::waitForEvents(double timeout) const
+	{
+		glfwWaitEventsTimeout(timeout);
 	}
 
 	bool Window::_initGLFW()
@@ -94,27 +102,52 @@ namespace SE
 		}
 
 		glfwMakeContextCurrent(m_window);
+		glfwSetWindowUserPointer(m_window, &m_inputEvents);
 
 		glfwSetWindowCloseCallback(m_window,
 		    [](GLFWwindow* window)
 		    {
-			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<WindowClose>());
+				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push({ InputEvent::Type::WindowClose });
 		    });
 
 		glfwSetCursorPosCallback(m_window,
 		    [](GLFWwindow* window, double x, double y)
 		    {
-			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<MouseMovedEvent>(x, y));
+				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push(
+					{ InputEvent::Type::CursorPosition, 0, InputEvent::Action::Release, x, y });
 		    });
 
 		glfwSetKeyCallback(m_window,
 		    [](GLFWwindow* window, int key, int scancode, int action, int mods)
 		    {
-			    if (action == GLFW_PRESS || action == GLFW_REPEAT)
-			    {
-				    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<KeyPressedEvent>(key, action == GLFW_REPEAT));
-			    }
+				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push(
+					{ InputEvent::Type::Key, key, static_cast<InputEvent::Action>(action) });
+			});
+
+		glfwSetMouseButtonCallback(m_window,
+			[](GLFWwindow* window, int button, int action, int mods)
+			{
+				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push(
+					{ InputEvent::Type::MouseButton, button, static_cast<InputEvent::Action>(action) });
+			});
+
+		glfwSetScrollCallback(m_window,
+			[](GLFWwindow* window, double x, double y)
+			{
+				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push(
+					{ InputEvent::Type::Scroll, 0, InputEvent::Action::Release, x, y });
+			});
+
+		glfwSetWindowFocusCallback(m_window,
+			[](GLFWwindow* window, int focused)
+			{
+				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push(
+					{ InputEvent::Type::Focus, 0, focused ? InputEvent::Action::Press : InputEvent::Action::Release });
 		    });
+
+		double x = 0.0, y = 0.0;
+		glfwGetCursorPos(m_window, &x, &y);
+		m_inputEvents.push({ InputEvent::Type::CursorPosition, 0, InputEvent::Action::Release, x, y });
 
 		// init glad
 		if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
