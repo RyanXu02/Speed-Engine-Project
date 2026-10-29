@@ -6,6 +6,17 @@ namespace SE
 {
 	struct CameraFrustum;
 	class MeshResource;
+	class Scene;
+	class Shader;
+
+	// Note: shaders must match the max lights value defined here
+	constexpr size_t MAX_LIGHTS = 16;
+
+	struct LightingSettings
+	{
+		float ambientStrength = 0.03f;
+		float gamma = 2.2f;
+	};
 
 	// @brief SceneRenderer is responsible for rendering all drawable entities in the scene
 	class SceneRenderer : public Renderer
@@ -31,7 +42,12 @@ namespace SE
 		// @return reference to camera dolly speed, used for imgui widgets
 		float& getCameraDollySpeed() { return m_cameraDollySpeed; }
 
+		LightingSettings& getLightingSettings() { return m_lightingSettings; }
+
 	private:
+		void _setLightUniforms(const RenderContext& context, Shader& shader);
+		LightingSettings m_lightingSettings;
+
 		// Default shader for meshes without material
 		uint32_t m_defaultShaderId = 0;
 		uint32_t m_defaultMaterialId = 0;

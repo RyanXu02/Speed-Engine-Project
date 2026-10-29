@@ -53,6 +53,12 @@ namespace SE
 		// Get default material
 		Material* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
 
+		// per frame uniforms
+		defaultShader->bind();
+		defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);
+		defaultShader->setVec3("camPos", camera.getPosition());
+		_setLightUniforms(context, *defaultShader);
+
 		auto entities = context.scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
 		for (auto& entity : entities)
 		{
@@ -74,16 +80,7 @@ namespace SE
 				continue;
 			}
 
-			defaultShader->bind();
-
-			defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);	// Set camera matrices
-			defaultShader->setVec3("viewPos", camera.getPosition());
 			defaultShader->setMat4("model", transform->getTransform());	// Set transform
-
-			defaultShader->setFloat("intensity", 1.0f);
-			defaultShader->setInt("frameIndex", 0);
-			defaultShader->setFloat("numRows", 1.0f);
-			defaultShader->setFloat("numCols", 1.0f);
 
 			// each submesh can have different set of material so get material for each mesh
 			const std::vector<uint32_t>& meshMaterials = _getMeshMaterials(context, meshResourceId, *meshResource);
@@ -99,7 +96,7 @@ namespace SE
 					material = defaultMaterial;
 
 				// Set material properties
-				defaultShader->setVec4("color", pbr ? pbr->albedoFactor : glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+				defaultShader->setVec4("albedoFactor", pbr ? pbr->albedoFactor : glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
 				defaultShader->setVec3("emissiveFactor", pbr ? pbr->emissiveFactor : glm::vec3(0.0f));
 				defaultShader->setFloat("roughnessFactor", pbr ? pbr->roughnessFactor : 1.0f);
 				defaultShader->setFloat("metallicFactor", pbr ? pbr->metallicFactor : 0.0f);
@@ -116,9 +113,31 @@ namespace SE
 					material->unbind();
 				}
 			}
-
-			defaultShader->unbind();
 		}
+
+		defaultShader->unbind();
+	}
+
+	void SceneRenderer::_setLightUniforms(const RenderContext& context, Shader& shader)
+	{
+		const DirectionalLight& sun = context.sun;
+		shader.setBool("useDirLight", sun.enabled);
+		shader.setVec3("dirLightDirection", glm::normalize(sun.direction));
+		shader.setVec3("dirLightColor", sun.color * sun.intensity);
+
+		auto pointLights = context.scene->getEntitiesWith<Transform, LightComponent>();
+		const size_t numLights = std::min(pointLights.size(), MAX_LIGHTS);
+		shader.setInt("numLights", static_cast<int>(numLights));
+		for (size_t i = 0; i < numLights; ++i)
+		{
+			Transform* transform = pointLights[i].getComponent<Transform>();
+			LightComponent* light = pointLights[i].getComponent<LightComponent>();
+			shader.setVec3(fmt::format("lightPositions[{}]", i), transform->getTranslation());
+			shader.setVec3(fmt::format("lightColors[{}]", i), light->color * light->intensity);
+		}
+
+		shader.setFloat("ambientStrength", m_lightingSettings.ambientStrength);
+		shader.setFloat("gamma", m_lightingSettings.gamma);
 	}
 
 	const std::vector<uint32_t>& SceneRenderer::_getMeshMaterials(RenderContext& context, uint32_t meshResourceId, const MeshResource& meshResource)

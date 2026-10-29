@@ -121,7 +121,8 @@ namespace SE
 		*/
 
 		// change this to set the final output to a specific target
-		setFinalSceneOutput("Grayscale");
+		setFinalSceneOutput("SceneColor");
+		//setFinalSceneOutput("Grayscale");
 #pragma endregion
 
 		// imgui always presents after the scene pipeline on the default framebuffer
@@ -133,7 +134,7 @@ namespace SE
 	{
 		SubSystem::update(deltaTime);
 		RenderContext context{ Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene(),
-			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets };
+			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, m_sun };
 
 		for (auto& renderer : m_renderers)
 			renderer->update(deltaTime, context);
@@ -153,7 +154,7 @@ namespace SE
 
 		m_sceneViewport->updateMatrices();
 		RenderContext context{ Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene(),
-			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets };
+			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, m_sun };
 
 		for (const auto& pass : m_passes)
 		{
