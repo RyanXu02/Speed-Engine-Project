@@ -25,7 +25,6 @@ namespace SE
 				return;
 
 			const Transform& transform = *entity.getComponent<Transform>();
-			const glm::vec3& rotation = transform.getRotation();
 			const TransformState transformState{ transform.getTranslation(), transform.getRotationQuat(), transform.getScale() };
 
 			auto [it,_] = m_drawItemHistories.try_emplace(entity.id(), 
