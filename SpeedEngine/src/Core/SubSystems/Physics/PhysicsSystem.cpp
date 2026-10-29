@@ -14,6 +14,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <Jolt/Physics/Body/BodyManager.h>
+#include <Jolt/Renderer/DebugRenderer.h>
 
 using namespace JPH;
 using namespace JPH::literals;
@@ -23,9 +25,6 @@ namespace SE
 	void PhysicsSystem::init() {
 		SubSystem::init();
 
-		// Allocation hook, can connect this to custom memory control if needed (see Jolt/Core/Memory.h)
-		RegisterDefaultAllocator();
-
 		Factory::sInstance = new Factory();
 		RegisterTypes();
 		m_temp_allocator = std::make_unique<TempAllocatorImpl>(10 * 1024 * 1024);
@@ -33,6 +32,7 @@ namespace SE
 
 		m_physics_system = std::make_unique<JPH::PhysicsSystem>();
 		m_physics_system->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, m_broad_phase_layer_interface, m_object_vs_broadphase_layer_filter, m_obj_vs_object_layer_filter);
+		m_physicsDebugRenderer = std::make_unique<PhysicsDebugRenderer>();
 
 		BodyInterface& body_interface = m_physics_system->GetBodyInterface();
 	}
@@ -41,6 +41,8 @@ namespace SE
 		// Initialize all uninitialized RigidBody components at once and add them to the physics world
 		// Update initial rigidbody transforms to match entities
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		if (!scene)
+			return;
 		auto entities = scene->getEntitiesWith<Transform, RigidBody>();
 		std::vector<BodyID> ioBodies;
 		for (auto& entity : entities)
@@ -65,8 +67,8 @@ namespace SE
 			}
 		}
 		// Batch add all bodies for better performance
-		BodyInterface::AddState addState = getBodyInterface()->AddBodiesPrepare(ioBodies.data(), ioBodies.size());
-		getBodyInterface()->AddBodiesFinalize(ioBodies.data(), ioBodies.size(), addState, EActivation::Activate);
+		BodyInterface::AddState addState = getBodyInterface()->AddBodiesPrepare(ioBodies.data(), static_cast<int>(ioBodies.size()));
+		getBodyInterface()->AddBodiesFinalize(ioBodies.data(), static_cast<int>(ioBodies.size()), addState, EActivation::Activate);
 		m_physics_system->OptimizeBroadPhase();
 	}
 
@@ -75,10 +77,12 @@ namespace SE
 
 		// Step physics simulation
 		if (m_running)
-			m_physics_system->Update(deltaTime, cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
+			m_physics_system->Update(static_cast<float>(deltaTime), cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
 
 		// Update entity transforms
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		if (!scene)
+			return;
 		auto entities = scene->getEntitiesWith<Transform, RigidBody>();
 		for (auto& entity : entities)
 		{
@@ -105,7 +109,13 @@ namespace SE
 				rigidBody->setRotation(glm::quat(transform->getRotation()));
 				getBodyInterface()->AddBody(rigidBody->getBodyID(), rigidBody->isActive() ? EActivation::Activate : EActivation::DontActivate);
 			}
-			else if (rigidBody->getMotionType() != EMotionType::Static)
+			else if (rigidBody->getMotionType() == EMotionType::Static || !m_running)
+			{
+				// Allows for transform to be changed while physics is paused (or for static objects)
+				rigidBody->setPosition(transform->getTranslation() + rigidBody->getOffset());
+				rigidBody->setRotation(glm::quat(transform->getRotation()));
+			}
+			else
 			{
 				///transform->setTransform(rigidBody->getTransform()); IDEAL
 				transform->setPosition(rigidBody->getPosition() - rigidBody->getOffset());
@@ -113,7 +123,7 @@ namespace SE
 				float rotationPitch = glm::pitch(rotationQ);
 				float rotationYaw = glm::yaw(rotationQ);
 				float rotationRoll = glm::roll(rotationQ);
-				transform->setRotation(glm::vec3(rotationPitch, rotationYaw, rotationRoll));
+				transform->setRotation(glm::vec3(rotationYaw, rotationPitch, rotationRoll));
 			}
 		}
 	}
@@ -121,8 +131,17 @@ namespace SE
 	void PhysicsSystem::shutdown() {
 		SubSystem::shutdown();
 		// Shut down physics system
+		m_physics_system.reset();
+		m_physicsDebugRenderer.reset();
+		m_job_system.reset();
+		m_temp_allocator.reset();
 		UnregisterTypes();
 		delete Factory::sInstance;
 		Factory::sInstance = nullptr;
+	}
+
+	void PhysicsSystem::appendDebugGeometry(RenderFrame& frame, const glm::vec3& cameraPosition) {
+		if (m_physics_system && m_physicsDebugRenderer)
+			m_physicsDebugRenderer->appendGeometry(frame, *m_physics_system, cameraPosition);
 	}
 }

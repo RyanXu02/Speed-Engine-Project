@@ -41,22 +41,9 @@ namespace SE
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	void DebugRenderer::drawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
-	{
-		m_lines.push_back({ from, color });
-		m_lines.push_back({ to, color });
-	}
-
-	void DebugRenderer::drawTri(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec4& color, bool)
-	{
-		m_triangles.push_back({ v1, color });
-		m_triangles.push_back({ v2, color });
-		m_triangles.push_back({ v3, color });
-	}
-
 	void DebugRenderer::render(RenderContext& context)
 	{
-		if (m_lines.empty() && m_triangles.empty())
+		if (context.frame.debugLines.empty() && context.frame.debugTriangles.empty())
 			return;
 
 		glEnable(GL_DEPTH_TEST);
@@ -70,8 +57,8 @@ namespace SE
 		m_shader.bind();
 		m_shader.setMat4("projectionView", context.viewport.getCameraFrustum().viewProjectionMatrix);
 		glBindVertexArray(m_VAO);
-		_draw(m_triangles, GL_TRIANGLES);
-		_draw(m_lines, GL_LINES);
+		_draw(context.frame.debugTriangles, GL_TRIANGLES);
+		_draw(context.frame.debugLines, GL_LINES);
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		m_shader.unbind();
@@ -80,9 +67,6 @@ namespace SE
 		glEnable(GL_CULL_FACE);
 		glDepthMask(GL_TRUE);
 		glDepthFunc(GL_LESS);
-
-		m_lines.clear();
-		m_triangles.clear();
 	}
 
 	void DebugRenderer::_draw(std::span<const DebugVertex> vertices, unsigned int mode) const
@@ -103,7 +87,5 @@ namespace SE
 		m_VBO = 0;
 		m_VAO = 0;
 		m_shader.destroy();
-		m_lines.clear();
-		m_triangles.clear();
 	}
 } // namespace SE

@@ -1,11 +1,11 @@
 #pragma once
 #include "SubSystems/Events/EventSubscription.h"
-
-#include <cassert>
+#include "Features/CameraController.h"
 
 namespace SE
 {
 	class SubSystem;
+	class FrameExchange;
 
 	class Engine
 	{
@@ -25,6 +25,7 @@ namespace SE
 		void start();
 		void run();
 		void stop();
+		CameraController& getCameraController() { return m_cameraController; }
 
 		// @brief Get the requested SubSystem, use this for all subsystems in the
 		// engine
@@ -54,6 +55,8 @@ namespace SE
 		double m_lastTime;
 
 		std::vector<std::unique_ptr<SubSystem>> m_subSystems;
+		CameraController m_cameraController;
+		std::unique_ptr<FrameExchange> m_frameExchange;
 
 		EventSubscription m_windowCloseEvent;
 		EventSubscription m_cameraSwitchEvent;

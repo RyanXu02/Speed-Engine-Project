@@ -1,6 +1,8 @@
 #pragma once
 #include "Core/SubSystems/SubSystem.h"
 
+#include "PhysicsDebugRenderer.h"
+
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -84,6 +86,8 @@ public:
 
 namespace SE
 {
+	struct RenderFrame;
+
 	class PhysicsSystem : public SubSystem
 	{
 		friend class Engine;
@@ -101,6 +105,8 @@ namespace SE
 
 		void shutdown() override;
 
+		void appendDebugGeometry(RenderFrame& frame, const glm::vec3& cameraPosition);
+
 		void pause() { m_running = false; }
 		void resume() { m_running = true; }
 
@@ -115,10 +121,11 @@ namespace SE
 		std::unique_ptr<TempAllocatorImpl> m_temp_allocator;
 		std::unique_ptr<JobSystemThreadPool> m_job_system;
 		std::unique_ptr<JPH::PhysicsSystem> m_physics_system;
+		std::unique_ptr<PhysicsDebugRenderer> m_physicsDebugRenderer;
 		BPLayerInterfaceImpl m_broad_phase_layer_interface;
 		ObjectVsBroadPhaseLayerFilterImpl m_object_vs_broadphase_layer_filter;
 		ObjectLayerPairFilterImpl m_obj_vs_object_layer_filter;
-		bool m_running = false;
+		bool m_running = true;
 		const uint cMaxBodies = 65536;
 		const uint cNumBodyMutexes = 0;
 		const uint cMaxBodyPairs = 65536;

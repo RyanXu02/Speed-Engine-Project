@@ -88,10 +88,9 @@ namespace SE
 		DirectionalLight& getSun() { return m_sun; }
 
 		void init() override;
-		void update(double deltaTime) override;
 		void shutdown() override;
 
-		void render();
+		void render(const RenderFrame& frame);
 
 	private:
 		explicit RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window){};

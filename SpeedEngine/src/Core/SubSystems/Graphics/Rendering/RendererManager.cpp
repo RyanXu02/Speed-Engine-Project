@@ -3,7 +3,6 @@
 #include "RendererManager.h"
 
 #include "Core/ResourceManagers/ResourceManager.h"
-#include "Core/SubSystems/Scenes/SceneSystem.h"
 
 #include "Core/SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
@@ -122,7 +121,6 @@ namespace SE
 
 		// change this to set the final output to a specific target
 		setFinalSceneOutput("SceneColor");
-		//setFinalSceneOutput("Grayscale");
 #pragma endregion
 
 		// imgui always presents after the scene pipeline on the default framebuffer
@@ -130,19 +128,7 @@ namespace SE
 		m_imguiRenderer->init();
 	}
 
-	void RendererManager::update(double deltaTime)
-	{
-		SubSystem::update(deltaTime);
-		RenderContext context{ Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene(),
-			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, m_sun };
-
-		for (auto& renderer : m_renderers)
-			renderer->update(deltaTime, context);
-
-		m_sceneViewport->updateMatrices();
-	}
-
-	void RendererManager::render()
+	void RendererManager::render(const RenderFrame& frame)
 	{
 		int width = 0;
 		int height = 0;
@@ -152,8 +138,9 @@ namespace SE
 #endif
 		_applySceneResize();
 
+		m_sceneViewport->setCamera(frame.camera);
 		m_sceneViewport->updateMatrices();
-		RenderContext context{ Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene(),
+		RenderContext context{ frame,
 			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, m_sun };
 
 		for (const auto& pass : m_passes)

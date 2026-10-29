@@ -5,18 +5,7 @@
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/ResourceManagers/Shader/Shader.h"
 
-#include "Core/Scene/Entity/Component/Transform.h"
-#include "Core/Scene/Entity/Entity.h"
-#include "Core/Scene/Scene.h"
-
-#include "Core/SubSystems/Input/InputSystem.h"
-
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
-
-#include "Engine.h"
-#include "EngineStates.h"
-
-#include <glm/gtc/matrix_transform.hpp>
 
 namespace SE
 {
@@ -28,17 +17,9 @@ namespace SE
 	{
 		m_logger.info("Shutting down");
 	}
-	void SceneRenderer::update(double deltaTime, RenderContext& context)
-	{
-		if (EngineStates::isEditorCameraActive())
-		{
-			_updateCamera(deltaTime, context.viewport.getCameraFrustum());
-		}
-	}
-
 	void SceneRenderer::render(RenderContext& context)
 	{
-		if (!context.scene)
+		if (context.frame.draws.empty())
 			return;
 
 		const CameraFrustum& camera = context.viewport.getCameraFrustum();
@@ -59,15 +40,9 @@ namespace SE
 		defaultShader->setVec3("camPos", camera.getPosition());
 		_setLightUniforms(context, *defaultShader);
 
-		auto entities = context.scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
-		for (auto& entity : entities)
+		for (const auto& draw : context.frame.draws)
 		{
-			MeshComponent* mesh = entity.getComponent<MeshComponent>();
-			Transform* transform = entity.getComponent<Transform>();
-			NameComponent* name = entity.getComponent<NameComponent>();
-
-
-			uint32_t meshResourceId = mesh->meshResourceID;
+			uint32_t meshResourceId = draw.meshResourceId;
 			if (meshResourceId == 0)
 			{
 				continue;
@@ -76,11 +51,11 @@ namespace SE
 			MeshResource* meshResource = context.resources.getResource<MeshResource>(meshResourceId);
 			if (!meshResource)
 			{
-				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, name->name);
+				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, draw.entityId);
 				continue;
 			}
 
-			defaultShader->setMat4("model", transform->getTransform());	// Set transform
+			defaultShader->setMat4("model", draw.modelMatrix);	// Set transform
 
 			// each submesh can have different set of material so get material for each mesh
 			const std::vector<uint32_t>& meshMaterials = _getMeshMaterials(context, meshResourceId, *meshResource);
@@ -92,8 +67,9 @@ namespace SE
 				const PBRMaterial* pbr = hasPBR ? &meshResource->getMaterials()[materialIndex] : nullptr;
 
 				Material* material = hasPBR ? context.resources.getResource<Material>(meshMaterials[materialIndex]) : nullptr;
-				if (!material)
+				if (!material) {
 					material = defaultMaterial;
+				}
 
 				// Set material properties
 				defaultShader->setVec4("albedoFactor", pbr ? pbr->albedoFactor : glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
@@ -125,15 +101,13 @@ namespace SE
 		shader.setVec3("dirLightDirection", glm::normalize(sun.direction));
 		shader.setVec3("dirLightColor", sun.color * sun.intensity);
 
-		auto pointLights = context.scene->getEntitiesWith<Transform, LightComponent>();
+		const auto& pointLights = context.frame.lights;
 		const size_t numLights = std::min(pointLights.size(), MAX_LIGHTS);
 		shader.setInt("numLights", static_cast<int>(numLights));
 		for (size_t i = 0; i < numLights; ++i)
 		{
-			Transform* transform = pointLights[i].getComponent<Transform>();
-			LightComponent* light = pointLights[i].getComponent<LightComponent>();
-			shader.setVec3(fmt::format("lightPositions[{}]", i), transform->getTranslation());
-			shader.setVec3(fmt::format("lightColors[{}]", i), light->color * light->intensity);
+			shader.setVec3(fmt::format("lightPositions[{}]", i), pointLights[i].position);
+			shader.setVec3(fmt::format("lightColors[{}]", i), pointLights[i].radiance);
 		}
 
 		shader.setFloat("ambientStrength", m_lightingSettings.ambientStrength);
@@ -182,97 +156,4 @@ namespace SE
 		return it->second;
 	}
 
-	void SceneRenderer::_updateCameraPosition(double deltaTime, CameraFrustum& camera)
-	{
-		auto IS = Engine::Instance().getSubSystem<InputSystem>();
-
-		// x-y plane movement
-		float movespeed = m_cameraMoveSpeed * static_cast<float>(deltaTime);
-		glm::vec3 cameraLookDir = glm::normalize(camera.getTarget() - camera.getPosition());
-		cameraLookDir.y = 0.0f;
-		glm::vec3 cameraRight = glm::normalize(glm::cross(cameraLookDir, WORLD_UP));
-		glm::vec3 CameraMoveDir(0.0f);
-		if (EngineStates::isEditorCameraActive())
-		{
-			if (IS->isKeyDown(KeyCodes::KEY_W))
-				CameraMoveDir += cameraLookDir;
-			if (IS->isKeyDown(KeyCodes::KEY_S))
-				CameraMoveDir += -cameraLookDir;
-			if (IS->isKeyDown(KeyCodes::KEY_A))
-				CameraMoveDir += -cameraRight;
-			if (IS->isKeyDown(KeyCodes::KEY_D))
-				CameraMoveDir += cameraRight;
-		}
-
-		if (glm::length(CameraMoveDir) > 0.0f)
-		{
-			CameraMoveDir = glm::normalize(CameraMoveDir);
-			camera.move(CameraMoveDir * movespeed);
-		}
-
-		// camera dolly movement (to and from target)
-		float dollySpeed = m_cameraDollySpeed * static_cast<float>(deltaTime);
-		glm::vec3 lookDir = glm::normalize(camera.getTarget() - camera.getPosition());
-		if (IS->getMouseScroll().yoffset > 0.0)
-		{
-			camera.move(lookDir * dollySpeed);
-		}
-		if (IS->getMouseScroll().yoffset < 0.0)
-		{
-			camera.move(-lookDir * dollySpeed);
-		}
-
-		// camera y-axis movement
-		if (IS->isKeyDown(KeyCodes::KEY_SPACE))
-			camera.move(WORLD_UP * movespeed);
-		if (IS->isKeyDown(KeyCodes::KEY_LEFT_CONTROL))
-			camera.move(-WORLD_UP * movespeed);
-	}
-
-	void SceneRenderer::_updateCameraTarget(double deltaTime, CameraFrustum& camera)
-	{
-		auto IS = Engine::Instance().getSubSystem<InputSystem>();
-
-		if (IS->isMouseDown(MouseCodes::MOUSE_BUTTON_3))
-		{
-			glm::vec2 mouseDelta = glm::vec2{ IS->getMouseDelta().x, IS->getMouseDelta().y };
-
-			glm::vec3 cameraDirection = glm::normalize(camera.getTarget() - camera.getPosition());
-			glm::vec3 cameraRight = glm::normalize(glm::cross(cameraDirection, WORLD_UP));
-			glm::vec3 cameraUp = glm::normalize(glm::cross(cameraRight, cameraDirection));
-
-			float yawAngle = -mouseDelta.x * m_sensitivity;
-			glm::mat4 yawRotation = glm::rotate(glm::mat4(1.0f), yawAngle, cameraUp);
-			cameraDirection = glm::vec3(yawRotation * glm::vec4(cameraDirection, 0.0f));
-			// Limit pitch avoid gimbal lock
-			float pitchAngle = -mouseDelta.y * m_sensitivity;
-			glm::vec3 newDirection = glm::vec3(glm::rotate(glm::mat4(1.0f), pitchAngle, cameraRight) * glm::vec4(cameraDirection, 0.0f));
-			float upDot = glm::dot(newDirection, WORLD_UP);
-			if (upDot < 0.999f && upDot > -0.999f)
-			{
-				cameraDirection = newDirection;
-			}
-
-			float distance = glm::length(camera.getTarget() - camera.getPosition());
-			glm::vec3 cameraTarget = camera.getPosition() + cameraDirection * distance;
-			camera.setTarget(cameraTarget);
-		}
-	}
-
-	void SceneRenderer::_updateCamera(double deltaTime, CameraFrustum& camera)
-	{
-		auto IS = Engine::Instance().getSubSystem<InputSystem>();
-		if (IS->isKeyRising(KeyCodes::KEY_LEFT_SHIFT))
-		{
-			m_cameraMoveSpeed *= 2.0f;
-			m_cameraDollySpeed *= 2.0f;
-		}
-		else if (IS->isKeyFalling(KeyCodes::KEY_LEFT_SHIFT))
-		{
-			m_cameraMoveSpeed /= 2.0f;
-			m_cameraDollySpeed /= 2.0f;
-		}
-		_updateCameraPosition(deltaTime, camera);
-		_updateCameraTarget(deltaTime, camera);
-	}
 } // namespace SE

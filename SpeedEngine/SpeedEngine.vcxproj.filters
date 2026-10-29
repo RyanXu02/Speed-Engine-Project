@@ -1,18 +1,73 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
+    <ClCompile Include="src\Core\Features\CameraController.cpp" />
+    <ClCompile Include="src\Core\Memory\FrameSlot.cpp" />
+    <ClCompile Include="src\Core\Threading\FrameExchange.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.cpp" />
+    <ClInclude Include="src\Core\Features\CameraState.h" />
+    <ClInclude Include="src\Core\Features\CameraController.h" />
+    <ClInclude Include="src\Core\Memory\FrameSlot.h" />
+    <ClInclude Include="src\Core\Threading\FrameExchange.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.h" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\RigidBody.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\Features\Math.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
+    <ClCompile Include="src\Core\Features\MemoryTrackable.cpp" />
+    <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
+    <ClCompile Include="src\Core\Features\Serializable.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
+    <ClCompile Include="src\Core\Scene\Scene.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Events\Event.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Resource.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
+    <ClCompile Include="src\Core\Logger\Logger.cpp" />
+    <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ScriptingSystem.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
+    <ClCompile Include="ThirdParty\pch.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -388,8 +443,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\example-post-process.vert" />
-    <None Include="Assets\Shaders\example-post-process.frag" />
+    <None Include="Assets\Shaders\debug.frag" />
+    <None Include="Assets\Shaders\debug.vert" />
+    <None Include="Assets\Shaders\grayscale.vert" />
+    <None Include="Assets\Shaders\grayscale.frag" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
   </ItemGroup>
