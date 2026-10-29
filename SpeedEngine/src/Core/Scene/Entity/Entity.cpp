@@ -120,4 +120,16 @@ namespace SE
 		return function;
 	}
 
+
+	Entity::HookFunction Entity::_onPhysicsShapeMeshComponentAdded() 
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* physicsShapeMeshComponent = entity.getComponent<PhysicsShapeMesh>();
+
+			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
+			physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->addResource<ResourceType::MeshResource>(physicsShapeMeshComponent->getPath(), physicsShapeMeshComponent->getPath()));
+		};
+		return function;
+	}
 }

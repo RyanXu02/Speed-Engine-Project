@@ -55,5 +55,6 @@ namespace SE
 		static HookFunction _onCameraComponentAdded();
 		static HookFunction _onSFXComponentAdded();
 		static HookFunction _onMusicComponentAdded();
+		static HookFunction _onPhysicsShapeMeshComponentAdded();
 	};
 } // namespace SE

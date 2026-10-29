@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/features/Serializable.h"
+#include "Core/Scene/Entity/Component/Transform.h"
 
 #include <glm/glm.hpp>
 
