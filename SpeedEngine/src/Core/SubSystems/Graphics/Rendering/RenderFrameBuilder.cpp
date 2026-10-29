@@ -26,9 +26,7 @@ namespace SE
 
 			const Transform& transform = *entity.getComponent<Transform>();
 			const glm::vec3& rotation = transform.getRotation();
-			const TransformState transformState{ transform.getTranslation(),
-				glm::quat_cast(glm::mat3(glm::yawPitchRoll(rotation.y, rotation.x, rotation.z))),
-				transform.getScale() };
+			const TransformState transformState{ transform.getTranslation(), transform.getRotationQuat(), transform.getScale() };
 
 			auto [it,_] = m_drawItemHistories.try_emplace(entity.id(), 
 				DrawItemHistory{ { meshId, entity.id(), transformState, transformState }, m_tick });
