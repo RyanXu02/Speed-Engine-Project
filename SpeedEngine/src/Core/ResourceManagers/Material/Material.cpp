@@ -13,6 +13,8 @@ namespace SE
 	bool Material::init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures)
 	{
 		m_shaderId = shaderId;
+		
+		m_isValid = textures.empty();	// every slot binds the shared fallback texture
 
 		for (const auto& [type, filePath] : textures)
 		{

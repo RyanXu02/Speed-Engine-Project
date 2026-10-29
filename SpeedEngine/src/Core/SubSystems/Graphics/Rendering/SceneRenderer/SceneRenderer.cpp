@@ -4,14 +4,19 @@
 
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/ResourceManagers/Shader/Shader.h"
-
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
+#include "Core/Engine.h"
+#include <glad/glad.h>
 
 namespace SE
 {
 	void SceneRenderer::init()
 	{
 		m_logger.info("Initializing");
+
+		ResourceManager* resources = Engine::Instance().getSubSystem<ResourceManager>();
+		m_defaultShaderId = resources->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
+		m_defaultMaterialId = resources->addResource<ResourceType::Material>(m_defaultShaderId, std::span<const std::pair<TextureType, std::string_view>>{}, "defaultMaterial");
 	}
 	void SceneRenderer::shutdown()
 	{
@@ -19,10 +24,50 @@ namespace SE
 	}
 	void SceneRenderer::render(RenderContext& context)
 	{
-		if (context.frame.draws.empty())
+		// start from the input target, its depth lets transparents be occluded by the opaque geometry
+		const FBO& input = context.getRenderTarget(m_inputTarget);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, input.getID());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, context.output->getID());
+		glBlitFramebuffer(0, 0, input.getWidth(), input.getHeight(),
+			0, 0, context.output->getWidth(), context.output->getHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		context.output->bind();
+
+		if (context.frame.draws.empty()) {
 			return;
+		}
 
 		const CameraFrustum& camera = context.viewport.getCameraFrustum();
+
+		// collect transparent submeshes for drawing, those that are skipped by the deferredpass, opaque meshes are drawn by the deferred pass
+		m_transparentItems.clear();
+		for (const auto& draw : context.frame.draws)
+		{
+			MeshResource* meshResource = draw.meshResourceId ? context.resources.getResource<MeshResource>(draw.meshResourceId) : nullptr;
+			if (!meshResource) {
+				continue;
+			}
+
+			// NOTE: within the same model, all submeshes currently share the same position from transform matrix
+			// this will likely cause issues with multiple overlapping transparent submeshes, or overlapping entities
+			// demo mostly have one entity or one mesh with transparency only so this is probably fine fix until that's an issue
+			const glm::vec3 cameraToObject = glm::vec3(draw.modelMatrix[3]) - camera.getPosition();
+			const std::vector<PBRMaterial>& pbrMaterials = meshResource->getMaterials();
+			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
+			for (size_t i = 0; i < subMeshes.size(); ++i) {
+				const int32_t materialIndex = subMeshes[i].materialIndex;
+				if (materialIndex >= 0 && static_cast<size_t>(materialIndex) < pbrMaterials.size() && pbrMaterials[materialIndex].albedoFactor.a < 1.0f) {
+					m_transparentItems.push_back({ &draw, meshResource, i, glm::dot(cameraToObject, cameraToObject) });
+				}
+			}
+		}
+
+		if (m_transparentItems.empty()) {
+			return;
+		}
+
+		// back to front so blending composites correctly, sorted per entity origin
+		std::sort(m_transparentItems.begin(), m_transparentItems.end(),
+			[](const TransparentItem& a, const TransparentItem& b) { return a.distanceSq > b.distanceSq; });
 
 		// Get default shader
 		Shader* defaultShader = context.resources.getResource<Shader>(m_defaultShaderId);
@@ -34,67 +79,55 @@ namespace SE
 		// Get default material
 		Material* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
 
+		// test against the opaque depth copied by the deferred pass, readonly
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDepthMask(GL_FALSE);
+
 		// per frame uniforms
 		defaultShader->bind();
 		defaultShader->setMat4("projectionView", camera.viewProjectionMatrix);
 		defaultShader->setVec3("camPos", camera.getPosition());
-		_setLightUniforms(context, *defaultShader);
+		setLightUniforms(context, *defaultShader);
 
-		for (const auto& draw : context.frame.draws)
+		for (const auto& item : m_transparentItems)
 		{
-			uint32_t meshResourceId = draw.meshResourceId;
-			if (meshResourceId == 0)
-			{
-				continue;
+			const uint32_t meshResourceId = item.draw->meshResourceId;
+			const int32_t materialIndex = item.meshResource->getSubMeshes()[item.subMeshIndex].materialIndex;
+			const PBRMaterial& pbr = item.meshResource->getMaterials()[materialIndex];
+
+			const std::vector<uint32_t>& meshMaterials = _getMeshMaterials(context, meshResourceId, *item.meshResource);
+			Material* material = context.resources.getResource<Material>(meshMaterials[materialIndex]);
+			if (!material) {
+				material = defaultMaterial;
 			}
 
-			MeshResource* meshResource = context.resources.getResource<MeshResource>(meshResourceId);
-			if (!meshResource)
-			{
-				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, draw.entityId);
-				continue;
+			// Set transform
+			defaultShader->setMat4("model", item.draw->modelMatrix);
+
+			// Set material properties
+			defaultShader->setVec4("albedoFactor", pbr.albedoFactor);
+			defaultShader->setVec3("emissiveFactor", pbr.emissiveFactor);
+			defaultShader->setFloat("roughnessFactor", pbr.roughnessFactor);
+			defaultShader->setFloat("metallicFactor", pbr.metallicFactor);
+			defaultShader->setFloat("aoStrength", pbr.aoStrength);
+			defaultShader->setFloat("normalScale", pbr.normalScale);
+
+			if (material) {
+				material->bind();
 			}
 
-			defaultShader->setMat4("model", draw.modelMatrix);	// Set transform
+			context.meshes.draw(meshResourceId, *item.meshResource, item.subMeshIndex);
 
-			// each submesh can have different set of material so get material for each mesh
-			const std::vector<uint32_t>& meshMaterials = _getMeshMaterials(context, meshResourceId, *meshResource);
-			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
-			for (size_t i = 0; i < subMeshes.size(); ++i)
-			{
-				const int32_t materialIndex = subMeshes[i].materialIndex;
-				const bool hasPBR = materialIndex >= 0 && static_cast<size_t>(materialIndex) < meshMaterials.size();
-				const PBRMaterial* pbr = hasPBR ? &meshResource->getMaterials()[materialIndex] : nullptr;
-
-				Material* material = hasPBR ? context.resources.getResource<Material>(meshMaterials[materialIndex]) : nullptr;
-				if (!material) {
-					material = defaultMaterial;
-				}
-
-				// Set material properties
-				defaultShader->setVec4("albedoFactor", pbr ? pbr->albedoFactor : glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
-				defaultShader->setVec3("emissiveFactor", pbr ? pbr->emissiveFactor : glm::vec3(0.0f));
-				defaultShader->setFloat("roughnessFactor", pbr ? pbr->roughnessFactor : 1.0f);
-				defaultShader->setFloat("metallicFactor", pbr ? pbr->metallicFactor : 0.0f);
-				defaultShader->setFloat("aoStrength", pbr ? pbr->aoStrength : 1.0f);
-				defaultShader->setFloat("normalScale", pbr ? pbr->normalScale : 1.0f);
-
-				if (material) {
-					material->bind();
-				}
-
-				context.meshes.draw(meshResourceId, *meshResource, i);
-
-				if (material) {
-					material->unbind();
-				}
+			if (material) {
+				material->unbind();
 			}
 		}
 
 		defaultShader->unbind();
 	}
 
-	void SceneRenderer::_setLightUniforms(const RenderContext& context, Shader& shader)
+	void SceneRenderer::setLightUniforms(const RenderContext& context, Shader& shader)
 	{
 		const DirectionalLight& sun = context.sun;
 		shader.setBool("useDirLight", sun.enabled);
@@ -143,8 +176,9 @@ namespace SE
 				}
 			}
 
+			// only transparent materials, opaque ones are owned by the deferred pass
 			uint32_t materialId = 0;
-			if (!textures.empty())
+			if (!textures.empty() && pbr.albedoFactor.a < 1.0f)
 			{
 				std::string materialName = fmt::format("{}_{}_{}", meshResource.getResourceName(), i, pbr.name);
 				materialId = context.resources.addResource<ResourceType::Material>(m_defaultShaderId, std::span<const std::pair<TextureType, std::string_view>>(textures), materialName);

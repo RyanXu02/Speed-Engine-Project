@@ -17,9 +17,15 @@ namespace SE
 
 		// Read in mesh file with given flags
 		// NOTE: may need aiProcess_FlipUVs
-		unsigned int flags = aiProcess_Triangulate 
-			| aiProcess_JoinIdenticalVertices 
+		unsigned int flags = aiProcess_Triangulate
+			| aiProcess_JoinIdenticalVertices
 			| aiProcess_GenSmoothNormals;
+
+		
+		// PreTransformVertices bakes the node hierarchy transforms into the vertices,
+		// otherwise meshes under different nodes end up at their untransformed positions
+		// NOTE: for demonstration only, this would destroy bone hierarchy transform and break skeletal animation
+		flags |= aiProcess_PreTransformVertices;
 
 		const aiScene* scene = importer.ReadFile(meshPath.data(), flags);
 

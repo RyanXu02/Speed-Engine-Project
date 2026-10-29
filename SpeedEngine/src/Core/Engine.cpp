@@ -85,18 +85,6 @@ namespace SE
 		sceneSystem->setCurrentScene("TestScene");
 		Scene* currentScene = sceneSystem->getCurrentScene();
 		currentScene->loadScene("Assets/Data/default-scene.json");
-
-		auto* sceneRenderer = getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
-		
-		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
-		uint32_t defaultShaderId = resourceManager->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
-		sceneRenderer->setDefaultShaderId(defaultShaderId);
-		
-		const std::pair<TextureType, std::string_view> defaultTextures[] = {
-			{ TextureType::Albedo, "Assets/Textures/default-texture-128.png" }
-		};
-		uint32_t defaultMaterialId = resourceManager->addResource<ResourceType::Material>(defaultShaderId, defaultTextures, "defaultMaterial");
-		sceneRenderer->setDefaultMaterialId(defaultMaterialId);
 	}
 	void Engine::run()
 	{
