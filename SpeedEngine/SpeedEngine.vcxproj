@@ -236,6 +236,7 @@
     <ClInclude Include="src\Core\Memory\FrameSlot.h" />
     <ClInclude Include="src\Core\Threading\FrameExchange.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Presentation.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
     <ClInclude Include="src\Core\EngineStates.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.h" />
@@ -264,6 +265,8 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
+    <ClInclude Include="src\Core\SubSystems\Input\InputEvent.h" />
+    <ClInclude Include="src\Core\SubSystems\Input\InputEventQueue.h" />
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.h" />
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResource.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.h" />

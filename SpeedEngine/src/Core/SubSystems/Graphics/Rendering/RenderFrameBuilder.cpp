@@ -7,36 +7,70 @@
 #include "Core/Scene/Scene.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
+
 namespace SE
 {
-	void RenderFrameBuilder::build(RenderFrame& frame, Scene* scene, PhysicsSystem& physics) const
+	void RenderFrameBuilder::captureSimulation(Scene& scene, std::chrono::steady_clock::time_point tickTime)
+	{
+		++m_tick;
+		if (&scene != m_lastScene)
+			m_drawItemHistories.clear();
+
+		scene.forEntitiesWith<Transform, NameComponent, MeshComponent>([&](Entity entity)
+		{
+			const auto meshId = entity.getComponent<MeshComponent>()->meshResourceID;
+			if (meshId == 0)
+				return;
+
+			const Transform& transform = *entity.getComponent<Transform>();
+			const TransformState transformState{ transform.getTranslation(), transform.getRotationQuat(), transform.getScale() };
+
+			auto [it,_] = m_drawItemHistories.try_emplace(entity.id(), 
+				DrawItemHistory{ { meshId, entity.id(), transformState, transformState }, m_tick });
+			auto& entry = it->second;
+			entry.drawItem.previous = entry.drawItem.current;
+			entry.drawItem.current = transformState;
+			entry.drawItem.meshResourceId = meshId;
+			entry.lastSeenTick = m_tick;
+		});
+		// Remove entries that were not present in this tick
+		std::erase_if(m_drawItemHistories, [this](const auto& entry) { return entry.second.lastSeenTick != m_tick; });
+
+		// capture lights, not interpolated
+		m_lights.clear();
+		scene.forEntitiesWith<Transform, LightComponent>([&](Entity entity)
+		{
+			const LightComponent* light = entity.getComponent<LightComponent>();
+			m_lights.push_back({ entity.getComponent<Transform>()->getTranslation(), light->color * light->intensity });
+		});
+
+		// capture camera state
+		const CameraFrustum* activeCamera = EngineStates::getActiveCamera();
+		const CameraState camera = activeCamera->getState();
+		m_camera.previous = activeCamera != m_lastCamera ? camera : m_camera.current;
+		m_camera.current = camera;
+		m_lastScene = &scene;
+		m_lastCamera = activeCamera;
+		m_tickTime = tickTime;
+	}
+
+	void RenderFrameBuilder::build(RenderFrame& frame, PhysicsSystem& physics) const
 	{
 		frame.draws.clear();
 		frame.lights.clear();
 		frame.debugLines.clear();
 		frame.debugTriangles.clear();
 
-		if (scene)
-		{
-			auto entities = scene->getEntitiesWith<Transform, NameComponent, MeshComponent>();
-			frame.draws.reserve(entities.size());
-			for (auto& entity : entities)
-			{
-				const auto meshId = entity.getComponent<MeshComponent>()->meshResourceID;
-				if (meshId != 0)
-					frame.draws.push_back({ meshId, entity.id(), entity.getComponent<Transform>()->getTransform() });
-			}
+		frame.draws.reserve(m_drawItemHistories.size());
+		for (const auto& [id, entry] : m_drawItemHistories)
+			frame.draws.push_back(entry.drawItem);
 
-			auto lights = scene->getEntitiesWith<Transform, LightComponent>();
-			frame.lights.reserve(lights.size());
-			for (auto& entity : lights)
-			{
-				const LightComponent* light = entity.getComponent<LightComponent>();
-				frame.lights.push_back({ entity.getComponent<Transform>()->getTranslation(), light->color * light->intensity });
-			}
-		}
+		frame.lights.assign(m_lights.begin(), m_lights.end());
 
-		frame.camera = EngineStates::getActiveCamera()->getState();
-		physics.appendDebugGeometry(frame, frame.camera.position);
+		frame.camera = m_camera;
+		frame.tickTime = m_tickTime;
+		physics.appendDebugGeometry(frame, frame.camera.current.position);
 	}
 } // namespace SE

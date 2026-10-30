@@ -5,7 +5,7 @@
 #include "PhysicsShape/PhysicsShapeBox.h"
 #include "PhysicsShape/PhysicsShapeCapsule.h"
 #include "PhysicsShape/PhysicsShapeSphere.h"
-//#include "PhysicsShape/PhysicsShapeMesh.h"
+#include "PhysicsShape/PhysicsShapeMesh.h"
 #include "Core/features/Serializable.h"
 #include "Core/features/CameraFrustum.h"
 #include "Core/EngineStates.h"

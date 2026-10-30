@@ -50,7 +50,7 @@ namespace SE
 			// NOTE: within the same model, all submeshes currently share the same position from transform matrix
 			// this will likely cause issues with multiple overlapping transparent submeshes, or overlapping entities
 			// demo mostly have one entity or one mesh with transparency only so this is probably fine fix until that's an issue
-			const glm::vec3 cameraToObject = glm::vec3(draw.modelMatrix[3]) - camera.getPosition();
+			const glm::vec3 cameraToObject = glm::vec3(interpolateTransform(draw.previous, draw.current, context.t)[3]) - camera.getPosition();
 			const std::vector<PBRMaterial>& pbrMaterials = meshResource->getMaterials();
 			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
 			for (size_t i = 0; i < subMeshes.size(); ++i) {
@@ -103,7 +103,7 @@ namespace SE
 			}
 
 			// Set transform
-			defaultShader->setMat4("model", item.draw->modelMatrix);
+			defaultShader->setMat4("model", interpolateTransform(item.draw->previous, item.draw->current, context.t));
 
 			// Set material properties
 			defaultShader->setVec4("albedoFactor", pbr.albedoFactor);

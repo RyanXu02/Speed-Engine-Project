@@ -1,14 +1,43 @@
 #pragma once
 
+#include "RenderFrame.h"
+
 namespace SE
 {
 	class Scene;
 	class PhysicsSystem;
-	struct RenderFrame;
-
+	struct CameraFrustum;
+ 
 	class RenderFrameBuilder
 	{
 	public:
-		void build(RenderFrame& frame, Scene* scene, PhysicsSystem& physics) const;
+		// @brief Captures the current state of the scene and stores it in the builder for later
+		// Call this once per simulation tick before building a RenderFrame
+		// @param scene The scene to capture
+		// @param tickTime The time point of the current simulation tick
+		void captureSimulation(Scene& scene, std::chrono::steady_clock::time_point tickTime);
+
+		// @brief Builds a RenderFrame from the captured state and appends debug geometry from the physics system
+		// @param frame The RenderFrame to build
+		// @param physics The PhysicsSystem to append debug geometry from
+		void build(RenderFrame& frame, PhysicsSystem& physics) const;
+
+	private:
+		struct DrawItemHistory
+		{
+			DrawItem drawItem;
+			uint64_t lastSeenTick; // The last simulation tick where this entity was present
+		};
+		std::unordered_map<uint32_t, DrawItemHistory> m_drawItemHistories;
+
+		std::vector<PointLight> m_lights;
+
+		CameraSnapshot m_camera;
+
+		const Scene* m_lastScene = nullptr;
+		const CameraFrustum* m_lastCamera = nullptr;
+
+		uint64_t m_tick = 0;
+		std::chrono::steady_clock::time_point m_tickTime{};
 	};
 } // namespace SE

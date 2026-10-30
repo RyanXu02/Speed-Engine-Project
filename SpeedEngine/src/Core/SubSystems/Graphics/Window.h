@@ -1,5 +1,6 @@
 #pragma once
-#include "../SubSystem.h"
+#include "Core/SubSystems/SubSystem.h"
+#include "Core/SubSystems/Input/InputEventQueue.h"
 
 struct GLFWwindow;
 
@@ -32,6 +33,11 @@ namespace SE
 
 		void swapBuffers() const;
 
+		bool shouldClose() const;
+
+		void waitForEvents(double timeout) const;
+		InputEventQueue& inputEvents() { return m_inputEvents; }
+
 		GLFWwindow* getWindow() const { return m_window; }
 
 		unsigned int getWidth() const { return m_windowWidth; }
@@ -39,15 +45,13 @@ namespace SE
 
 		void setSize(int width, int height);
 
-		double getFPS() const { return m_fps; }
-		void setFPS(double fps) { m_fps = fps; }
-
 		double getCurrentTime() const;
 
 	private:
 		bool _initGLFW();
 
-		bool m_vsyncEnabled{ true };
+		bool m_vsyncEnabled{ false };
+		InputEventQueue m_inputEvents; // Because Window runs on main thread
 
 		std::string m_windowTitle;
 
@@ -56,7 +60,5 @@ namespace SE
 
 		unsigned int m_windowWidth;
 		unsigned int m_windowHeight;
-
-		double m_fps{ 60.0 };
 	};
 } // namespace SE

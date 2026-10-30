@@ -10,6 +10,7 @@
     <ClInclude Include="src\Core\Memory\FrameSlot.h" />
     <ClInclude Include="src\Core\Threading\FrameExchange.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Presentation.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.h" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
@@ -30,6 +31,8 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
+    <ClInclude Include="src\Core\SubSystems\Input\InputEvent.h" />
+    <ClInclude Include="src\Core\SubSystems\Input\InputEventQueue.h" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp" />

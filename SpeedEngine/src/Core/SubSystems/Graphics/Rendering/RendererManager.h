@@ -90,7 +90,10 @@ namespace SE
 		void init() override;
 		void shutdown() override;
 
-		void render(const RenderFrame& frame);
+		// @brief Renders a frame through all render passes
+		// @param frame The RenderFrame to render
+		// @param t The interpolation factor between the current and next frame
+		void render(const RenderFrame& frame, float t);
 
 	private:
 		explicit RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window){};

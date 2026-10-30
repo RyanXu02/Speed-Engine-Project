@@ -41,6 +41,7 @@ namespace SE
 		MeshGPUCache& meshes;
 		const RenderTargets& targets;
 		const DirectionalLight& sun;
+		float t = 1.0f; // for interpolation
 		FBO* output = nullptr;
 
 		const FBO& getRenderTarget(const std::string& name) const

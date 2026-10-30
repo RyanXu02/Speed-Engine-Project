@@ -15,21 +15,18 @@ namespace SE
 	FrameExchange::WriteHandle::~WriteHandle()
 	{
 		if (m_exchange)
-			m_exchange->_freeSlot(m_index, FrameSlotState::Writing);
+			m_exchange->_freeSlot(m_index);
 	}
 
 	RenderFrame& FrameExchange::WriteHandle::frame()
 	{
-		assert(m_exchange);
 		return m_exchange->m_slots[m_index].frame();
 	}
 
-	bool FrameExchange::WriteHandle::publish()
+	void FrameExchange::WriteHandle::publish()
 	{
-		assert(m_exchange);
-		const bool published = m_exchange->_publish(m_index);
+		m_exchange->_publish(m_index);
 		m_exchange = nullptr;
-		return published;
 	}
 
 	FrameExchange::ReadHandle::ReadHandle(FrameExchange& exchange, std::size_t index)
@@ -43,29 +40,21 @@ namespace SE
 	FrameExchange::ReadHandle::~ReadHandle()
 	{
 		if (m_exchange)
-			m_exchange->_freeSlot(m_index, FrameSlotState::Reading);
+			m_exchange->_freeSlot(m_index);
 	}
 
 	const RenderFrame& FrameExchange::ReadHandle::frame() const
 	{
-		assert(m_exchange);
-		const auto& slot = m_exchange->m_slots[m_index];
-		return slot.frame();
+		return m_exchange->m_slots[m_index].frame();
 	}
 
-	FrameExchange::WriteHandle FrameExchange::beginWrite()
+	FrameExchange::WriteHandle FrameExchange::tryBeginWrite()
 	{
 		std::unique_lock lock(m_mutex);
-
-		// Wait until a free slot is available or the exchange is closed
-		m_freeSlotAvailable.wait(lock, [this]
-		{
-			return m_closed || std::find(m_states.begin(), m_states.end(), FrameSlotState::Free) != m_states.end();
-		});
-		if (m_closed)
+		const auto free = std::find(m_states.begin(), m_states.end(), FrameSlotState::Free);
+		if (free == m_states.end())
 			return {};
-
-		const auto index = static_cast<std::size_t>(std::find(m_states.begin(), m_states.end(), FrameSlotState::Free) - m_states.begin());
+		const auto index = static_cast<std::size_t>(free - m_states.begin());
 		m_states[index] = FrameSlotState::Writing;
 		lock.unlock();
 
@@ -75,26 +64,12 @@ namespace SE
 		return write;
 	}
 
-	bool FrameExchange::_publish(std::size_t index)
+	void FrameExchange::_publish(std::size_t index)
 	{
-		{
-			std::lock_guard lock(m_mutex);
-
-			assert(m_states[index] == FrameSlotState::Writing);
-			// Exchange isn't closed, publish the frame and make it available for reading
-			if (!m_closed)
-			{
-				m_ready[(m_readyHead + m_readyCount) % 2] = index;
-				++m_readyCount;
-				m_states[index] = FrameSlotState::Ready;
-				return true;
-			}
-
-			m_states[index] = FrameSlotState::Free;
-		}
-		// notify the writer that a free slot is available
-		m_freeSlotAvailable.notify_one();
-		return false;
+		std::lock_guard lock(m_mutex);
+		m_ready[(m_readyHead + m_readyCount) % 2] = index;
+		++m_readyCount;
+		m_states[index] = FrameSlotState::Ready;
 	}
 
 	FrameExchange::ReadHandle FrameExchange::tryAcquireReady()
@@ -108,29 +83,13 @@ namespace SE
 		m_readyHead = (m_readyHead + 1) % 2;
 		--m_readyCount;
 
-		assert(m_states[index] == FrameSlotState::Ready);
 		m_states[index] = FrameSlotState::Reading;
 		return ReadHandle(*this, index);
 	}
 
-	void FrameExchange::_freeSlot(std::size_t index, FrameSlotState expectedState)
+	void FrameExchange::_freeSlot(std::size_t index)
 	{
-		{
-			std::lock_guard lock(m_mutex);
-			assert(m_states[index] == expectedState);
-			m_states[index] = FrameSlotState::Free;
-		}
-		// notify the writer that a free slot is available
-		m_freeSlotAvailable.notify_one();
-	}
-
-	void FrameExchange::close()
-	{
-		{
-			std::lock_guard lock(m_mutex);
-			m_closed = true;
-		}
-		// notify all waiting writers that the exchange is closed
-		m_freeSlotAvailable.notify_all();
+		std::lock_guard lock(m_mutex);
+		m_states[index] = FrameSlotState::Free;
 	}
 } // namespace SE

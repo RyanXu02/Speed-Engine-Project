@@ -175,7 +175,7 @@ namespace SE
 				    component.setGravityFactor(gravityFactor);
 		    });
 
-		m_inspectors.registerComponent<PhysicsShapeBox>("PhysicsShapeBox", false,
+		m_inspectors.registerComponent<PhysicsShapeBox>("PhysicsShapeBox", true,
 		    [](Entity&, PhysicsShapeBox& component)
 		    {
 			    auto halfExtents = component.getHalfExtents();
@@ -183,7 +183,7 @@ namespace SE
 				    component.setHalfExtents(halfExtents);
 		    });
 
-		m_inspectors.registerComponent<PhysicsShapeCapsule>("PhysicsShapeCapsule", false,
+		m_inspectors.registerComponent<PhysicsShapeCapsule>("PhysicsShapeCapsule", true,
 		    [](Entity&, PhysicsShapeCapsule& component)
 		    {
 			    auto halfHeight = component.getHalfHeight();
@@ -194,12 +194,27 @@ namespace SE
 				    component.setRadius(radius);
 		    });
 
-		m_inspectors.registerComponent<PhysicsShapeSphere>("PhysicsShapeSphere", false,
+		m_inspectors.registerComponent<PhysicsShapeSphere>("PhysicsShapeSphere", true,
 		    [](Entity&, PhysicsShapeSphere& component)
 		    {
 			    auto radius = component.getRadius();
 			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
 				    component.setRadius(radius);
+		    });
+
+		m_inspectors.registerComponent<PhysicsShapeMesh>("PhysicsShapeMesh", true,
+		    [this](Entity&, PhysicsShapeMesh& component)
+		    {
+			    if (!m_physicsShapeMeshDraftInitialized)
+			    {
+				    m_physicsShapeMeshPathDraft = component.getPath();
+				    m_physicsShapeMeshDraftInitialized = true;
+			    }
+			    const bool enter = ImGui::InputText("Path", &m_physicsShapeMeshPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
+			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+			    // user confirmed a new path
+			    if ((enter || deactivated) && m_physicsShapeMeshPathDraft != component.getPath())
+				    component.setPath(m_physicsShapeMeshPathDraft);
 		    });
 
 		m_inspectors.registerComponent<AudioSFXComponent>("AudioSFXComponent", true, 

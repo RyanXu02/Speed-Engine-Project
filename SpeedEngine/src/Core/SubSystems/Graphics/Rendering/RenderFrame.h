@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Features/CameraState.h"
+#include "Presentation.h"
 
 namespace SE
 {
@@ -8,7 +8,14 @@ namespace SE
 	{
 		uint32_t meshResourceId;
 		uint32_t entityId;
-		glm::mat4 modelMatrix;
+		TransformState previous;
+		TransformState current;
+	};
+
+	struct CameraSnapshot
+	{
+		CameraState previous;
+		CameraState current;
 	};
 
 	struct PointLight
@@ -39,7 +46,8 @@ namespace SE
 			debugTriangles.insert(debugTriangles.end(), { { a, color }, { b, color }, { c, color } });
 		}
 
-		CameraState camera;
+		CameraSnapshot camera;
+		std::chrono::steady_clock::time_point tickTime{};
 		std::pmr::vector<DrawItem> draws;
 		std::pmr::vector<PointLight> lights;
 		std::pmr::vector<DebugVertex> debugLines;

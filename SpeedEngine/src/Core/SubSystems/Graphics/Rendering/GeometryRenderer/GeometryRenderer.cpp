@@ -58,7 +58,7 @@ namespace SE
 				continue;
 			}
 
-			defaultShader->setMat4("model", draw.modelMatrix);	// Set transform
+			defaultShader->setMat4("model", interpolateTransform(draw.previous, draw.current, context.t));	// Set transform
 
 			const std::vector<uint32_t>& meshMaterials = _getMeshMaterials(context, meshResourceId, *meshResource);
 			const std::vector<SubMesh>& subMeshes = meshResource->getSubMeshes();
