@@ -9,6 +9,7 @@
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 
 #include "Core/Engine.h"
+#include "Core/EngineStates.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -66,7 +67,8 @@ namespace SE
 		addPass(RenderPass{
 			.renderer = debugRenderer, 
 			.output = sceneColor, 
-			.clearMask = 0 });
+			.clearMask = 0,
+			.debugOnly = true });
 
 		// Example:
 		// A render pass that samples "SceneColor" and output to a new "Grayscale" target
@@ -145,6 +147,9 @@ namespace SE
 
 		for (const auto& pass : m_passes)
 		{
+			if (pass.debugOnly && !EngineStates::isDebugRenderingEnabled())
+				continue;
+
 			resetPassState();
 			pass.output.bind(); // bind the pass's output
 			glViewport(0, 0, pass.output.getWidth(), pass.output.getHeight());

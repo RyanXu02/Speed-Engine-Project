@@ -21,6 +21,7 @@ namespace SE
 		GLbitfield clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 		glm::vec4 clearColor{ 0.1f, 0.1f, 0.1f, 1.0f };
 		double clearDepth = 1.0;
+		bool debugOnly = false;
 	};
 
 	// @brief Manager for all renderers in the engine
