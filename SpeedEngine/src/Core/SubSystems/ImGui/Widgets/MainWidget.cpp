@@ -6,6 +6,7 @@
 #include "../../Scenes/SceneSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
+#include "EngineStates.h"
 #include "MainWidget.h"
 #include "MemoryWidget.h"
 #include "ConsoleWidget.h"
@@ -166,6 +167,9 @@ namespace SE
 				}
 				ImGui::EndMenu();
 			}
+			const bool debugEnabled = EngineStates::isDebugRenderingEnabled();
+			if (ImGui::Button(debugEnabled ? "Debug Rendering: On" : "Debug Rendering: Off"))
+				EngineStates::setDebugRenderingEnabled(!debugEnabled);
 		}
 		ImGui::EndMainMenuBar();
 	}

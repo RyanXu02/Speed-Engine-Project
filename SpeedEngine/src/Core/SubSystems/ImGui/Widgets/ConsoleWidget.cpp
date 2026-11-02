@@ -5,6 +5,7 @@
 
 #pragma region Commands
 #include "Core/Engine.h"
+#include "Core/EngineStates.h"
 #include "Core/Subsystems/Graphics/Window.h"
 #pragma endregion
 
@@ -67,6 +68,19 @@ namespace SE
 				Engine::Instance().getSubSystem<Window>()->setSize(w, h);
 				m_logger.info("Resized window to {} {}", args[0], args[1]);
 		    });
+
+		registerCommand("debug", [this](CommandArg args)
+			{
+				if (args.size() > 1 || (!args.empty() && args[0] != "on" && args[0] != "off"))
+				{
+					m_logger.error("Usage: debug [on|off] (no argument toggles)");
+					return;
+				}
+
+				const bool enabled = args.empty() ? !EngineStates::isDebugRenderingEnabled() : args[0] == "on";
+				EngineStates::setDebugRenderingEnabled(enabled);
+				m_logger.info("Debug rendering {}", enabled ? "enabled" : "disabled");
+			});
 #pragma endregion
 	}
 

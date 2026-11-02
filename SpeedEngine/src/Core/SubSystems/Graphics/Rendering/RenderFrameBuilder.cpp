@@ -71,6 +71,7 @@ namespace SE
 
 		frame.camera = m_camera;
 		frame.tickTime = m_tickTime;
-		physics.appendDebugGeometry(frame, frame.camera.current.position);
+		if (EngineStates::isDebugRenderingEnabled())
+			physics.appendDebugGeometry(frame, frame.camera.current.position);
 	}
 } // namespace SE

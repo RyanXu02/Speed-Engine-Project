@@ -11,6 +11,7 @@
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 
 #include "Core/Engine.h"
+#include "Core/EngineStates.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -153,6 +154,9 @@ namespace SE
 
 		for (const auto& pass : m_passes)
 		{
+			if (pass.debugOnly && !EngineStates::isDebugRenderingEnabled())
+				continue;
+
 			resetPassState();
 			pass.output.bind(); // bind the pass's output
 			glViewport(0, 0, pass.output.getWidth(), pass.output.getHeight());
