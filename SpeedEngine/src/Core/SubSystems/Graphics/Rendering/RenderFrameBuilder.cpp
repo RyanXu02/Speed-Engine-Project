@@ -12,6 +12,12 @@
 
 namespace SE
 {
+	void RenderFrameBuilder::submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color)
+	{
+		if (font && !text.empty())
+			m_textSubmissions.push_back({ std::move(font), std::string(text), position, color });
+	}
+
 	void RenderFrameBuilder::captureSimulation(Scene& scene, std::chrono::steady_clock::time_point tickTime)
 	{
 		++m_tick;
@@ -53,6 +59,12 @@ namespace SE
 		frame.draws.clear();
 		frame.debugLines.clear();
 		frame.debugTriangles.clear();
+		frame.textDraws.clear();
+
+		frame.textDraws.reserve(m_textSubmissions.size());
+		for (const auto& submission : m_textSubmissions)
+			frame.textDraws.emplace_back(submission.font, submission.text, submission.position,
+				submission.color, frame.textDraws.get_allocator().resource());
 
 		frame.draws.reserve(m_drawItemHistories.size());
 		for (const auto& [id, entry] : m_drawItemHistories)
@@ -60,6 +72,7 @@ namespace SE
 
 		frame.camera = m_camera;
 		frame.tickTime = m_tickTime;
-		physics.appendDebugGeometry(frame, frame.camera.current.position);
+		if (EngineStates::isDebugRenderingEnabled())
+			physics.appendDebugGeometry(frame, frame.camera.current.position);
 	}
 } // namespace SE

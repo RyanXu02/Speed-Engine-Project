@@ -7,6 +7,8 @@
 
 namespace SE
 {
+	class TextRenderer;
+
 	// @brief Use this to define a render pass
 	// @brief A render pass is a single rendering operation that uses a specific renderer and outputs to a specific FBO
 	// @param renderer The renderer to use for this pass
@@ -21,6 +23,7 @@ namespace SE
 		GLbitfield clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 		glm::vec4 clearColor{ 0.1f, 0.1f, 0.1f, 1.0f };
 		double clearDepth = 1.0;
+		bool debugOnly = false;
 	};
 
 	// @brief Manager for all renderers in the engine
@@ -105,6 +108,7 @@ namespace SE
 		RenderTargets m_targets;
 
 		std::vector<std::unique_ptr<Renderer>> m_renderers;
+		TextRenderer* m_textRenderer = nullptr; // owned by m_renderers
 		std::unique_ptr<ImGuiRenderer> m_imguiRenderer; // imgui is special
 
 		std::vector<RenderPass> m_passes;

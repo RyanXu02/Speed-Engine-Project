@@ -4,6 +4,7 @@
 #include "Core/SubSystems/Events/EventSystem.h"
 #include "Core/SubSystems/SubSystem.h"
 #include "Manager.h"
+#include "Font/FontManager.h"
 #include "Material/MaterialManager.h"
 #include "MeshResource/MeshResourceManager.h"
 #include "Resource.h"
@@ -19,7 +20,6 @@ namespace SE
 
 		void init() override;
 		void shutdown() override;
-
 
 		//@brief generates a resource id. atomic and does not reuse ids
 		//@returns an id (uint32)
@@ -49,6 +49,10 @@ namespace SE
 			else if constexpr (Type == ResourceType::MeshResource)
 			{
 				return _addResourceImpl<ResourceType::MeshResource>(std::forward<Args>(args)...);
+			}
+			else if constexpr (Type == ResourceType::Font)
+			{
+				return _addResourceImpl<ResourceType::Font>(std::forward<Args>(args)...);
 			}
 			else
 			{
@@ -80,6 +84,10 @@ namespace SE
 				else if constexpr (std::is_same_v<T, MeshResource>)
 				{
 					return _getManager<MeshResourceManager>()->getMeshResource(id);
+				}
+				else if constexpr (std::is_same_v<T, Font>)
+				{
+					return _getManager<FontManager>()->getFont(id);
 				}
 				// ...
 				else
@@ -175,6 +183,19 @@ namespace SE
 #if defined(COMPILE_WITH_EDITOR)
 				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
 #endif
+				return id;
+			}
+			else if constexpr (Type == ResourceType::Font)
+			{
+				// Loading is main-thread/pre-runtime only, like the other resource managers.
+				uint32_t id = _getManager<FontManager>()->addFont(generateId(), std::forward<Args>(args)...);
+				if (id != 0)
+				{
+					m_resourceTypes.insert({ id, ResourceType::Font });
+#if defined(COMPILE_WITH_EDITOR)
+					Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
+#endif
+				}
 				return id;
 			}
 			else

@@ -13,11 +13,13 @@ namespace SE
 			: Renderer(logger, "DebugRenderer"), m_shader(0, "DebugRenderer")
 		{}
 
-		void init() override;
+		// Defer GPU allocation until the first enabled debug draw
+		void init() override {}
 		void shutdown() override;
 		void render(RenderContext& context) override;
 
 	private:
+		void _lazyInit();
 		void _draw(std::span<const DebugVertex> vertices, unsigned int mode) const;
 
 		unsigned int m_VAO = 0;

@@ -160,6 +160,9 @@
     <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
     <ClCompile Include="src\Core\Features\CameraController.cpp" />
     <ClCompile Include="src\Core\Memory\FrameSlot.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Font\Font.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Font\FontManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.cpp" />
     <ClCompile Include="src\Core\Threading\FrameExchange.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.cpp" />
     <ClCompile Include="src\Core\EngineStates.cpp" />
@@ -234,6 +237,9 @@
     <ClInclude Include="src\Core\Features\CameraState.h" />
     <ClInclude Include="src\Core\Features\CameraController.h" />
     <ClInclude Include="src\Core\Memory\FrameSlot.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Font\Font.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Font\FontManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.h" />
     <ClInclude Include="src\Core\Threading\FrameExchange.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Presentation.h" />
@@ -317,6 +323,8 @@
     <None Include="Assets\Shaders\grayscale.frag" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
+    <None Include="Assets\Shaders\text.frag" />
+    <None Include="Assets\Shaders\text.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.targets" Condition="Exists('$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.targets')" />

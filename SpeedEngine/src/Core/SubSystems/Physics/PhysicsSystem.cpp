@@ -32,7 +32,6 @@ namespace SE
 
 		m_physics_system = std::make_unique<JPH::PhysicsSystem>();
 		m_physics_system->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, m_broad_phase_layer_interface, m_object_vs_broadphase_layer_filter, m_obj_vs_object_layer_filter);
-		m_physicsDebugRenderer = std::make_unique<PhysicsDebugRenderer>();
 
 		m_contact_listener = std::make_unique<PhysicsContactListener>();
 		m_physics_system->SetContactListener(m_contact_listener.get());
@@ -151,7 +150,10 @@ namespace SE
 	}
 
 	void PhysicsSystem::appendDebugGeometry(RenderFrame& frame, const glm::vec3& cameraPosition) {
-		if (m_physics_system && m_physicsDebugRenderer)
-			m_physicsDebugRenderer->appendGeometry(frame, *m_physics_system, cameraPosition);
+		if (!m_physics_system)
+			return;
+		if (!m_physicsDebugRenderer)
+			m_physicsDebugRenderer = std::make_unique<PhysicsDebugRenderer>();
+		m_physicsDebugRenderer->appendGeometry(frame, *m_physics_system, cameraPosition);
 	}
 }
