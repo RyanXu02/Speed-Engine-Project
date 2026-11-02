@@ -64,6 +64,14 @@ namespace SE
 		inputTable["isKeyDown"] = [](KeyCodes key) {
 			return Engine::Instance().getSubSystem<InputSystem>()->isKeyDown(key);
 		};
+		inputTable["isKeyPressed"] = [](KeyCodes key)
+		{
+			return Engine::Instance().getSubSystem<InputSystem>()->isKeyRising(key);
+		};
+		inputTable["isKeyReleased"] = [](KeyCodes key)
+		{
+			return Engine::Instance().getSubSystem<InputSystem>()->isKeyFalling(key);
+		};
 		inputTable["isMouseDown"] = [](MouseCodes button) {
 			return Engine::Instance().getSubSystem<InputSystem>()->isMouseDown(button);
 		};

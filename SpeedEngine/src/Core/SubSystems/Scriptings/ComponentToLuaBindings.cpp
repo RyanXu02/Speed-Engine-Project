@@ -78,6 +78,41 @@ namespace SE
 			return sol::object(lua, sol::nil);
 		};
 
+		luaState.new_usertype<RigidBody>("RigidBody", 
+			"getOffset", &RigidBody::getOffset, 
+			"setOffset", &RigidBody::setOffset,
+			"getPosition", &RigidBody::getPosition,
+			"setPosition", &RigidBody::setPosition,
+			"getRotation", &RigidBody::getRotation,
+			"setRotation", &RigidBody::setRotation,
+			"getLinearVelocity", &RigidBody::getLinearVelocity, 
+			"setLinearVelocity", &RigidBody::setLinearVelocity, 
+			"getAngularVelocity", &RigidBody::setAngularVelocity, 
+			"addForce", &RigidBody::addForce,
+			"addTorque", &RigidBody::addTorque, 
+			"addImpulse", &RigidBody::addImpulse, 
+			"addAngularImpulse", &RigidBody::addAngularImpulse,
+			"getMaxLinearVelocity", &RigidBody::getMaxLinearVelocity, 
+			"setMaxLinearVelocity", &RigidBody::setMaxLinearVelocity, 
+			"getMaxAngularVelocity", &RigidBody::getMaxAngularVelocity,
+			"setMaxAngularVelocity", &RigidBody::setMaxAngularVelocity, 
+			"getRestitution", &RigidBody::getRestitution, 
+			"setRestitution", &RigidBody::setRestitution, 
+			"getFriction", &RigidBody::getFriction, 
+			"setFriction", &RigidBody::setFriction,
+			"getGravityFactor", &RigidBody::getGravityFactor,
+			"setGravityFactor", &RigidBody::setGravityFactor);
+
+		componentGetters["RigidBody"] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			RigidBody* component = e.getComponent<RigidBody>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+
 		_registerComponent<NameComponent>(luaState);
 	}
 }

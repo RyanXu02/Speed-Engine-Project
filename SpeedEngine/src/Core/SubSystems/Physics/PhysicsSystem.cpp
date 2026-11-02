@@ -34,6 +34,9 @@ namespace SE
 		m_physics_system->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, m_broad_phase_layer_interface, m_object_vs_broadphase_layer_filter, m_obj_vs_object_layer_filter);
 		m_physicsDebugRenderer = std::make_unique<PhysicsDebugRenderer>();
 
+		m_contact_listener = std::make_unique<PhysicsContactListener>();
+		m_physics_system->SetContactListener(m_contact_listener.get());
+
 		BodyInterface& body_interface = m_physics_system->GetBodyInterface();
 	}
 
@@ -141,6 +144,7 @@ namespace SE
 		m_physicsDebugRenderer.reset();
 		m_job_system.reset();
 		m_temp_allocator.reset();
+		m_contact_listener.reset();
 		UnregisterTypes();
 		delete Factory::sInstance;
 		Factory::sInstance = nullptr;
