@@ -18,6 +18,7 @@ namespace SE
 		m_managers.emplace_back(std::make_unique<ShaderManager>());
 		m_managers.emplace_back(std::make_unique<MaterialManager>());
 		m_managers.emplace_back(std::make_unique<MeshResourceManager>());
+		m_managers.emplace_back(std::make_unique<FontManager>());
 		//...
 		for (auto& manager : m_managers)
 		{
@@ -94,6 +95,10 @@ namespace SE
 			{
 				return _getManager<MeshResourceManager>()->getMeshResource(id);
 			}
+			else if (it->second == ResourceType::Font)
+			{
+				return _getManager<FontManager>()->getFont(id);
+			}
 			//.......
 		}
 		return nullptr;
@@ -127,6 +132,18 @@ namespace SE
 #if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 #endif
+			return removed;
+		}
+		else if (it->second == ResourceType::Font)
+		{
+			removed = _getManager<FontManager>()->removeFont(id);
+			if (removed)
+			{
+				m_resourceTypes.erase(it);
+#if defined(COMPILE_WITH_EDITOR)
+				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Font, false));
+#endif
+			}
 			return removed;
 		}
 		//.....

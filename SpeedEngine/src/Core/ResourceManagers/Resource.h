@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Features/MemoryTrackable.h"
+#include "Core/Features/MemoryTrackable.h"
 
 namespace SE
 {
@@ -29,6 +29,7 @@ namespace SE
 	{
 		Material,
 		Shader,
-		MeshResource
+		MeshResource,
+		Font
 	};
 } // namespace SE

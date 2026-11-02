@@ -85,6 +85,10 @@ namespace SE
 		auto* sceneRenderer = getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
 		
 		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
+
+		uint32_t fontid = resourceManager->addResource<ResourceType::Font>("fonts/Quicksand-Regular.ttf", 32, "QSfont");
+		QSfont = resourceManager->getResource<Font>(fontid)->getHandle();
+
 		uint32_t defaultShaderId = resourceManager->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
 		sceneRenderer->setDefaultShaderId(defaultShaderId);
 		
@@ -144,6 +148,7 @@ namespace SE
 
 	void Engine::updateSimulation(double deltaTime, int physicsSteps)
 	{
+		m_frameBuilder.beginSimulation();
 		getSubSystem<InputSystem>()->update(deltaTime);
 		getSubSystem<EventSystem>()->update(deltaTime);
 		getSubSystem<SceneSystem>()->update(deltaTime);
@@ -153,6 +158,9 @@ namespace SE
 		getSubSystem<AudioSystem>()->update(deltaTime);
 		if (EngineStates::isEditorCameraActive())
 			m_cameraController.update(EngineStates::getEditorCamera(), *getSubSystem<InputSystem>(), deltaTime);
+		
+		// temp test text
+		submitText(QSfont, "Hello text blah blah blah\nnew line: !@#$%^&*()_+-=,./;'[]<>?:{}|", { 20.0f, 20.0f });
 	}
 
 	void Engine::produceRenderFrame()
