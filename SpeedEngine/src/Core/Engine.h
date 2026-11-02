@@ -28,9 +28,6 @@ namespace SE
 		void stop();
 		CameraController& getCameraController() { return m_cameraController; }
 
-		// Submit each simulation update; copies text. Pixels, top-left line-box anchor, later draws on top.
-		// Simulation thread only (main thread in editor); never call from renderer/editor widget rendering.
-
 		// @brief Submits text to be rendered in the next RenderFrame
 		// @brief Use this instead of directly accessing the RenderFrameBuilder, as it is not thread-safe
 		// @param font The font to use for rendering the text
