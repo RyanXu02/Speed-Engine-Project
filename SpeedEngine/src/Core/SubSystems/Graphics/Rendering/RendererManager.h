@@ -21,6 +21,7 @@ namespace SE
 		GLbitfield clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 		glm::vec4 clearColor{ 0.1f, 0.1f, 0.1f, 1.0f };
 		double clearDepth = 1.0;
+		bool debugOnly = false;
 	};
 
 	// @brief Manager for all renderers in the engine
@@ -86,7 +87,10 @@ namespace SE
 		void init() override;
 		void shutdown() override;
 
-		void render(const RenderFrame& frame);
+		// @brief Renders a frame through all render passes
+		// @param frame The RenderFrame to render
+		// @param t The interpolation factor between the current and next frame
+		void render(const RenderFrame& frame, float t);
 
 	private:
 		explicit RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window){};

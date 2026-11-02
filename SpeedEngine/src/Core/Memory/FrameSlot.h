@@ -7,7 +7,7 @@ namespace SE
 	class FrameSlot
 	{
 	public:
-		static constexpr std::size_t InitialCapacity = 2 * 1024 * 1024;
+		static constexpr std::size_t InitialCapacity = 1 * 128;
 
 		explicit FrameSlot(std::size_t initialCapacity = InitialCapacity);
 

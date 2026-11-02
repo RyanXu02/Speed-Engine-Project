@@ -23,5 +23,7 @@ namespace SE
 
 	private:
 		RenderFrame* m_frame = nullptr;
+		std::size_t m_debugLineCapacity = 0;
+		std::size_t m_debugTriangleCapacity = 0;
 	};
 } // namespace SE

@@ -9,7 +9,7 @@
 
 namespace SE
 {
-	void DebugRenderer::init()
+	void DebugRenderer::_lazyInit()
 	{
 		m_logger.info("Initializing");
 
@@ -46,6 +46,9 @@ namespace SE
 		if (context.frame.debugLines.empty() && context.frame.debugTriangles.empty())
 			return;
 
+		if (!m_VAO)
+			_lazyInit();
+
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glDepthMask(GL_FALSE);
@@ -81,6 +84,9 @@ namespace SE
 
 	void DebugRenderer::shutdown()
 	{
+		if (!m_VAO && !m_VBO)
+			return;
+
 		m_logger.info("Shutting down");
 		glDeleteBuffers(1, &m_VBO);
 		glDeleteVertexArrays(1, &m_VAO);

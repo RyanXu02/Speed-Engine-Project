@@ -1,8 +1,7 @@
 #pragma once
-#include "../SubSystem.h"
+#include "Core/SubSystems/SubSystem.h"
 #include "KeyCodes.h"
-
-struct GLFWwindow;
+#include "InputEventQueue.h"
 
 namespace SE
 {
@@ -54,17 +53,12 @@ namespace SE
 		const MouseScroll& getMouseScroll() const;
 
 	private:
-		InputSystem()
-		    : SubSystem("InputSystem")
+		InputSystem(InputEventQueue& inputEvents)
+			: SubSystem("InputSystem"), m_inputEvents(inputEvents)
 		{}
 
-		void _setKeyState(KeyCodes key);
-		void _clearKeyState(KeyCodes key);
-
-		void _setMouseState(MouseCodes key);
-		void _clearMouseState(MouseCodes key);
-
-		void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+		InputEventQueue& m_inputEvents;
+		std::vector<InputEvent> m_pendingEvents;
 
 		std::bitset<512> m_keyCurrState{ 0 };
 		std::bitset<512> m_keyPrevState{ 0 };
@@ -77,10 +71,9 @@ namespace SE
 		std::bitset<8> m_mouseFalling{ 0 };
 
 		MousePos m_mousePosition{ 0.0, 0.0 };
-		MousePos m_prevMousePosition{ 0.0, 0.0 };
-		MousePos m_mouseDelta{ 0.0, 0.0 }; // per-frame
+		MousePos m_mouseDelta{ 0.0, 0.0 }; // per simulation tick
+		bool m_hasMousePosition = false;
 
 		MouseScroll m_mouseScroll{ 0.0, 0.0 };
-		MouseScroll m_mouseScrollAccumulated{ 0.0, 0.0 };
 	};
 } // namespace SE
