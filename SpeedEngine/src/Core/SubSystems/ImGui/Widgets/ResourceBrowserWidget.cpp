@@ -195,6 +195,7 @@ namespace SE
 		case ResourceType::Shader: return "Shader";
 		case ResourceType::Material: return "Material";
 		case ResourceType::MeshResource: return "Mesh";
+		case ResourceType::Font: return "Font";
 		default: return "Unknown";
 		}
 	}
@@ -206,6 +207,7 @@ namespace SE
 		case ResourceType::Shader: return ImVec4(0.2f, 0.8f, 0.2f, 0.8f); // Green
 		case ResourceType::Material: return ImVec4(0.8f, 0.2f, 0.8f, 0.8f); // Magenta
 		case ResourceType::MeshResource: return ImVec4(0.1f, 0.2f, 0.8f, 0.8f); // Blue
+		case ResourceType::Font: return ImVec4(0.9f, 0.6f, 0.2f, 0.8f); // Orange
 		default: return ImVec4(0.5f, 0.5f, 0.5f, 0.8f); // Gray
 		}
 	}
