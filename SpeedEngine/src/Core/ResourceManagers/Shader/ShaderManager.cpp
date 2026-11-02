@@ -27,18 +27,17 @@ namespace SE
 			}
 		}
 		m_shaders.clear();
+		m_shaderPaths.clear();
 
 		m_logger->info("ShaderManager cleared all shaders.");
 	}
 
-	//@brief adds a shader to be managed by the ShaderManager. if a shader of
-	// programName already exists, returns id of existing shader
+	//@brief loads a shader, reusing an existing shader with the same source paths
 	//@param id id of new shader
 	//@param vertexShaderPath path to vertex shader file
 	//@param fragmentShaderPath path to fragment shader file
 	//@param programName name of shader program to create
-	//@returns id of new shader, or id of existing shader if new shader would be a
-	// duplicate name
+	//@returns an existing or new shader ID, or 0 on failure
 	uint32_t ShaderManager::addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName)
 	{
 		// check if vertex and fragment shader paths are valid
@@ -48,34 +47,35 @@ namespace SE
 			m_logger->critical("One or more invalid shader paths: {} and {}", vertexShaderPath, fragmentShaderPath);
 			return 0;
 		}
-		// look for in cache
-		auto it = std::ranges::find_if(m_shaders,
-		    [programName](const auto& kv)
-		    {
-			    return kv.second->getResourceName() == programName;
-		    });
-		if (it != m_shaders.end())
+		if (auto it = m_shaderPaths.find(shaderPaths); it != m_shaderPaths.end())
 		{
-			m_logger->debug("Shader with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
-			return it->first;
+			assert(m_shaders.contains(it->second));
+			return it->second;
 		}
 
 		// Load shader source code from file
 		auto shader = std::make_unique<Shader>(id, std::string(programName));
 
-		const std::string* vertexSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.first);
-		const std::string* fragmentSource = Engine::Instance().getSubSystem<ResourceManager>()->getString(shaderPaths.second);
+		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
+		const std::string* vertexSource = resources->getString(shaderPaths.first);
+		const std::string* fragmentSource = resources->getString(shaderPaths.second);
 		if (!vertexSource || !fragmentSource)
+		{
+			resources->forgetShaderSources(shaderPaths);
 			return 0;
+		}
 
 		GLCompStatus status = shader->init(*vertexSource, *fragmentSource);
 		if (!status.success)
 		{
 			m_logger->critical("Shader compilation failed for {}: {}", programName, status.log);
+			resources->forgetShaderSources(shaderPaths);
 			return 0;
 		}
 
 		m_shaders.try_emplace(id, std::move(shader));
+		m_shaderPaths.emplace(shaderPaths, id);
+		assert(m_shaderPaths.size() == m_shaders.size());
 
 		m_logger->info("Shader '{}' loaded: ID {}", m_shaders[id]->getResourceName(), id);
 
@@ -97,14 +97,14 @@ namespace SE
 		// variable
 		if (vertexShaderPath.contains(".vert"))
 		{
-			shaderPaths.first = std::string(vertexShaderPath);
-			shaderPaths.second = std::string(fragmentShaderPath);
+			shaderPaths.first = normalizeResourcePath(vertexShaderPath);
+			shaderPaths.second = normalizeResourcePath(fragmentShaderPath);
 		}
 		else // vertexShaderPath contains .frag meaning user passed in fragment path
 		    // to this variable, swap in shaderPaths
 		{
-			shaderPaths.first = std::string(fragmentShaderPath);
-			shaderPaths.second = std::string(vertexShaderPath);
+			shaderPaths.first = normalizeResourcePath(fragmentShaderPath);
+			shaderPaths.second = normalizeResourcePath(vertexShaderPath);
 		}
 
 		return shaderPaths;
@@ -126,6 +126,14 @@ namespace SE
 			return false;
 
 		m_shaders.erase(shaderId);
+		std::erase_if(m_shaderPaths, [shaderId](const auto& entry)
+		{
+			if (entry.second != shaderId)
+				return false;
+			Engine::Instance().getSubSystem<ResourceManager>()->forgetShaderSources(entry.first);
+			return true;
+		});
+		assert(m_shaderPaths.size() == m_shaders.size());
 		return true;
 	}
 } // namespace SE

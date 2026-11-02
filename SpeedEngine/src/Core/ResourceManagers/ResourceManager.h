@@ -43,6 +43,7 @@ namespace SE
 	{
 	public:
 		friend class Engine;
+		friend class ShaderManager;
 
 		void init() override;
 		void shutdown() override;
@@ -56,21 +57,21 @@ namespace SE
 		//@returns pointer to filePath's entire contents	
 		const std::string* getString(std::string_view filePath);
 
-		// @brief loads a shader from the specified paths and returns its id
+		// @brief loads or reuses a shader by source paths. Name is only a display label
 		// @param vertexShaderPath path to the vertex shader file
 		// @param fragmentShaderPath path to the fragment shader file
 		// @param name name of the shader
 		uint32_t loadShader(const ShaderLoadDesc& desc);
-		// @brief loads a mesh from the specified path and returns its id
+		// @brief loads or reuses a mesh by file path. Name is only a display label
 		// @param path path to the mesh file
 		// @param name name of the mesh
 		uint32_t loadMesh(const MeshLoadDesc& desc);
-		// @brief loads a font from the specified path and returns its id
+		// @brief loads or reuses a font by file path and pixel height. Name is only a display label
 		// @param path path to the font file
 		// @param pixelHeight height of the font in pixels
 		// @param name name of the font
 		uint32_t loadFont(const FontLoadDesc& desc);
-		// @brief creates a material from the specified shader and textures and returns its id
+		// @brief creates a new material, even if another material has the same name
 		// @param shaderId id of the shader to use for the material
 		// @param textures array of texture types and paths to use for the material
 		// @param name name of the material
@@ -130,6 +131,10 @@ namespace SE
 		bool removeResource(uint32_t id);
 
 	private:
+		// @brief removes the cached shader source code
+		// @param paths the pair of vertex and fragment shader paths to remove from cache
+		void forgetShaderSources(const std::pair<std::string, std::string>& paths);
+
 		// singleton instance, use singleton Engine to access its subsystems
 		ResourceManager()
 		    : SubSystem("ResourceManager")

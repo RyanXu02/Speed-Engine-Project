@@ -26,18 +26,6 @@ namespace SE
 
 	uint32_t MaterialManager::addMaterial(uint32_t id, uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures, std::string_view materialName)
 	{
-		// look for material in cache
-		auto it = std::ranges::find_if(m_materials,
-		    [materialName](const auto& kv)
-		    {
-			    return kv.second->getResourceName() == materialName;
-		    });
-		if (it != m_materials.end())
-		{
-			m_logger->debug("Material with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
-			return it->first;
-		}
-
 		auto newMat = std::make_unique<Material>(id, materialName, *m_logger);
 		if (!newMat->init(shaderId, textures))
 			return 0;

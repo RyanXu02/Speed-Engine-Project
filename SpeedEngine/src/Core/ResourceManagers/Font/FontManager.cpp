@@ -35,9 +35,12 @@ namespace SE
 			m_logger->error("Cannot load font '{}': FreeType unavailable or pixel height is zero", path);
 			return 0;
 		}
-		const auto key = std::make_pair(std::string(path), pixelHeight);
+		const auto key = std::make_pair(normalizeResourcePath(path), pixelHeight);
 		if (auto it = m_variants.find(key); it != m_variants.end())
+		{
+			assert(m_fonts.contains(it->second));
 			return it->second;
+		}
 
 		FT_Face face = nullptr;
 		if (const auto error = FT_New_Face(m_library, key.first.c_str(), 0, &face))
@@ -133,6 +136,7 @@ namespace SE
 
 		m_fonts.emplace(id, std::make_unique<Font>(id, std::string(name), std::move(data)));
 		m_variants.emplace(key, id);
+		assert(m_variants.size() == m_fonts.size());
 		m_logger->info("Loaded font '{}' at {} pixels: ID {}", path, pixelHeight, id);
 		return id;
 	}
@@ -148,6 +152,7 @@ namespace SE
 		if (!m_fonts.erase(id))
 			return false;
 		std::erase_if(m_variants, [id](const auto& entry) { return entry.second == id; });
+		assert(m_variants.size() == m_fonts.size());
 		return true;
 	}
 } // namespace SE
