@@ -28,6 +28,20 @@ namespace SE
 		void stop();
 		CameraController& getCameraController() { return m_cameraController; }
 
+		// Submit each simulation update; copies text. Pixels, top-left line-box anchor, later draws on top.
+		// Simulation thread only (main thread in editor); never call from renderer/editor widget rendering.
+
+		// @brief Submits text to be rendered in the next RenderFrame
+		// @brief Use this instead of directly accessing the RenderFrameBuilder, as it is not thread-safe
+		// @param font The font to use for rendering the text
+		// @param text The text to render
+		// @param position The position in pixels from the top left
+		// @param color The color of the text
+		void submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color = glm::vec4(1.0f))
+		{
+			m_frameBuilder.submitText(std::move(font), text, position, color);
+		}
+
 		// @brief Get the requested SubSystem, use this for all subsystems in the
 		// engine
 		// @tparam T The type of the SubSystem to get
@@ -81,5 +95,7 @@ namespace SE
 
 		EventSubscription m_windowCloseEvent;
 		EventSubscription m_cameraSwitchEvent;
+
+		FontHandle QSfont; // temporary
 	};
 } // namespace SE
