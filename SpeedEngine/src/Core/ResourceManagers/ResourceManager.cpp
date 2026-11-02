@@ -2,11 +2,8 @@
 
 #include "ResourceManager.h"
 
-#include "../Logger/Logger.h"
+#include "Core/Logger/Logger.h"
 #include "Engine.h"
-#include "Material/MaterialManager.h"
-#include "MeshResource/MeshResourceManager.h"
-#include "Shader/ShaderManager.h"
 
 namespace SE
 {
@@ -14,28 +11,74 @@ namespace SE
 	{
 		SubSystem::init();
 
-		// init managers
-		m_managers.emplace_back(std::make_unique<ShaderManager>());
-		m_managers.emplace_back(std::make_unique<MaterialManager>());
-		m_managers.emplace_back(std::make_unique<MeshResourceManager>());
-		m_managers.emplace_back(std::make_unique<FontManager>());
-		//...
-		for (auto& manager : m_managers)
-		{
-			manager->init();
-		}
+		m_shaderManager.init();
+		m_materialManager.init();
+		m_meshManager.init();
+		m_fontManager.init();
 	}
 
 	void ResourceManager::shutdown()
 	{
 		SubSystem::shutdown();
 
-		for (auto& manager : m_managers)
-		{
-			manager->shutdown();
-		}
-		m_managers.clear();
+		m_shaderManager.shutdown();
+		m_materialManager.shutdown();
+		m_meshManager.shutdown();
+		m_fontManager.shutdown();
 	}
+
+	uint32_t ResourceManager::loadShader(const ShaderLoadDesc& desc)
+	{
+		uint32_t id = m_shaderManager.addShader(generateId(), desc.vertexShaderPath, desc.fragmentShaderPath, desc.name);
+		if (id != 0)
+		{
+			m_resourceTypes.insert({ id, ResourceType::Shader });
+		}
+#if defined(COMPILE_WITH_EDITOR)
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Shader, true));
+#endif
+		return id;
+	}
+
+	uint32_t ResourceManager::loadMesh(const MeshLoadDesc& desc)
+	{
+		uint32_t id = m_meshManager.addMeshResource(generateId(), desc.name, desc.path);
+		if (id != 0)
+		{
+			m_resourceTypes.insert({ id, ResourceType::MeshResource });
+		}
+#if defined(COMPILE_WITH_EDITOR)
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::MeshResource, true));
+#endif
+		return id;
+	}
+
+	uint32_t ResourceManager::loadFont(const FontLoadDesc& desc)
+	{
+		uint32_t id = m_fontManager.addFont(generateId(), desc.path, desc.pixelHeight, desc.name);
+		if (id != 0)
+		{
+			m_resourceTypes.insert({ id, ResourceType::Font });
+#if defined(COMPILE_WITH_EDITOR)
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Font, true));
+#endif
+		}
+		return id;
+	}
+
+	uint32_t ResourceManager::createMaterial(const MaterialDesc& desc)
+	{
+		uint32_t id = m_materialManager.addMaterial(generateId(), desc.shaderId, desc.textures, desc.name);
+		if (id != 0)
+		{
+			m_resourceTypes.insert({ id, ResourceType::Material });
+		}
+#if defined(COMPILE_WITH_EDITOR)
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Material, true));
+#endif
+		return id;
+	}
+
 
 	uint32_t ResourceManager::generateId()
 	{
@@ -85,19 +128,19 @@ namespace SE
 		{
 			if (it->second == ResourceType::Shader)
 			{
-				return _getManager<ShaderManager>()->getShader(id);
+				return m_shaderManager.getShader(id);
 			}
 			else if (it->second == ResourceType::Material)
 			{
-				return _getManager<MaterialManager>()->getMaterial(id);
+				return m_materialManager.getMaterial(id);
 			}
 			else if (it->second == ResourceType::MeshResource)
 			{
-				return _getManager<MeshResourceManager>()->getMeshResource(id);
+				return m_meshManager.getMeshResource(id);
 			}
 			else if (it->second == ResourceType::Font)
 			{
-				return _getManager<FontManager>()->getFont(id);
+				return m_fontManager.getFont(id);
 			}
 			//.......
 		}
@@ -112,7 +155,7 @@ namespace SE
 			return false;
 		if (it->second == ResourceType::Shader)
 		{
-			removed = _getManager<ShaderManager>()->removeShader(id);
+			removed = m_shaderManager.removeShader(id);
 #if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 #endif
@@ -120,7 +163,7 @@ namespace SE
 		}
 		else if (it->second == ResourceType::Material)
 		{
-			removed = _getManager<MaterialManager>()->removeMaterial(id);
+			removed = m_materialManager.removeMaterial(id);
 #if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 #endif
@@ -128,7 +171,7 @@ namespace SE
 		}
 		else if (it->second == ResourceType::MeshResource)
 		{
-			removed = _getManager<MeshResourceManager>()->removeMeshResource(id);
+			removed = m_meshManager.removeMeshResource(id);
 #if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
 #endif
@@ -136,7 +179,7 @@ namespace SE
 		}
 		else if (it->second == ResourceType::Font)
 		{
-			removed = _getManager<FontManager>()->removeFont(id);
+			removed = m_fontManager.removeFont(id);
 			if (removed)
 			{
 				m_resourceTypes.erase(it);

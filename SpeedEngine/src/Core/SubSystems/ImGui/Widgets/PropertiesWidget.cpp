@@ -61,7 +61,7 @@ namespace SE
 				    uint32_t resource = 0;
 				    const bool empty = m_meshPathDraft.empty() || m_meshPathDraft == "None";
 				    if (!empty)
-					    resource = Engine::Instance().getSubSystem<ResourceManager>()->addResource<ResourceType::MeshResource>(m_meshPathDraft, m_meshPathDraft);
+						resource = Engine::Instance().getSubSystem<ResourceManager>()->loadMesh({ .path = m_meshPathDraft, .name = m_meshPathDraft });
 				    if (empty || resource != 0)
 				    {
 					    component.path = m_meshPathDraft;

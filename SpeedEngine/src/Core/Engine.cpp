@@ -86,16 +86,26 @@ namespace SE
 		
 		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
 
-		uint32_t fontid = resourceManager->addResource<ResourceType::Font>("fonts/Quicksand-Regular.ttf", 32, "QSfont");
+		uint32_t fontid = resourceManager->loadFont({ 
+			.path = "fonts/Quicksand-Regular.ttf", 
+			.pixelHeight = 32, 
+			.name = "QSfont" });
 		QSfont = resourceManager->getResource<Font>(fontid)->getHandle();
 
-		uint32_t defaultShaderId = resourceManager->addResource<ResourceType::Shader>("Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader");
+		uint32_t defaultShaderId = resourceManager->loadShader({
+			.vertexShaderPath = "Assets/Shaders/default.vert",
+			.fragmentShaderPath = "Assets/Shaders/default.frag",
+			.name = "defaultShader"
+		});
 		sceneRenderer->setDefaultShaderId(defaultShaderId);
 		
 		const std::pair<TextureType, std::string_view> defaultTextures[] = {
 			{ TextureType::Albedo, "Assets/Textures/default-texture-128.png" }
 		};
-		uint32_t defaultMaterialId = resourceManager->addResource<ResourceType::Material>(defaultShaderId, defaultTextures, "defaultMaterial");
+		uint32_t defaultMaterialId = resourceManager->createMaterial({ 
+			.shaderId = defaultShaderId, 
+			.textures = defaultTextures, 
+			.name = "defaultMaterial" });
 		sceneRenderer->setDefaultMaterialId(defaultMaterialId);
 	}
 
