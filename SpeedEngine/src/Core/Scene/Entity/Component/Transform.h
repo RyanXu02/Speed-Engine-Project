@@ -1,14 +1,25 @@
 #pragma once
+#include "Features/Serializable.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <nlohmann/json.hpp>
-#include <string>
 
 
 namespace glm
 {
+	inline void to_json(nlohmann::json& j, const glm::vec2& v)
+	{
+		j = nlohmann::json{ v.x, v.y };
+	}
+
+	inline void from_json(const nlohmann::json& j, glm::vec2& v)
+	{
+		j.at(0).get_to(v.x);
+		j.at(1).get_to(v.y);
+	}
+
 	inline void to_json(nlohmann::json& j, const glm::vec3& v)
 	{
 		j = nlohmann::json{ v.x, v.y, v.z };
@@ -100,8 +111,11 @@ namespace SE
 		const glm::vec3& getScale() const { return scale; }
 		const glm::mat4& getTransform();
 
-		//this is fine for now, the script needs custom functionality anyway so manually define it in script
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(Transform, translate, rotate, scale);
+		DEFINE_TYPE(Transform,
+			member("translate", &Transform::translate),
+			member("rotate", &Transform::rotate),
+			member("scale", &Transform::scale)
+		);
 
 	private:
 		bool m_scaleLink{ true };

@@ -308,6 +308,15 @@ namespace SE
 			    }
 		    });
 
+		m_inspectors.registerComponent<UICanvasComponent>("UICanvasComponent");
+		m_inspectors.registerComponent<UIRectComponent>("UIRectComponent");
+		m_inspectors.registerComponent<UIElementComponent>("UIElementComponent");
+		m_inspectors.registerComponent<UIImageComponent>("UIImageComponent");
+		m_inspectors.registerComponent<UITextComponent>("UITextComponent");
+		m_inspectors.registerComponent<UISelectableComponent>("UISelectableComponent");
+		m_inspectors.registerComponent<UIButtonComponent>("UIButtonComponent");
+		m_inspectors.registerComponent<UISliderComponent>("UISliderComponent");
+
 #pragma endregion RegisterComponentEditors
 
 

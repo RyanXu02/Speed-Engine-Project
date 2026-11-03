@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Editor|x64">
@@ -267,6 +267,14 @@
     <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h" />
     <ClInclude Include="src\Core\Features\Serializable.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UICanvasComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIRectComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIElementComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIImageComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UITextComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISelectableComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIButtonComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISliderComponent.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />

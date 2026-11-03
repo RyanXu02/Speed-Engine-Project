@@ -44,6 +44,14 @@ namespace SE
 		REGISTER_COMPONENT(PhysicsShapeMesh, Entity::_onPhysicsShapeMeshComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(AudioSFXComponent, Entity::_onSFXComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(AudioMusicComponent, Entity::_onMusicComponentAdded(), NO_DEFINE);
+		REGISTER_COMPONENT(UICanvasComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(UIRectComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(UIElementComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(UIImageComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(UITextComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(UISelectableComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(UIButtonComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(UISliderComponent, NO_DEFINE, NO_DEFINE);
 
 	}
 
