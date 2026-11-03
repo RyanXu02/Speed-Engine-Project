@@ -291,6 +291,12 @@ namespace SE
 			    }
 		    });
 
+		m_inspectors.registerComponent<ParticleEmitter>("ParticleEmitter", true, 
+			[](Entity&, ParticleEmitter& component) 
+			{
+			    ImGui::Button("hi");
+			});
+
 #pragma endregion RegisterComponentEditors
 
 

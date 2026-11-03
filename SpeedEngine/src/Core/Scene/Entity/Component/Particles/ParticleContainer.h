@@ -1,4 +1,6 @@
 #pragma once
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 namespace SE
 {
@@ -27,9 +29,6 @@ namespace SE
 
         void Update(std::function<void(Particle& particle, float dt)> const& lambda, float dt);
 
-        // @brief Render the Object each frame.
-        void Render(std::function<void(const Particle& particle)> const& lambda) const;
-
         //do we have no active particles?
         bool IsEmpty() const;
 
@@ -49,4 +48,4 @@ namespace SE
         bool mOneShot{false};
     };
 
-}  // namespace mts
+}  // namespace SE

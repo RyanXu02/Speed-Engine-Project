@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "ParticleEmitter.h"
-#include "ParticleContainer.h"
 #include "Core/Features/RNG.h"
 #include "Core/Features/Math.h"
 
@@ -8,6 +7,9 @@ namespace SE
 {
     void ParticleEmitter::update(float dt)
     {
+        // the added-hook only runs for deserialized components, so make sure the container exists
+        finalize();
+
         // lambda function to update a particle
         auto lambda = [this](Particle& particle, float dt)
         {
@@ -97,7 +99,7 @@ namespace SE
 
             // Set random starting rotation of particle
 			particle->rotation = RNG::Range(mRotationMin, mRotationMax);
-            //================================================================TRANSLATE TO 3D==================================================
+            
             // Set random rotation speed between min and max, also randomize rotation direction (+ or -)
 			float rotationSpeed = RNG::Range(mRotationSpeedMin, mRotationSpeedMax);
 			if (RNG::Range(0, 1) == 1)
@@ -105,16 +107,32 @@ namespace SE
             else
                 particle->rotationSpeed = -rotationSpeed;
 
+            //==========VELOCITY DIRECTION CALCULATION==========================
             // Set velocity direction, if direction < 0, set to random direction
-            glm::vec2 dir;
-			float dirRad = RNG::Range(mDirectionRange.x, mDirectionRange.y);
-            dir = glm::vec2(glm::cos(dirRad), glm::sin(dirRad));
+			float minA = glm::radians(mConeAngleRange.x);
+			float maxA = glm::radians(mConeAngleRange.y);
 
+			// Sample cos(theta) so the distribution is uniform over the sphere surface
+			float cosTheta = RNG::Range(glm::cos(maxA), glm::cos(minA));
+			float sinTheta = glm::sqrt(glm::max(0.f, 1.f - cosTheta * cosTheta));
+			float phi = glm::radians(RNG::Range(mAzimuthRange.x, mAzimuthRange.y));
+
+			// Direction in a local frame where the axis is +Z
+			glm::vec3 local(sinTheta * glm::cos(phi), sinTheta * glm::sin(phi), cosTheta);
+
+			// Build an orthonormal basis around the emission axis
+			glm::vec3 axis = glm::normalize(mDirectionAxis);
+			glm::vec3 up = (glm::abs(axis.y) < 0.99f) ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
+			glm::vec3 right = glm::normalize(glm::cross(up, axis));
+			glm::vec3 fwd = glm::cross(axis, right);
+
+			glm::vec3 dir = right * local.x + fwd * local.y + axis * local.z;
+            //===========END VELOCITY DIRECTION CALCULATION===================
             // Set random speed between min and max
 			float speed = RNG::Range(mSpeedMin, mSpeedMax);
             dir *= speed;
             particle->velocity = dir;
-            //==================================================================================================================
+            
             // Set particle initial acceleration
             particle->acceleration = mAcceleration;
         }
@@ -122,6 +140,7 @@ namespace SE
 
     void ParticleEmitter::ForEachParticle(std::function<void(Particle& particle, float dt)> const& lambda, float dt)
     {
+        finalize();
         mContainer->Update(lambda, dt);
     }
 

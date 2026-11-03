@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Features/Serializable.h"
 #include "Core/Scene/Entity/Component/Transform.h"
+#include "ParticleContainer.h"
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -8,17 +9,13 @@
 namespace SE
 {
     // Forward Declaration
-    struct Particle;
-    class ParticleContainer;
-    class Texture;
 
     class ParticleEmitter
     {
     public:
-        ParticleEmitter() = default;
-		~ParticleEmitter() = default;
+		ParticleEmitter() = default;
 
-        void update(float dt);
+		void update(float dt);
 
         void SetFrame(int frameIndex, Particle* particle);
         void EmitParticle();
@@ -31,7 +28,7 @@ namespace SE
 		void acquireTransform(const Transform* tr) { myTransform = tr; }
 
         glm::vec2 GetAcceleration() const { return mAcceleration; }
-        void SetAcceleration(glm::vec2 v) { mAcceleration = v; }
+        void SetAcceleration(glm::vec3 v) { mAcceleration = v; }
 
         void ToggleEmitter() { mIsRunning ^= true; }
         void StartEmitter() { mIsRunning = true; }
@@ -49,14 +46,18 @@ namespace SE
         void SetNumRows(int v) { mNumRows = v; }
         int GetNumCols() const { return mNumCols; }
         void SetNumCols(int v) { mNumCols = v; }
-        glm::vec2 GetEmitterScale() const { return mEmitterScale; }
-        void SetEmitterScale(glm::vec2 v) { mEmitterScale = v; }
-        glm::vec2 GetScaleMin() const { return mScaleMin; }
-        void SetScaleMin(glm::vec2 v) { mScaleMin = v; }
-        glm::vec2 GetScaleMax() const { return mScaleMax; }
-        void SetScaleMax(glm::vec2 v) { mScaleMax = v; }
-        glm::vec2 GetDirectionRange() const { return mDirectionRange; }
-        void SetDirectionRange(glm::vec2 v) { mDirectionRange = v; }
+        glm::vec3 GetEmitterScale() const { return mEmitterScale; }
+        void SetEmitterScale(glm::vec3 v) { mEmitterScale = v; }
+        glm::vec3 GetScaleMin() const { return mScaleMin; }
+        void SetScaleMin(glm::vec3 v) { mScaleMin = v; }
+        glm::vec3 GetScaleMax() const { return mScaleMax; }
+        void SetScaleMax(glm::vec3 v) { mScaleMax = v; }
+        glm::vec3 GetDirectionAxis() const { return mDirectionAxis; }
+        void SetDirectionAxis(glm::vec3 v) { mDirectionAxis = v; }
+		glm::vec2 GetConeAngleRange() const { return mConeAngleRange; }
+		void SetConeAngleRange(glm::vec2 v) { mConeAngleRange = v; }
+		glm::vec2 GetAzimuthRange() const { return mAzimuthRange; }
+		void SetAzimuthRange(glm::vec2 v) { mAzimuthRange = v; }
         float GetEmitRate() const { return mEmitRate; }
         void SetEmitRate(float v) { mEmitRate = v; }
         unsigned GetEmitMax() const { return mEmitMax; }
@@ -95,7 +96,9 @@ namespace SE
             member("particleScaleMin", &ParticleEmitter::mScaleMin),
             member("particleScaleMax", &ParticleEmitter::mScaleMax),
             member("acceleration", &ParticleEmitter::mAcceleration),
-            member("directionRange", &ParticleEmitter::mDirectionRange),
+            member("directionAxis", &ParticleEmitter::mDirectionAxis),
+            member("coneAngleRange", &ParticleEmitter::mConeAngleRange),
+            member("azimuthRange", &ParticleEmitter::mAzimuthRange),
             member("emitRate", &ParticleEmitter::mEmitRate),
             member("emitMax", &ParticleEmitter::mEmitMax),
             member("lifetimeMin", &ParticleEmitter::mLifetimeMin),
@@ -121,8 +124,10 @@ namespace SE
         glm::vec3 mScaleMin{1.0f, 1.0f, 1.f};
         glm::vec3 mScaleMax{1.0f, 1.0f, 1.f};
         glm::vec3 mAcceleration{0.0f, 0.0f, 0.f};
-		//for choosing random velocity direction. ex:(0,360) = emitted in any 2d direction from point of emission
-        glm::vec3 mDirectionRange{0.0f, 6.28f};
+		
+		glm::vec3 mDirectionAxis{ 0.f, 1.f, 0.f }; // emission axis (cone center)
+		glm::vec2 mConeAngleRange{ 0.f, 180.f }; // min/max angle away from the axis, degrees
+		glm::vec2 mAzimuthRange{ 0.f, 360.f }; // optional: spin around the axis, degrees
 
         float mEmitAccumulator{0.0f};
         float mEmitRate{1.0f};
@@ -139,9 +144,29 @@ namespace SE
         bool mIsRunning{true};
 
         //replaces GetGameObj()->getComponent<Transform> from mitosis engine code in conjunction with SE::ParticleEmitter::acquireTransform
-        const Transform* myTransform;
+		const Transform* myTransform{ nullptr };
 		bool mIsDone{ false };
 
-        std::unique_ptr<ParticleContainer> mContainer{};
+        // component storage needs copy-constructible types. this is a unique_ptr that is copy-constructible
+        // but copies are empty. No need to copy over the particles themselves.
+        // Doing this also means we dont have to write the big 4 for the ParticleEmitter, which has like 20+ goddam fields
+        struct ContainerPtr : std::unique_ptr<ParticleContainer>
+        {
+            using std::unique_ptr<ParticleContainer>::unique_ptr;
+            using std::unique_ptr<ParticleContainer>::operator=;
+
+            ContainerPtr() = default;
+            ContainerPtr(const ContainerPtr&) {}
+            ContainerPtr& operator=(const ContainerPtr& other)
+            {
+                if (this != &other)
+                    reset();
+                return *this;
+            }
+            ContainerPtr(ContainerPtr&&) = default;
+            ContainerPtr& operator=(ContainerPtr&&) = default;
+        };
+
+        ContainerPtr mContainer{};
     };
 }  // namespace SE

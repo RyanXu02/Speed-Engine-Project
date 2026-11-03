@@ -23,16 +23,6 @@ namespace SE
         }
     }
 
-    // @brief Render the Object each frame.
-    void ParticleContainer::Render(std::function<void(const Particle& particle)> const& lambda) const
-    {
-        // Pass all particles to lambda render function
-        for (const auto& particle : mParticles)
-        {
-            lambda(particle);
-        }
-    }
-
     bool ParticleContainer::IsEmpty() const
     {
         return mNumActiveParticles == 0;
@@ -73,4 +63,4 @@ namespace SE
         }
         --mNumActiveParticles;
     }
-}  // namespace mts
+}  // namespace SE
