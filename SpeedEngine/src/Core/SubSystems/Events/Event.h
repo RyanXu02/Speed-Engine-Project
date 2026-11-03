@@ -2,7 +2,9 @@
 
 #include "../../ResourceManagers/Resource.h"
 #include "core/features/Serializable.h"
+#include "Core/Scene/Entity/Component/Transform.h"
 #include "glm/glm.hpp"
+#include <Jolt/Physics/Body/BodyID.h>
 
 
 // When adding editor-only events, add them at the bottom of this file inside the COMPILE_WITH_EDITOR block
@@ -28,6 +30,9 @@ namespace SE
 		SceneChanged, // Active scene has been changed
 		ActiveSceneModified, // Active scene has been modified (entity added, removed, renamed)
 		CameraSwitched,
+		CollisionAddedEvent,
+		CollisionPersistedEvent,
+		CollisionRemovedEvent,
 #if defined(COMPILE_WITH_EDITOR)
 		EntitySelected, // An entity has been selected in the SceneInfoWidget
 		ResourceChanged, // A resource in the resource manager has been added or removed
@@ -154,6 +159,73 @@ namespace SE
 		std::string getName() const override { return "ActiveSceneModified"; }
 		std::string getDataAsString() const override { return std::format("modifytype {}, id {}, name {}", static_cast<int>(modifytype), id, name); }
 	};
+
+	// @brief Event that is triggered when two rigidbodies first collide
+	class CollisionAddedEvent : public Event
+	{
+	public:
+		uint32_t bodyID1;
+		uint32_t bodyID2;
+		glm::vec3 normal;
+		glm::vec3 id1Velocity;
+		glm::vec3 id2Velocity;
+		CollisionAddedEvent(uint32_t bodyID1, uint32_t bodyID2, glm::vec3 normal, glm::vec3 id1Velocity, glm::vec3 id2Velocity)
+		    : bodyID1(bodyID1),
+		      bodyID2(bodyID2),
+		      normal(normal),
+		      id1Velocity(id1Velocity),
+		      id2Velocity(id2Velocity)
+		{}
+		EventType getEventType() const override { return EventType::CollisionAddedEvent; }
+		std::string getName() const override { return "CollisionAddedEvent"; }
+		std::string getDataAsString() const override { return std::format("Entity with BodyID {} collided with entity with BodyID {}", bodyID1, bodyID2); }
+		DEFINE_TYPE(CollisionAddedEvent,
+			member("bodyID1", &CollisionAddedEvent::bodyID1),
+			member("bodyID2", &CollisionAddedEvent::bodyID2),
+			member("normal", &CollisionAddedEvent::normal),
+			member("id1Velocity", &CollisionAddedEvent::id1Velocity),
+			member("id2Velocity", &CollisionAddedEvent::id2Velocity));
+	};
+
+	// @brief Event that is triggered when two rigidbodies continue colliding
+	class CollisionPersistedEvent : public Event
+	{
+	public:
+		uint32_t bodyID1;
+		uint32_t bodyID2;
+		glm::vec3 normal;
+		CollisionPersistedEvent(uint32_t bodyID1, uint32_t bodyID2, glm::vec3 normal)
+		    : bodyID1(bodyID1),
+		      bodyID2(bodyID2),
+		      normal(normal)
+		{}
+		EventType getEventType() const override { return EventType::CollisionPersistedEvent; }
+		std::string getName() const override { return "CollisionPersistedEvent"; }
+		std::string getDataAsString() const override { return std::format("Entity with BodyID {} continued colliding with entity with BodyID {}", bodyID1, bodyID2); }
+		DEFINE_TYPE(CollisionPersistedEvent,
+			member("bodyID1", &CollisionPersistedEvent::bodyID1),
+			member("bodyID2", &CollisionPersistedEvent::bodyID2),
+			member("normal", &CollisionPersistedEvent::normal));
+	};
+
+	// @brief Event that is triggered when two rigidbodies stop colliding
+	class CollisionRemovedEvent : public Event
+	{
+	public:
+		uint32_t bodyID1;
+		uint32_t bodyID2;
+		CollisionRemovedEvent(uint32_t bodyID1, uint32_t bodyID2)
+		    : bodyID1(bodyID1),
+		      bodyID2(bodyID2)
+		{}
+		EventType getEventType() const override { return EventType::CollisionRemovedEvent; }
+		std::string getName() const override { return "CollisionRemovedEvent"; }
+		std::string getDataAsString() const override { return std::format("Entity with BodyID {} stopped colliding with entity with BodyID {}", bodyID1, bodyID2); }
+		DEFINE_TYPE(CollisionRemovedEvent,
+			member("bodyID1", &CollisionRemovedEvent::bodyID1),
+			member("bodyID2", &CollisionRemovedEvent::bodyID2));
+	};
+
 #if defined(COMPILE_WITH_EDITOR)
 	// @brief Event that is triggered when an entity is selected in the
 	// SceneInfoWidget

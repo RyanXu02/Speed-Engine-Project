@@ -74,6 +74,7 @@ namespace SE
 			bodySettings.mObjectLayer = 0;
 		else
 			bodySettings.mObjectLayer = 1;
+		bodySettings.mMotionQuality = JPH::EMotionQuality::Discrete;
 		bodySettings.mFriction = m_friction;
 		bodySettings.mRestitution = m_restitution;
 		bodySettings.mMaxLinearVelocity = m_maxLinearVelocity;

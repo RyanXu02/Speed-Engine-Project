@@ -95,7 +95,7 @@ namespace SE
 		}
 
 		const glm::vec3& getTranslation() const { return translate; }
-		const glm::vec3& getRotation() const { return glm::eulerAngles(rotate); }
+		const glm::vec3 getRotation() const { return glm::eulerAngles(rotate); }
 		const glm::quat& getRotationQuat() const { return rotate; }
 		const glm::vec3& getScale() const { return scale; }
 		const glm::mat4& getTransform();

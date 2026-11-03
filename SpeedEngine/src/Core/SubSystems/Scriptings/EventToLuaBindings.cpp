@@ -31,7 +31,10 @@ namespace SE
 			"MouseScrolled", EventType::MouseScrolled,
 			"SceneChanged", EventType::SceneChanged,
 			"ActiveSceneModified", EventType::ActiveSceneModified,
-            "CameraSwitched", EventType::CameraSwitched
+            "CameraSwitched", EventType::CameraSwitched, 
+            "CollisionAddedEvent", EventType::CollisionAddedEvent,
+            "CollisionPersistedEvent", EventType::CollisionPersistedEvent,
+            "CollisionRemovedEvent", EventType::CollisionRemovedEvent
 			// "EntitySelected", EventType::EntitySelected 
 			// "ResourceChanged", EventType::ResourceChanged
 		);
@@ -77,6 +80,9 @@ namespace SE
 		_registerEvent<MouseMovedEvent>(luaState);
 		_registerEvent<KeyPressedEvent>(luaState);
 		_registerEvent<SwitchCameraEvent>(luaState);
+		_registerEvent<CollisionAddedEvent>(luaState);
+		_registerEvent<CollisionPersistedEvent>(luaState);
+		_registerEvent<CollisionRemovedEvent>(luaState);
 
         // custom pointer type event is not supported through the macro so require manual register
 		sol::usertype<SwitchCameraEvent> switchCameraType = luaState["SwitchCameraEvent"];
