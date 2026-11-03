@@ -48,14 +48,14 @@ void main()
 {
     vec4 albedoSample = texture(albedoMap, TexCoords);
     vec3 albedo    = pow(albedoSample.rgb, vec3(2.2)) * albedoFactor.rgb;
-    float metallic  = texture(metallicMap, TexCoords).b * metallicFactor;
-    float roughness = max(texture(roughnessMap, TexCoords).g * roughnessFactor, 0.04);
     float ao        = mix(1.0, texture(aoMap, TexCoords).r, aoStrength);
+    float roughness = max(texture(roughnessMap, TexCoords).g * roughnessFactor, 0.04);
+    float metallic  = texture(metallicMap, TexCoords).b * metallicFactor;
     vec3 emissive   = pow(texture(emissiveMap, TexCoords).rgb, vec3(2.2)) * emissiveFactor;
 
     gPosition = vec4(WorldPos, 1.0);
     gNormal   = vec4(getNormalFromMap(), 0.0);
-    gAlbedo   = vec4(albedo, ao);
-    gMaterial = vec4(metallic, roughness, 0.0, 0.0);
+    gAlbedo   = vec4(albedo, 0.0);
+    gMaterial = vec4(ao, roughness, metallic, 0.0);
     gEmissive = vec4(emissive, 0.0);
 }

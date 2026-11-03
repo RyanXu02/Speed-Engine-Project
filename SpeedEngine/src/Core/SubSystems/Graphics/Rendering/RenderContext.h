@@ -27,7 +27,7 @@ namespace SE
 	struct DirectionalLight
 	{
 		bool enabled = true;
-		glm::vec3 direction{ -0.3f, -1.0f, -0.5f };
+		glm::vec3 direction{ -0.3f, -1.0f, -0.5f }; // the way the light travels, from the sun toward the ground
 		glm::vec3 color{ 1.0f };
 		float intensity = 3.0f;
 	};

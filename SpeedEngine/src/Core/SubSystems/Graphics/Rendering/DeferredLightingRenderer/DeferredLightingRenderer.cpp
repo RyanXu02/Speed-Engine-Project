@@ -6,6 +6,7 @@
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
 #include "Core/SubSystems/Graphics/Rendering/RendererManager.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
 
 #include <glad/glad.h>
 
@@ -20,9 +21,13 @@ namespace SE
 		"gEmissive",
 	};
 
-	DeferredLightingRenderer::DeferredLightingRenderer(Logger& logger, std::string gBufferTarget)
+	// shadow map goes in the slot right after the G-buffer
+	static constexpr int SHADOW_MAP_SLOT = static_cast<int>(GBUFFER_SAMPLERS.size());
+
+	DeferredLightingRenderer::DeferredLightingRenderer(Logger& logger, std::string gBufferTarget, std::string shadowMapTarget)
 	    : Renderer(logger, "DeferredLightingRenderer"),
 	      m_gBufferTarget(std::move(gBufferTarget)),
+	      m_shadowMapTarget(std::move(shadowMapTarget)),
 	      m_shader(0, "DeferredLightingRenderer")
 	{}
 
@@ -61,7 +66,18 @@ namespace SE
 			glBindTexture(GL_TEXTURE_2D, gBuffer.getColorTexture(slot));
 		}
 		m_shader.setVec3("camPos", camera.getPosition());
-		
+
+		// from shadow pass
+		const FBO& shadowMap = context.getRenderTarget(m_shadowMapTarget);
+		m_shader.setInt("shadowMap", SHADOW_MAP_SLOT);
+		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
+		glBindTexture(GL_TEXTURE_2D, shadowMap.getDepthTexture());
+		if (auto* shadowRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>()) {
+			m_shader.setMat4("lightSpaceMatrix", shadowRenderer->getLightSpaceMatrix());
+			m_shader.setFloat("shadowBias", shadowRenderer->depthBias);
+			m_shader.setFloat("shadowNormalOffset", shadowRenderer->normalOffset);
+		}
+
 		if (auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>()) {
 			sceneRenderer->setLightUniforms(context, m_shader);
 		}
@@ -74,6 +90,8 @@ namespace SE
 			glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(slot));
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
+		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE0);
 		m_shader.unbind();
 

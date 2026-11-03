@@ -16,7 +16,7 @@ uniform sampler2D roughnessMap;
 uniform sampler2D aoMap;
 uniform sampler2D emissiveMap;
 
-// material factors (glTF)
+// material factors
 uniform vec4 albedoFactor;
 uniform float metallicFactor;
 uniform float roughnessFactor;
@@ -125,14 +125,14 @@ vec3 calculateLo(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 F0, vec3 albedo, fl
 void main()
 {
     vec4 albedoSample = texture(albedoMap, TexCoords);
-    vec3 albedo       = pow(albedoSample.rgb, vec3(2.2)) * albedoFactor.rgb;
-    float alpha       = albedoSample.a * albedoFactor.a;
+    vec3 albedo = pow(albedoSample.rgb, vec3(2.2)) * albedoFactor.rgb;
+    float alpha = albedoSample.a * albedoFactor.a;
 
     // glTF's roughness value is in g channel, while metallic is in b channel
-    float metallic  = texture(metallicMap, TexCoords).b * metallicFactor;
+    float metallic = texture(metallicMap, TexCoords).b * metallicFactor;
     float roughness = max(texture(roughnessMap, TexCoords).g * roughnessFactor, 0.04);
-    float ao        = mix(1.0, texture(aoMap, TexCoords).r, aoStrength);
-    vec3 emissive   = pow(texture(emissiveMap, TexCoords).rgb, vec3(2.2)) * emissiveFactor;
+    float ao = mix(1.0, texture(aoMap, TexCoords).r, aoStrength);
+    vec3 emissive = pow(texture(emissiveMap, TexCoords).rgb, vec3(2.2)) * emissiveFactor;
 
     vec3 N = getNormalFromMap();
     vec3 V = normalize(camPos - WorldPos);

@@ -10,7 +10,8 @@ namespace SE
 	{
 	public:
 		// @param gBufferTarget the name of the G-buffer render target written by the GeometryRenderer
-		DeferredLightingRenderer(Logger& logger, std::string gBufferTarget);
+		// @param shadowMapTarget the name of the depth only render target written by the ShadowRenderer
+		DeferredLightingRenderer(Logger& logger, std::string gBufferTarget, std::string shadowMapTarget);
 
 		void init() override;
 		void render(RenderContext& context) override;
@@ -18,6 +19,7 @@ namespace SE
 
 	private:
 		std::string m_gBufferTarget;
+		std::string m_shadowMapTarget;
 		Shader m_shader;
 		unsigned int m_VAO = 0;
 	};

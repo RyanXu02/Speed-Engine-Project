@@ -3,6 +3,7 @@
 #if defined(COMPILE_WITH_EDITOR)
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
+#include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
 #include "../../Scenes/SceneSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
@@ -104,9 +105,28 @@ namespace SE
 					ImGui::SeparatorText("Sun");
 					DirectionalLight& sun = Engine::Instance().getSubSystem<RendererManager>()->getSun();
 					ImGui::Checkbox("Enabled", &sun.enabled);
-					ImGui::DragFloat3("Direction", &sun.direction.x, 0.01f, -1.0f, 1.0f);
 					ImGui::ColorEdit3("Color", &sun.color.x);
 					ImGui::DragFloat("Intensity", &sun.intensity, 0.05f, 0.0f, 100.0f);
+				}
+
+				if (auto* shadow = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>())
+				{
+					// the animation drives these, so only editable while it's off
+					ImGui::BeginDisabled(shadow->animateSun);
+					ImGui::SliderFloat("Azimuth", &shadow->sunAzimuth, -180.0f, 180.0f, "%.1f deg");
+					ImGui::SliderFloat("Elevation", &shadow->sunElevation, -89.0f, 89.0f, "%.1f deg");
+					ImGui::EndDisabled();
+
+					ImGui::Checkbox("Animate Sun", &shadow->animateSun);
+					ImGui::SliderFloat("Azimuth Speed", &shadow->sunRotateSpeed, -180.0f, 180.0f, "%.0f deg/s");
+					ImGui::SliderFloat("Elevation Speed", &shadow->sunElevationSpeed, 0.0f, 180.0f, "%.0f deg/s");
+					ImGui::DragFloatRange2("Elevation Range", &shadow->sunMinElevation, &shadow->sunMaxElevation, 0.5f, -89.0f, 89.0f, "Min %.0f", "Max %.0f");
+
+					ImGui::SeparatorText("Shadows");
+					ImGui::DragFloat("Coverage", &shadow->orthoHalfSize, 0.5f, 1.0f, 500.0f);
+					ImGui::DragFloat("Light Distance", &shadow->lightDistance, 0.5f, 1.0f, 1000.0f);
+					ImGui::SliderFloat("Depth Bias", &shadow->depthBias, 0.0f, 0.02f, "%.4f");
+					ImGui::SliderFloat("Normal Offset", &shadow->normalOffset, 0.0f, 0.5f, "%.3f");
 				}
 				ImGui::EndMenu();
 			}
