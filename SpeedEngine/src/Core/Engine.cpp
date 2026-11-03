@@ -14,6 +14,7 @@
 #include "SubSystems/Scenes/SceneSystem.h"
 #include "SubSystems/Physics/PhysicsSystem.h"
 #include "SubSystems/Audio/AudioSystem.h"
+#include "SubSystems/UI/UISystem.h"
 #include "SubSystems/SubSystem.h"
 #include "EngineStates.h"
 #include "Threading/FrameExchange.h"
@@ -51,6 +52,7 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
 		m_subSystems.push_back(std::unique_ptr<AudioSystem>(new AudioSystem()));
+		m_subSystems.push_back(std::unique_ptr<UISystem>(new UISystem()));
 
 
 		// init all subsystems
@@ -168,6 +170,7 @@ namespace SE
 		for (int step = 0; step < physicsSteps; ++step)
 			getSubSystem<PhysicsSystem>()->step(simulationDeltaTime);
 		getSubSystem<AudioSystem>()->update(deltaTime);
+		getSubSystem<UISystem>()->update(deltaTime);
 		if (EngineStates::isEditorCameraActive())
 			m_cameraController.update(EngineStates::getEditorCamera(), *getSubSystem<InputSystem>(), deltaTime);
 		
