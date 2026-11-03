@@ -42,9 +42,9 @@ namespace SE
 		{
 			sceneSystem->unloadScene(scene);
 		};
-		sceneSystemTable["setCurrentScene"] = [&](const std::string& name) -> void
+		sceneSystemTable["setCurrentScene"] = [&](const std::string& path) -> void
 		{
-			sceneSystem->setCurrentScene(name);
+			sceneSystem->setCurrentScene(path);
 		};
 		sceneSystemTable["getCurrentScene"] = [&]() -> Scene*
 		{

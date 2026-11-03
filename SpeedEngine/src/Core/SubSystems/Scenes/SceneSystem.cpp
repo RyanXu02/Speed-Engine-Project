@@ -2,7 +2,7 @@
 
 #include "SceneSystem.h"
 
-#include "../Events/EventSystem.h"
+#include "Events/EventSystem.h"
 #include "Engine.h"
 
 namespace SE
@@ -16,12 +16,6 @@ namespace SE
 	{
 		SubSystem::update(deltaTime);
 
-		if (!m_currentScene && !m_scenes.empty())
-		{
-			m_currentScene = m_scenes.front().get();
-			m_currentScene->initializeScene();
-		}
-
 		if (m_currentScene)
 		{
 			m_currentScene->updateScene(deltaTime);
@@ -32,73 +26,47 @@ namespace SE
 	{
 		SubSystem::shutdown();
 
-		for (auto& scene : m_scenes)
-		{
-			scene->shutdownScene();
-		}
-
-		m_scenes.clear();
-		m_currentScene = nullptr;
+		if (m_currentScene)
+			unloadScene(m_currentScene.get());
 	}
 
 	void SceneSystem::newScene(const std::string& name)
 	{
 		m_logger->info("Creating new scene: {}", name);
-		auto newScene = std::make_unique<Scene>(name, *m_logger);
-		m_scenes.push_back(std::move(newScene));
+		if (m_currentScene)
+			m_currentScene->shutdownScene();
+		m_currentScene = std::make_unique<Scene>(name, *m_logger);
+		m_currentScene->initializeScene();
+		sceneContentsReplaced(m_currentScene.get());
 	}
 
 	void SceneSystem::unloadScene(Scene* scene)
 	{
-		if (!scene)
+		if (!scene || scene != m_currentScene.get())
 		{
-			m_logger->warn("Attempted to unload a null scene.");
+			m_logger->warn("Attempted to unload a scene that is not active.");
 			return;
 		}
 
 		m_logger->info("Unloading scene: {}", scene->getName());
-		if (scene == m_currentScene)
-		{
-			scene->shutdownScene();
-			m_currentScene = nullptr;
-		}
-
-		m_scenes.erase(std::remove_if(m_scenes.begin(), m_scenes.end(),
-		                   [this, scene](const std::unique_ptr<Scene>& s)
-		                   {
-			                   if (s.get() != scene)
-				                   return false;
-			                   s->shutdownScene();
-			                   if (scene == m_currentScene)
-				                   m_currentScene = nullptr;
-			                   return true;
-		                   }),
-		    m_scenes.end());
+		scene->shutdownScene();
+		m_currentScene.reset();
+		++m_sceneRevision;
 	}
 
-	void SceneSystem::setCurrentScene(const std::string& name)
+	void SceneSystem::setCurrentScene(const std::string& path)
 	{
-		m_logger->info("Setting current scene: {}", name);
+		if (!m_currentScene)
+			newScene(std::filesystem::path(path).stem().string());
+		m_currentScene->loadScene(path);
+	}
 
-		auto it = std::find_if(m_scenes.begin(), m_scenes.end(),
-		    [&name](const std::unique_ptr<Scene>& scene)
-		    {
-			    return scene->getName() == name;
-		    });
-
-		if (it != m_scenes.end())
+	void SceneSystem::sceneContentsReplaced(const Scene* scene)
+	{
+		if (scene == m_currentScene.get())
 		{
-			if (m_currentScene)
-				m_currentScene->shutdownScene();
-
-			m_currentScene = it->get();
-			m_currentScene->initializeScene();
-
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<SceneChanged>(name));
-		}
-		else
-		{
-			m_logger->warn("Scene '{}' not found. Current scene not changed.", name);
+			++m_sceneRevision;
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<SceneChanged>(scene->getName()));
 		}
 	}
 } // namespace SE

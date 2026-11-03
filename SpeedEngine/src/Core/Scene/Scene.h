@@ -25,7 +25,7 @@ namespace SE
 		void reloadScene();
 
 		const std::string& getName() const { return m_name; }
-
+		const std::string& getSourcePath() const { return m_path; }
 
 		uint32_t addEntity(const std::string& name);
 		bool hasEntity(uint32_t id);

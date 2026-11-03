@@ -4,6 +4,7 @@
 
 #include "Core/SubSystems/Events/EventSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
+#include "Core/SubSystems/Scenes/SceneSystem.h"
 #include "Engine.h"
 #include <SubSystems/Scriptings/ScriptingSystem.h>
 #include <SubSystems/Audio/AudioSystem.h>
@@ -69,13 +70,15 @@ namespace SE
 	{
 		m_logger.info("Shutting down");
 		m_registry.clear();
+		m_entitiesToRemove.clear();
+		m_reloadRequested = false;
 
 		m_isInitialized = false;
 	}
 
 	void Scene::reloadScene()
 	{
-		if (m_reloadRequested)	//if already requested dont allow multiple request
+		if (m_path.empty() || m_reloadRequested)	//if already requested dont allow multiple request
 		{
 			return;
 		}
@@ -130,8 +133,8 @@ namespace SE
 
 	void Scene::saveScene(std::string_view path)
 	{
-		std::filesystem::path filePath(path); //make sure parent directory exist
-		std::filesystem::create_directory(filePath.parent_path());
+		const auto filePath = std::filesystem::absolute(std::filesystem::path(path)).lexically_normal();
+		std::filesystem::create_directories(filePath.parent_path());
 
 		nlohmann::json sceneJson;
 		serialize(sceneJson);
@@ -141,6 +144,7 @@ namespace SE
 		if (!out)
 		{
 			m_logger.error("Stream error: Could not open file at {}", filePath.string());
+			return;
 		}
 
 		try
@@ -150,8 +154,10 @@ namespace SE
 			if (out.fail())
 			{
 				m_logger.error("Failed writing data to disk for {}", filePath.string());
+				return;
 			}
 			out.close();
+			m_path = filePath.generic_string();
 			return;
 		}
 		catch (const std::exception& e)
@@ -164,11 +170,11 @@ namespace SE
 
 	void Scene::loadScene(std::string_view path)
 	{
+		const auto filePath = std::filesystem::absolute(std::filesystem::path(path)).lexically_normal().generic_string();
 		nlohmann::json sceneJson;
-		if (loadJson(path.data(), m_logger, sceneJson))
+		if (!loadJson(filePath, m_logger, sceneJson))
 		{
-			//TODO: add ifdef option for logging, release should not have log messeage
-			//m_logger.info("Scene load success: {}", sceneJson.dump(4));
+			return;
 		}
 
 		if (sceneJson.contains("scene_name"))
@@ -181,6 +187,8 @@ namespace SE
 		{
 			m_registry.clear();
 		}
+		m_entitiesToRemove.clear();
+		m_reloadRequested = false;
 
 		//DOES NOT RESET ACTIVE MUSIC lol. but this can easily be changed in future.
 		Engine::Instance().getSubSystem<AudioSystem>()->clearSoundLibraries();
@@ -192,7 +200,8 @@ namespace SE
 			Engine::Instance().getSubSystem<PhysicsSystem>()->createAndAddComponents();
 		}
 
-		m_path = path;
+		m_path = filePath;
+		Engine::Instance().getSubSystem<SceneSystem>()->sceneContentsReplaced(this);
 	}
 
 	std::unordered_map<uint32_t, std::string> Scene::getEntityList()

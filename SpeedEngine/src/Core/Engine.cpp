@@ -77,10 +77,7 @@ namespace SE
 		m_shutdownRequested.store(false);
 
 		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
-		sceneSystem->newScene("TestScene");
-		sceneSystem->setCurrentScene("TestScene");
-		Scene* currentScene = sceneSystem->getCurrentScene();
-		currentScene->loadScene("Assets/Data/default-scene.json");
+		sceneSystem->setCurrentScene("Assets/Data/default-scene.json");
 
 		auto* sceneRenderer = getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
 		
