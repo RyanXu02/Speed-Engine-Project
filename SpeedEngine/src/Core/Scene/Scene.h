@@ -23,7 +23,6 @@ namespace SE
 		void initializeScene();
 		void updateScene(double deltaTime);
 		void shutdownScene();
-		void reloadScene();
 
 		const std::string& getName() const { return m_name; }
 		const std::string& getSourcePath() const { return m_path; }
@@ -87,6 +86,5 @@ namespace SE
 		EntityRegistry m_registry;
 
 		bool m_isInitialized{ false };
-		bool m_reloadRequested{ false };
 	};
 } // namespace SE

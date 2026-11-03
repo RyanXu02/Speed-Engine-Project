@@ -40,13 +40,7 @@ namespace SE
 				}
 				if (ImGui::MenuItem("Load", "Ctrl+O"))
 				{
-					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
-					{
-						// load scene does not defer to next frame so it will crash running systems on null references
-						// reload does defer request so use it for now 
-						//scene->loadScene(path);
-						scene->reloadScene();
-					}
+					Engine::Instance().getSubSystem<SceneSystem>()->requestOpenScene(path);
 				}
 				if (ImGui::MenuItem("mute test"))
 				{

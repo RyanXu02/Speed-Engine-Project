@@ -160,6 +160,7 @@ namespace SE
 	void Engine::updateSimulation(double deltaTime, int physicsSteps)
 	{
 		m_frameBuilder.beginSimulation();
+		getSubSystem<SceneSystem>()->processPendingTransition();
 		getSubSystem<InputSystem>()->update(deltaTime);
 		getSubSystem<EventSystem>()->update(deltaTime);
 		getSubSystem<SceneSystem>()->update(deltaTime);

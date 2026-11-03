@@ -25,9 +25,54 @@ namespace SE
 	void SceneSystem::shutdown()
 	{
 		SubSystem::shutdown();
+		m_pendingTransition.reset();
 
 		if (m_currentScene)
 			unloadScene(m_currentScene.get());
+	}
+
+	void SceneSystem::requestNewScene(const std::string& name)
+	{
+		if (!m_pendingTransition)
+			m_pendingTransition = TransitionRequest{ TransitionType::New, name };
+	}
+
+	void SceneSystem::requestOpenScene(const std::string& path)
+	{
+		if (!m_pendingTransition)
+			m_pendingTransition = TransitionRequest{ TransitionType::Open, path };
+	}
+
+	void SceneSystem::requestReloadScene()
+	{
+		if (!m_pendingTransition)
+			m_pendingTransition = TransitionRequest{ TransitionType::Reload, {} };
+	}
+
+	void SceneSystem::processPendingTransition()
+	{
+		if (!m_pendingTransition)
+			return;
+
+		const auto request = std::move(*m_pendingTransition);
+		// Consume first so callbacks can queue a request for the next update
+		m_pendingTransition.reset();
+
+		switch (request.type)
+		{
+		case TransitionType::New:
+			newScene(request.value);
+			break;
+		case TransitionType::Open:
+			setCurrentScene(request.value);
+			break;
+		case TransitionType::Reload:
+			if (m_currentScene && !m_currentScene->getSourcePath().empty())
+				m_currentScene->loadScene(m_currentScene->getSourcePath());
+			else
+				m_logger->warn("Cannot reload a scene without a saved source path.");
+			break;
+		}
 	}
 
 	void SceneSystem::newScene(const std::string& name)

@@ -28,12 +28,6 @@ namespace SE
 
 	void Scene::updateScene(double deltaTime)
 	{
-		if (m_reloadRequested)
-		{
-			m_reloadRequested = false;
-			m_logger.info("Scene reloading");
-			loadScene(m_path);
-		}
 		if (!m_entitiesToRemove.empty())
 		{
 			for (uint32_t id : m_entitiesToRemove)
@@ -69,19 +63,8 @@ namespace SE
 		m_logger.info("Shutting down");
 		m_registry.clear();
 		m_entitiesToRemove.clear();
-		m_reloadRequested = false;
 
 		m_isInitialized = false;
-	}
-
-	void Scene::reloadScene()
-	{
-		if (m_path.empty() || m_reloadRequested)	//if already requested dont allow multiple request
-		{
-			return;
-		}
-
-		m_reloadRequested = true;
 	}
 
 	uint32_t Scene::addEntity(const std::string& name)
@@ -249,7 +232,6 @@ namespace SE
 		Engine::Instance().getSubSystem<ScriptingSystem>()->reset();
 		m_registry.clear();
 		m_entitiesToRemove.clear();
-		m_reloadRequested = false;
 
 		if (j.contains("scene_name"))
 			m_name = j["scene_name"].get<std::string>();
