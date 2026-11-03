@@ -17,15 +17,14 @@ namespace SE
 	void PhysicsContactListener::OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) 
 	{
 		const std::lock_guard lock(m_mutex);
-		Engine::Instance().getSubSystem<EventSystem>()->publish(
-			std::make_unique<CollisionAddedEvent>(inBody1.GetID(), inBody2.GetID(), toGLM(inManifold.mWorldSpaceNormal), toGLM(inBody1.GetLinearVelocity()), toGLM(inBody2.GetLinearVelocity())));
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<CollisionAddedEvent>(
+		    inBody1.GetID().GetIndexAndSequenceNumber(), inBody2.GetID().GetIndexAndSequenceNumber(), toGLM(inManifold.mWorldSpaceNormal), toGLM(inBody1.GetLinearVelocity()), toGLM(inBody2.GetLinearVelocity())));
 	}
 
 	void PhysicsContactListener::OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings)
 	{
 		const std::lock_guard lock(m_mutex);
-		Engine::Instance().getSubSystem<EventSystem>()->publish(
-		    std::make_unique<CollisionPersistedEvent>(inBody1.GetID(), inBody2.GetID(), toGLM(inManifold.mWorldSpaceNormal)));
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<CollisionPersistedEvent>(inBody1.GetID().GetIndexAndSequenceNumber(), inBody2.GetID().GetIndexAndSequenceNumber(), toGLM(inManifold.mWorldSpaceNormal)));
 	}
 
 	void PhysicsContactListener::OnContactRemoved(const SubShapeIDPair& inSubShapePair)
@@ -33,6 +32,6 @@ namespace SE
 		const std::lock_guard lock(m_mutex);
 		BodyID inBody1Id = inSubShapePair.GetBody1ID();
 		BodyID inBody2Id = inSubShapePair.GetBody2ID();
-		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<CollisionRemovedEvent>(inBody1Id, inBody2Id));
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<CollisionRemovedEvent>(inBody1Id.GetIndexAndSequenceNumber(), inBody2Id.GetIndexAndSequenceNumber()));
 	}
 }
