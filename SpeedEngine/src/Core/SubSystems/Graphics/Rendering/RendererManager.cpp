@@ -10,6 +10,7 @@
 #include "Core/SubSystems/Graphics/Rendering/GeometryRenderer/GeometryRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
 
 #include "Core/Engine.h"
 #include "Core/EngineStates.h"
@@ -87,7 +88,7 @@ namespace SE
 
 		// Example: A render pass that draws on top of SceneColor
 		auto& debugRenderer = addRenderer<DebugRenderer>();
-		addPass(RenderPass{ .renderer = debugRenderer,  .output = sceneColor,  .clearMask = 0 });
+		addPass(RenderPass{ .renderer = debugRenderer,  .output = sceneColor,  .clearMask = 0, .debugOnly = true });
 
 		// Example: A render pass that samples "SceneColor" and output to a new "Grayscale" target
 		Descriptor grayscaleDescriptor{ 
@@ -140,6 +141,8 @@ namespace SE
 		setFinalSceneOutput("SceneColor");
 #pragma endregion
 
+		m_textRenderer = &addRenderer<TextRenderer>();
+
 		// imgui always presents after the scene pipeline on the default framebuffer
 		m_imguiRenderer = std::unique_ptr<ImGuiRenderer>(new ImGuiRenderer(*m_logger, *m_window));
 		m_imguiRenderer->init();
@@ -173,6 +176,27 @@ namespace SE
 			glClear(pass.clearMask);
 			context.output = &pass.output;
 			pass.renderer.render(context);
+		}
+
+		// text after final output
+		if (!frame.textDraws.empty())
+		{
+			resetPassState();
+			m_finalSceneOutput->bind();
+			glViewport(0, 0, m_finalSceneOutput->getWidth(), m_finalSceneOutput->getHeight());
+			GLint count = 0;
+			glGetIntegerv(GL_MAX_DRAW_BUFFERS, &count);
+			std::vector<GLenum> drawBuffers(count);
+			for (GLint i = 0; i < count; ++i)
+			{
+				GLint buffer = 0;
+				glGetIntegerv(GL_DRAW_BUFFER0 + i, &buffer);
+				drawBuffers[i] = static_cast<GLenum>(buffer);
+			}
+			glDrawBuffer(GL_COLOR_ATTACHMENT0 + static_cast<GLenum>(m_finalColorAttachment));
+			context.output = m_finalSceneOutput;
+			m_textRenderer->render(context);
+			glDrawBuffers(count, drawBuffers.data());
 		}
 
 		resetPassState();
@@ -266,6 +290,7 @@ namespace SE
 		m_passes.clear();
 		for (auto& renderer : m_renderers | std::views::reverse)
 			renderer->shutdown();
+		m_textRenderer = nullptr;
 		m_renderers.clear();
 		m_meshes.reset();
 		m_finalSceneOutput = nullptr;

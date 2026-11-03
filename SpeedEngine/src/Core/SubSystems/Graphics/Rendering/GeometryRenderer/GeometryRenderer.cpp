@@ -13,8 +13,8 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		m_defaultShaderId = resources->addResource<ResourceType::Shader>("Assets/Shaders/gpass.vert", "Assets/Shaders/gpass.frag", "gBufferShader");
-		m_defaultMaterialId = resources->addResource<ResourceType::Material>(m_defaultShaderId, std::span<const std::pair<TextureType, std::string_view>>{}, "defaultGBufferMaterial");
+		m_defaultShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/gpass.vert", .fragmentShaderPath = "Assets/Shaders/gpass.frag", .name = "gBufferShader" });
+		m_defaultMaterialId = resources->createMaterial({ .shaderId = m_defaultShaderId, .textures = {}, .name = "defaultGBufferMaterial" });
 	}
 
 	void GeometryRenderer::shutdown()
@@ -113,7 +113,7 @@ namespace SE
 		{
 			const PBRMaterial& pbr = pbrMaterials[i];
 
-			std::vector<std::pair<TextureType, std::string_view>> textures;
+			std::vector<TextureBinding> textures;
 			const std::pair<TextureType, const std::string&> candidates[] = {
 				{ TextureType::Albedo, pbr.albedoPath },
 				{ TextureType::Normal, pbr.normalPath },
@@ -124,8 +124,11 @@ namespace SE
 			};
 			for (const auto& [type, path] : candidates)
 			{
-				if (!path.empty()) {
-					textures.emplace_back(type, path);
+				if (path.empty()) {
+					continue;
+				}
+				if (const uint32_t textureId = context.resources.loadTexture({ .path = path, .name = path })) {
+					textures.push_back({ .usage = type, .textureId = textureId });
 				}
 			}
 
@@ -134,7 +137,7 @@ namespace SE
 			if (!textures.empty() && pbr.albedoFactor.a >= 1.0f)
 			{
 				std::string materialName = fmt::format("{}_{}_{}", meshResource.getResourceName(), i, pbr.name);
-				materialId = context.resources.addResource<ResourceType::Material>(m_defaultShaderId, std::span<const std::pair<TextureType, std::string_view>>(textures), materialName);
+				materialId = context.resources.createMaterial({ .shaderId = m_defaultShaderId, .textures = textures, .name = materialName });
 			}
 			it->second.push_back(materialId);
 		}

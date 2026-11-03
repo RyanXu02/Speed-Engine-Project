@@ -1,25 +1,59 @@
 #pragma once
-#include "Core/Engine.h"
 #include "Core/Logger/Logger.h"
-#include "Core/SubSystems/Events/EventSystem.h"
 #include "Core/SubSystems/SubSystem.h"
-#include "Manager.h"
-#include "Material/MaterialManager.h"
-#include "MeshResource/MeshResourceManager.h"
+
 #include "Resource.h"
+
 #include "Shader/ShaderManager.h"
+#include "MeshResource/MeshResourceManager.h"
+#include "Material/MaterialManager.h"
+#include "Material/Texture.h"
+#include "Font/FontManager.h"
 
 namespace SE
 {
+	struct ShaderLoadDesc
+	{
+		std::string_view vertexShaderPath;
+		std::string_view fragmentShaderPath;
+		std::string_view name;
+	};
+
+	struct TextureLoadDesc
+	{
+		std::string_view path;
+		std::string_view name;
+	};
+
+	struct MeshLoadDesc
+	{
+		std::string_view path;
+		std::string_view name;
+	};
+
+	struct FontLoadDesc
+	{
+		std::string_view path;
+		uint32_t pixelHeight;
+		std::string_view name;
+	};
+
+	struct MaterialDesc
+	{
+		uint32_t shaderId;
+		std::span<const TextureBinding> textures;
+		std::string_view name;
+	};
+
 	// @brief Public interface for managing all resources in the engine.
 	class ResourceManager : public SubSystem
 	{
 	public:
 		friend class Engine;
+		friend class ShaderManager;
 
 		void init() override;
 		void shutdown() override;
-
 
 		//@brief generates a resource id. atomic and does not reuse ids
 		//@returns an id (uint32)
@@ -30,32 +64,29 @@ namespace SE
 		//@returns pointer to filePath's entire contents	
 		const std::string* getString(std::string_view filePath);
 
-		//@brief adds a resource to the Resource Manager
-		//@param type the type of resource being added
-		//@param args arguments to pass for type of resource being added (filepaths,
-		// names, etc)
-		//@returns id of newly added resource
-		template<ResourceType Type, typename... Args>
-		uint32_t addResource(Args&&... args)
-		{
-			if constexpr (Type == ResourceType::Shader)
-			{
-				return _addResourceImpl<ResourceType::Shader>(std::forward<Args>(args)...);
-			}
-			else if constexpr (Type == ResourceType::Material)
-			{
-				return _addResourceImpl<ResourceType::Material>(std::forward<Args>(args)...);
-			}
-			else if constexpr (Type == ResourceType::MeshResource)
-			{
-				return _addResourceImpl<ResourceType::MeshResource>(std::forward<Args>(args)...);
-			}
-			else
-			{
-				m_logger->warn("ResourceManager::addResource: Unhandled ResourceType");
-				return 0;
-			}
-		}
+		// @brief loads or reuses a shader by source paths. Name is only a display label
+		// @param vertexShaderPath path to the vertex shader file
+		// @param fragmentShaderPath path to the fragment shader file
+		// @param name name of the shader
+		uint32_t loadShader(const ShaderLoadDesc& desc);
+		// @brief loads or reuses a mesh by file path. Name is only a display label
+		// @param path path to the mesh file
+		// @param name name of the mesh
+		uint32_t loadMesh(const MeshLoadDesc& desc);
+		// @brief loads or reuses a font by file path and pixel height. Name is only a display label
+		// @param path path to the font file
+		// @param pixelHeight height of the font in pixels
+		// @param name name of the font
+		uint32_t loadFont(const FontLoadDesc& desc);
+		// @brief loads or reuses a texture by file path. Name is only a display label
+		// @param path path to the texture file
+		// @param name name of the texture
+		uint32_t loadTexture(const TextureLoadDesc& desc);
+		// @brief creates a new material, even if another material has the same name
+		// @param shaderId id of the shader to use for the material
+		// @param textures Material usage and ID of textures that are already loaded into ResourceManager
+		// @param name name of the material
+		uint32_t createMaterial(const MaterialDesc& desc);
 
 		//@brief retrieves a resource of requested type given an id (Not prefered,
 		// used the other one. It is callers responsibility to ensure the type is
@@ -71,15 +102,24 @@ namespace SE
 			{
 				if constexpr (std::is_same_v<T, Shader>)
 				{
-					return _getManager<ShaderManager>()->getShader(id);
+					return m_shaderManager.getShader(id);
 				}
 				else if constexpr (std::is_same_v<T, Material>)
 				{
-					return _getManager<MaterialManager>()->getMaterial(id);
+					return m_materialManager.getMaterial(id);
 				}
 				else if constexpr (std::is_same_v<T, MeshResource>)
 				{
-					return _getManager<MeshResourceManager>()->getMeshResource(id);
+					return m_meshManager.getMeshResource(id);
+				}
+				else if constexpr (std::is_same_v<T, Font>)
+				{
+					return m_fontManager.getFont(id);
+				}
+				else if constexpr (std::is_same_v<T, Texture>)
+				{
+					auto texture = m_textures.find(id);
+					return texture == m_textures.end() ? nullptr : texture->second.get();
 				}
 				// ...
 				else
@@ -107,6 +147,10 @@ namespace SE
 		bool removeResource(uint32_t id);
 
 	private:
+		// @brief removes the cached shader source code
+		// @param paths the pair of vertex and fragment shader paths to remove from cache
+		void forgetShaderSources(const std::pair<std::string, std::string>& paths);
+
 		// singleton instance, use singleton Engine to access its subsystems
 		ResourceManager()
 		    : SubSystem("ResourceManager")
@@ -115,73 +159,19 @@ namespace SE
 		// universal id for all resources in the engine
 		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
 
-		// All registered managers
-		std::vector<std::unique_ptr<Manager>> m_managers;
+		ShaderManager m_shaderManager;
+		MaterialManager m_materialManager;
+		MeshResourceManager m_meshManager;
+		FontManager m_fontManager;
+
+		// texture resource id -> texture object
+		std::unordered_map<uint32_t, std::unique_ptr<Texture>> m_textures;
+		// path -> texture resource id
+		std::unordered_map<std::string, uint32_t> m_texturePaths;
 
 		// path -> file contents
 		std::unordered_map<std::string, std::string> m_stringCache;
 		// id -> ResourceType
 		std::unordered_map<uint32_t, ResourceType> m_resourceTypes;
-
-		// get manager of type T
-		template<typename T>
-		T* _getManager()
-		{
-			for (auto& manager : m_managers)
-			{
-				if (auto ptr = dynamic_cast<T*>(manager.get()))
-				{
-					return ptr;
-				}
-			}
-			return nullptr;
-		}
-
-		// helper function to add a resource of a specific type
-		template<ResourceType Type, typename... Args>
-		uint32_t _addResourceImpl(Args&&... args)
-		{
-			if constexpr (Type == ResourceType::Shader)
-			{
-				uint32_t id = _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
-				if (id != 0)
-				{
-					m_resourceTypes.insert({ id, ResourceType::Shader });
-				}
-#if defined(COMPILE_WITH_EDITOR)
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
-#endif
-				return id;
-			}
-			else if constexpr (Type == ResourceType::Material)
-			{
-				uint32_t id = _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
-				if (id != 0)
-				{
-					m_resourceTypes.insert({ id, ResourceType::Material });
-				}
-#if defined(COMPILE_WITH_EDITOR)
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
-#endif
-				return id;
-			}
-			else if constexpr (Type == ResourceType::MeshResource)
-			{
-				uint32_t id = _getManager<MeshResourceManager>()->addMeshResource(generateId(), std::forward<Args>(args)...);
-				if (id != 0)
-				{
-					m_resourceTypes.insert({ id, ResourceType::MeshResource });
-				}
-#if defined(COMPILE_WITH_EDITOR)
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
-#endif
-				return id;
-			}
-			else
-			{
-				static_assert(false, "Unhandled ResourceType in _addResourceImpl");
-				return 0;
-			}
-		}
 	};
 } // namespace SE

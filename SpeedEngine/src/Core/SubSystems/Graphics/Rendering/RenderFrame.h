@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Presentation.h"
+#include "Core/ResourceManagers/Font/Font.h"
 
 namespace SE
 {
@@ -30,10 +31,23 @@ namespace SE
 		glm::vec4 color;
 	};
 
+	struct TextDraw
+	{
+		TextDraw(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color,
+			std::pmr::memory_resource* resource)
+			: font(std::move(font)), text(text, resource), position(position), color(color)
+		{}
+
+		FontHandle font;
+		std::pmr::string text;
+		glm::vec2 position;
+		glm::vec4 color;
+	};
+
 	struct RenderFrame
 	{
 		explicit RenderFrame(std::pmr::memory_resource* resource = std::pmr::get_default_resource())
-			: draws(resource), lights(resource), debugLines(resource), debugTriangles(resource)
+			: draws(resource), lights(resource), debugLines(resource), debugTriangles(resource), textDraws(resource)
 		{}
 
 		void addDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
@@ -52,5 +66,6 @@ namespace SE
 		std::pmr::vector<PointLight> lights;
 		std::pmr::vector<DebugVertex> debugLines;
 		std::pmr::vector<DebugVertex> debugTriangles;
+		std::pmr::vector<TextDraw> textDraws;
 	};
 } // namespace SE

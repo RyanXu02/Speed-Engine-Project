@@ -11,6 +11,17 @@ namespace SE
 	class RenderFrameBuilder
 	{
 	public:
+		// @brief Use before updating any text producers
+		void beginSimulation() { m_textSubmissions.clear(); }
+
+		// @brief Submits text to be rendered in the next RenderFrame
+		// @brief Do not use this directly, use Engine::submitText instead, as it is not thread-safe
+		// @param font The font to use for rendering the text
+		// @param text The text to render
+		// @param position The position in pixels from the top left
+		// @param color The color of the text
+		void submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color);
+
 		// @brief Captures the current state of the scene and stores it in the builder for later
 		// Call this once per simulation tick before building a RenderFrame
 		// @param scene The scene to capture
@@ -23,6 +34,15 @@ namespace SE
 		void build(RenderFrame& frame, PhysicsSystem& physics) const;
 
 	private:
+		struct TextSubmission
+		{
+			FontHandle font;
+			std::string text;
+			glm::vec2 position;
+			glm::vec4 color;
+		};
+		std::vector<TextSubmission> m_textSubmissions;
+
 		struct DrawItemHistory
 		{
 			DrawItem drawItem;

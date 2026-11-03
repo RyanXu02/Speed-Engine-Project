@@ -17,7 +17,7 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		m_shadowShaderId = resources->addResource<ResourceType::Shader>("Assets/Shaders/shadow.vert", "Assets/Shaders/shadow.frag", "shadowShader");
+		m_shadowShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/shadow.vert", .fragmentShaderPath = "Assets/Shaders/shadow.frag", .name = "shadowShader" });
 	}
 
 	void ShadowRenderer::render(RenderContext& context)

@@ -143,6 +143,9 @@
         "NameComponent": {
           "name": "entity"
         },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/physicstest.lua"
+        },
         "PhysicsShapeSphere": {
           "radius": 0.5
         },

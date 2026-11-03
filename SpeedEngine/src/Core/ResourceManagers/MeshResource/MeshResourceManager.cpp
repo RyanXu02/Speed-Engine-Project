@@ -25,27 +25,22 @@ namespace SE
 			}
 		}
 		m_meshresources.clear();
+		m_meshPaths.clear();
 
 		m_logger->info("MeshResourceManager cleared all mesh resources.");
 	}
 
 	uint32_t MeshResourceManager::addMeshResource(uint32_t id, std::string_view meshName, std::string_view meshPath)
 	{
-		// Check if mesh resource already exists
-
-		auto it = std::ranges::find_if(m_meshresources,
-		    [meshName](const auto& kv)
-		    {
-			    return kv.second->getResourceName() == meshName;
-		    });
-		if (it != m_meshresources.end())
+		const auto path = normalizeResourcePath(meshPath);
+		if (auto it = m_meshPaths.find(path); it != m_meshPaths.end())
 		{
-			m_logger->debug("MeshResource with name already loaded: {} with ID {}", it->second->getResourceName(), it->first);
-			return it->first;
+			assert(m_meshresources.contains(it->second));
+			return it->second;
 		}
 
 		auto newMesh = std::make_unique<MeshResource>(id, meshName, *m_logger);
-		if (!newMesh->init(meshPath))
+		if (path.empty() || !newMesh->init(path))
 		{
 			m_logger->warn("Failed to initialize MeshResource {} from {}", meshName, meshPath);
 			return 0;
@@ -53,6 +48,9 @@ namespace SE
 
 		// Actually add the mesh to the map!
 		m_meshresources[id] = std::move(newMesh);
+		m_meshPaths.emplace(path, id);
+		assert(m_meshPaths.size() == m_meshresources.size());
+
 		m_logger->info("Added MeshResource {} with id {}", meshName, id);
 
 		return id;
@@ -74,6 +72,9 @@ namespace SE
 			return false;
 
 		m_meshresources.erase(meshResourceId);
+		std::erase_if(m_meshPaths, [meshResourceId](const auto& entry) { return entry.second == meshResourceId; });
+		assert(m_meshPaths.size() == m_meshresources.size());
+
 		return true;
 	}
 } // namespace SE

@@ -51,7 +51,7 @@ namespace SE
 			auto* meshComponent = entity.getComponent<MeshComponent>();
 
 			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-			meshComponent->meshResourceID = meshResourceManager->addResource<ResourceType::MeshResource>(meshComponent->path, meshComponent->path);
+			meshComponent->meshResourceID = meshResourceManager->loadMesh({ .path = meshComponent->path, .name = meshComponent->path });
 		};
 		return function;
 	}
@@ -128,7 +128,7 @@ namespace SE
 			auto* physicsShapeMeshComponent = entity.getComponent<PhysicsShapeMesh>();
 
 			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-			physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->addResource<ResourceType::MeshResource>(physicsShapeMeshComponent->getPath(), physicsShapeMeshComponent->getPath()));
+			physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->loadMesh({ .path = physicsShapeMeshComponent->getPath(), .name = physicsShapeMeshComponent->getPath() }));
 		};
 		return function;
 	}

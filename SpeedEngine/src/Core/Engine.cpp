@@ -81,6 +81,13 @@ namespace SE
 		sceneSystem->setCurrentScene("TestScene");
 		Scene* currentScene = sceneSystem->getCurrentScene();
 		currentScene->loadScene("Assets/Data/default-scene.json");
+
+		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
+		uint32_t fontid = resourceManager->loadFont({ 
+			.path = "fonts/Quicksand-Regular.ttf", 
+			.pixelHeight = 32, 
+			.name = "QSfont" });
+		QSfont = resourceManager->getResource<Font>(fontid)->getHandle();
 	}
 
 	void Engine::run()
@@ -132,6 +139,7 @@ namespace SE
 
 	void Engine::updateSimulation(double deltaTime, int physicsSteps)
 	{
+		m_frameBuilder.beginSimulation();
 		getSubSystem<InputSystem>()->update(deltaTime);
 		getSubSystem<EventSystem>()->update(deltaTime);
 		getSubSystem<SceneSystem>()->update(deltaTime);
@@ -141,6 +149,9 @@ namespace SE
 		getSubSystem<AudioSystem>()->update(deltaTime);
 		if (EngineStates::isEditorCameraActive())
 			m_cameraController.update(EngineStates::getEditorCamera(), *getSubSystem<InputSystem>(), deltaTime);
+		
+		// temp test text
+		submitText(QSfont, "Hello text blah blah blah\nnew line: !@#$%^&*()_+-=,./;'[]<>?:{}|", { 20.0f, 20.0f });
 	}
 
 	void Engine::produceRenderFrame()

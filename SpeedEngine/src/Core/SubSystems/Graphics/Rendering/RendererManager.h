@@ -7,6 +7,8 @@
 
 namespace SE
 {
+	class TextRenderer;
+
 	// @brief Use this to define a render pass
 	// @brief A render pass is a single rendering operation that uses a specific renderer and outputs to a specific FBO
 	// @param renderer The renderer to use for this pass
@@ -112,6 +114,7 @@ namespace SE
 		DirectionalLight m_sun;
 
 		std::vector<std::unique_ptr<Renderer>> m_renderers;
+		TextRenderer* m_textRenderer = nullptr; // owned by m_renderers
 		std::unique_ptr<ImGuiRenderer> m_imguiRenderer; // imgui is special
 
 		std::vector<RenderPass> m_passes;

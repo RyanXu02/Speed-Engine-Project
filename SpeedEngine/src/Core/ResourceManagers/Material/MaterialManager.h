@@ -21,12 +21,11 @@ namespace SE
 		// @brief adds a material to this manager
 		// @param id The unique ID for the material
 		// @param shaderId The ID of the shader to use for this material
-		// @param textures A span of pairs, each containing a TextureType and the
-		// corresponding file path for the texture
+		// @param textures  Material usage and ID of textures that are already loaded into ResourceManager
 		// @param materialName The name of the material shown in the resource browser
 		// @returns the ID of the newly added material, or 0 if the material could not
 		// be added
-		uint32_t addMaterial(uint32_t id, uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures, std::string_view materialName);
+		uint32_t addMaterial(uint32_t id, uint32_t shaderId, std::span<const TextureBinding> textures, std::string_view materialName);
 
 		// @brief retrieves a material from the manager given an id
 		// @param materialId the id of material to retrieve
