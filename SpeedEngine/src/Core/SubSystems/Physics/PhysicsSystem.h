@@ -2,6 +2,7 @@
 #include "Core/SubSystems/SubSystem.h"
 
 #include "PhysicsDebugRenderer.h"
+#include "PhysicsContactListener.h"
 
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
@@ -122,6 +123,7 @@ namespace SE
 		std::unique_ptr<JobSystemThreadPool> m_job_system;
 		std::unique_ptr<JPH::PhysicsSystem> m_physics_system;
 		std::unique_ptr<PhysicsDebugRenderer> m_physicsDebugRenderer;
+		std::unique_ptr<PhysicsContactListener> m_contact_listener;
 		BPLayerInterfaceImpl m_broad_phase_layer_interface;
 		ObjectVsBroadPhaseLayerFilterImpl m_object_vs_broadphase_layer_filter;
 		ObjectLayerPairFilterImpl m_obj_vs_object_layer_filter;
