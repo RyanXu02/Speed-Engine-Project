@@ -12,6 +12,7 @@ namespace SE
 		explicit TextRenderer(Logger& logger)
 			: Renderer(logger, "TextRenderer"), m_shader(0, "TextRenderer")
 		{}
+		~TextRenderer() override { shutdown(); }
 
 		void init() override;
 		void shutdown() override;
@@ -32,6 +33,7 @@ namespace SE
 		Shader m_shader;
 		unsigned int m_VAO = 0;
 		unsigned int m_VBO = 0;
+		// Keep CPU font handles and GPU atlases even if resource removed
 		std::unordered_map<FontHandle, unsigned int> m_atlases;
 		std::vector<Vertex> m_vertices;
 	};

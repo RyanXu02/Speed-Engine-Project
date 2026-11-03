@@ -1,5 +1,5 @@
 #pragma once
-#include "../Manager.h"
+#include "Core/ResourceManagers/Manager.h"
 #include "Shader.h"
 
 namespace SE
@@ -23,7 +23,7 @@ namespace SE
 		//@param vertexShaderPath file path to the vertex shader
 		//@param fragmentShaderPath file path to the fragment shader
 		//@param programName name of the shader object (for readability in logs)
-		//@returns true if shader successfully added, otherwise false
+		//@returns an existing or new shader ID, or 0 on failure
 		uint32_t addShader(uint32_t id, std::string_view vertexShaderPath, std::string_view fragmentShaderPath, std::string_view programName);
 
 		//@brief retrieves a shader from manager given an id
@@ -36,8 +36,8 @@ namespace SE
 		//@returns true if successfully removed, false if not
 		bool removeShader(uint32_t shaderId);
 
-		// map ids -> ShaderPrograms
-		std::unordered_map<uint32_t, std::unique_ptr<Shader>> m_shaders;
+		std::unordered_map<uint32_t, std::unique_ptr<Shader>> m_shaders; // map of shader id to shader object
+		std::map<std::pair<std::string, std::string>, uint32_t> m_shaderPaths; // map of vertex and fragment shader paths to shader id
 
 		// @brief helper fn that verifies that the vertex and fragment shader paths
 		// are valid

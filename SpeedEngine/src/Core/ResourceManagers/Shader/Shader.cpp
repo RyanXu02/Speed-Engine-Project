@@ -11,8 +11,14 @@ namespace SE
 	      m_ProgramId(0)
 	{}
 
+	Shader::~Shader()
+	{
+		destroy();
+	}
+
 	GLCompStatus Shader::init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource)
 	{
+		assert(m_ProgramId == 0);
 		GLCompStatus status;
 
 		// Compile vertex shader
@@ -22,7 +28,10 @@ namespace SE
 		glCompileShader(vertexShader);
 		status = _checkCompilationErr(vertexShader, "VERTEX");
 		if (!status.success)
+		{
+			glDeleteShader(vertexShader);
 			return status;
+		}
 
 		// Compile fragment shader
 		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -31,7 +40,11 @@ namespace SE
 		glCompileShader(fragmentShader);
 		status = _checkCompilationErr(fragmentShader, "FRAGMENT");
 		if (!status.success)
+		{
+			glDeleteShader(vertexShader);
+			glDeleteShader(fragmentShader);
 			return status;
+		}
 
 		// Link shaders into a program
 		m_ProgramId = glCreateProgram();
@@ -39,12 +52,14 @@ namespace SE
 		glAttachShader(m_ProgramId, fragmentShader);
 		glLinkProgram(m_ProgramId);
 		status = _checkCompilationErr(m_ProgramId, "PROGRAM");
-		if (!status.success)
-			return status;
 
 		// Clean up shaders as they are no longer needed after linking
+		glDetachShader(m_ProgramId, vertexShader);
+		glDetachShader(m_ProgramId, fragmentShader);
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
+		if (!status.success)
+			destroy();
 
 		return status;
 	}
@@ -64,6 +79,7 @@ namespace SE
 			glDeleteProgram(m_ProgramId);
 			m_ProgramId = 0;
 		}
+		m_uniforms.clear();
 	}
 
 	GLCompStatus Shader::_checkCompilationErr(unsigned int shader, std::string_view type)

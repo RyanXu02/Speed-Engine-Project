@@ -25,6 +25,12 @@ namespace SE
 	{
 	public:
 		Shader(uint32_t id, std::string resourceName);
+		~Shader();
+
+		Shader(const Shader&) = delete;
+		Shader& operator=(const Shader&) = delete;
+		Shader(Shader&&) = delete;
+		Shader& operator=(Shader&&) = delete;
 
 		//@brief compiles and links a shader object
 		//@param vertexShaderSource the literal source code of vertex shader as a

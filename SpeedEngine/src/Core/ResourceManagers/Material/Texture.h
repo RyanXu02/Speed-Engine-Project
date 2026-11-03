@@ -1,44 +1,33 @@
 #pragma once
 
+#include "../Resource.h"
+
 namespace SE
 {
-	enum class TextureType
-	{
-		None = -1,
-		Albedo,
-		Normal,
-		Height,
-		AmbOcc,
-		Roughness
-	};
-
-	// @brief Represents a texture that can be used in materials
-	// A texture is owned by a material
-	class Texture
+	// @brief GPU texture owned by ResourceManager
+	class Texture : public Resource
 	{
 	public:
-		Texture(TextureType type);
+		Texture(uint32_t id, std::string_view name)
+			: Resource(id, std::string(name))
+		{}
 		~Texture();
+
+		Texture(const Texture&) = delete;
+		Texture& operator=(const Texture&) = delete;
+		Texture(Texture&&) = delete;
+		Texture& operator=(Texture&&) = delete;
 
 		// @brief Initializes the texture by loading it into GPU
 		// @param filePath The file path of the texture file
 		// @returns an empty string if successful, or an error message if failed
 		std::string init(std::string_view filePath);
 
-		// @brief Deletes the texture from GPU
-		void destroy();
-
-		TextureType getType() const { return m_type; }
-		std::string getVarName() const { return name; }
-		bool isLoaded() const { return m_type != TextureType::None; }
-
-		unsigned int glTextureId = 0;
+		// @brief Returns the OpenGL texture ID
+		unsigned int getTextureId() const { return m_textureId; }
 
 	private:
-		TextureType m_type{ TextureType::None };
-		std::string name{ "" };
-		int width, height;
-		unsigned int format;
+		unsigned int m_textureId = 0; // OpenGL texture ID, 0 if not initialized
 	};
 
 } // namespace SE

@@ -36,8 +36,8 @@ namespace SE
 		// @returns true if successfully removed, false if not
 		bool removeMeshResource(uint32_t meshResourceId);
 
-		// map ids -> mesh resource objects
-		std::unordered_map<uint32_t, std::unique_ptr<MeshResource>> m_meshresources;
+		std::unordered_map<uint32_t, std::unique_ptr<MeshResource>> m_meshresources; // map of mesh resource id to mesh resource object
+		std::unordered_map<std::string, uint32_t> m_meshPaths; // map of mesh resource file paths to mesh resource id
 	};
 
 } // namespace SE
