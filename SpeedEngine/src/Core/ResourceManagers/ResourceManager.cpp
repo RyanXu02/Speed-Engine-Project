@@ -22,8 +22,10 @@ namespace SE
 	{
 		SubSystem::shutdown();
 
-		m_shaderManager.shutdown();
 		m_materialManager.shutdown();
+		m_shaderManager.shutdown();
+		m_textures.clear();
+		m_texturePaths.clear();
 		m_meshManager.shutdown();
 		m_fontManager.shutdown();
 		m_resourceTypes.clear();
@@ -63,6 +65,32 @@ namespace SE
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Font, true));
 #endif
 		}
+		return id;
+	}
+
+	uint32_t ResourceManager::loadTexture(const TextureLoadDesc& desc)
+	{
+		const auto path = normalizeResourcePath(desc.path);
+		if (auto it = m_texturePaths.find(path); it != m_texturePaths.end())
+		{
+			assert(m_textures.contains(it->second));
+			return it->second;
+		}
+
+		const uint32_t id = generateId();
+		auto texture = std::make_unique<Texture>(id, desc.name);
+		const auto error = texture->init(path);
+		if (!error.empty())
+		{
+			m_logger->warn("{}", error);
+			return 0;
+		}
+		m_textures.emplace(id, std::move(texture));
+		m_texturePaths.emplace(path, id);
+		m_resourceTypes.emplace(id, ResourceType::Texture);
+#if defined(COMPILE_WITH_EDITOR)
+		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Texture, true));
+#endif
 		return id;
 	}
 
@@ -147,6 +175,11 @@ namespace SE
 			{
 				return m_fontManager.getFont(id);
 			}
+			else if (it->second == ResourceType::Texture)
+			{
+				auto texture = m_textures.find(id);
+				return texture == m_textures.end() ? nullptr : texture->second.get();
+			}
 			//.......
 		}
 		return nullptr;
@@ -166,6 +199,7 @@ namespace SE
 		case ResourceType::Material: removed = m_materialManager.removeMaterial(id); break;
 		case ResourceType::MeshResource: removed = m_meshManager.removeMeshResource(id); break;
 		case ResourceType::Font: removed = m_fontManager.removeFont(id); break;
+		case ResourceType::Texture: return false; // Cached textures cannot be removed individually, they live until shutdown
 		}
 
 		if (removed)

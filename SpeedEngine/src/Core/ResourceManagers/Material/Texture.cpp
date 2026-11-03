@@ -8,65 +8,70 @@
 
 namespace SE
 {
-	Texture::Texture(TextureType type)
-	    : m_type(type)
+	Texture::~Texture()
 	{
-		switch (m_type)
+		if (m_textureId != 0)
 		{
-		case TextureType::Albedo: name = "albedo"; break;
-		case TextureType::Normal: name = "normalmap"; break;
-		case TextureType::Height: name = "heightmap"; break;
-		case TextureType::AmbOcc: name = "ambientOcc"; break;
-		case TextureType::Roughness: name = "roughness"; break;
-		default: break;
+			glDeleteTextures(1, &m_textureId);
 		}
 	}
-
-	Texture::~Texture() {}
 
 	std::string Texture::init(std::string_view filePath)
 	{
+		assert(m_textureId == 0);
+
+		// load image
 		stbi_set_flip_vertically_on_load(true);
-		int channels;
-		unsigned char* image = stbi_load(filePath.data(), &width, &height, &channels, 0);
+		int width = 0, height = 0, channels = 0;
+		const std::string path(filePath);
+		unsigned char* image = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		if (!image)
-		{
 			return "Failed to load texture " + std::string(filePath);
-		}
-		else
+
+		// create OpenGL texture
+		glGenTextures(1, &m_textureId);
+		if (!m_textureId)
 		{
-			if (channels == 1)
-				format = GL_RED;
-			else if (channels == 3)
-				format = GL_RGB;
-			else if (channels == 4)
-				format = GL_RGBA;
-
-			glGenTextures(1, &glTextureId);
-			glBindTexture(GL_TEXTURE_2D, glTextureId);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
-			glGenerateMipmap(GL_TEXTURE_2D);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-			    GL_REPEAT); // tiles texture
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-			glBindTexture(GL_TEXTURE_2D, 0);
 			stbi_image_free(image);
-
-			return "";
+			return "Failed to create GPU texture " + path;
 		}
-	}
 
-	//@brief deletes texture data
-	void Texture::destroy()
-	{
-		if (glTextureId != 0)
-		{
-			glDeleteTextures(1, &glTextureId);
-			glTextureId = 0;
-		}
+		// save OpenGL state and set unpack parameters for texture upload
+		GLint previousTexture = 0;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+		const GLenum unpackNames[] = { GL_UNPACK_ALIGNMENT, GL_UNPACK_ROW_LENGTH, GL_UNPACK_SKIP_ROWS,
+			GL_UNPACK_SKIP_PIXELS, GL_PIXEL_UNPACK_BUFFER_BINDING };
+		GLint unpack[5]{};
+		for (size_t i = 0; i < std::size(unpackNames); ++i)
+			glGetIntegerv(unpackNames[i], &unpack[i]);
+
+		// reset unpack parameters to default values
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+		glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+		glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+		
+		// upload texture data to GPU
+		assert(channels >= 1 && channels <= 4);
+		const GLenum formats[] = { GL_RED, GL_RG, GL_RGB, GL_RGBA };
+		const GLenum internalFormats[] = { GL_R8, GL_RG8, GL_RGB8, GL_RGBA8 };
+		glBindTexture(GL_TEXTURE_2D, m_textureId);
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormats[channels - 1], width, height, 0,
+			formats[channels - 1], GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		// restore previous OpenGL state
+		glBindTexture(GL_TEXTURE_2D, previousTexture);
+		for (size_t i = 0; i < 4; ++i)
+			glPixelStorei(unpackNames[i], unpack[i]);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, unpack[4]);
+
+		stbi_image_free(image);
+		return "";
 	}
 } // namespace SE

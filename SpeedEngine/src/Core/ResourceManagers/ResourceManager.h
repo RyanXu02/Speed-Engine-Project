@@ -7,6 +7,7 @@
 #include "Shader/ShaderManager.h"
 #include "MeshResource/MeshResourceManager.h"
 #include "Material/MaterialManager.h"
+#include "Material/Texture.h"
 #include "Font/FontManager.h"
 
 namespace SE
@@ -15,6 +16,12 @@ namespace SE
 	{
 		std::string_view vertexShaderPath;
 		std::string_view fragmentShaderPath;
+		std::string_view name;
+	};
+
+	struct TextureLoadDesc
+	{
+		std::string_view path;
 		std::string_view name;
 	};
 
@@ -34,7 +41,7 @@ namespace SE
 	struct MaterialDesc
 	{
 		uint32_t shaderId;
-		std::span<const std::pair<TextureType, std::string_view>> textures;
+		std::span<const TextureBinding> textures;
 		std::string_view name;
 	};
 
@@ -71,9 +78,13 @@ namespace SE
 		// @param pixelHeight height of the font in pixels
 		// @param name name of the font
 		uint32_t loadFont(const FontLoadDesc& desc);
+		// @brief loads or reuses a texture by file path. Name is only a display label
+		// @param path path to the texture file
+		// @param name name of the texture
+		uint32_t loadTexture(const TextureLoadDesc& desc);
 		// @brief creates a new material, even if another material has the same name
 		// @param shaderId id of the shader to use for the material
-		// @param textures array of texture types and paths to use for the material
+		// @param textures Material usage and ID of textures that are already loaded into ResourceManager
 		// @param name name of the material
 		uint32_t createMaterial(const MaterialDesc& desc);
 
@@ -104,6 +115,11 @@ namespace SE
 				else if constexpr (std::is_same_v<T, Font>)
 				{
 					return m_fontManager.getFont(id);
+				}
+				else if constexpr (std::is_same_v<T, Texture>)
+				{
+					auto texture = m_textures.find(id);
+					return texture == m_textures.end() ? nullptr : texture->second.get();
 				}
 				// ...
 				else
@@ -147,6 +163,11 @@ namespace SE
 		MaterialManager m_materialManager;
 		MeshResourceManager m_meshManager;
 		FontManager m_fontManager;
+
+		// texture resource id -> texture object
+		std::unordered_map<uint32_t, std::unique_ptr<Texture>> m_textures;
+		// path -> texture resource id
+		std::unordered_map<std::string, uint32_t> m_texturePaths;
 
 		// path -> file contents
 		std::unordered_map<std::string, std::string> m_stringCache;

@@ -19,13 +19,6 @@ namespace SE
 	{
 		Manager::shutdown();
 
-		for (auto& [k, shader] : m_shaders)
-		{
-			if (shader)
-			{
-				shader->destroy();
-			}
-		}
 		m_shaders.clear();
 		m_shaderPaths.clear();
 

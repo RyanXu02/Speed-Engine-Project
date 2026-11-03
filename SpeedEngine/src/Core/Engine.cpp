@@ -99,8 +99,12 @@ namespace SE
 		});
 		sceneRenderer->setDefaultShaderId(defaultShaderId);
 		
-		const std::pair<TextureType, std::string_view> defaultTextures[] = {
-			{ TextureType::Albedo, "Assets/Textures/default-texture-128.png" }
+		const uint32_t defaultTextureId = resourceManager->loadTexture({
+			.path = "Assets/Textures/default-texture-128.png",
+			.name = "defaultTexture"
+		});
+		const TextureBinding defaultTextures[] = {
+			{ .usage = TextureType::Albedo, .textureId = defaultTextureId }
 		};
 		uint32_t defaultMaterialId = resourceManager->createMaterial({ 
 			.shaderId = defaultShaderId, 
