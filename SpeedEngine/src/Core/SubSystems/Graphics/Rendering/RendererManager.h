@@ -80,6 +80,11 @@ namespace SE
 		// @return The texture ID of the final scene output
 		uint32_t getFinalSceneTexture() const { return m_finalSceneOutput->getColorTexture(m_finalColorAttachment); }
 
+		glm::uvec2 getFinalSceneSize() const
+		{
+			return { m_finalSceneOutput->getWidth(), m_finalSceneOutput->getHeight() };
+		}
+
 		// @brief Gets the scene viewport, which defines the size and camera of the scene being rendered
 		// @return A reference to the scene viewport
 		const Viewport& getSceneViewport() const { return *m_sceneViewport; }

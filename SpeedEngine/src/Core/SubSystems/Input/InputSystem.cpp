@@ -71,7 +71,8 @@ namespace SE
 				break;
 
 			case InputEvent::Type::Focus:
-				if (inputEvent.action == InputEvent::Action::Release)
+				m_hasFocus = inputEvent.action != InputEvent::Action::Release;
+				if (!m_hasFocus)
 				{
 					m_keyFalling |= m_keyCurrState;
 					m_mouseFalling |= m_mouseCurrState;

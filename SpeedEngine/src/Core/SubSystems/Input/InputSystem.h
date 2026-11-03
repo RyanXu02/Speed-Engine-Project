@@ -5,7 +5,7 @@
 
 namespace SE
 {
-	// @brief 0 at top left corner, measured in screen space (sub)pixels
+	// @brief Window content coordinates in logical units, with (0,0) at the top left.
 	struct MousePos
 	{
 		double x;
@@ -26,6 +26,7 @@ namespace SE
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
+		bool hasFocus() const { return m_hasFocus; }
 
 		// @brief Rising edge (key 0 -> 1)
 		bool isKeyRising(KeyCodes key) const;
@@ -45,7 +46,7 @@ namespace SE
 		// @brief Mouse button is currently up (button 0)
 		bool isMouseUp(MouseCodes key) const;
 
-		// @brief Get mouse position in screen space (0,0 top left corner)
+		// @brief Get mouse position in window content logical units (0,0 top left corner)
 		const MousePos& getMousePosition() const;
 		// @brief Get mouse position delta between last and this frame
 		const MousePos& getMouseDelta() const;
@@ -59,6 +60,7 @@ namespace SE
 
 		InputEventQueue& m_inputEvents;
 		std::vector<InputEvent> m_pendingEvents;
+		bool m_hasFocus{ true };
 
 		std::bitset<512> m_keyCurrState{ 0 };
 		std::bitset<512> m_keyPrevState{ 0 };

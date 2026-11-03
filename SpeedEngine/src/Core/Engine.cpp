@@ -144,6 +144,7 @@ namespace SE
 
 			auto read = m_frameExchange.tryAcquireReady();
 			renderer->render(read.frame(), 1.0f);
+			getSubSystem<UISystem>()->captureInput(renderer->getFinalSceneSize());
 		}
 	}
 
@@ -224,6 +225,7 @@ namespace SE
 				const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - frame.tickTime).count();
 				const float t = static_cast<float>(elapsed / simulationDeltaTime);
 				renderer->render(frame, t);
+				getSubSystem<UISystem>()->captureInput(renderer->getFinalSceneSize());
 			}
 			// no frame ready, don't busy wait
 			else
