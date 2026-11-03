@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "PhysicsShapeMesh.h"
 
+#include "Engine.h"
+
 #include "Core/ResourceManagers/MeshResource/MeshResource.h"
 #include "Core/ResourceManagers/ResourceManager.h"
 
@@ -28,8 +30,8 @@ namespace SE
 			return;
 
 		m_path = path;
-		auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-		setMeshResourceID(meshResourceManager->addResource<ResourceType::MeshResource>(m_path, m_path));
+		auto resourceManager = Engine::Instance().getSubSystem<ResourceManager>();
+		setMeshResourceID(resourceManager->loadMesh({ .path = m_path, .name = m_path }));
 	}
 
 	void PhysicsShapeMesh::createShape()

@@ -11,45 +11,26 @@
 namespace SE
 {
 
-	bool Material::init(uint32_t shaderId, std::span<const std::pair<TextureType, std::string_view>> textures)
+	bool Material::init(uint32_t shaderId, std::span<const TextureBinding> textures)
 	{
-		m_shaderId = shaderId;
-
-		for (const auto& [type, filePath] : textures)
+		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
+		for (const auto& binding : textures)
 		{
-			if (addTexture(type, filePath))
-				m_isValid = true;
+			if (binding.usage == TextureType::None || !resources->getResource<Texture>(binding.textureId))
+			{
+				m_logger.warn("Invalid texture binding: {}", binding.textureId);
+				return false;
+			}
 		}
-		if (m_isValid)
-		{
-			m_logger.info("Successfully initialized");
-			return true;
-		}
-		else
+		if (textures.empty())
 		{
 			m_logger.warn("Failed to initialize");
 			return false;
 		}
-	}
 
-	void Material::destroy()
-	{
-		for (auto& tex : m_textures)
-		{
-			tex.get()->destroy();
-		}
-	}
-
-	bool Material::addTexture(TextureType type, std::string_view filePath)
-	{
-		auto newTexture = std::make_unique<Texture>(type);
-		std::string msg = newTexture.get()->init(filePath);
-		if (msg != "")
-		{ // texture failed to load
-			m_logger.warn(msg);
-			return false;
-		}
-		m_textures.push_back(std::move(newTexture));
+		m_shaderId = shaderId;
+		m_textures.assign(textures.begin(), textures.end());
+		m_logger.info("Successfully initialized");
 		return true;
 	}
 
@@ -57,17 +38,16 @@ namespace SE
 	// occlusion, slot 4 = roughness
 	void Material::bind()
 	{
-		for (auto& t : m_textures)
+		for (const auto& binding : m_textures)
 		{
-			if (!t->isLoaded())
-				continue;
-			switch (t->getType())
+			switch (binding.usage)
 			{
-			case TextureType::Albedo: _bindTexture(0, *t); break;
-			case TextureType::Normal: _bindTexture(1, *t); break;
-			case TextureType::Height: _bindTexture(2, *t); break;
-			case TextureType::AmbOcc: _bindTexture(3, *t); break;
-			case TextureType::Roughness: _bindTexture(4, *t); break;
+			case TextureType::Albedo: _bindTexture(0, "albedo", binding.textureId); break;
+			case TextureType::Normal: _bindTexture(1, "normalmap", binding.textureId); break;
+			case TextureType::Height: _bindTexture(2, "heightmap", binding.textureId); break;
+			case TextureType::AmbOcc: _bindTexture(3, "ambientOcc", binding.textureId); break;
+			case TextureType::Roughness: _bindTexture(4, "roughness", binding.textureId); break;
+			default: assert(false); break;
 			}
 		}
 	}
@@ -81,17 +61,20 @@ namespace SE
 		}
 	}
 
-	void Material::_bindTexture(unsigned int slot, Texture& tex)
+	void Material::_bindTexture(unsigned int slot, std::string_view uniformName, uint32_t textureId)
 	{
+		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
+		auto* texture = resources->getResource<Texture>(textureId);
+		assert(texture);
 		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, tex.glTextureId);
-		Shader* s = Engine::Instance().getSubSystem<ResourceManager>()->getResource<Shader>(m_shaderId);
+		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+		Shader* s = resources->getResource<Shader>(m_shaderId);
 		if (!s)
 		{
 			m_logger.critical("Slot {} failed to bind in shader (ID = {})", slot, m_shaderId);
 			return;
 		}
-		s->setInt(tex.getVarName(), slot);
+		s->setInt(uniformName, slot);
 	}
 
 } // namespace SE

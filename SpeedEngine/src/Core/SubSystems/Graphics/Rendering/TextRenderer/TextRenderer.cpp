@@ -23,7 +23,7 @@ namespace SE
 		if (!status.success)
 		{
 			m_logger.error("Text shader compilation failed: {}", status.log);
-			m_shader.destroy();
+			shutdown();
 			return;
 		}
 		GLint previousVAO = 0, previousBuffer = 0;
@@ -49,8 +49,17 @@ namespace SE
 
 	unsigned int TextRenderer::_getOrUpload(const FontHandle& font)
 	{
+		assert(font);
 		if (auto it = m_atlases.find(font); it != m_atlases.end())
 			return it->second;
+
+		unsigned int texture = 0;
+		glGenTextures(1, &texture);
+		if (!texture)
+		{
+			m_logger.error("Failed to create font atlas texture");
+			return 0;
+		}
 
 		const GLenum unpackNames[] = { GL_UNPACK_ALIGNMENT, GL_UNPACK_ROW_LENGTH, GL_UNPACK_SKIP_ROWS,
 			GL_UNPACK_SKIP_PIXELS, GL_PIXEL_UNPACK_BUFFER_BINDING };
@@ -63,8 +72,6 @@ namespace SE
 		glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 		glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 
-		unsigned int texture = 0;
-		glGenTextures(1, &texture);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, font->atlasWidth, font->atlasHeight, 0,
 			GL_RED, GL_UNSIGNED_BYTE, font->atlasPixels.data());

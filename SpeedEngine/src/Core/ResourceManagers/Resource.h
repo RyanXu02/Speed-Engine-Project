@@ -4,6 +4,8 @@
 
 namespace SE
 {
+	std::string normalizeResourcePath(std::string_view path);
+
 	// @brief base class for a generic resource managed by the ResourceManager
 	class Resource : public MemoryTrackable
 	{
@@ -30,6 +32,7 @@ namespace SE
 		Material,
 		Shader,
 		MeshResource,
-		Font
+		Font,
+		Texture
 	};
 } // namespace SE
