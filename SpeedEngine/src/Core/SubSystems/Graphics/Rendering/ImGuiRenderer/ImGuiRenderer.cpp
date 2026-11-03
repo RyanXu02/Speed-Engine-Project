@@ -154,7 +154,7 @@ namespace SE
 	void ImGuiRenderer::initWidgets()
 	{
 #if defined(COMPILE_WITH_EDITOR)
-		createWidget<MainWidget>();
+		m_mainWidgetId = createWidget<MainWidget>();
 		createWidget<ResourceBrowserWidget>();
 		createWidget<MemoryWidget>();
 		createWidget<ScenePreviewWidget>();
@@ -176,13 +176,27 @@ namespace SE
 
 	void ImGuiRenderer::render(RenderContext& context)
 	{
+#if defined(COMPILE_WITH_EDITOR)
+		auto* main = getWidget<MainWidget>(m_mainWidgetId);
+		main->beginEditorFrame();
+		main->render();
+#endif
+
 		for (const auto& [id, widget] : m_widgets)
 		{
+#if defined(COMPILE_WITH_EDITOR)
+			if (id == m_mainWidgetId)
+				continue;
+#endif
 			if (widget)
 			{
 				widget->render();
 			}
 		}
+
+#if defined(COMPILE_WITH_EDITOR)
+		main->finishEditorFrame();
+#endif
 	}
 
 	void ImGuiRenderer::finalizeFrame() const

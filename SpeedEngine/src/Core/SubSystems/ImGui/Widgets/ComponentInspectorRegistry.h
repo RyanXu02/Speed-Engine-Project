@@ -2,6 +2,7 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 #include "Core/Scene/Entity/Entity.h"
+#include "MainWidget.h"
 
 namespace SE
 {
@@ -56,6 +57,7 @@ namespace SE
 				    if (_editComponentJson("Properties", properties))
 				    {
 					    properties.get_to(*component);
+						MainWidget::markSceneDirty();
 					    if (onEdited)
 						    onEdited(entity, *component);
 				    }

@@ -20,6 +20,7 @@ namespace SE
 		void requestNewScene(const std::string& name);
 		void requestOpenScene(const std::string& path);
 		void requestReloadScene();
+		bool hasPendingTransition() const { return m_pendingTransition.has_value(); }
 		// @brief Returns the current active scene, or nullptr if no scene is active
 		Scene* getCurrentScene() const { return m_currentScene.get(); }
 		// @brief Returns the current scene revision, which is incremented every time the scene contents are replaced.

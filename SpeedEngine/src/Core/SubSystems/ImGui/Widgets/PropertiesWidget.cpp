@@ -5,6 +5,7 @@
 #include "../../Scenes/SceneSystem.h"
 #include "Engine.h"
 #include "PropertiesWidget.h"
+#include "MainWidget.h"
 #include "ResourceManagers/ResourceManager.h"
 #include "imgui.h"
 #include "imgui_stdlib.h"
@@ -13,6 +14,13 @@
 
 namespace SE
 {
+	static bool authoredEdit(bool changed)
+	{
+		if (changed)
+			MainWidget::markSceneDirty();
+		return changed;
+	}
+
 	PropertiesWidget::PropertiesWidget()
 		: VisibleWidget("PropertiesWidget")
 	{
@@ -37,11 +45,11 @@ namespace SE
 			    auto position = component.getTranslation();
 			    auto rotation = component.getRotation();
 			    auto scale = component.getScale();
-			    if (ImGui::DragFloat3("Position", &position.x, 0.1f))
+				if (authoredEdit(ImGui::DragFloat3("Position", &position.x, 0.1f)))
 				    component.setPosition(position);
-			    if (ImGui::DragFloat3("Rotation (radians)", &rotation.x, 0.01f))
+				if (authoredEdit(ImGui::DragFloat3("Rotation (radians)", &rotation.x, 0.01f)))
 				    component.setRotation(rotation);
-			    if (ImGui::DragFloat3("Scale", &scale.x, 0.01f))
+				if (authoredEdit(ImGui::DragFloat3("Scale", &scale.x, 0.01f)))
 				    component.setScale(scale);
 		    });
 
@@ -66,6 +74,7 @@ namespace SE
 				    {
 					    component.path = m_meshPathDraft;
 					    component.meshResourceID = resource;
+						MainWidget::markSceneDirty();
 					    m_meshPathError.clear();
 				    }
 				    else
@@ -123,7 +132,7 @@ namespace SE
 					for (unsigned int i = 0; i < IM_COUNTOF(motionTypes); ++i)
 					{
 					    const bool isSelected = typeIndex == i;
-					    if (ImGui::Selectable(motionTypes[i], isSelected))
+						if (authoredEdit(ImGui::Selectable(motionTypes[i], isSelected) && !isSelected))
 					    {
 						    if (i == 0)
 							    component.setMotionType(JPH::EMotionType::Dynamic);
@@ -139,11 +148,11 @@ namespace SE
 				}
 
 				auto offset = component.getOffset();
-			    if (ImGui::DragFloat3("Offset", &offset.x, 0.1f))
+				if (authoredEdit(ImGui::DragFloat3("Offset", &offset.x, 0.1f)))
 				    component.setOffset(offset);
 
 				auto isActive = component.isActive();
-				if (ImGui::Checkbox("Active", &isActive))
+				if (authoredEdit(ImGui::Checkbox("Active", &isActive)))
 				{
 				    if (isActive)
 					    component.activateBody();
@@ -152,19 +161,19 @@ namespace SE
 				}
 
 				auto maxLinearVelocity = component.getMaxLinearVelocity();
-			    if (ImGui::DragFloat("Max Linear Velocity", &maxLinearVelocity, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Max Linear Velocity", &maxLinearVelocity, 0.1f)))
 				    component.setMaxLinearVelocity(maxLinearVelocity);
 			    auto maxAngularVelocity = component.getMaxAngularVelocity();
-			    if (ImGui::DragFloat("Max Angular Velocity", &maxAngularVelocity, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Max Angular Velocity", &maxAngularVelocity, 0.1f)))
 				    component.setMaxAngularVelocity(maxAngularVelocity);
 			    auto restitution = component.getRestitution();
-			    if (ImGui::DragFloat("Restitution", &restitution, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Restitution", &restitution, 0.1f)))
 				    component.setRestitution(restitution);
 			    auto friction = component.getFriction();
-			    if (ImGui::DragFloat("Friction", &friction, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Friction", &friction, 0.1f)))
 				    component.setFriction(friction);
 			    auto gravityFactor = component.getGravityFactor();
-			    if (ImGui::DragFloat("Gravity Factor", &gravityFactor, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Gravity Factor", &gravityFactor, 0.1f)))
 				    component.setGravityFactor(gravityFactor);
 		    });
 
@@ -172,7 +181,7 @@ namespace SE
 		    [](Entity&, PhysicsShapeBox& component)
 		    {
 			    auto halfExtents = component.getHalfExtents();
-			    if (ImGui::DragFloat3("Half Extents", &halfExtents.x, 0.1f))
+				if (authoredEdit(ImGui::DragFloat3("Half Extents", &halfExtents.x, 0.1f)))
 				    component.setHalfExtents(halfExtents);
 		    });
 
@@ -180,10 +189,10 @@ namespace SE
 		    [](Entity&, PhysicsShapeCapsule& component)
 		    {
 			    auto halfHeight = component.getHalfHeight();
-			    if (ImGui::DragFloat("Half Height", &halfHeight, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Half Height", &halfHeight, 0.1f)))
 				    component.setHalfHeight(halfHeight);
 			    auto radius = component.getRadius();
-			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Radius", &radius, 0.1f)))
 				    component.setRadius(radius);
 		    });
 
@@ -191,7 +200,7 @@ namespace SE
 		    [](Entity&, PhysicsShapeSphere& component)
 		    {
 			    auto radius = component.getRadius();
-			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Radius", &radius, 0.1f)))
 				    component.setRadius(radius);
 		    });
 
@@ -207,7 +216,10 @@ namespace SE
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
 			    // user confirmed a new path
 			    if ((enter || deactivated) && m_physicsShapeMeshPathDraft != component.getPath())
+				{
 				    component.setPath(m_physicsShapeMeshPathDraft);
+					MainWidget::markSceneDirty();
+				}
 		    });
 
 		m_inspectors.registerComponent<AudioSFXComponent>("AudioSFXComponent", true, 
@@ -227,6 +239,8 @@ namespace SE
 				    {
 					    if (!component.createSound(component.pathDraft, component.isGameSFX()))
 							component.pathDraft = path;
+						else
+							MainWidget::markSceneDirty();
 					    component.pathError.clear();
 				    }
 				    else
@@ -239,7 +253,8 @@ namespace SE
 				ImGui::BeginDisabled(path.empty());
 			    if (ImGui::Checkbox("Is Game SFX", &isGameSFX))
 			    {
-				    component.createSound(component.getFilepath(), isGameSFX);
+					if (component.createSound(component.getFilepath(), isGameSFX))
+						MainWidget::markSceneDirty();
 			    }
 			    ImGui::EndDisabled();
 				//for testing 
@@ -272,6 +287,8 @@ namespace SE
 				    {
 					    if (!component.createTrack(component.pathDraft))
 						    component.pathDraft = path;
+						else
+							MainWidget::markSceneDirty();
 					    component.pathError.clear();
 				    }
 				    else
@@ -301,6 +318,7 @@ namespace SE
 		    {
 			    const EntitySelected& entitySelectedEvent = static_cast<const EntitySelected&>(event);
 			    m_selectedEntityId = entitySelectedEvent.id;
+				m_physicsShapeMeshDraftInitialized = false;
 			    m_meshDraftInitialized = false;
 			    m_meshPathError.clear();
 		    });
@@ -312,6 +330,7 @@ namespace SE
 			    {
 				    m_selectedEntityId = 0;
 				    m_meshDraftInitialized = false;
+					m_physicsShapeMeshDraftInitialized = false;
 			    }
 		    });
 		m_SceneChangedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
@@ -319,6 +338,7 @@ namespace SE
 		    {
 			    m_selectedEntityId = 0;
 			    m_meshDraftInitialized = false;
+				m_physicsShapeMeshDraftInitialized = false;
 			    m_meshPathError.clear();
 		    });
 
@@ -363,6 +383,7 @@ namespace SE
 		}
 
 		ImGui::PushID(static_cast<int>(entity.id()));
+		ImGui::BeginDisabled(MainWidget::isSceneEditingBlocked());
 		ImGui::Text("Entity ID: %u", entity.id());
 
 		const auto* components = entity.getComponentRegistry();
@@ -420,11 +441,15 @@ namespace SE
 		if (remove)
 		{
 			remove->remove(entity);
+			if (!remove->has(entity))
+				MainWidget::markSceneDirty();
 			if (remove->type == typeid(MeshComponent))
 			{
 				m_meshDraftInitialized = false;
 				m_meshPathError.clear();
 			}
+			if (remove->type == typeid(PhysicsShapeMesh))
+				m_physicsShapeMeshDraftInitialized = false;
 		}
 
 		// Add component popup
@@ -440,7 +465,11 @@ namespace SE
 				available = true;
 				ImGui::PushID(&entry);
 				if (ImGui::MenuItem(entry.name.c_str()))
+				{
 					entry.add(entity);
+					if (entry.has(entity))
+						MainWidget::markSceneDirty();
+				}
 				ImGui::PopID();
 			}
 			if (!available)
@@ -448,6 +477,7 @@ namespace SE
 			ImGui::EndPopup();
 		}
 
+		ImGui::EndDisabled();
 		ImGui::PopID();
 		ImGui::End();
 	}
