@@ -144,7 +144,6 @@ namespace SE
 		}
 
 		shader.setFloat("ambientStrength", m_lightingSettings.ambientStrength);
-		shader.setFloat("gamma", m_lightingSettings.gamma);
 	}
 
 	const std::vector<uint32_t>& SceneRenderer::_getMeshMaterials(RenderContext& context, uint32_t meshResourceId, const MeshResource& meshResource)

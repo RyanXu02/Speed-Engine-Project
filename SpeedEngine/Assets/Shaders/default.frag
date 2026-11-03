@@ -39,7 +39,6 @@ uniform vec3 camPos;
 
 // tunables
 uniform float ambientStrength;
-uniform float gamma;
 
 const float PI = 3.14159265359;
 
@@ -152,19 +151,15 @@ void main()
     for (int i = 0; i < numLights && i < MAX_LIGHTS; ++i)
     {
         vec3 L = normalize(lightPositions[i] - WorldPos);
-        float distance    = length(lightPositions[i] - WorldPos);
+        float distance = length(lightPositions[i] - WorldPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance     = lightColors[i] * attenuation;
+        vec3 radiance = lightColors[i] * attenuation;
 
         Lo += calculateLo(N, V, L, radiance, F0, albedo, metallic, roughness);
     }
 
     vec3 ambient = vec3(ambientStrength) * albedo * ao;
     vec3 color   = ambient + Lo + emissive;
-
-    // TODO: seprate Tonemap and gamma correct in to a finalize pass to not lose detail for inbetween passes
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0 / gamma));
 
     FragColor = vec4(color, alpha);
 

@@ -13,7 +13,6 @@ namespace SE
 	struct LightingSettings
 	{
 		float ambientStrength = 0.03f;
-		float gamma = 2.2f;
 	};
 
 	// @brief Forward pass, copies the input target's color and depth then draws the transparent submeshes sorted back to front

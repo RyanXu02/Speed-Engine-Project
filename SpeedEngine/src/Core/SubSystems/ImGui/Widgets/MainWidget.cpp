@@ -4,6 +4,7 @@
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
+#include "../../Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
 #include "../../Scenes/SceneSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
@@ -95,12 +96,27 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Lighting"))
 			{
-				auto* SR = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
-				if (SR)
+				auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
+				if (sceneRenderer)
 				{
-					LightingSettings& settings = SR->getLightingSettings();
+					LightingSettings& settings = sceneRenderer->getLightingSettings();
 					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f);
-					ImGui::SliderFloat("Gamma", &settings.gamma, 1.0f, 3.0f);
+				}
+
+				auto* tonemap = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<TonemapRenderer>();
+				if (tonemap)
+				{
+					int curve = static_cast<int>(tonemap->curve);
+					if (ImGui::Combo("Tonemap", &curve, "None\0Reinhard\0ACES\0")) {
+						tonemap->curve = static_cast<TonemapCurve>(curve);
+					}
+					ImGui::SliderFloat("Exposure", &tonemap->exposure, 0.0f, 8.0f, "%.2f");
+					ImGui::SliderFloat("Gamma", &tonemap->gamma, 1.0f, 3.0f);
+					ImGui::Checkbox("Dither", &tonemap->dither);
+				}
+
+				if (sceneRenderer)
+				{
 
 					ImGui::SeparatorText("Sun");
 					DirectionalLight& sun = Engine::Instance().getSubSystem<RendererManager>()->getSun();
@@ -109,7 +125,8 @@ namespace SE
 					ImGui::DragFloat("Intensity", &sun.intensity, 0.05f, 0.0f, 100.0f);
 				}
 
-				if (auto* shadow = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>())
+				auto* shadow = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>();
+				if (shadow)
 				{
 					// the animation drives these, so only editable while it's off
 					ImGui::BeginDisabled(shadow->animateSun);

@@ -11,6 +11,7 @@
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
 
 #include "Core/Engine.h"
 #include "Core/EngineStates.h"
@@ -76,26 +77,34 @@ namespace SE
 
 		//TODO: add an AO pass here
 
+		// lighting stays linear and unclamped in half floats until the tonemap pass, 8 bit here would band
+		const Attachment hdrAttachment{ .internalFormat = GL_RGBA16F, .format = GL_RGBA, .type = GL_FLOAT };
+
 		// Deferred lighting pass, shades the G-buffer into DeferredColor
-		FBO& deferredColor = createRenderTarget("DeferredColor", Descriptor{});
+		FBO& deferredColor = createRenderTarget("DeferredColor", Descriptor{ .colors = { hdrAttachment } });
 		auto& deferredLightingRenderer = addRenderer<DeferredLightingRenderer>("GBuffer", "ShadowMap");
 		addPass(RenderPass{ .renderer = deferredLightingRenderer, .output = deferredColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
 
 		// Forward pass, copies DeferredColor then draws transparent submeshes sorted back to front
-		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{});
+		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{ .colors = { hdrAttachment } });
 		auto& sceneRenderer = addRenderer<SceneRenderer>("DeferredColor");
 		addPass(RenderPass{ .renderer = sceneRenderer, .output = sceneColor, .clearMask = 0 });
 
-		// Example: A render pass that draws on top of SceneColor
-		auto& debugRenderer = addRenderer<DebugRenderer>();
-		addPass(RenderPass{ .renderer = debugRenderer,  .output = sceneColor,  .clearMask = 0, .debugOnly = true });
+		// Tonemap pass, HDR SceneColor to the 8 bit display ready FinalColor, also copies the depth
+		FBO& finalColor = createRenderTarget("FinalColor", Descriptor{});
+		auto& tonemapRenderer = addRenderer<TonemapRenderer>("SceneColor");
+		addPass(RenderPass{ .renderer = tonemapRenderer, .output = finalColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
 
-		// Example: A render pass that samples "SceneColor" and output to a new "Grayscale" target
-		Descriptor grayscaleDescriptor{ 
-			.colors = { Attachment{} }, 
+		// Example: A render pass that draws on top of FinalColor, after the tonemap so debug colors show as is
+		auto& debugRenderer = addRenderer<DebugRenderer>();
+		addPass(RenderPass{ .renderer = debugRenderer,  .output = finalColor,  .clearMask = 0, .debugOnly = true });
+
+		// Example: A render pass that samples "FinalColor" and output to a new "Grayscale" target
+		Descriptor grayscaleDescriptor{
+			.colors = { Attachment{} },
 			.depth = std::nullopt };
 		FBO& grayscale = createRenderTarget("Grayscale", grayscaleDescriptor);
-		auto& grayscaleRenderer = addRenderer<GrayscaleRenderer>("SceneColor"); // make your own renderer that consumes some target
+		auto& grayscaleRenderer = addRenderer<GrayscaleRenderer>("FinalColor"); // make your own renderer that consumes some target
 		addPass(RenderPass{ .renderer = grayscaleRenderer,  .output = grayscale,  .clearMask = GL_COLOR_BUFFER_BIT });
 
 		// Example:
@@ -138,7 +147,7 @@ namespace SE
 		*/
 
 		// change this to set the final output to a specific target
-		setFinalSceneOutput("SceneColor");
+		setFinalSceneOutput("FinalColor");
 #pragma endregion
 
 		m_textRenderer = &addRenderer<TextRenderer>();
