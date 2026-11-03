@@ -118,8 +118,13 @@ namespace SE
 					ImGui::EndDisabled();
 
 					ImGui::Checkbox("Animate Sun", &shadow->animateSun);
-					ImGui::SliderFloat("Azimuth Speed", &shadow->sunRotateSpeed, -180.0f, 180.0f, "%.0f deg/s");
-					ImGui::SliderFloat("Elevation Speed", &shadow->sunElevationSpeed, 0.0f, 180.0f, "%.0f deg/s");
+					ImGui::SameLine();
+					ImGui::Checkbox("Use PCSS", &shadow->usePCSS);
+					ImGui::SameLine();
+					ImGui::Checkbox("Blue Noise", &shadow->useBlueNoise);
+
+					//ImGui::SliderFloat("Azimuth Speed", &shadow->sunRotateSpeed, -180.0f, 180.0f, "%.0f deg/s");
+					//ImGui::SliderFloat("Elevation Speed", &shadow->sunElevationSpeed, 0.0f, 180.0f, "%.0f deg/s");
 					ImGui::DragFloatRange2("Elevation Range", &shadow->sunMinElevation, &shadow->sunMaxElevation, 0.5f, -89.0f, 89.0f, "Min %.0f", "Max %.0f");
 
 					ImGui::SeparatorText("Shadows");
@@ -127,6 +132,8 @@ namespace SE
 					ImGui::DragFloat("Light Distance", &shadow->lightDistance, 0.5f, 1.0f, 1000.0f);
 					ImGui::SliderFloat("Depth Bias", &shadow->depthBias, 0.0f, 0.02f, "%.4f");
 					ImGui::SliderFloat("Normal Offset", &shadow->normalOffset, 0.0f, 0.5f, "%.3f");
+					ImGui::SliderFloat("Penumbra Scale", &shadow->penumbraScale, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Search Radius", &shadow->searchRadius, 0.0f, 0.1f, "%.3f");
 				}
 				ImGui::EndMenu();
 			}

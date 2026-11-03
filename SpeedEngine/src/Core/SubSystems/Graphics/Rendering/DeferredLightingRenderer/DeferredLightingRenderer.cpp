@@ -3,6 +3,7 @@
 #include "DeferredLightingRenderer.h"
 #include "Core/Engine.h"
 #include "Core/ResourceManagers/ResourceManager.h"
+#include "Core/ResourceManagers/Material/Texture.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
 #include "Core/SubSystems/Graphics/Rendering/RendererManager.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
@@ -21,8 +22,9 @@ namespace SE
 		"gEmissive",
 	};
 
-	// shadow map goes in the slot right after the G-buffer
+	// shadow map goes in the slot right after the G-buffer, noise right after that
 	static constexpr int SHADOW_MAP_SLOT = static_cast<int>(GBUFFER_SAMPLERS.size());
+	static constexpr int BLUE_NOISE_SLOT = SHADOW_MAP_SLOT + 1;
 
 	DeferredLightingRenderer::DeferredLightingRenderer(Logger& logger, std::string gBufferTarget, std::string shadowMapTarget)
 	    : Renderer(logger, "DeferredLightingRenderer"),
@@ -48,6 +50,12 @@ namespace SE
 			shutdown();
 			throw std::runtime_error("Failed to create DeferredLightingRenderer vertex array");
 		}
+
+		// read with texelFetch, so the texture's filtering and mipmaps don't matter
+		m_blueNoiseTextureId = resources->loadTexture({ .path = "Assets/Textures/obluenoise64.png", .name = "blueNoise" });
+		if (!m_blueNoiseTextureId) {
+			m_logger.warn("Failed to load blue noise texture, PCSS falls back to gradient noise");
+		}
 	}
 
 	void DeferredLightingRenderer::render(RenderContext& context)
@@ -72,10 +80,18 @@ namespace SE
 		m_shader.setInt("shadowMap", SHADOW_MAP_SLOT);
 		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
 		glBindTexture(GL_TEXTURE_2D, shadowMap.getDepthTexture());
+		const Texture* blueNoise = context.resources.getResource<Texture>(m_blueNoiseTextureId);
+		m_shader.setInt("blueNoise", BLUE_NOISE_SLOT);
+		glActiveTexture(GL_TEXTURE0 + BLUE_NOISE_SLOT);
+		glBindTexture(GL_TEXTURE_2D, blueNoise ? blueNoise->getTextureId() : 0);
 		if (auto* shadowRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>()) {
 			m_shader.setMat4("lightSpaceMatrix", shadowRenderer->getLightSpaceMatrix());
 			m_shader.setFloat("shadowBias", shadowRenderer->depthBias);
 			m_shader.setFloat("shadowNormalOffset", shadowRenderer->normalOffset);
+			m_shader.setFloat("penumbraScale", shadowRenderer->penumbraScale);
+			m_shader.setFloat("searchRadius", shadowRenderer->searchRadius);
+			m_shader.setBool("usePCSS", shadowRenderer->usePCSS);
+			m_shader.setBool("useBlueNoise", shadowRenderer->useBlueNoise && blueNoise);
 		}
 
 		if (auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>()) {
@@ -91,6 +107,8 @@ namespace SE
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0 + BLUE_NOISE_SLOT);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE0);
 		m_shader.unbind();

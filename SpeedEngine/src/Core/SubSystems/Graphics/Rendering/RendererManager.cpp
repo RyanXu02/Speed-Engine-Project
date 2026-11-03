@@ -62,7 +62,7 @@ namespace SE
 		// border is 1.0 or max depth, so anything outside the map reads as lit
 		const Attachment shadowDepth{ .internalFormat = GL_DEPTH_COMPONENT24, .format = GL_DEPTH_COMPONENT, .type = GL_FLOAT,
 			.minFilter = GL_NEAREST, .magFilter = GL_NEAREST, .wrapS = GL_CLAMP_TO_BORDER, .wrapT = GL_CLAMP_TO_BORDER };
-		FBO& shadowMap = createRenderTarget("ShadowMap", Descriptor{ .width = 1024, .height = 1024, .colors = {}, .depth = shadowDepth }, RenderTargetSize{ .followSceneViewport = false });
+		FBO& shadowMap = createRenderTarget("ShadowMap", Descriptor{ .width = 2048, .height = 2048, .colors = {}, .depth = shadowDepth }, RenderTargetSize{ .followSceneViewport = false });
 		auto& shadowRenderer = addRenderer<ShadowRenderer>();
 		addPass(RenderPass{ .renderer = shadowRenderer, .output = shadowMap, .clearMask = GL_DEPTH_BUFFER_BIT });
 

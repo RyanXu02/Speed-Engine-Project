@@ -29,6 +29,11 @@ uniform sampler2D shadowMap;
 uniform mat4 lightSpaceMatrix;
 uniform float shadowBias;
 uniform float shadowNormalOffset;
+uniform float penumbraScale;  // UV of blur per unit of depth gap (bigger light = softer)
+uniform float searchRadius;   // UV radius of the blocker search
+uniform bool usePCSS;
+uniform sampler2D blueNoise;  // tiled per pixel to rotate the PCSS samples
+uniform bool useBlueNoise;
 
 // point lights
 #define MAX_LIGHTS 16
@@ -41,6 +46,7 @@ uniform vec3 camPos;
 // tunables
 uniform float ambientStrength;
 uniform float gamma;
+
 
 const float PI = 3.14159265359;
 
@@ -84,6 +90,38 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+// different disk version
+// const vec2 poissonDisk16[16] = vec2[](
+//     vec2(-0.1741, 0.0197), vec2(0.0263, -0.1667),
+//     vec2(0.1556, 0.1533), vec2(-0.2520, -0.3392),
+//     vec2(0.4209, -0.0654), vec2(-0.1610, 0.4448),
+//     vec2(-0.4557, 0.1623), vec2(0.2057, -0.5641),
+//     vec2(0.4706, 0.4578), vec2(-0.6861, -0.2227),
+//     vec2(0.3204, 0.6955), vec2(0.6874, -0.4045),
+//     vec2(-0.3541, -0.7423), vec2(-0.8354, 0.3582),
+//     vec2(0.7936, 0.3807), vec2(-0.1172, 0.9525)
+// );
+
+const vec2 poissonDisk16[16] = vec2[](
+    vec2( -0.94201624, -0.39906216 ),
+    vec2( 0.94558609, -0.76890725 ),
+    vec2( -0.094184101, -0.92938870 ),
+    vec2( 0.34495938, 0.29387760 ),
+    vec2( -0.91588581, 0.45771432 ),
+    vec2( -0.81544232, -0.87912464 ),
+    vec2( -0.38277543, 0.27676845 ),
+    vec2( 0.97484398, 0.75648379 ),
+    vec2( 0.44323325, -0.97511554 ),
+    vec2( 0.53742981, -0.47373420 ),
+    vec2( -0.26496911, -0.41893023 ),
+    vec2( 0.79197514, 0.19090188 ),
+    vec2( -0.24188840, 0.99706507 ),
+    vec2( -0.81409955, 0.91437590 ),
+    vec2( 0.19984126, 0.78641367 ),
+    vec2( 0.14383161, -0.14100790 )
+);
+
+
 // outgoing radiance from one light, the body of the light loop in the article
 vec3 calculateLo(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 F0, vec3 albedo, float metallic, float roughness)
 {
@@ -105,19 +143,91 @@ vec3 calculateLo(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 F0, vec3 albedo, fl
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
+//PCSS shadow ref https://developer.download.nvidia.com/shaderlibrary/docs/shadow_PCSS.pdf
+//the paper uses perspective shadow with spot light which give a bit differnt result from orthographic shadow so need some math adjustments
+//orthographics have light being parallel, dB goes to infinity so this formular isn't used for orthographics shadow
+float penumbraSize(float receiver, float blocker) { // parallel plane estimation
+    return (receiver - blocker) / blocker; //TODO: maybe * wLight check this
+}
+
+float interleavedGradientNoise(vec2 p)  // per pixel random between 0 and 1
+{
+    return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715))));
+}
+
+// average depth of the occluders around this pixel
+float findBlockerDepth(vec2 uv, float receiverDepth, mat2 rot, out int blockerCount) {
+    float sum = 0.0;
+    blockerCount = 0;
+    for(int i = 0; i < 16; i++) {
+        float d = texture(shadowMap, uv + rot * poissonDisk16[i] * searchRadius).r;
+        if(d < receiverDepth) {
+            sum += d;
+            blockerCount++;
+        }
+    }
+    return blockerCount > 0 ? sum / float(blockerCount) : 1.0;
+}
+
+// pcf over a disk of the given radius
+float pcfPoisson(vec2 uv, float receiverDepth, float radius, mat2 rot) {
+    float lit = 0.0;
+    for(int i = 0; i < 16; i++) {
+        float d = texture(shadowMap, uv + rot * poissonDisk16[i] * radius).r;
+        lit += receiverDepth > d ? 0.0 : 1.0;
+    }
+    
+    return lit / 16.0;
+}
+
 float calculateShadow(vec3 worldPos, vec3 N, vec3 L)
 {
-    float normalOffset = shadowNormalOffset * (1.0 - max(dot(N, L), 0.0));
+    float normalOffset = shadowNormalOffset * (1.0 - max(dot(N, L), 0.0));  // prevent self shadowing from grazing sun angle
     vec4 lightSpacePos = lightSpaceMatrix * vec4(worldPos + N * normalOffset, 1.0);
     vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
     vec3 projCoordsNDC = projCoords * 0.5 + 0.5;
 
-    float closestDepth = texture(shadowMap, projCoordsNDC.xy).r;
-    float shadow = projCoordsNDC.z > closestDepth ? 0.0 : 1.0;
-    if(projCoordsNDC.z > closestDepth) {
-        shadow = 0.0;
-    } else {
-        shadow = 1.0;
+    // lit when outside the light far range
+    if(projCoordsNDC.z > 1.0) {
+        return 1.0;
+    }
+
+    float bias = max(shadowBias * (1.0 - dot(N, L)), shadowBias * 0.1);
+    float currentDepth = projCoordsNDC.z - bias;
+    float shadow = 0.0;
+
+    if(usePCSS) {
+        // one noise texel per screen pixel, texelFetch so it never gets filtered
+        float noise = useBlueNoise
+            ? texelFetch(blueNoise, ivec2(gl_FragCoord.xy) % textureSize(blueNoise, 0), 0).r
+            : interleavedGradientNoise(gl_FragCoord.xy);
+        float angle = noise * 2.0 * PI;
+        float c = cos(angle);
+        float s = sin(angle);
+        mat2 rot = mat2(c, s, -s, c);
+
+        int blockerCount;
+        float blockerDepth = findBlockerDepth(projCoordsNDC.xy, currentDepth, rot, blockerCount);
+        if(blockerCount == 0) { // nothing is blocking, scene is lit
+            return 1.0;
+        }
+
+        float penumbra = (currentDepth - blockerDepth) * penumbraScale;
+        vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+        penumbra = clamp(penumbra, texelSize.x, searchRadius);
+        shadow = pcfPoisson(projCoordsNDC.xy, currentDepth, penumbra, rot);
+    } 
+    else {
+        vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+        const int radius = 3;
+        for(int i = -radius; i <= radius; i++) {
+            for(int j = -radius; j <= radius; j++) {
+                float pcfDepth = texture(shadowMap, projCoordsNDC.xy + vec2(i, j) * texelSize).r;   //closest depth
+                shadow += currentDepth > pcfDepth ? 0.0 : 1.0;
+            }
+        }
+
+        shadow /= float((2 * radius + 1) * (2 * radius + 1));
     }
 
     return shadow;

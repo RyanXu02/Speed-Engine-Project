@@ -21,9 +21,13 @@ namespace SE
 		const glm::mat4& getLightSpaceMatrix() const { return m_lightSpaceMatrix; }
 
 		float orthoHalfSize = 30.0f;	// half size of the ortho box around the camera, bigger covers more but blurs the shadows
-		float lightDistance = 50.0f;	// how far back from the camera the light sits, also the depth range is twice this
+		float lightDistance = 125.0f;	// how far back from the camera the light sits, also the depth range is twice this
 		float depthBias = 0.002f;		// depth bias at grazing angles, fights shadow acne
 		float normalOffset = 0.05f;		// world units to push the lookup along the normal, also fights acne
+		float penumbraScale = 0.3f;
+		float searchRadius = 0.05f;
+		bool usePCSS = true;
+		bool useBlueNoise = true;		// rotate the PCSS samples with the blue noise texture instead of gradient noise
 
 		// sun position in degrees, written to the sun's direction every frame
 		// azimuth is around world up starting at +Z, elevation is height above the horizon

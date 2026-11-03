@@ -22,5 +22,6 @@ namespace SE
 		std::string m_shadowMapTarget;
 		Shader m_shader;
 		unsigned int m_VAO = 0;
+		uint32_t m_blueNoiseTextureId = 0; // resource id, tiled over the screen to rotate the PCSS samples
 	};
 } // namespace SE
