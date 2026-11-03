@@ -8,6 +8,7 @@
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
 
 #include "Core/Engine.h"
 #include "Core/EngineStates.h"
@@ -61,6 +62,13 @@ namespace SE
 			.renderer = sceneRenderer, 
 			.output = sceneColor, 
 			.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
+
+		// Billboard particles draw on top of SceneColor, depth tested against the scene
+		auto& particleRenderer = addRenderer<ParticleRenderer>();
+		addPass(RenderPass{
+			.renderer = particleRenderer,
+			.output = sceneColor,
+			.clearMask = 0 });
 
 		// Example:
 		// A render pass that draws on top of SceneColor

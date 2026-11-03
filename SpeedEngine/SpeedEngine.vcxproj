@@ -162,6 +162,9 @@
     <ClCompile Include="src\Core\Memory\FrameSlot.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Font\Font.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Font\FontManager.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.cpp" />
     <ClCompile Include="src\Core\Threading\FrameExchange.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.cpp" />
@@ -236,9 +239,13 @@
     <ClInclude Include="src\Core\Features\CameraFrustum.h" />
     <ClInclude Include="src\Core\Features\CameraState.h" />
     <ClInclude Include="src\Core\Features\CameraController.h" />
+    <ClInclude Include="src\Core\Features\RNG.h" />
     <ClInclude Include="src\Core\Memory\FrameSlot.h" />
     <ClInclude Include="src\Core\ResourceManagers\Font\Font.h" />
     <ClInclude Include="src\Core\ResourceManagers\Font\FontManager.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.h" />
     <ClInclude Include="src\Core\Threading\FrameExchange.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
@@ -323,6 +330,8 @@
     <None Include="Assets\Shaders\grayscale.frag" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
+    <None Include="Assets\Shaders\particle_billboard.frag" />
+    <None Include="Assets\Shaders\particle_billboard.vert" />
     <None Include="Assets\Shaders\text.frag" />
     <None Include="Assets\Shaders\text.vert" />
   </ItemGroup>

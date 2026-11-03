@@ -38,10 +38,19 @@ namespace SE
 		glm::vec4 color;
 	};
 
+	// @brief One billboard particle, already simulated on the CPU
+	struct ParticleInstance
+	{
+		glm::vec3 position;
+		float size;
+		float rotation; // radians, around the view axis
+		glm::vec4 color;
+	};
+
 	struct RenderFrame
 	{
 		explicit RenderFrame(std::pmr::memory_resource* resource = std::pmr::get_default_resource())
-			: draws(resource), debugLines(resource), debugTriangles(resource), textDraws(resource)
+			: draws(resource), debugLines(resource), debugTriangles(resource), textDraws(resource), particles(resource)
 		{}
 
 		void addDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
@@ -60,5 +69,6 @@ namespace SE
 		std::pmr::vector<DebugVertex> debugLines;
 		std::pmr::vector<DebugVertex> debugTriangles;
 		std::pmr::vector<TextDraw> textDraws;
+		std::pmr::vector<ParticleInstance> particles; // billboards, sorted back to front
 	};
 } // namespace SE

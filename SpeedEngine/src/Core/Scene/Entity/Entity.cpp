@@ -132,4 +132,13 @@ namespace SE
 		};
 		return function;
 	}
+
+	Entity::HookFunction Entity::_onParticleEmitterAdded()
+	{
+		HookFunction function = [](Entity entity) 
+		{
+			auto* pe = entity.getComponent<ParticleEmitter>();
+			pe.finalize();
+		}
+	}
 }

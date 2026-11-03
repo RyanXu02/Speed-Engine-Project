@@ -1,41 +1,34 @@
 #pragma once
-#include "Engine/EntitySystem/Component/Component.h"
-#include "Engine/Interfaces/ISubmitRenderCommand.h"
+#include "Core/Features/Serializable.h"
+#include "Core/Scene/Entity/Component/Transform.h"
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-namespace mts
+namespace SE
 {
     // Forward Declaration
     struct Particle;
     class ParticleContainer;
-    class Mesh;
     class Texture;
-    class Shader;
 
-    class ParticleEmitter : public Component, public ISubmitRenderCommand
+    class ParticleEmitter
     {
-        MTS_CLASS_NEW_DELETE();
-
-       public:
-        ParticleEmitter(GameObject* owner);
+    public:
         ParticleEmitter() = default;
-        ~ParticleEmitter() override;
+		~ParticleEmitter() = default;
 
-        void Init() override;
-        void Update(float dt) override;
-        void LateUpdate(float dt) override;
-        void Render() override;
-        void Deserialize(JsonValue const& jsonObj) override;
-        void Serialize(JsonDocument& doc) const override;
-
-        void SubmitRenderCommand() const override;
-        
+        void update(float dt);
 
         void SetFrame(int frameIndex, Particle* particle);
         void EmitParticle();
-        void ForEachParticle(std::function<void(Particle& particle, float dt)> const& lambda,
-                             float dt);
+        void ForEachParticle(std::function<void(Particle& particle, float dt)> const& lambda, float dt);
+
+        //@brief This exists because the container has know max particles to hold as well as if its a oneshot system.
+        //@brief With our serialization, this gets called from the hook function when a PE is added.
+        //@brief lowkenuinely horrible that its public so anyone could call it but idk how else to solve this
+		void finalize();
+		void acquireTransform(const Transform* tr) { myTransform = tr; }
 
         glm::vec2 GetAcceleration() const { return mAcceleration; }
         void SetAcceleration(glm::vec2 v) { mAcceleration = v; }
@@ -43,14 +36,11 @@ namespace mts
         void ToggleEmitter() { mIsRunning ^= true; }
         void StartEmitter() { mIsRunning = true; }
         void StopEmitter() { mIsRunning = false; }
-        Component* Clone(GameObject* newOwner) const override;
 
-        Mesh* GetMesh() const { return mMesh; }
-        void SetMesh(Mesh* v) { mMesh = v; }
-        Texture* GetTexture() const { return mTexture; }
+        /*Texture* GetTexture() const { return mTexture; }
         void SetTexture(Texture* v) { mTexture = v; }
         Shader* GetShader() const { return mShader; }
-        void SetShader(Shader* v) { mShader = v; }
+        void SetShader(Shader* v) { mShader = v; }*/
         float GetAlpha() const { return mAlpha; }
         void SetAlpha(float v) { mAlpha = v; }
         glm::vec3 GetTintColor() const { return mTintColor; }
@@ -91,25 +81,52 @@ namespace mts
         void SetOneShot(bool v) { mOneShot = v; }
         bool GetIsRunning() const { return mIsRunning; }
 
-       private:
-        Mesh* mMesh{nullptr};
-        Texture* mTexture{nullptr};
-        Shader* mShader{nullptr};
+        bool AmIDone() const { return mIsDone; }
+
+        DEFINE_TYPE(ParticleEmitter, 
+            member("tintColor", &ParticleEmitter::mTintColor),
+            member("alpha", &ParticleEmitter::mAlpha),
+            //member("texture", &ParticleEmitter::),
+            //member("shader", &ParticleEmitter::mTintColor),       //probably dont need shader, as all billboard particles will use same billboard shader. idk maybe lol
+	        member("frameIndex", &ParticleEmitter::mFrameIndex), 
+            member("sheetRows", &ParticleEmitter::mNumRows), 
+            member("sheetColumns", &ParticleEmitter::mNumCols),
+            member("scale", &ParticleEmitter::mEmitterScale),
+            member("particleScaleMin", &ParticleEmitter::mScaleMin),
+            member("particleScaleMax", &ParticleEmitter::mScaleMax),
+            member("acceleration", &ParticleEmitter::mAcceleration),
+            member("directionRange", &ParticleEmitter::mDirectionRange),
+            member("emitRate", &ParticleEmitter::mEmitRate),
+            member("emitMax", &ParticleEmitter::mEmitMax),
+            member("lifetimeMin", &ParticleEmitter::mLifetimeMin),
+            member("lifetimeMax", &ParticleEmitter::mLifetimeMax),
+            member("speedMin", &ParticleEmitter::mSpeedMin),
+            member("speedMax", &ParticleEmitter::mSpeedMax),
+            member("rotationSpeedMin", &ParticleEmitter::mRotationSpeedMin),
+            member("rotationSpeedMax", &ParticleEmitter::mRotationSpeedMax),
+            member("rotationMin", &ParticleEmitter::mRotationMin),
+            member("rotationMax", &ParticleEmitter::mRotationMax),
+            member("oneShot", &ParticleEmitter::mOneShot),
+            member("isRunning", &ParticleEmitter::mIsRunning));
+    private:
+        //Texture* mTexture{nullptr};
+        //Shader* mShader{nullptr};
         float mAlpha{1.0f};
         glm::vec3 mTintColor{1.0f, 1.0f, 1.0f};
         int mNumRows = 1;
         int mNumCols = 1;
         int mFrameIndex = 0;
 
-        glm::vec2 mEmitterScale{0.0f, 0.0f};
-        glm::vec2 mScaleMin{1.0f, 1.0f};
-        glm::vec2 mScaleMax{1.0f, 1.0f};
-        glm::vec2 mAcceleration{0.0f, 0.0f};
-        glm::vec2 mDirectionRange{0.0f, 6.28f};
+        glm::vec3 mEmitterScale{0.0f, 0.0f, 0.f};
+        glm::vec3 mScaleMin{1.0f, 1.0f, 1.f};
+        glm::vec3 mScaleMax{1.0f, 1.0f, 1.f};
+        glm::vec3 mAcceleration{0.0f, 0.0f, 0.f};
+		//for choosing random velocity direction. ex:(0,360) = emitted in any 2d direction from point of emission
+        glm::vec3 mDirectionRange{0.0f, 6.28f};
 
         float mEmitAccumulator{0.0f};
         float mEmitRate{1.0f};
-        unsigned mEmitMax{250};
+        unsigned mEmitMax{1000}; //must be able to emit @ least 1000 particles at once with no fps drop
         float mLifetimeMin{1.0f};
         float mLifetimeMax{1.0f};
         float mSpeedMin{1.0f};
@@ -118,10 +135,13 @@ namespace mts
         float mRotationSpeedMax{0.0f};
         float mRotationMin{0.0f};
         float mRotationMax{0.0f};
-        bool mOneShot{false};
+        bool mOneShot{false}; //whether particle system loops (e.g. campfire sparks: false)
         bool mIsRunning{true};
 
-        ParticleContainer* mContainer{};
-    };
+        //replaces GetGameObj()->getComponent<Transform> from mitosis engine code in conjunction with SE::ParticleEmitter::acquireTransform
+        const Transform* myTransform;
+		bool mIsDone{ false };
 
-}  // namespace mts
+        std::unique_ptr<ParticleContainer> mContainer{};
+    };
+}  // namespace SE

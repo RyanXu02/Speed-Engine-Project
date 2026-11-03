@@ -60,6 +60,7 @@ namespace SE
 		frame.debugLines.clear();
 		frame.debugTriangles.clear();
 		frame.textDraws.clear();
+		frame.particles.clear();
 
 		frame.textDraws.reserve(m_textSubmissions.size());
 		for (const auto& submission : m_textSubmissions)

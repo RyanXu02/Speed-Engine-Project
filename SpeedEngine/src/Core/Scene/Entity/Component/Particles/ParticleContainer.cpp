@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ParticleContainer.h"
 
-namespace mts
+namespace SE
 {
     ParticleContainer::ParticleContainer(unsigned maxParticles, bool oneShot)
         : mParticles(), mNumActiveParticles(0), mNumFreeParticles(maxParticles), mOneShot(oneShot)
@@ -14,8 +14,7 @@ namespace mts
         }
     }
 
-    void ParticleContainer::Update(std::function<void(Particle& particle, float dt)> const &lambda,
-                                   float dt)
+    void ParticleContainer::Update(std::function<void(Particle& particle, float dt)> const &lambda, float dt)
     {
         // Pass all particles and current dt to lambda update function
         for (auto& particle : mParticles)
@@ -25,8 +24,7 @@ namespace mts
     }
 
     // @brief Render the Object each frame.
-    void ParticleContainer::Render(
-        std::function<void(const Particle& particle)> const& lambda) const
+    void ParticleContainer::Render(std::function<void(const Particle& particle)> const& lambda) const
     {
         // Pass all particles to lambda render function
         for (const auto& particle : mParticles)

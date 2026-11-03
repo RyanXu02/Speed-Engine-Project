@@ -1,17 +1,17 @@
 #pragma once
 
-namespace mts
+namespace SE
 {
     struct Particle
     {
         // Transform variables
-        glm::vec2 position{0.0f, 0.0f};
-        glm::vec2 scale{0.0f, 0.0f};
+        glm::vec3 position{0.0f, 0.0f, 0.f};
+        glm::vec3 scale{0.0f, 0.0f, 0.f};
         float rotation{0.0f};
 
         // Physics variables
-        glm::vec2 velocity{0.0f, 0.0f};
-        glm::vec2 acceleration{0.0f, 0.0f};
+        glm::vec3 velocity{0.0f, 0.0f, 0.f};
+        glm::vec3 acceleration{0.0f, 0.0f, 0.f};
         float rotationSpeed{0.0f};
 
         // Particle specific variables
@@ -30,8 +30,10 @@ namespace mts
         // @brief Render the Object each frame.
         void Render(std::function<void(const Particle& particle)> const& lambda) const;
 
+        //do we have no active particles?
         bool IsEmpty() const;
 
+        //do we have no free particles?
         bool IsFull() const;
 
         Particle* AllocateParticle();
