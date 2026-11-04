@@ -5,6 +5,9 @@
 #include "Core/ResourceManagers/ResourceManager.h"
 
 #include "Core/SubSystems/Graphics/Rendering/DebugRenderer/DebugRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/DeferredLightingRenderer/DeferredLightingRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/GeometryRenderer/GeometryRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
@@ -18,7 +21,6 @@
 
 namespace SE
 {
-	// Common pass baseline
 	// Passes bind their own inputs and restore their state beyond this list
 	static void resetPassState()
 	{
@@ -56,12 +58,34 @@ namespace SE
 
 		// Configure your targets, execution order, outputs, and clears here		
 #pragma region RenderPasses
+		//TODO: add ibl, potentially a single scattered sky pass here
+
+		// border is 1.0 or max depth, so anything outside the map reads as lit
+		const Attachment shadowDepth{ .internalFormat = GL_DEPTH_COMPONENT24, .format = GL_DEPTH_COMPONENT, .type = GL_FLOAT,
+			.minFilter = GL_NEAREST, .magFilter = GL_NEAREST, .wrapS = GL_CLAMP_TO_BORDER, .wrapT = GL_CLAMP_TO_BORDER };
+		FBO& shadowMap = createRenderTarget("ShadowMap", Descriptor{ .width = 2048, .height = 2048, .colors = {}, .depth = shadowDepth }, RenderTargetSize{ .followSceneViewport = false });
+		auto& shadowRenderer = addRenderer<ShadowRenderer>();
+		addPass(RenderPass{ .renderer = shadowRenderer, .output = shadowMap, .clearMask = GL_DEPTH_BUFFER_BIT });
+
+		// Geometry pass, opaque submeshes into the G-buffer
+		// attachments: 0 position, 1 normal, 2 albedo, 3 ao, metallic, and roughness in rgb channels, 4 emissive
+		const Attachment floatAttachment{ .internalFormat = GL_RGBA16F, .format = GL_RGBA, .type = GL_FLOAT, .minFilter = GL_NEAREST, .magFilter = GL_NEAREST };
+		const Attachment byteAttachment{ .minFilter = GL_NEAREST, .magFilter = GL_NEAREST };
+		FBO& gBuffer = createRenderTarget("GBuffer", Descriptor{ .colors = { floatAttachment, floatAttachment, byteAttachment, byteAttachment, floatAttachment } });
+		auto& geometryRenderer = addRenderer<GeometryRenderer>();
+		addPass(RenderPass{ .renderer = geometryRenderer, .output = gBuffer, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, .clearColor = glm::vec4(0.0f) });
+
+		//TODO: add an AO pass here
+
+		// Deferred lighting pass, shades the G-buffer into DeferredColor
+		FBO& deferredColor = createRenderTarget("DeferredColor", Descriptor{});
+		auto& deferredLightingRenderer = addRenderer<DeferredLightingRenderer>("GBuffer", "ShadowMap");
+		addPass(RenderPass{ .renderer = deferredLightingRenderer, .output = deferredColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
+
+		// Forward pass, copies DeferredColor then draws transparent submeshes sorted back to front
 		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{});
-		auto& sceneRenderer = addRenderer<SceneRenderer>();
-		addPass(RenderPass{ 
-			.renderer = sceneRenderer, 
-			.output = sceneColor, 
-			.clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
+		auto& sceneRenderer = addRenderer<SceneRenderer>("DeferredColor");
+		addPass(RenderPass{ .renderer = sceneRenderer, .output = sceneColor, .clearMask = 0 });
 
 		// Billboard particles draw on top of SceneColor, depth tested against the scene
 		auto& particleRenderer = addRenderer<ParticleRenderer>();
@@ -73,23 +97,15 @@ namespace SE
 		// Example:
 		// A render pass that draws on top of SceneColor
 		auto& debugRenderer = addRenderer<DebugRenderer>();
-		addPass(RenderPass{
-			.renderer = debugRenderer, 
-			.output = sceneColor, 
-			.clearMask = 0,
-			.debugOnly = true });
+		addPass(RenderPass{ .renderer = debugRenderer,  .output = sceneColor,  .clearMask = 0, .debugOnly = true });
 
-		// Example:
-		// A render pass that samples "SceneColor" and output to a new "Grayscale" target
+		// Example: A render pass that samples "SceneColor" and output to a new "Grayscale" target
 		Descriptor grayscaleDescriptor{ 
 			.colors = { Attachment{} }, 
 			.depth = std::nullopt };
 		FBO& grayscale = createRenderTarget("Grayscale", grayscaleDescriptor);
 		auto& grayscaleRenderer = addRenderer<GrayscaleRenderer>("SceneColor"); // make your own renderer that consumes some target
-		addPass(RenderPass{ 
-			.renderer = grayscaleRenderer, 
-			.output = grayscale, 
-			.clearMask = GL_COLOR_BUFFER_BIT });
+		addPass(RenderPass{ .renderer = grayscaleRenderer,  .output = grayscale,  .clearMask = GL_COLOR_BUFFER_BIT });
 
 		// Example:
 		// What an AO pass could look like:
@@ -154,7 +170,7 @@ namespace SE
 		m_sceneViewport->setCamera(interpolateCamera(frame.camera.previous, frame.camera.current, t));
 		m_sceneViewport->updateMatrices();
 		RenderContext context{ frame,
-			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, t };
+			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, m_sun, t };
 
 		for (const auto& pass : m_passes)
 		{

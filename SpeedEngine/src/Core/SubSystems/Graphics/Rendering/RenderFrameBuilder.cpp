@@ -44,6 +44,14 @@ namespace SE
 		// Remove entries that were not present in this tick
 		std::erase_if(m_drawItemHistories, [this](const auto& entry) { return entry.second.lastSeenTick != m_tick; });
 
+		// capture lights, not interpolated
+		m_lights.clear();
+		scene.forEntitiesWith<Transform, LightComponent>([&](Entity entity)
+		{
+			const LightComponent* light = entity.getComponent<LightComponent>();
+			m_lights.push_back({ entity.getComponent<Transform>()->getTranslation(), light->color * light->intensity });
+		});
+
 		// capture camera state
 		const CameraFrustum* activeCamera = EngineStates::getActiveCamera();
 		const CameraState camera = activeCamera->getState();
@@ -57,6 +65,7 @@ namespace SE
 	void RenderFrameBuilder::build(RenderFrame& frame, PhysicsSystem& physics) const
 	{
 		frame.draws.clear();
+		frame.lights.clear();
 		frame.debugLines.clear();
 		frame.debugTriangles.clear();
 		frame.textDraws.clear();
@@ -70,6 +79,8 @@ namespace SE
 		frame.draws.reserve(m_drawItemHistories.size());
 		for (const auto& [id, entry] : m_drawItemHistories)
 			frame.draws.push_back(entry.drawItem);
+
+		frame.lights.assign(m_lights.begin(), m_lights.end());
 
 		frame.camera = m_camera;
 		frame.tickTime = m_tickTime;

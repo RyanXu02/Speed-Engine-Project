@@ -39,10 +39,10 @@ namespace SE
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -51,20 +51,16 @@ namespace SE
 		return data;
 	}
 
-	void MeshGPUCache::draw(uint32_t meshId, const MeshResource& mesh)
+	void MeshGPUCache::draw(uint32_t meshId, const MeshResource& mesh, size_t subMeshIndex)
 	{
-		if (mesh.getVertices().empty() || mesh.getIndices().empty())
+		if (mesh.getVertices().empty() || mesh.getIndices().empty() || subMeshIndex >= mesh.getSubMeshes().size())
 			return;
 
 		const auto& data = getOrUpload(meshId, mesh);
+		const SubMesh& subMesh = mesh.getSubMeshes()[subMeshIndex];
 		glBindVertexArray(data.VAO);
-		int vertices = 0;
-		for (const auto& subMesh : mesh.getSubMeshes())
-		{
-			glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMesh.indexCount), GL_UNSIGNED_INT,
-				(void*)(sizeof(uint32_t) * subMesh.indexOffset), vertices);
-			vertices += subMesh.vertexCount;
-		}
+		glDrawElementsBaseVertex(GL_TRIANGLES, static_cast<GLsizei>(subMesh.indexCount), GL_UNSIGNED_INT,
+			(void*)(sizeof(uint32_t) * subMesh.indexOffset), static_cast<GLint>(subMesh.vertexOffset));
 		glBindVertexArray(0);
 	}
 
