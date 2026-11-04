@@ -1,6 +1,9 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
+#include "../../Graphics/Rendering/RendererManager.h"
+#include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
+#include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
 #include "../../Scenes/SceneSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
@@ -96,6 +99,50 @@ namespace SE
 				ImGui::SliderFloat("sensitivity", &controller.getCameraSensitivity(), 0.001f, 0.01f);
 				ImGui::SliderFloat("MoveSpeed", &controller.getCameraMoveSpeed(), 1.0f, 20.0f);
 				ImGui::SliderFloat("DollySpeed", &controller.getCameraDollySpeed(), 1.0f, 40.0f);
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Lighting"))
+			{
+				auto* SR = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
+				if (SR)
+				{
+					LightingSettings& settings = SR->getLightingSettings();
+					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f);
+					ImGui::SliderFloat("Gamma", &settings.gamma, 1.0f, 3.0f);
+
+					ImGui::SeparatorText("Sun");
+					DirectionalLight& sun = Engine::Instance().getSubSystem<RendererManager>()->getSun();
+					ImGui::Checkbox("Enabled", &sun.enabled);
+					ImGui::ColorEdit3("Color", &sun.color.x);
+					ImGui::DragFloat("Intensity", &sun.intensity, 0.05f, 0.0f, 100.0f);
+				}
+
+				if (auto* shadow = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>())
+				{
+					// the animation drives these, so only editable while it's off
+					ImGui::BeginDisabled(shadow->animateSun);
+					ImGui::SliderFloat("Azimuth", &shadow->sunAzimuth, -180.0f, 180.0f, "%.1f deg");
+					ImGui::SliderFloat("Elevation", &shadow->sunElevation, -89.0f, 89.0f, "%.1f deg");
+					ImGui::EndDisabled();
+
+					ImGui::Checkbox("Animate Sun", &shadow->animateSun);
+					ImGui::SameLine();
+					ImGui::Checkbox("Use PCSS", &shadow->usePCSS);
+					ImGui::SameLine();
+					ImGui::Checkbox("Blue Noise", &shadow->useBlueNoise);
+
+					//ImGui::SliderFloat("Azimuth Speed", &shadow->sunRotateSpeed, -180.0f, 180.0f, "%.0f deg/s");
+					//ImGui::SliderFloat("Elevation Speed", &shadow->sunElevationSpeed, 0.0f, 180.0f, "%.0f deg/s");
+					ImGui::DragFloatRange2("Elevation Range", &shadow->sunMinElevation, &shadow->sunMaxElevation, 0.5f, -89.0f, 89.0f, "Min %.0f", "Max %.0f");
+
+					ImGui::SeparatorText("Shadows");
+					ImGui::DragFloat("Coverage", &shadow->orthoHalfSize, 0.5f, 1.0f, 500.0f);
+					ImGui::DragFloat("Light Distance", &shadow->lightDistance, 0.5f, 1.0f, 1000.0f);
+					ImGui::SliderFloat("Depth Bias", &shadow->depthBias, 0.0f, 0.02f, "%.4f");
+					ImGui::SliderFloat("Normal Offset", &shadow->normalOffset, 0.0f, 0.5f, "%.3f");
+					ImGui::SliderFloat("Penumbra Scale", &shadow->penumbraScale, 0.0f, 1.0f, "%.3f");
+					ImGui::SliderFloat("Search Radius", &shadow->searchRadius, 0.0f, 0.1f, "%.3f");
+				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Window"))

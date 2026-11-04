@@ -116,6 +116,13 @@ namespace SE
 			    
 		    });
 
+		m_inspectors.registerComponent<LightComponent>("LightComponent", true,
+		    [](Entity&, LightComponent& component)
+		    {
+			    ImGui::ColorEdit3("Color", &component.color.x);
+			    ImGui::DragFloat("Intensity", &component.intensity, 1.0f, 0.0f, 10000.0f);
+		    });
+
 		m_inspectors.registerComponent<RigidBody>("RigidBody", true,
 		    [](Entity&, RigidBody& component)
 		    {

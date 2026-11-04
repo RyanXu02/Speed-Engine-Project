@@ -16,6 +16,7 @@ namespace SE
 		Manager::shutdown();
 
 		m_materials.clear();
+		Material::destroyDefaults();
 
 		m_logger->info("MaterialManager cleared all materials");
 	}

@@ -10,6 +10,16 @@
 
 namespace SE
 {
+	// sampler names in the shaders, indexed by TextureType
+	static constexpr std::array<std::string_view, NUM_TEXTURE_TYPES> SAMPLER_NAMES = {
+		"albedoMap",
+		"normalMap",
+		"heightMap",
+		"aoMap",
+		"roughnessMap",
+		"emissiveMap",
+		"metallicMap",
+	};
 
 	bool Material::init(uint32_t shaderId, std::span<const TextureBinding> textures)
 	{
@@ -22,12 +32,8 @@ namespace SE
 				return false;
 			}
 		}
-		if (textures.empty())
-		{
-			m_logger.warn("Failed to initialize");
-			return false;
-		}
 
+		// no textures is fine, every slot binds the shared fallback texture
 		m_shaderId = shaderId;
 		m_textures.assign(textures.begin(), textures.end());
 		m_logger.info("Successfully initialized");
@@ -35,39 +41,52 @@ namespace SE
 	}
 
 	// slot 0 = albedo, slot 1 = normal, slot 2 = height, slot 3 = ambient
-	// occlusion, slot 4 = roughness
+	// occlusion, slot 4 = roughness, slot 5 = emissive, slot 6 = metallic
+	// slots without a texture get the shared 1x1 fallback texture
 	void Material::bind()
 	{
+		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
+
+		std::array<unsigned int, NUM_TEXTURE_TYPES> slots{};
 		for (const auto& binding : m_textures)
 		{
-			switch (binding.usage)
-			{
-			case TextureType::Albedo: _bindTexture(0, "albedo", binding.textureId); break;
-			case TextureType::Normal: _bindTexture(1, "normalmap", binding.textureId); break;
-			case TextureType::Height: _bindTexture(2, "heightmap", binding.textureId); break;
-			case TextureType::AmbOcc: _bindTexture(3, "ambientOcc", binding.textureId); break;
-			case TextureType::Roughness: _bindTexture(4, "roughness", binding.textureId); break;
-			default: assert(false); break;
+			if (auto* texture = resources->getResource<Texture>(binding.textureId)) {
+				slots[static_cast<size_t>(binding.usage)] = texture->getTextureId();
 			}
+		}
+
+		for (size_t slot = 0; slot < slots.size(); ++slot)
+		{
+			const unsigned int glTextureId = slots[slot] ? slots[slot] : _getDefaultTexture(static_cast<TextureType>(slot));
+			_bindTexture(static_cast<unsigned int>(slot), SAMPLER_NAMES[slot], glTextureId);
 		}
 	}
 
 	void Material::unbind()
 	{
-		for (unsigned int slot = 0; slot < 5; ++slot)
+		for (unsigned int slot = 0; slot < static_cast<unsigned int>(NUM_TEXTURE_TYPES); ++slot)
 		{
 			glActiveTexture(GL_TEXTURE0 + slot);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
 
-	void Material::_bindTexture(unsigned int slot, std::string_view uniformName, uint32_t textureId)
+	void Material::destroyDefaults()
+	{
+		for (auto& texture : s_defaultTextures)
+		{
+			if (texture) {
+				glDeleteTextures(1, &texture);
+			}
+			texture = 0;
+		}
+	}
+
+	void Material::_bindTexture(unsigned int slot, std::string_view uniformName, unsigned int glTextureId)
 	{
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		auto* texture = resources->getResource<Texture>(textureId);
-		assert(texture);
 		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+		glBindTexture(GL_TEXTURE_2D, glTextureId);
 		Shader* s = resources->getResource<Shader>(m_shaderId);
 		if (!s)
 		{
@@ -75,6 +94,35 @@ namespace SE
 			return;
 		}
 		s->setInt(uniformName, slot);
+	}
+
+	// return the default fallback texture based on the type enum
+	unsigned int Material::_getDefaultTexture(TextureType type)
+	{
+		unsigned int& texture = s_defaultTextures[static_cast<size_t>(type)];
+		if (texture)
+			return texture;
+
+		// flat normal for the normal map, black for height, white for the rest so the factors pass through
+		std::array<unsigned char, 4> pixel{ 255, 255, 255, 255 };
+		if (type == TextureType::Normal)
+			pixel = { 128, 128, 255, 255 };
+		else if (type == TextureType::Height)
+			pixel = { 0, 0, 0, 255 };
+
+		GLint previousTexture = 0;
+		glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel.data());
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glBindTexture(GL_TEXTURE_2D, previousTexture);
+		return texture;
 	}
 
 } // namespace SE

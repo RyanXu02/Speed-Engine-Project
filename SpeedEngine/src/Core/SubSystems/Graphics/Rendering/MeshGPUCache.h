@@ -26,7 +26,7 @@ namespace SE
 		MeshGPUCache& operator=(MeshGPUCache&&) = delete;
 
 		const MeshGPUData& getOrUpload(uint32_t meshId, const MeshResource& mesh);
-		void draw(uint32_t meshId, const MeshResource& mesh);
+		void draw(uint32_t meshId, const MeshResource& mesh, size_t subMeshIndex);
 		void remove(uint32_t meshId);
 		void clear();
 
