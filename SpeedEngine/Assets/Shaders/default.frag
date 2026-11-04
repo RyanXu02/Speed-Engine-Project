@@ -121,6 +121,56 @@ vec3 calculateLo(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 F0, vec3 albedo, fl
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
+// image based lighting from the ImageBasedRenderer, falls back to the flat ambient when off
+uniform bool useIBL;
+uniform vec3 shIrradiance[9];       // irradiance SH, already cosine convolved and divided by PI
+uniform samplerCube prefilterMap;   // GGX prefiltered environment, mip = roughness * prefilterMaxLod
+uniform sampler2D brdfLUT;          // split sum scale and bias on F0
+uniform float prefilterMaxLod;
+uniform float iblIntensity;
+
+// same basis as iblSHProject.comp
+vec3 evaluateSH(vec3 n)
+{
+    return shIrradiance[0] * 0.282095
+         + shIrradiance[1] * 0.488603 * n.y
+         + shIrradiance[2] * 0.488603 * n.z
+         + shIrradiance[3] * 0.488603 * n.x
+         + shIrradiance[4] * 1.092548 * n.x * n.y
+         + shIrradiance[5] * 1.092548 * n.y * n.z
+         + shIrradiance[6] * 0.315392 * (3.0 * n.z * n.z - 1.0)
+         + shIrradiance[7] * 1.092548 * n.x * n.z
+         + shIrradiance[8] * 0.546274 * (n.x * n.x - n.y * n.y);
+}
+
+// fresnel over the whole hemisphere instead of one H, rough surfaces reflect less at grazing angles
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 calculateAmbient(vec3 N, vec3 V, vec3 F0, vec3 albedo, float metallic, float roughness, float ao)
+{
+    if (!useIBL) {
+        return vec3(ambientStrength) * albedo * ao;
+    }
+
+    float NdotV = max(dot(N, V), 0.0);
+    vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
+    vec3 kD = (1.0 - F) * (1.0 - metallic);
+
+    // diffuse, irradiance from the SH around the normal
+    vec3 diffuse = max(evaluateSH(N), vec3(0.0)) * albedo;
+
+    // specular, split sum: prefiltered radiance along R times the BRDF integral
+    vec3 R = reflect(-V, N);
+    vec3 prefiltered = textureLod(prefilterMap, R, roughness * prefilterMaxLod).rgb;
+    vec2 envBRDF = texture(brdfLUT, vec2(NdotV, roughness)).rg;
+    vec3 specular = prefiltered * (F0 * envBRDF.x + envBRDF.y);
+
+    return (kD * diffuse + specular) * ao * iblIntensity;
+}
+
 void main()
 {
     vec4 albedoSample = texture(albedoMap, TexCoords);
@@ -158,7 +208,7 @@ void main()
         Lo += calculateLo(N, V, L, radiance, F0, albedo, metallic, roughness);
     }
 
-    vec3 ambient = vec3(ambientStrength) * albedo * ao;
+    vec3 ambient = calculateAmbient(N, V, F0, albedo, metallic, roughness, ao);
     vec3 color   = ambient + Lo + emissive;
 
     FragColor = vec4(color, alpha);

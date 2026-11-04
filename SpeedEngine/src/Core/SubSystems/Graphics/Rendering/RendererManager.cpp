@@ -8,6 +8,7 @@
 #include "Core/SubSystems/Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/DeferredLightingRenderer/DeferredLightingRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GeometryRenderer/GeometryRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
@@ -58,7 +59,11 @@ namespace SE
 
 		// Configure your targets, execution order, outputs, and clears here		
 #pragma region RenderPasses
-		//TODO: add ibl, potentially a single scattered sky pass here
+		//TODO: potentially a single scattered sky pass here
+
+		// Image based lighting, precomputes its maps once in init and the lighting passes read them
+		// created first so the maps exist before any lighting, its skybox pass is added after the deferred lighting
+		auto& imageBasedRenderer = addRenderer<ImageBasedRenderer>("Assets/Textures/photo_studio_loft_hall_2k.hdr");
 
 		// border is 1.0 or max depth, so anything outside the map reads as lit
 		const Attachment shadowDepth{ .internalFormat = GL_DEPTH_COMPONENT24, .format = GL_DEPTH_COMPONENT, .type = GL_FLOAT,
@@ -84,6 +89,9 @@ namespace SE
 		FBO& deferredColor = createRenderTarget("DeferredColor", Descriptor{ .colors = { hdrAttachment } });
 		auto& deferredLightingRenderer = addRenderer<DeferredLightingRenderer>("GBuffer", "ShadowMap");
 		addPass(RenderPass{ .renderer = deferredLightingRenderer, .output = deferredColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
+
+		// Skybox pass, draws the environment into DeferredColor where the copied G-buffer depth is still the far plane
+		addPass(RenderPass{ .renderer = imageBasedRenderer, .output = deferredColor, .clearMask = 0 });
 
 		// Forward pass, copies DeferredColor then draws transparent submeshes sorted back to front
 		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{ .colors = { hdrAttachment } });

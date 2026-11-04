@@ -33,13 +33,15 @@ namespace SE
 		Shader& operator=(Shader&&) = delete;
 
 		//@brief compiles and links a shader object
-		//@param vertexShaderSource the literal source code of vertex shader as a
-		// string
-		//@param fragmentShaderSource the literal source code of fragment shader as a
-		// string
-		//@returns compilation status containing its success (T/F) and any compilation
-		// logs
+		//@param vertexShaderSource the literal source code of vertex shader as a string
+		//@param fragmentShaderSource the literal source code of fragment shader as a string
+		//@returns compilation status containing its success (T/F) and any compilation logs
 		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
+
+		//@brief compiles and links a compute only shader object, needs a 4.3+ context
+		//@param computeShaderSource the literal source code of the compute shader as a string
+		//@returns compilation status containing its success (T/F) and any compilation logs
+		GLCompStatus initCompute(std::string_view computeShaderSource);
 
 		//@brief binds shader to be used in graphics pipeline
 		void bind();

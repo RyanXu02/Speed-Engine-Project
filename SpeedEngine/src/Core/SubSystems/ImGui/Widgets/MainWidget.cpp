@@ -2,6 +2,7 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 #include "../../Graphics/Rendering/RendererManager.h"
+#include "../../Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
 #include "../../Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
@@ -100,7 +101,22 @@ namespace SE
 				if (sceneRenderer)
 				{
 					LightingSettings& settings = sceneRenderer->getLightingSettings();
-					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f);
+					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f); // flat ambient, used while IBL is off
+				}
+
+				auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
+				if (ibl)
+				{
+					ImGui::Checkbox("IBL", &ibl->enabled);
+					ImGui::SameLine();
+					ImGui::SliderFloat("IBL Intensity", &ibl->intensity, 0.0f, 4.0f, "%.2f");
+
+					ImGui::Checkbox("Skybox", &ibl->drawSkybox);
+					ImGui::SameLine();
+					int source = static_cast<int>(ibl->skyboxSource);
+					if (ImGui::Combo("Sky Source", &source, "Environment\0Irradiance\0")) {
+						ibl->skyboxSource = static_cast<SkyboxSource>(source);
+					}
 				}
 
 				auto* tonemap = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<TonemapRenderer>();

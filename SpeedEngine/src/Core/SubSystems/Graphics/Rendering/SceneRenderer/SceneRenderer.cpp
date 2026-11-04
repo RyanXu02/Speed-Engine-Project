@@ -5,11 +5,16 @@
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/ResourceManagers/Shader/Shader.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
+#include "Core/SubSystems/Graphics/Rendering/RendererManager.h"
+#include "Core/SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "Core/Engine.h"
 #include <glad/glad.h>
 
 namespace SE
 {
+	// IBL maps go after the 7 slots used by the materials (forward) and the G-buffer, shadow map and noise (deferred)
+	static constexpr int IBL_FIRST_SLOT = 7;
+
 	void SceneRenderer::init()
 	{
 		m_logger.info("Initializing");
@@ -144,6 +149,13 @@ namespace SE
 		}
 
 		shader.setFloat("ambientStrength", m_lightingSettings.ambientStrength);
+
+		if (auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>()) {
+			ibl->bindLighting(shader, IBL_FIRST_SLOT);
+		}
+		else {
+			ImageBasedRenderer::bindDisabled(shader, IBL_FIRST_SLOT);
+		}
 	}
 
 	const std::vector<uint32_t>& SceneRenderer::_getMeshMaterials(RenderContext& context, uint32_t meshResourceId, const MeshResource& meshResource)
