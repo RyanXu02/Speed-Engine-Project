@@ -6,6 +6,10 @@
 
 namespace SE
 {
+	struct UIRectDraw;
+	struct UITextDraw;
+	class ResourceManager;
+
 	class TextRenderer : public Renderer
 	{
 	public:
@@ -30,10 +34,17 @@ namespace SE
 		// @return The OpenGL texture ID of the font atlas
 		unsigned int _getOrUpload(const FontHandle& font);
 
+		void _appendQuad(glm::vec2 a, glm::vec2 b, glm::vec2 uvMin, glm::vec2 uvMax);
+
+		void _drawVertices(unsigned int texture, const glm::vec4& color, int mode);
+		void _drawText(const FontHandle& font, std::string_view text, glm::vec2 position, glm::vec4 color, float scale);
+		void _drawRectangle(const UIRectDraw& draw, glm::vec2 outputSize, ResourceManager& resources);
+		void _drawUIText(const UITextDraw& draw, glm::vec2 outputSize, ResourceManager& resources);
+
 		Shader m_shader;
 		unsigned int m_VAO = 0;
 		unsigned int m_VBO = 0;
-		// Keep CPU font handles and GPU atlases even if resource removed
+
 		std::unordered_map<FontHandle, unsigned int> m_atlases;
 		std::vector<Vertex> m_vertices;
 	};

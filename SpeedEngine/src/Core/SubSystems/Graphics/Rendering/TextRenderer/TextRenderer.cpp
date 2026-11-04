@@ -4,6 +4,7 @@
 #include "Core/Engine.h"
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
+#include "Core/SubSystems/UI/UILayout.h"
 
 #include <glad/glad.h>
 
@@ -87,9 +88,85 @@ namespace SE
 		return texture;
 	}
 
+	void TextRenderer::_appendQuad(glm::vec2 a, glm::vec2 b, glm::vec2 uvMin, glm::vec2 uvMax)
+	{
+		m_vertices.insert(m_vertices.end(), {
+			{ a, uvMin },
+			{ { b.x, a.y }, { uvMax.x, uvMin.y } },
+			{ b, uvMax },
+			{ a, uvMin },
+			{ b, uvMax },
+			{ { a.x, b.y }, { uvMin.x, uvMax.y } }
+		});
+	}
+
+	void TextRenderer::_drawVertices(unsigned int texture, const glm::vec4& color, int mode)
+	{
+		glBindTexture(GL_TEXTURE_2D, texture);
+		m_shader.setInt("drawMode", mode);
+		m_shader.setVec4("textColor", color);
+		glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), m_vertices.data(), GL_STREAM_DRAW);
+		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_vertices.size()));
+	}
+
+	void TextRenderer::_drawText(const FontHandle& font, std::string_view text, glm::vec2 position, glm::vec4 color, float scale)
+	{
+		if (!font || color.a <= 0.0f)
+			return;
+		m_vertices.clear();
+		font->layout(text, [&](const FontGlyph& glyph, const glm::vec2& topLeft)
+		{
+			const glm::vec2 a = position + topLeft * scale;
+			_appendQuad(a, a + glyph.size * scale, glyph.uvMin, glyph.uvMax);
+		});
+		if (m_vertices.empty())
+			return;
+		const unsigned int atlas = _getOrUpload(font);
+		if (atlas)
+			_drawVertices(atlas, color, 0);
+	}
+
+	void TextRenderer::_drawRectangle(const UIRectDraw& draw, glm::vec2 outputSize, ResourceManager& resources)
+	{
+		unsigned int texture = 0;
+		if (!draw.texturePath.empty())
+		{
+			const auto id = resources.loadTexture({ .path = draw.texturePath, .name = draw.texturePath });
+			const auto* resource = resources.getResource<Texture>(id);
+			if (!resource)
+				return;
+			texture = resource->getTextureId();
+		}
+		const auto canvas = resolveUICanvasLayout(outputSize, draw.referenceResolution);
+		const auto rect = resolveUIRectLayout(draw.rect, canvas);
+		m_vertices.clear();
+
+		_appendQuad(rect.pixelTopLeft, rect.pixelTopLeft + rect.pixelSize, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+		_drawVertices(texture, draw.color, draw.texturePath.empty() ? 1 : 2);
+	}
+
+	void TextRenderer::_drawUIText(const UITextDraw& draw, glm::vec2 outputSize, ResourceManager& resources)
+	{
+		const auto id = resources.loadFont({ .path = draw.fontPath, .pixelHeight = draw.fontPixelHeight, .name = draw.fontPath });
+		const auto* resource = resources.getResource<Font>(id);
+		if (!resource)
+			return;
+		const auto font = resource->getHandle();
+		const auto canvas = resolveUICanvasLayout(outputSize, draw.referenceResolution);
+		const auto rect = resolveUIRectLayout(draw.rect, canvas);
+		const float scale = draw.fontSize / font->pixelHeight * canvas.scale;
+		const glm::vec2 extent = font->measure(draw.text).extent * scale;
+		const float horizontal = draw.horizontalAlignment == UIHorizontalAlignment::Center ? 0.5f
+			: draw.horizontalAlignment == UIHorizontalAlignment::Right ? 1.0f : 0.0f;
+		const float vertical = draw.verticalAlignment == UIVerticalAlignment::Middle ? 0.5f
+			: draw.verticalAlignment == UIVerticalAlignment::Bottom ? 1.0f : 0.0f;
+		const glm::vec2 position = rect.pixelTopLeft + (rect.pixelSize - extent) * glm::vec2(horizontal, vertical);
+		_drawText(font, draw.text, position, draw.color, scale);
+	}
+
 	void TextRenderer::render(RenderContext& context)
 	{
-		if (!m_VAO || !context.output || context.frame.textDraws.empty())
+		if (!m_VAO || !context.output || (context.frame.textDraws.empty() && context.frame.uiDraws.empty()))
 			return;
 
 		GLint previousTexture = 0, previousBuffer = 0, previousSampler = 0;
@@ -111,35 +188,20 @@ namespace SE
 		glBindSampler(0, 0);
 		m_shader.bind();
 		m_shader.setInt("glyphAtlas", 0);
-		m_shader.setVec2("outputSize", glm::vec2(context.output->getWidth(), context.output->getHeight()));
 		glBindVertexArray(m_VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
-		for (const auto& draw : context.frame.textDraws)
+		const glm::vec2 outputSize(context.output->getWidth(), context.output->getHeight());
+		m_shader.setVec2("outputSize", outputSize);
+		for (const auto& draw : context.frame.uiDraws)
 		{
-			if (!draw.font || draw.color.a <= 0.0f)
-				continue;
-			m_vertices.clear();
-			draw.font->layout(draw.text, [&](const FontGlyph& glyph, const glm::vec2& topLeft)
-			{
-				const glm::vec2 a = draw.position + topLeft;
-				const glm::vec2 b = a + glyph.size;
-				m_vertices.insert(m_vertices.end(), {
-					{ a, glyph.uvMin },
-					{ { b.x, a.y }, { glyph.uvMax.x, glyph.uvMin.y } },
-					{ b, glyph.uvMax },
-					{ a, glyph.uvMin },
-					{ b, glyph.uvMax },
-					{ { a.x, b.y }, { glyph.uvMin.x, glyph.uvMax.y } }
-				});
-			});
-			if (m_vertices.empty())
-				continue;
-			glBindTexture(GL_TEXTURE_2D, _getOrUpload(draw.font));
-			m_shader.setVec4("textColor", draw.color);
-			glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), m_vertices.data(), GL_STREAM_DRAW);
-			glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_vertices.size()));
+			if (const auto* rect = std::get_if<UIRectDraw>(&draw))
+				_drawRectangle(*rect, outputSize, context.resources);
+			else
+				_drawUIText(std::get<UITextDraw>(draw), outputSize, context.resources);
 		}
+		for (const auto& draw : context.frame.textDraws)
+			_drawText(draw.font, draw.text, draw.position, draw.color, draw.scale);
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, previousBuffer);

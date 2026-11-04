@@ -14,7 +14,6 @@
 #include "SubSystems/Scenes/SceneSystem.h"
 #include "SubSystems/Physics/PhysicsSystem.h"
 #include "SubSystems/Audio/AudioSystem.h"
-#include "SubSystems/UI/UISystem.h"
 #include "SubSystems/SubSystem.h"
 #include "EngineStates.h"
 #include "Threading/FrameExchange.h"
@@ -52,7 +51,6 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
 		m_subSystems.push_back(std::unique_ptr<AudioSystem>(new AudioSystem()));
-		m_subSystems.push_back(std::unique_ptr<UISystem>(new UISystem()));
 
 
 		// init all subsystems
@@ -121,7 +119,6 @@ namespace SE
 
 			auto read = m_frameExchange.tryAcquireReady();
 			renderer->render(read.frame(), 1.0f);
-			getSubSystem<UISystem>()->captureInput(renderer->getFinalSceneSize());
 		}
 	}
 
@@ -148,7 +145,6 @@ namespace SE
 		for (int step = 0; step < physicsSteps; ++step)
 			getSubSystem<PhysicsSystem>()->step(simulationDeltaTime);
 		getSubSystem<AudioSystem>()->update(deltaTime);
-		getSubSystem<UISystem>()->update(deltaTime);
 		if (EngineStates::isEditorCameraActive())
 			m_cameraController.update(EngineStates::getEditorCamera(), *getSubSystem<InputSystem>(), deltaTime);
 		
@@ -161,7 +157,7 @@ namespace SE
 		if (auto write = m_frameExchange.tryBeginWrite())
 		{
 			RenderFrame& frame = write.frame();
-			m_frameBuilder.build(frame, *getSubSystem<PhysicsSystem>());
+			m_frameBuilder.build(frame, *getSubSystem<PhysicsSystem>(), *getSubSystem<SceneSystem>()->getCurrentScene());
 			write.publish();
 		}
 	}
@@ -202,7 +198,6 @@ namespace SE
 				const double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - frame.tickTime).count();
 				const float t = static_cast<float>(elapsed / simulationDeltaTime);
 				renderer->render(frame, t);
-				getSubSystem<UISystem>()->captureInput(renderer->getFinalSceneSize());
 			}
 			// no frame ready, don't busy wait
 			else

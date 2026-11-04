@@ -178,8 +178,8 @@ namespace SE
 			pass.renderer.render(context);
 		}
 
-		// text after final output
-		if (!frame.textDraws.empty())
+		// UI and text go on top the selected final output
+		if (!frame.uiDraws.empty() || !frame.textDraws.empty())
 		{
 			resetPassState();
 			m_finalSceneOutput->bind();
@@ -218,6 +218,11 @@ namespace SE
 		}
 #endif
 		context.output = nullptr;
+
+#if !defined(COMPILE_WITH_EDITOR)
+		m_imguiRenderer->setGameViewport(m_window->getInputRegion(getFinalSceneSize()));
+#endif
+
 		m_imguiRenderer->beginFrame();
 		m_imguiRenderer->render(context);
 		m_imguiRenderer->finalizeFrame();

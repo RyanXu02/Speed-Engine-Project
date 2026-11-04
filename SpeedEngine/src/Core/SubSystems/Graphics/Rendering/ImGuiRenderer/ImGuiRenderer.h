@@ -1,6 +1,7 @@
 #pragma once
-#include "../../../ImGui/Widget.h"
-#include "../Renderer.h"
+#include "Core/SubSystems/ImGui/Widget.h"
+#include "Core/SubSystems/Graphics/Rendering/Renderer.h"
+#include "Core/SubSystems/Input/InputEvent.h"
 
 namespace SE
 {
@@ -17,6 +18,8 @@ namespace SE
 		void beginFrame();
 		void render(RenderContext& context) override;
 		void shutdown() override;
+
+		void setInputRegion(const InputRegion& inputRegion) { m_inputRegion = inputRegion; }
 
 		// @brief Creates a widget of the specified type
 		// @tparam T The type of the widget to create
@@ -68,5 +71,7 @@ namespace SE
 		uint32_t _assignID() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 
 		const Window* m_window{ nullptr };
+
+		InputRegion m_inputRegion;
 	};
 } // namespace SE

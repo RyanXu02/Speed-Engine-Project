@@ -12,6 +12,52 @@
 
 namespace SE
 {
+	// Helper to append all UI elements in the scene to RenderFrame
+	static void appendUIDraws(Scene& scene, RenderFrame& frame)
+	{
+		std::unordered_map<std::string, glm::vec2> canvases;
+		scene.forEntitiesWith<UICanvasComponent>([&](Entity entity)
+		{
+			const auto& canvas = *entity.getComponent<UICanvasComponent>();
+			if (canvas.visible && !canvas.canvasKey.empty() &&
+				canvas.referenceResolution.x > 0.0f && canvas.referenceResolution.y > 0.0f)
+				canvases.emplace(canvas.canvasKey, canvas.referenceResolution);
+		});
+
+		struct Member
+		{
+			Entity entity;
+			glm::vec2 referenceResolution;
+			int drawOrder;
+		};
+		std::vector<Member> members;
+		scene.forEntitiesWith<UIElementComponent, UIRectComponent>([&](Entity entity)
+		{
+			const auto& element = *entity.getComponent<UIElementComponent>();
+			const auto& rect = *entity.getComponent<UIRectComponent>();
+			const auto canvas = canvases.find(element.canvasKey);
+			if (element.visible && canvas != canvases.end() && rect.size.x > 0.0f && rect.size.y > 0.0f)
+				members.push_back({ entity, canvas->second, element.drawOrder });
+		});
+		std::ranges::sort(members, [](const Member& a, const Member& b)
+		{
+			if (a.drawOrder != b.drawOrder)
+				return a.drawOrder < b.drawOrder;
+			return a.entity.id() < b.entity.id();
+		});
+
+		auto* resource = frame.uiDraws.get_allocator().resource();
+		for (auto& member : members)
+		{
+			const auto& rect = *member.entity.getComponent<UIRectComponent>();
+			if (const auto* image = member.entity.getComponent<UIImageComponent>(); image && image->color.a > 0.0f)
+				frame.uiDraws.emplace_back(std::in_place_type<UIRectDraw>, rect, member.referenceResolution, *image, resource);
+			if (const auto* text = member.entity.getComponent<UITextComponent>(); text && !text->text.empty() &&
+				!text->fontPath.empty() && text->fontPixelHeight > 0 && text->fontSize > 0.0f && text->color.a > 0.0f)
+				frame.uiDraws.emplace_back(std::in_place_type<UITextDraw>, rect, member.referenceResolution, *text, resource);
+		}
+	}
+
 	void RenderFrameBuilder::submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color)
 	{
 		if (font && !text.empty())
@@ -62,13 +108,14 @@ namespace SE
 		m_tickTime = tickTime;
 	}
 
-	void RenderFrameBuilder::build(RenderFrame& frame, PhysicsSystem& physics) const
+	void RenderFrameBuilder::build(RenderFrame& frame, PhysicsSystem& physics, Scene& scene) const
 	{
 		frame.draws.clear();
 		frame.lights.clear();
 		frame.debugLines.clear();
 		frame.debugTriangles.clear();
 		frame.textDraws.clear();
+		frame.uiDraws.clear();
 
 		frame.textDraws.reserve(m_textSubmissions.size());
 		for (const auto& submission : m_textSubmissions)
@@ -85,5 +132,7 @@ namespace SE
 		frame.tickTime = m_tickTime;
 		if (EngineStates::isDebugRenderingEnabled())
 			physics.appendDebugGeometry(frame, frame.camera.current.position);
+
+		appendUIDraws(scene, frame);
 	}
 } // namespace SE

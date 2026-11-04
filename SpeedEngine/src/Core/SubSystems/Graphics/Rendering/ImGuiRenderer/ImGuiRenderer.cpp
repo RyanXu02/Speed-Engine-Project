@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "Core/Engine.h"
+#include "Core/EngineStates.h"
 
 #if defined(COMPILE_WITH_EDITOR)
 #include "SubSystems/ImGui/Widgets/EngineStateWidget.h"
@@ -168,6 +170,10 @@ namespace SE
 
 	void ImGuiRenderer::beginFrame()
 	{
+#if defined(COMPILE_WITH_EDITOR)
+		m_inputRegion = {};
+#endif
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -196,7 +202,16 @@ namespace SE
 
 #if defined(COMPILE_WITH_EDITOR)
 		main->finishEditorFrame();
+		m_inputRegion.acceptsInput &= EngineStates::isPlaying() && !MainWidget::isSceneEditingBlocked();
+#else
+		m_inputRegion.acceptsInput &= !ImGui::GetIO().WantCaptureMouse;
 #endif
+
+		m_inputRegion.acceptsInput &= !ImGui::IsAnyItemActive() &&
+			!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+		InputEvent viewportEvent{ InputEvent::Type::InputRegion };
+		viewportEvent.inputRegion = m_inputRegion;
+		Engine::Instance().getSubSystem<Window>()->inputEvents().push(viewportEvent);
 	}
 
 	void ImGuiRenderer::finalizeFrame() const

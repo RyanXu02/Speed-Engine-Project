@@ -195,7 +195,6 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp" />
-    <ClCompile Include="src\Core\SubSystems\UI\UISystem.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
     <ClCompile Include="src\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
@@ -292,7 +291,6 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\KeyCodes.h" />
     <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h" />
-    <ClInclude Include="src\Core\SubSystems\UI\UISystem.h" />
     <ClInclude Include="src\Core\SubSystems\UI\UILayout.h" />
     <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
     <ClInclude Include="src\Core\Scene\Scene.h" />

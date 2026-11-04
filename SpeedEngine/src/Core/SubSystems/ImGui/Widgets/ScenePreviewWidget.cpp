@@ -1,12 +1,9 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "../../Graphics/Rendering/RendererManager.h"
+#include "Core/SubSystems/Graphics/Rendering/RendererManager.h"
 #include "Engine.h"
-#include "EngineStates.h"
-#include "MainWidget.h"
 #include "ScenePreviewWidget.h"
-#include "SubSystems/UI/UISystem.h"
 
 #include <imgui.h>
 
@@ -44,12 +41,10 @@ namespace SE
 			const ImVec2 imageMax = ImGui::GetItemRectMax();
 			const ImVec2 windowOrigin = ImGui::GetMainViewport()->Pos;
 
-			const bool pointerEnabled = EngineStates::isPlaying() && !MainWidget::isSceneEditingBlocked() &&
-				ImGui::IsItemHovered() && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-
-			Engine::Instance().getSubSystem<UISystem>()->setSceneInputRegion(
+			rendererManager->getRenderer<ImGuiRenderer>()->setInputRegion({
 				{ imageMin.x - windowOrigin.x, imageMin.y - windowOrigin.y },
-				{ imageMax.x - imageMin.x, imageMax.y - imageMin.y }, pointerEnabled);
+				{ imageMax.x - imageMin.x, imageMax.y - imageMin.y }, rendererManager->getFinalSceneSize(),
+				ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) });
 		}
 
 		ImGui::End();
