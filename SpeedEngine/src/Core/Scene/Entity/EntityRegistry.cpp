@@ -3,10 +3,7 @@
 #include "EntityRegistry.h"
 
 #include "Component/ComponentStructs.h"
-#include "Core/Engine.h"
-#include "Core/Scene/Scene.h"
 #include "Entity.h"
-#include "SubSystems/Scenes/SceneSystem.h"
 
 
 //loadHook determines what needs to be done after a component is loaded
@@ -29,8 +26,9 @@
 
 namespace SE
 {
-	EntityRegistry::EntityRegistry()
-	    : Serializable()
+	EntityRegistry::EntityRegistry(const LoggerProxy& logger)
+		: Serializable(),
+		  m_logger(logger)
 	{
 		REGISTER_COMPONENT(NameComponent, Entity::_onNameComponentAdded(), Entity::_onNameComponentRemoved());
 		REGISTER_COMPONENT(LifeComponent, NO_DEFINE, NO_DEFINE);
@@ -100,10 +98,7 @@ namespace SE
 
 	void EntityRegistry::serialize(nlohmann::json& j) const
 	{
-		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
-		auto logger = scene->getLogger();
-
-		j["entities"] = nlohmann::json::array();
+		j = nlohmann::json::array();
 
 		for (const auto& [entityID, components] : m_registry)
 		{
@@ -130,7 +125,7 @@ namespace SE
 					if (type == "PrefabComponent")
 					{
 						isPrefabEntity = true;
-						prefabPath = componentAsJson["PrefabComponent"]["prefab_path"];
+						prefabPath = componentAsJson.at("prefabPath").get<std::string>();
 					}
 					else
 					{
@@ -139,8 +134,8 @@ namespace SE
 				}
 				catch (const nlohmann::json::exception& e)
 				{
-					logger.warn("failed to serialize {}: {}", type, e.what());
-					continue;
+					m_logger.warn("failed to serialize {}: {}", type, e.what());
+					throw;
 				}
 			}
 
@@ -152,12 +147,12 @@ namespace SE
 				{
 					entityObj["overrides"]["components"] = componentsJson;
 				}
-				j["entities"].push_back(entityObj);
+				j.push_back(entityObj);
 			}
-			else if (!componentsJson.empty())
+			else
 			{
 				entityObj["components"] = componentsJson;
-				j["entities"].push_back(entityObj);
+				j.push_back(entityObj);
 			}
 		}
 	}
@@ -166,23 +161,17 @@ namespace SE
 	{
 		assert(j.is_array() && !j.is_null() && !j.is_discarded() && "Registry: failed to deserialize json");
 
-		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
-		auto logger = scene->getLogger();
-
 		for (const auto& entity : j)
 		{
 			uint32_t entityID = addEntity();
-			if (!entity.contains("components") || !entity["components"].is_object())
-			{
-				continue;
-			}
+			auto componentsJson = entity.value("components", nlohmann::json::object());
 
 			if (entity.contains("prefab_ref"))
 			{
 				addComponent<PrefabComponent>(entityID, entity["prefab_ref"]);
 			}
 
-			for (auto& [type, json] : entity["components"].items())
+			for (auto& [type, json] : componentsJson.items())
 			{
 				auto typeResult = m_typeResolver.Get(type);
 				if (!typeResult.isValid())
@@ -199,7 +188,7 @@ namespace SE
 				}
 				catch (const nlohmann::json::exception& e)
 				{
-					logger.warn("failed to deserialize {}: {}", type, e.what());
+					m_logger.warn("failed to deserialize {}: {}", type, e.what());
 
 					continue;
 				}

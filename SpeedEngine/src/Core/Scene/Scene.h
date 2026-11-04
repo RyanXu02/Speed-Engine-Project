@@ -14,26 +14,27 @@ namespace SE
 	{
 	public:
 		Scene(const std::string& name, Logger& logger)
-		    : m_name(name),
-		      m_logger(logger, fmt::format("Scene: {}", name)),
-		      Serializable()
+			: Serializable(),
+			  m_logger(logger, fmt::format("Scene: {}", name)),
+			  m_name(name),
+			  m_registry(m_logger)
 		{}
 
 		void initializeScene();
 		void updateScene(double deltaTime);
 		void shutdownScene();
-		void reloadScene();
 
 		const std::string& getName() const { return m_name; }
-
+		const std::string& getSourcePath() const { return m_path; }
 
 		uint32_t addEntity(const std::string& name);
 		bool hasEntity(uint32_t id);
 		Entity getEntity(uint32_t id);
 		bool removeEntity(uint32_t id);
 		bool isEntityPendingRemoval(uint32_t id) const { return std::ranges::find(m_entitiesToRemove, id) != m_entitiesToRemove.end(); }
-		void saveScene(std::string_view path);
-		void loadScene(std::string_view path);
+		bool readScene(std::string_view path, nlohmann::json& sceneJson) const;
+		bool saveScene(std::string_view path);
+		bool loadScene(std::string_view path);
 
 		template<typename... Ts>
 		std::vector<Entity> getEntitiesWith()
@@ -74,6 +75,8 @@ namespace SE
 		virtual void deserialize(const nlohmann::json& j) override;
 
 	private:
+		bool validateSceneJson(const nlohmann::json& j) const;
+
 		LoggerProxy m_logger;
 		std::string m_name;
 		std::string m_path;
@@ -83,6 +86,5 @@ namespace SE
 		EntityRegistry m_registry;
 
 		bool m_isInitialized{ false };
-		bool m_reloadRequested{ false };
 	};
 } // namespace SE
