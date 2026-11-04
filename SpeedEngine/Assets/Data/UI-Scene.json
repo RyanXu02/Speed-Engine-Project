@@ -469,6 +469,73 @@
           "verticalAlignment": 1
         }
       }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "NameComponent": {
+          "name": "test text"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "UIElementComponent": {
+          "canvasKey": "main",
+          "drawOrder": 0,
+          "elementKey": "test",
+          "enabled": true,
+          "visible": true
+        },
+        "UIRectComponent": {
+          "anchor": [
+            1.0,
+            0.0
+          ],
+          "offset": [
+            -50.0,
+            100.0
+          ],
+          "pivot": [
+            0.5,
+            0.5
+          ],
+          "size": [
+            100.0,
+            100.0
+          ]
+        },
+        "UITextComponent": {
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fontPath": "fonts/Quicksand-Bold.ttf",
+          "fontPixelHeight": 48,
+          "fontSize": 24.0,
+          "horizontalAlignment": 0,
+          "text": "test",
+          "verticalAlignment": 0
+        }
+      }
     }
   ],
   "scene_name": "Untitled"
