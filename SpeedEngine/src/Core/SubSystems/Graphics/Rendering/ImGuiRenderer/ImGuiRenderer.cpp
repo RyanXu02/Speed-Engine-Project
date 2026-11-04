@@ -1,6 +1,4 @@
 #include "pch.h"
-#include "Core/Engine.h"
-#include "Core/EngineStates.h"
 
 #if defined(COMPILE_WITH_EDITOR)
 #include "SubSystems/ImGui/Widgets/EngineStateWidget.h"
@@ -170,11 +168,6 @@ namespace SE
 
 	void ImGuiRenderer::beginFrame()
 	{
-		m_inputRegionItemActive = false;
-#if defined(COMPILE_WITH_EDITOR)
-		m_inputRegion = {};
-#endif
-
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -203,16 +196,20 @@ namespace SE
 
 #if defined(COMPILE_WITH_EDITOR)
 		main->finishEditorFrame();
-		m_inputRegion.acceptsInput &= EngineStates::isGameInputActive() && !MainWidget::isSceneEditingBlocked();
+#endif
+	}
+
+
+	bool ImGuiRenderer::isBlockingGameInput(bool gameItemActive) const
+	{
+#if defined(COMPILE_WITH_EDITOR)
+		const bool blocked = MainWidget::isSceneEditingBlocked();
 #else
-		m_inputRegion.acceptsInput &= !ImGui::GetIO().WantCaptureMouse;
+		const bool blocked = ImGui::GetIO().WantCaptureMouse;
 #endif
 
-		m_inputRegion.acceptsInput &= (!ImGui::IsAnyItemActive() || m_inputRegionItemActive) &&
-			!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
-		InputEvent viewportEvent{ InputEvent::Type::InputRegion };
-		viewportEvent.inputRegion = m_inputRegion;
-		Engine::Instance().getSubSystem<Window>()->inputEvents().push(viewportEvent);
+		return blocked || (ImGui::IsAnyItemActive() && !gameItemActive) ||
+			ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
 	}
 
 	void ImGuiRenderer::finalizeFrame() const

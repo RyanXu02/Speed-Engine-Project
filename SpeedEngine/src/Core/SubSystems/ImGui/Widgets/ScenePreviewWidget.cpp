@@ -44,7 +44,7 @@ namespace SE
 			ImGui::GetWindowDrawList()->AddImage(imguiTexId, imageMin, imageMax, ImVec2(0, 1), ImVec2(1, 0));
 			const ImVec2 windowOrigin = ImGui::GetMainViewport()->Pos;
 
-			rendererManager->getRenderer<ImGuiRenderer>()->setInputRegion({
+			rendererManager->setGameInputRegion({
 				{ imageMin.x - windowOrigin.x, imageMin.y - windowOrigin.y },
 				{ imageMax.x - imageMin.x, imageMax.y - imageMin.y }, rendererManager->getFinalSceneSize(),
 				ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) }, ImGui::IsItemActive());

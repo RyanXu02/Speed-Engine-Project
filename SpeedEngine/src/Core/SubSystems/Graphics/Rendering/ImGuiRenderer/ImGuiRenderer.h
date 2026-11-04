@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/SubSystems/ImGui/Widget.h"
 #include "Core/SubSystems/Graphics/Rendering/Renderer.h"
-#include "Core/SubSystems/Input/InputEvent.h"
 
 namespace SE
 {
@@ -19,11 +18,8 @@ namespace SE
 		void render(RenderContext& context) override;
 		void shutdown() override;
 
-		void setInputRegion(const InputRegion& inputRegion, bool itemActive)
-		{
-			m_inputRegion = inputRegion;
-			m_inputRegionItemActive = itemActive;
-		}
+		// @brief Returns true if ImGui is blocking game input, e.g. when a widget is focused or hovered
+		bool isBlockingGameInput(bool gameItemActive) const;
 
 		// @brief Creates a widget of the specified type
 		// @tparam T The type of the widget to create
@@ -75,8 +71,5 @@ namespace SE
 		uint32_t _assignID() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 
 		const Window* m_window{ nullptr };
-
-		InputRegion m_inputRegion;
-		bool m_inputRegionItemActive{ false };
 	};
 } // namespace SE
