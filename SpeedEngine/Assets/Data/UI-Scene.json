@@ -284,7 +284,7 @@
         "UIElementComponent": {
           "canvasKey": "main",
           "drawOrder": 0,
-          "elementKey": "bottom",
+          "elementKey": "goto scene",
           "enabled": true,
           "visible": true
         },
@@ -357,8 +357,8 @@
           "fontPixelHeight": 48,
           "fontSize": 24.0,
           "horizontalAlignment": 1,
-          "text": "hi I'm bottom uwu",
-          "verticalAlignment": 2
+          "text": "go to default scene",
+          "verticalAlignment": 1
         }
       }
     }

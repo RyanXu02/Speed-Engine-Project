@@ -73,13 +73,25 @@ namespace SE
 			    const SwitchCameraEvent& cameraEvent = static_cast<const SwitchCameraEvent&>(event);
 			    EngineStates::setCamera(cameraEvent.camera);
 		    });
+
+		// testing button event
+		m_buttonSubscription = getSubSystem<EventSystem>()->subscribe(EventType::ButtonActivated,
+		    [this](Event& event)
+		    {
+			    const auto& button = static_cast<const ButtonActivated&>(event);
+
+			    if (button.canvasKey == "main" && button.elementKey == "goto scene")
+			    {
+				    getSubSystem<SceneSystem>()->requestOpenScene("Assets/Data/default-scene.json");
+			    }
+		    });
 	}
 	void Engine::start()
 	{
 		m_shutdownRequested.store(false);
 
 		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
-		sceneSystem->setCurrentScene("Assets/Data/default-scene.json");
+		sceneSystem->setCurrentScene("Assets/Data/UI-scene.json");
 
 		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
 		uint32_t fontid = resourceManager->loadFont({ 
