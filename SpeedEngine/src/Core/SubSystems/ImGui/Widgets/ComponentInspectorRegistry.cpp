@@ -68,6 +68,9 @@ namespace SE
 		{
 			// Keep each element's signed/unsigned/floating JSON type
 			ImGui::TextUnformatted(label);
+			const float count = static_cast<float>(value.size());
+			const float width = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x * (count - 1.0f)) / count;
+			ImGui::PushItemWidth(std::max(1.0f, width));
 			for (size_t i = 0; i < value.size(); ++i)
 			{
 				if (i != 0)
@@ -75,6 +78,7 @@ namespace SE
 				std::string index = std::format("##{}", i);
 				changed |= _editComponentJson(index.c_str(), value[i]);
 			}
+			ImGui::PopItemWidth();
 		}
 		else if (value.is_object())
 		{
