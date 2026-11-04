@@ -27,7 +27,7 @@ namespace SE
 		void finalize();
 		void acquireTransform(const Transform* tr) { myTransform = tr; }
 
-        glm::vec2 GetAcceleration() const { return mAcceleration; }
+        glm::vec3 GetAcceleration() const { return mAcceleration; }
         void SetAcceleration(glm::vec3 v) { mAcceleration = v; }
 
         void ToggleEmitter() { mIsRunning ^= true; }
@@ -109,8 +109,8 @@ namespace SE
             member("rotationSpeedMax", &ParticleEmitter::mRotationSpeedMax),
             member("rotationMin", &ParticleEmitter::mRotationMin),
             member("rotationMax", &ParticleEmitter::mRotationMax),
-            member("oneShot", &ParticleEmitter::mOneShot),
-            member("isRunning", &ParticleEmitter::mIsRunning));
+            member("oneShot", &ParticleEmitter::mOneShot));
+            //could also serialize mIsRunning but this seems to be for internal use as Stop/StartEmitter change its value.
     private:
         //Texture* mTexture{nullptr};
         //Shader* mShader{nullptr};

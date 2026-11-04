@@ -301,7 +301,104 @@ namespace SE
 		m_inspectors.registerComponent<ParticleEmitter>("ParticleEmitter", true, 
 			[](Entity&, ParticleEmitter& component) 
 			{
-			    ImGui::Button("hi");
+				//color + alpha selection
+			    static float tintcolorRGBA[4]{ 0.f };
+				auto temp = component.GetTintColor();
+			    tintcolorRGBA[0] = temp.x, tintcolorRGBA[1] = temp.y, tintcolorRGBA[2] = temp.z;
+			    tintcolorRGBA[3] = component.GetAlpha();
+				if (ImGui::ColorEdit4("Tint Color + Alpha", tintcolorRGBA))
+				{
+				    component.SetTintColor(glm::vec3(tintcolorRGBA[0], tintcolorRGBA[1], tintcolorRGBA[2]));
+				    component.SetAlpha(tintcolorRGBA[3]);
+				}
+				//emitter scale
+			    auto emitterScale = component.GetEmitterScale();
+			    if (ImGui::DragFloat3("Emitter Scale", &emitterScale.x, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetEmitterScale(emitterScale);
+				//particle scale min and max
+			    auto particleScaleMin = component.GetScaleMin();
+			    auto particleScaleMax = component.GetScaleMax();
+					//must be bound >= 0
+			    if (ImGui::DragFloat3("Particle Scale Min", &particleScaleMin.x, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetScaleMin(particleScaleMin);
+			    if (ImGui::DragFloat3("Particle Scale Max", &particleScaleMax.x, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetScaleMax(particleScaleMax);
+				//acceleration
+			    auto accel = component.GetAcceleration();
+			    if (ImGui::DragFloat3("Acceleration", &accel.x, 0.1f))
+				    component.SetAcceleration(accel);
+				//direction axis
+			    auto dirAxis = component.GetDirectionAxis();
+			    if (ImGui::DragFloat3("Direction Axis", &dirAxis.x, 0.1f))
+				    component.SetDirectionAxis(dirAxis);
+				//cone angle range
+			    auto coneAngleRange = component.GetConeAngleRange();
+					//limit to 180. cuz its half angle, 180 on both sides = 360 around axis
+			    if (ImGui::DragFloat2("Cone Angle Range", &coneAngleRange.x, 0.1f, 0.f, 180.f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetConeAngleRange(coneAngleRange);
+				//azimuth range
+			    auto azimuthRange = component.GetAzimuthRange();
+					//also limit, but to 360. 360 azimuth = all around. 
+				if (ImGui::DragFloat2("Azimuth Range", &azimuthRange.x, 0.1f, 0.f, 360.f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetAzimuthRange(azimuthRange);
+				//emit rate
+			    auto emitRate = component.GetEmitRate();
+					//greater than 0 cuz cant have negative emit rate
+			    if (ImGui::DragFloat("Emit Rate", &emitRate, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetEmitRate(emitRate);
+				//emit max (max particles to emit)
+			    auto emitMax = component.GetEmitMax();
+					//greater than 0
+			    unsigned min = 0, max = UINT_MAX;
+			    if (ImGui::DragScalar("Max Particles to Emit", ImGuiDataType_U32, &emitMax, 1, &min, &max, "%u"))
+				    component.SetEmitMax(emitMax);
+				//lifetime min and max
+			    auto lifetimeMin = component.GetLifetimeMin();
+					//greater than 0
+			    if (ImGui::DragFloat("Lifetime Min", &lifetimeMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetLifetimeMin(lifetimeMin);
+				    component.SetLifetimeMax(lifetimeMin);
+			    }
+			    auto lifetimeMax = component.GetLifetimeMax();
+			    if (ImGui::DragFloat("Lifetime Max", &lifetimeMax, 0.1f, lifetimeMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetLifetimeMax(lifetimeMax);
+				//speed min and max
+			    auto speedMin = component.GetSpeedMin();
+					//greater than 0
+			    if (ImGui::DragFloat("Speed Min", &speedMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetSpeedMin(speedMin);
+				    component.SetSpeedMax(speedMin);
+			    }
+			    auto speedMax = component.GetSpeedMax();
+			    if (ImGui::DragFloat("Speed Max", &speedMax, 0.1f, speedMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetSpeedMax(speedMax);
+				//rotation speed min and max
+			    auto rotSpeedMin = component.GetRotationSpeedMin();
+					//greater than 0
+			    if (ImGui::DragFloat("Rotation Speed Min", &rotSpeedMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetRotationSpeedMin(rotSpeedMin);
+				    component.SetRotationSpeedMax(rotSpeedMin);
+			    }
+			    auto rotSpeedMax = component.GetRotationSpeedMax();
+			    if (ImGui::DragFloat("Rotation Speed Max", &rotSpeedMax, 0.1f, rotSpeedMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetRotationSpeedMax(rotSpeedMax);
+				//rotation min and max
+			    auto rotMin = component.GetRotationMin();
+			    if (ImGui::DragFloat("Rotation Min", &rotMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetRotationMin(rotMin);
+				    component.SetRotationMax(rotMin);
+			    }
+			    auto rotMax = component.GetRotationMax();
+			    if (ImGui::DragFloat("Rotation Max", &rotMax, 0.1f, rotMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetRotationMax(rotMax);
+				//oneshot status
+			    auto oneShot = component.GetOneShot();
+			    if (ImGui::Checkbox("Is OneShot", &oneShot))
+				    component.SetOneShot(oneShot);
 			});
 
 #pragma endregion RegisterComponentEditors
