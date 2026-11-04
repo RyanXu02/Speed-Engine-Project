@@ -84,6 +84,10 @@ namespace SE
 			    {
 				    getSubSystem<SceneSystem>()->requestOpenScene("Assets/Data/default-scene.json");
 			    }
+			    if (button.canvasKey == "main" && button.elementKey == "goto particle")
+			    {
+				    getSubSystem<SceneSystem>()->requestOpenScene("Assets/Data/scene-with-particles.json");
+			    }
 		    });
 	}
 	void Engine::start()
@@ -92,13 +96,6 @@ namespace SE
 
 		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
 		sceneSystem->setCurrentScene("Assets/Data/UI-scene.json");
-
-		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
-		uint32_t fontid = resourceManager->loadFont({ 
-			.path = "fonts/Quicksand-Regular.ttf", 
-			.pixelHeight = 32, 
-			.name = "QSfont" });
-		QSfont = resourceManager->getResource<Font>(fontid)->getHandle();
 	}
 
 	void Engine::run()
@@ -162,9 +159,6 @@ namespace SE
 		getSubSystem<UISystem>()->update(deltaTime);
 		if (EngineStates::isEditorCameraActive() && !getSubSystem<UISystem>()->isAcceptingCommands())
 			m_cameraController.update(EngineStates::getEditorCamera(), *getSubSystem<InputSystem>(), deltaTime);
-		
-		// temp test text
-		submitText(QSfont, "Hello text blah blah blah\nnew line: !@#$%^&*()_+-=,./;'[]<>?:{}|", { 20.0f, 20.0f });
 	}
 
 	void Engine::produceRenderFrame()
