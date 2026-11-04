@@ -1,0 +1,486 @@
+{
+  "entities": [
+    {
+      "components": {
+        "CameraComponent": {
+          "farPlane": 1000.0,
+          "fov": 70.0,
+          "isPrimary": true,
+          "nearPlane": 0.10000000149011612
+        },
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "NameComponent": {
+          "name": "camera"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/Camera.lua"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "LightComponent": {
+          "color": [
+            1.0,
+            0.8999999761581421,
+            0.800000011920929
+          ],
+          "intensity": 50.0
+        },
+        "NameComponent": {
+          "name": "point light"
+        }
+      }
+    },
+    {
+      "components": {
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death.wav",
+          "isGameSFX": true
+        },
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "player"
+        },
+        "ParticleEmitter": {
+          "acceleration": [
+            2.4000000953674316,
+            0.0,
+            0.0
+          ],
+          "alpha": 1.0,
+          "azimuthRange": [
+            0.0,
+            360.0
+          ],
+          "coneAngleRange": [
+            0.0,
+            180.0
+          ],
+          "directionAxis": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "emitMax": 3000,
+          "emitRate": 25.0,
+          "frameIndex": 0,
+          "lifetimeMax": 5.0,
+          "lifetimeMin": 1.0,
+          "oneShot": false,
+          "particleScaleMax": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "particleScaleMin": [
+            0.25,
+            0.25,
+            0.25
+          ],
+          "rotationMax": 68.30000305175781,
+          "rotationMin": 0.0,
+          "rotationSpeedMax": 20.799999237060547,
+          "rotationSpeedMin": 4.699999809265137,
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "sheetColumns": 1,
+          "sheetRows": 1,
+          "speedMax": 6.800000190734863,
+          "speedMin": 1.0,
+          "tintColor": [
+            0.8538205623626709,
+            0.6892970204353333,
+            0.6892970204353333
+          ]
+        },
+        "PhysicsShapeCapsule": {
+          "halfHeight": 0.4000000059604645,
+          "radius": 0.800000011920929
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/Player.lua"
+        },
+        "Transform": {
+          "rotate": [
+            -0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            -7.104677200317383,
+            0.699999988079071,
+            -1.4767171144485474
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "AudioMusicComponent": {
+          "filepath": "Assets/Audio/funkytown.wav"
+        },
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "entity"
+        },
+        "PhysicsShapeSphere": {
+          "radius": 0.5
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": true,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
+          "restitution": 0.0
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/physicstest.lua"
+        },
+        "Transform": {
+          "rotate": [
+            -0.42941364645957947,
+            -0.2151782214641571,
+            -0.22619618475437164,
+            0.8474300503730774
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            3.0847742557525635,
+            -51602.59375,
+            60.495811462402344
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death_nongame.wav",
+          "isGameSFX": false
+        },
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/cube.obj"
+        },
+        "NameComponent": {
+          "name": "floor"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            30.0,
+            0.009999999776482582,
+            30.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            -0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            30.0,
+            0.009999999776482582,
+            30.0
+          ],
+          "translate": [
+            0.0,
+            -10.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "entity2"
+        },
+        "PhysicsShapeSphere": {
+          "radius": 0.5
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": true,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.8576171398162842,
+            0.4865657091140747,
+            0.055026743561029434,
+            -0.15722164511680603
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            -9.735034942626953,
+            -30970.6796875,
+            52.132057189941406
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "entity3"
+        },
+        "PhysicsShapeSphere": {
+          "radius": 0.5
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": true,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.8935641050338745,
+            0.05524676665663719,
+            -0.3454165756702423,
+            0.28138676285743713
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            14.735172271728516,
+            -34032.17578125,
+            52.02497100830078
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/Suzanne.gltf"
+        },
+        "NameComponent": {
+          "name": "static_entity"
+        },
+        "ParticleEmitter": {
+          "acceleration": [
+            0.0,
+            2.0,
+            0.0
+          ],
+          "alpha": 1.0,
+          "azimuthRange": [
+            0.0,
+            360.0
+          ],
+          "coneAngleRange": [
+            0.0,
+            180.0
+          ],
+          "directionAxis": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "emitMax": 6,
+          "emitRate": 1.0,
+          "frameIndex": 0,
+          "lifetimeMax": 1.0,
+          "lifetimeMin": 1.0,
+          "oneShot": true,
+          "particleScaleMax": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "particleScaleMin": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "rotationMax": 0.0,
+          "rotationMin": 0.0,
+          "rotationSpeedMax": 0.0,
+          "rotationSpeedMin": 0.0,
+          "scale": [
+            2.9000000953674316,
+            3.700000047683716,
+            5.099999904632568
+          ],
+          "sheetColumns": 1,
+          "sheetRows": 1,
+          "speedMax": 1.0,
+          "speedMin": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "PhysicsShapeMesh": {
+          "path": "Assets/Meshes/Suzanne.gltf"
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": true,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            -0.24530602991580963,
+            0.24286481738090515,
+            0.0683087408542633,
+            0.9360424876213074
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            14.100000381469727,
+            -1.899999976158142,
+            -9.300000190734863
+          ]
+        }
+      }
+    }
+  ],
+  "scene_name": "default"
+}

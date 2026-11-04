@@ -9,6 +9,17 @@
 
 namespace glm
 {
+	inline void to_json(nlohmann::json& j, const glm::vec2& v)
+	{
+		j = nlohmann::json{ v.x, v.y };
+	}
+
+	inline void from_json(const nlohmann::json& j, glm::vec2& v)
+	{
+		j.at(0).get_to(v.x);
+		j.at(1).get_to(v.y);
+	}
+
 	inline void to_json(nlohmann::json& j, const glm::vec3& v)
 	{
 		j = nlohmann::json{ v.x, v.y, v.z };

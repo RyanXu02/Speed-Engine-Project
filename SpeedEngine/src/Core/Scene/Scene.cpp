@@ -54,6 +54,19 @@ namespace SE
 				const glm::vec3 pos = entity.getComponent<Transform>()->getTranslation();
 				sfxComponent->updateMyPosition(pos);
 			}
+
+			//update all particle emitter components on entities
+			auto* PEComponent = entity.getComponent<ParticleEmitter>();
+			if (PEComponent)
+			{
+				PEComponent->acquireTransform(entity.getComponent<Transform>());
+				PEComponent->update(deltaTime);
+				if (PEComponent->GetOneShot() && PEComponent->AmIDone()) { //oneshot is done, time to KILL MY PARENT >:) or stop emitter :)
+					removeEntity(entity.id());
+					//PEComponent->StopEmitter();
+				}
+
+			}
 		}
 
 	}

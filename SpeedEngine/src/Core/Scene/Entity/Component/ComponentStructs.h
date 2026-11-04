@@ -10,6 +10,7 @@
 #include "Core/features/CameraFrustum.h"
 #include "Core/EngineStates.h"
 #include "AudioComponents.h"
+#include "Particles/ParticleEmitter.h"
 
 
 namespace SE
