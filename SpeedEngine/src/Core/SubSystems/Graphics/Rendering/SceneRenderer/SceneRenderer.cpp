@@ -5,11 +5,14 @@
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/ResourceManagers/Shader/Shader.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
+#include "Core/SubSystems/Graphics/Rendering/RendererManager.h"
+#include "Core/SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "Core/Engine.h"
 #include <glad/glad.h>
 
 namespace SE
 {
+
 	void SceneRenderer::init()
 	{
 		m_logger.info("Initializing");
@@ -144,7 +147,30 @@ namespace SE
 		}
 
 		shader.setFloat("ambientStrength", m_lightingSettings.ambientStrength);
-		shader.setFloat("gamma", m_lightingSettings.gamma);
+
+		// the samplers always get their own slots, a cube and a 2D sampler sharing slot 0 fails the draw
+		shader.setInt("prefilterMap", TextureSlots::IBL_PREFILTER);
+		shader.setInt("brdfLUT", TextureSlots::IBL_BRDF_LUT);
+
+		auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
+		if (!ibl || !ibl->isReady()) {
+			shader.setBool("useIBL", false);
+			return;
+		}
+
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::IBL_PREFILTER);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->getPrefilterMap());
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::IBL_BRDF_LUT);
+		glBindTexture(GL_TEXTURE_2D, ibl->getBRDFLUTTexture());
+		glActiveTexture(GL_TEXTURE0);
+
+		// lighting still records the set intensity and SH even with IBL off
+		shader.setBool("useIBL", ibl->enabled);
+		shader.setFloat("iblIntensity", ibl->intensity);
+		const auto& shIrradiance = ibl->getSHIrradiance();
+		for (size_t i = 0; i < shIrradiance.size(); ++i) {
+			shader.setVec3(fmt::format("shIrradiance[{}]", i), shIrradiance[i]);
+		}
 	}
 
 	const std::vector<uint32_t>& SceneRenderer::_getMeshMaterials(RenderContext& context, uint32_t meshResourceId, const MeshResource& meshResource)

@@ -1,0 +1,5 @@
+* -text
+*.hdr binary
+*.png binary
+*.bin binary
+*.glb binary

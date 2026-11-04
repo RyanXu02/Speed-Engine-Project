@@ -4,6 +4,7 @@
 #include "Core/Engine.h"
 #include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/ResourceManagers/Material/Texture.h"
+#include "Core/SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
 #include "Core/SubSystems/Graphics/Rendering/RendererManager.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
@@ -13,19 +14,6 @@
 
 namespace SE
 {
-	// sampler names in deferred_lighting.frag, in G-buffer attachment order (see RendererManager::init)
-	static constexpr std::array<std::string_view, 5> GBUFFER_SAMPLERS = {
-		"gPosition",
-		"gNormal",
-		"gAlbedo",
-		"gMaterial",
-		"gEmissive",
-	};
-
-	// shadow map goes in the slot right after the G-buffer, noise right after that
-	static constexpr int SHADOW_MAP_SLOT = static_cast<int>(GBUFFER_SAMPLERS.size());
-	static constexpr int BLUE_NOISE_SLOT = SHADOW_MAP_SLOT + 1;
-
 	DeferredLightingRenderer::DeferredLightingRenderer(Logger& logger, std::string gBufferTarget, std::string shadowMapTarget)
 	    : Renderer(logger, "DeferredLightingRenderer"),
 	      m_gBufferTarget(std::move(gBufferTarget)),
@@ -60,7 +48,6 @@ namespace SE
 
 	void DeferredLightingRenderer::render(RenderContext& context)
 	{
-		// from geometry renderer pass
 		const FBO& gBuffer = context.getRenderTarget(m_gBufferTarget);
 		const CameraFrustum& camera = context.viewport.getCameraFrustum();
 
@@ -68,22 +55,39 @@ namespace SE
 		glDisable(GL_CULL_FACE);
 
 		m_shader.bind();
-		for (size_t slot = 0; slot < GBUFFER_SAMPLERS.size(); ++slot) {
-			m_shader.setInt(GBUFFER_SAMPLERS[slot], static_cast<int>(slot));
-			glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(slot));
-			glBindTexture(GL_TEXTURE_2D, gBuffer.getColorTexture(slot));
-		}
+
+		m_shader.setInt("gPosition", TextureSlots::G_POSITION);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_POSITION);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorTexture(0));
+
+		m_shader.setInt("gNormal", TextureSlots::G_NORMAL);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_NORMAL);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorTexture(1));
+
+		m_shader.setInt("gAlbedo", TextureSlots::G_ALBEDO);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_ALBEDO);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorTexture(2));
+
+		m_shader.setInt("gMaterial", TextureSlots::G_MATERIAL);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_MATERIAL);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorTexture(3));
+
+		m_shader.setInt("gEmissive", TextureSlots::G_EMISSIVE);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_EMISSIVE);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getColorTexture(4));
+
 		m_shader.setVec3("camPos", camera.getPosition());
 
-		// from shadow pass
 		const FBO& shadowMap = context.getRenderTarget(m_shadowMapTarget);
-		m_shader.setInt("shadowMap", SHADOW_MAP_SLOT);
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
+		m_shader.setInt("shadowMap", TextureSlots::SHADOW_MAP);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::SHADOW_MAP);
 		glBindTexture(GL_TEXTURE_2D, shadowMap.getDepthTexture());
+		
 		const Texture* blueNoise = context.resources.getResource<Texture>(m_blueNoiseTextureId);
-		m_shader.setInt("blueNoise", BLUE_NOISE_SLOT);
-		glActiveTexture(GL_TEXTURE0 + BLUE_NOISE_SLOT);
+		m_shader.setInt("blueNoise", TextureSlots::BLUE_NOISE);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::BLUE_NOISE);
 		glBindTexture(GL_TEXTURE_2D, blueNoise ? blueNoise->getTextureId() : 0);
+		
 		if (auto* shadowRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>()) {
 			m_shader.setMat4("lightSpaceMatrix", shadowRenderer->getLightSpaceMatrix());
 			m_shader.setFloat("shadowBias", shadowRenderer->depthBias);
@@ -98,18 +102,42 @@ namespace SE
 			sceneRenderer->setLightUniforms(context, m_shader);
 		}
 
+		// sky fills the pixels the G-buffer left empty, the cube sampler always gets its own slot
+		m_shader.setInt("environmentMap", TextureSlots::SKY);
+		auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
+		if (ibl && ibl->isReady() && ibl->drawSkybox) {
+			const glm::mat4 rotationOnlyView = glm::mat4(glm::mat3(camera.viewMatrix));	// rotation only, so the sky doesn't move with camera
+			m_shader.setBool("useSky", true);
+			m_shader.setInt("skySource", static_cast<int>(ibl->skyboxSource));
+			m_shader.setMat4("skyInverseViewProj", glm::inverse(camera.projectionMatrix * rotationOnlyView));
+			glActiveTexture(GL_TEXTURE0 + TextureSlots::SKY);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->getEnvCubemap());
+			glActiveTexture(GL_TEXTURE0);
+		}
+		else {
+			m_shader.setBool("useSky", false);
+		}
+
 		glBindVertexArray(m_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glBindVertexArray(0);
-		for (size_t slot = 0; slot < GBUFFER_SAMPLERS.size(); ++slot) {
-			glActiveTexture(GL_TEXTURE0 + static_cast<GLenum>(slot));
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		glActiveTexture(GL_TEXTURE0 + SHADOW_MAP_SLOT);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_POSITION);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		glActiveTexture(GL_TEXTURE0 + BLUE_NOISE_SLOT);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_NORMAL);
 		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_ALBEDO);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_MATERIAL);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::G_EMISSIVE);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::SHADOW_MAP);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::BLUE_NOISE);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::SKY);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glActiveTexture(GL_TEXTURE0);
 		m_shader.unbind();
 

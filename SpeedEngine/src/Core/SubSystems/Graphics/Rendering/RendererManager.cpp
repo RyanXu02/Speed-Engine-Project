@@ -8,11 +8,14 @@
 #include "Core/SubSystems/Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/DeferredLightingRenderer/DeferredLightingRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GeometryRenderer/GeometryRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
 
+#include "Core/ResourceManagers/Material/Material.h"
 #include "Core/Engine.h"
 #include "Core/EngineStates.h"
 
@@ -21,6 +24,25 @@
 
 namespace SE
 {
+	namespace TextureSlots
+	{
+		extern constexpr int G_POSITION = 0;
+		extern constexpr int G_NORMAL = 1;
+		extern constexpr int G_ALBEDO = 2;
+		extern constexpr int G_MATERIAL = 3;
+		extern constexpr int G_EMISSIVE = 4;
+		extern constexpr int SHADOW_MAP = 5;
+		extern constexpr int BLUE_NOISE = 6;
+		extern constexpr int IBL_PREFILTER = 7;
+		extern constexpr int IBL_BRDF_LUT = 8;
+		extern constexpr int SKY = 9;
+
+		constexpr int MATERIAL_LAST = 6;	// this needs to be updated to match the material enums
+		static_assert(NUM_TEXTURE_TYPES - 1 == MATERIAL_LAST, "update the slot table when adding a TextureType");
+		static_assert(MATERIAL_LAST < IBL_PREFILTER, "material maps overlap the IBL slots");
+		static_assert(BLUE_NOISE < IBL_PREFILTER, "deferred inputs overlap the IBL slots");
+	}
+
 	// Passes bind their own inputs and restore their state beyond this list
 	static void resetPassState()
 	{
@@ -58,7 +80,7 @@ namespace SE
 
 		// Configure your targets, execution order, outputs, and clears here		
 #pragma region RenderPasses
-		//TODO: add ibl, potentially a single scattered sky pass here
+		//TODO: potentially a single scattered sky pass here
 
 		// border is 1.0 or max depth, so anything outside the map reads as lit
 		const Attachment shadowDepth{ .internalFormat = GL_DEPTH_COMPONENT24, .format = GL_DEPTH_COMPONENT, .type = GL_FLOAT,
@@ -77,13 +99,17 @@ namespace SE
 
 		//TODO: add an AO pass here
 
-		// Deferred lighting pass, shades the G-buffer into DeferredColor
-		FBO& deferredColor = createRenderTarget("DeferredColor", Descriptor{});
+		// Image based lighting, no pass of its own, interally precomputes its maps once in init and the lighting passes read them
+		addRenderer<ImageBasedRenderer>("Assets/Textures/photo_studio_loft_hall_2k.hdr");
+
+		// lighting stays linear and unclamped in half floats until the tonemap pass, 8 bit here would band
+		const Attachment hdrAttachment{ .internalFormat = GL_RGBA16F, .format = GL_RGBA, .type = GL_FLOAT };
+		FBO& deferredColor = createRenderTarget("DeferredColor", Descriptor{ .colors = { hdrAttachment } });
 		auto& deferredLightingRenderer = addRenderer<DeferredLightingRenderer>("GBuffer", "ShadowMap");
 		addPass(RenderPass{ .renderer = deferredLightingRenderer, .output = deferredColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
 
 		// Forward pass, copies DeferredColor then draws transparent submeshes sorted back to front
-		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{});
+		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{ .colors = { hdrAttachment } });
 		auto& sceneRenderer = addRenderer<SceneRenderer>("DeferredColor");
 		addPass(RenderPass{ .renderer = sceneRenderer, .output = sceneColor, .clearMask = 0 });
 
@@ -94,17 +120,21 @@ namespace SE
 			.output = sceneColor,
 			.clearMask = 0 });
 
-		// Example:
-		// A render pass that draws on top of SceneColor
-		auto& debugRenderer = addRenderer<DebugRenderer>();
-		addPass(RenderPass{ .renderer = debugRenderer,  .output = sceneColor,  .clearMask = 0, .debugOnly = true });
+		// Tonemap pass, HDR SceneColor to the 8 bit display ready FinalColor, also copies the depth
+		FBO& finalColor = createRenderTarget("FinalColor", Descriptor{});
+		auto& tonemapRenderer = addRenderer<TonemapRenderer>("SceneColor");
+		addPass(RenderPass{ .renderer = tonemapRenderer, .output = finalColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
 
-		// Example: A render pass that samples "SceneColor" and output to a new "Grayscale" target
-		Descriptor grayscaleDescriptor{ 
-			.colors = { Attachment{} }, 
+		// Example: A render pass that draws on top of FinalColor, after the tonemap so debug colors show as is
+		auto& debugRenderer = addRenderer<DebugRenderer>();
+		addPass(RenderPass{ .renderer = debugRenderer,  .output = finalColor,  .clearMask = 0, .debugOnly = true });
+
+		// Example: A render pass that samples "FinalColor" and output to a new "Grayscale" target
+		Descriptor grayscaleDescriptor{
+			.colors = { Attachment{} },
 			.depth = std::nullopt };
 		FBO& grayscale = createRenderTarget("Grayscale", grayscaleDescriptor);
-		auto& grayscaleRenderer = addRenderer<GrayscaleRenderer>("SceneColor"); // make your own renderer that consumes some target
+		auto& grayscaleRenderer = addRenderer<GrayscaleRenderer>("FinalColor"); // make your own renderer that consumes some target
 		addPass(RenderPass{ .renderer = grayscaleRenderer,  .output = grayscale,  .clearMask = GL_COLOR_BUFFER_BIT });
 
 		// Example:
@@ -147,7 +177,7 @@ namespace SE
 		*/
 
 		// change this to set the final output to a specific target
-		setFinalSceneOutput("SceneColor");
+		setFinalSceneOutput("FinalColor");
 #pragma endregion
 
 		m_textRenderer = &addRenderer<TextRenderer>();

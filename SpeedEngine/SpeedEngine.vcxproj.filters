@@ -47,6 +47,8 @@
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TonemapRenderer\TonemapRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImageBasedRenderer\ImageBasedRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GeometryRenderer\GeometryRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DeferredLightingRenderer\DeferredLightingRenderer.cpp" />
@@ -289,6 +291,8 @@
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TonemapRenderer\TonemapRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImageBasedRenderer\ImageBasedRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GeometryRenderer\GeometryRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DeferredLightingRenderer\DeferredLightingRenderer.h" />

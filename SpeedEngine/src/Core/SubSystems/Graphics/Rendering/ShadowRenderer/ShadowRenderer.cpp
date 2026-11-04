@@ -45,12 +45,14 @@ namespace SE
 
 		for (const auto& draw : context.frame.draws)
 		{
-			if (draw.meshResourceId == 0)
+			if (draw.meshResourceId == 0) {
 				continue;
+			}
 
 			MeshResource* meshResource = context.resources.getResource<MeshResource>(draw.meshResourceId);
-			if (!meshResource)
+			if (!meshResource) {
 				continue;
+			}
 
 			shadowShader->setMat4("model", interpolateTransform(draw.previous, draw.current, context.t));
 
@@ -60,8 +62,9 @@ namespace SE
 			{
 				// transparent submeshes don't cast shadows, same split as the GeometryRenderer
 				const int32_t materialIndex = subMeshes[i].materialIndex;
-				if (materialIndex >= 0 && static_cast<size_t>(materialIndex) < materials.size() && materials[materialIndex].albedoFactor.a < 1.0f)
+				if (materialIndex >= 0 && static_cast<size_t>(materialIndex) < materials.size() && materials[materialIndex].albedoFactor.a < 1.0f) {
 					continue;
+				}
 
 				context.meshes.draw(draw.meshResourceId, *meshResource, i);
 			}

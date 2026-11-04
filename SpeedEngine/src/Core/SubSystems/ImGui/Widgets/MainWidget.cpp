@@ -2,8 +2,11 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 #include "../../Graphics/Rendering/RendererManager.h"
+#include "../../Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
+#include "../../Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
+#include "../../Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
 #include "../../Scenes/SceneSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
@@ -103,12 +106,42 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Lighting"))
 			{
-				auto* SR = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
-				if (SR)
+				auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
+				if (sceneRenderer)
 				{
-					LightingSettings& settings = SR->getLightingSettings();
-					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f);
-					ImGui::SliderFloat("Gamma", &settings.gamma, 1.0f, 3.0f);
+					LightingSettings& settings = sceneRenderer->getLightingSettings();
+					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f); // flat ambient, used while IBL is off
+				}
+
+				auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
+				if (ibl)
+				{
+					ImGui::Checkbox("IBL", &ibl->enabled);
+					ImGui::SameLine();
+					ImGui::SliderFloat("IBL Intensity", &ibl->intensity, 0.0f, 4.0f, "%.2f");
+
+					ImGui::Checkbox("Skybox", &ibl->drawSkybox);
+					ImGui::SameLine();
+					int source = static_cast<int>(ibl->skyboxSource);
+					if (ImGui::Combo("Sky Source", &source, "Environment\0Irradiance\0")) {
+						ibl->skyboxSource = static_cast<SkyboxSource>(source);
+					}
+				}
+
+				auto* tonemap = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<TonemapRenderer>();
+				if (tonemap)
+				{
+					int curve = static_cast<int>(tonemap->curve);
+					if (ImGui::Combo("Tonemap", &curve, "None\0Reinhard\0ACES\0")) {
+						tonemap->curve = static_cast<TonemapCurve>(curve);
+					}
+					ImGui::SliderFloat("Exposure", &tonemap->exposure, 0.0f, 8.0f, "%.2f");
+					ImGui::SliderFloat("Gamma", &tonemap->gamma, 1.0f, 3.0f);
+					ImGui::Checkbox("Dither", &tonemap->dither);
+				}
+
+				if (sceneRenderer)
+				{
 
 					ImGui::SeparatorText("Sun");
 					DirectionalLight& sun = Engine::Instance().getSubSystem<RendererManager>()->getSun();
@@ -117,7 +150,8 @@ namespace SE
 					ImGui::DragFloat("Intensity", &sun.intensity, 0.05f, 0.0f, 100.0f);
 				}
 
-				if (auto* shadow = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>())
+				auto* shadow = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>();
+				if (shadow)
 				{
 					// the animation drives these, so only editable while it's off
 					ImGui::BeginDisabled(shadow->animateSun);
@@ -142,6 +176,18 @@ namespace SE
 					ImGui::SliderFloat("Normal Offset", &shadow->normalOffset, 0.0f, 0.5f, "%.3f");
 					ImGui::SliderFloat("Penumbra Scale", &shadow->penumbraScale, 0.0f, 1.0f, "%.3f");
 					ImGui::SliderFloat("Search Radius", &shadow->searchRadius, 0.0f, 0.1f, "%.3f");
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Particles"))
+			{
+				auto* particles = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ParticleRenderer>();
+				if (particles)
+				{
+					int mode = static_cast<int>(particles->blendMode);
+					if (ImGui::Combo("Blend", &mode, "Alpha\0Additive\0")) {
+						particles->blendMode = static_cast<ParticleBlendMode>(mode);
+					}
 				}
 				ImGui::EndMenu();
 			}

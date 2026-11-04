@@ -39,7 +39,6 @@ uniform vec3 camPos;
 
 // tunables
 uniform float ambientStrength;
-uniform float gamma;
 
 const float PI = 3.14159265359;
 
@@ -122,6 +121,60 @@ vec3 calculateLo(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 F0, vec3 albedo, fl
     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
+// image based lighting from the ImageBasedRenderer, falls back to the flat ambient when off
+uniform bool useIBL;
+uniform vec3 shIrradiance[9];       // stands in for irradianceMap, cosine convolved and divided by PI
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
+uniform float iblIntensity;
+
+const float MAX_REFLECTION_LOD = 4.0; // prefilterMap mips - 1
+
+vec3 evaluateSH(vec3 n)
+{
+    return shIrradiance[0] * 0.282095
+         + shIrradiance[1] * 0.488603 * n.y
+         + shIrradiance[2] * 0.488603 * n.z
+         + shIrradiance[3] * 0.488603 * n.x
+         + shIrradiance[4] * 1.092548 * n.x * n.y
+         + shIrradiance[5] * 1.092548 * n.y * n.z
+         + shIrradiance[6] * 0.315392 * (3.0 * n.z * n.z - 1.0)
+         + shIrradiance[7] * 1.092548 * n.x * n.z
+         + shIrradiance[8] * 0.546274 * (n.x * n.x - n.y * n.y);
+}
+
+// fresnel over the whole hemisphere instead of one H, rough surfaces reflect less at grazing angles
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 calculateAmbient(vec3 N, vec3 V, vec3 F0, vec3 albedo, float metallic, float roughness, float ao)
+{
+    if (!useIBL) {
+        return vec3(ambientStrength) * albedo * ao;
+    }
+
+    vec3 R = reflect(-V, N);
+
+    // ambient lighting (we now use IBL as the ambient term)
+    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 irradiance = max(evaluateSH(N), vec3(0.0)); // texture(irradianceMap, N).rgb in LearnOpenGL
+    vec3 diffuse = irradiance * albedo;
+
+    // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F0 * brdf.x + brdf.y); // LearnOpenGL uses F here, F0 is the split sum from Karis 2013
+
+    return (kD * diffuse + specular) * ao * iblIntensity;
+}
+
 void main()
 {
     vec4 albedoSample = texture(albedoMap, TexCoords);
@@ -152,19 +205,15 @@ void main()
     for (int i = 0; i < numLights && i < MAX_LIGHTS; ++i)
     {
         vec3 L = normalize(lightPositions[i] - WorldPos);
-        float distance    = length(lightPositions[i] - WorldPos);
+        float distance = length(lightPositions[i] - WorldPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance     = lightColors[i] * attenuation;
+        vec3 radiance = lightColors[i] * attenuation;
 
         Lo += calculateLo(N, V, L, radiance, F0, albedo, metallic, roughness);
     }
 
-    vec3 ambient = vec3(ambientStrength) * albedo * ao;
+    vec3 ambient = calculateAmbient(N, V, F0, albedo, metallic, roughness, ao);
     vec3 color   = ambient + Lo + emissive;
-
-    // TODO: seprate Tonemap and gamma correct in to a finalize pass to not lose detail for inbetween passes
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0 / gamma));
 
     FragColor = vec4(color, alpha);
 
