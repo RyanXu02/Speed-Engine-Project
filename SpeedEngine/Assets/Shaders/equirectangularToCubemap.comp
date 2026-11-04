@@ -1,0 +1,47 @@
+#version 430 core
+
+// one invocation per cube texel, z is the face
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(binding = 0) uniform sampler2D equirectangularMap;
+layout(rgba16f, binding = 0) uniform writeonly imageCube envCubemap;
+
+const vec2 invAtan = vec2(0.1591, 0.3183);
+const float MAX_HALF = 65000.0; // stay under the half float max so very bright texels don't become inf
+
+vec2 SampleSphericalMap(vec3 v)
+{
+    vec2 uv = vec2(atan(v.z, v.x), asin(clamp(v.y, -1.0, 1.0)));
+    uv *= invAtan;
+    uv += 0.5;
+    return uv;
+}
+
+// stands in for the cube vertex shader, the direction through a texel of a face in the GL cubemap layout
+vec3 cubeDirection(ivec3 texel, int size)
+{
+    vec2 uv = (vec2(texel.xy) + 0.5) / float(size) * 2.0 - 1.0;
+    switch (texel.z) {
+        case 0:  return vec3( 1.0, -uv.y, -uv.x);
+        case 1:  return vec3(-1.0, -uv.y,  uv.x);
+        case 2:  return vec3( uv.x,  1.0,  uv.y);
+        case 3:  return vec3( uv.x, -1.0, -uv.y);
+        case 4:  return vec3( uv.x, -uv.y,  1.0);
+        default: return vec3(-uv.x, -uv.y, -1.0);
+    }
+}
+
+void main()
+{
+    int size = imageSize(envCubemap).x;
+    ivec3 texel = ivec3(gl_GlobalInvocationID);
+    if (texel.x >= size || texel.y >= size) {
+        return;
+    }
+
+    vec3 WorldPos = cubeDirection(texel, size);
+    vec2 uv = SampleSphericalMap(normalize(WorldPos));
+    vec3 color = min(textureLod(equirectangularMap, uv, 0.0).rgb, vec3(MAX_HALF));
+
+    imageStore(envCubemap, texel, vec4(color, 1.0));
+}

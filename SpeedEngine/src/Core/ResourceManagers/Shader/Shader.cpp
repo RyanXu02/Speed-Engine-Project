@@ -64,6 +64,37 @@ namespace SE
 		return status;
 	}
 
+	GLCompStatus Shader::initCompute(std::string_view computeShaderSource)
+	{
+		assert(m_ProgramId == 0);
+		GLCompStatus status;
+
+		// Compile compute shader
+		unsigned int computeShader = glCreateShader(GL_COMPUTE_SHADER);
+		const char* computeSourceCStr = computeShaderSource.data();
+		glShaderSource(computeShader, 1, &computeSourceCStr, nullptr);
+		glCompileShader(computeShader);
+		status = _checkCompilationErr(computeShader, "COMPUTE");
+		if (!status.success)
+		{
+			glDeleteShader(computeShader);
+			return status;
+		}
+
+		// Link it into its own program
+		m_ProgramId = glCreateProgram();
+		glAttachShader(m_ProgramId, computeShader);
+		glLinkProgram(m_ProgramId);
+		status = _checkCompilationErr(m_ProgramId, "PROGRAM");
+
+		glDetachShader(m_ProgramId, computeShader);
+		glDeleteShader(computeShader);
+		if (!status.success)
+			destroy();
+
+		return status;
+	}
+
 	void Shader::bind()
 	{
 		glUseProgram(m_ProgramId);

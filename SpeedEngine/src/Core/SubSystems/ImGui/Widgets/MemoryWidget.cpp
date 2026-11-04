@@ -33,7 +33,7 @@ namespace SE
 			ImGui::End();
 			return;
 		}
-
+		ImGui::Text("Current FPS: %.2f", ImGui::GetIO().Framerate);
 		ImGui::Text("Current: %zu bytes", snap.currentBytes);
 		ImGui::Text("Peak: %zu bytes", snap.peakBytes);
 		ImGui::Text("Allocations: %zu", snap.totalAllocations);

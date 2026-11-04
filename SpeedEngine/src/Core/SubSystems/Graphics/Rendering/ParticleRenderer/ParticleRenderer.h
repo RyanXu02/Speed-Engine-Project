@@ -4,8 +4,13 @@
 
 namespace SE
 {
+	enum class ParticleBlendMode : int
+	{
+		Alpha,
+		Additive
+	};
+
 	// @brief Draws CPU-simulated billboard particles from RenderFrame::particles
-	// @brief Draws on top of an existing target; depth tested, no depth writes, alpha blended.
 	// @brief will eventually get in geometric (3d) particles
 	class ParticleRenderer : public Renderer
 	{
@@ -18,6 +23,8 @@ namespace SE
 		void init() override;
 		void shutdown() override;
 		void render(RenderContext& context) override;
+
+		ParticleBlendMode blendMode = ParticleBlendMode::Alpha;
 
 	private:
 		unsigned int m_VAO = 0;

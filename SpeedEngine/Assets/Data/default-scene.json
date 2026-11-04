@@ -45,30 +45,13 @@
         "LightComponent": {
           "color": [
             1.0,
-            0.9,
-            0.8
+            0.8999999761581421,
+            0.800000011920929
           ],
           "intensity": 50.0
         },
         "NameComponent": {
           "name": "point light"
-        },
-        "Transform": {
-          "rotate": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "scale": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "translate": [
-            0.0,
-            4.0,
-            4.0
-          ]
         }
       }
     },
@@ -143,9 +126,6 @@
         "NameComponent": {
           "name": "entity"
         },
-        "ScriptComponent": {
-          "path": "Assets/Scripts/physicstest.lua"
-        },
         "PhysicsShapeSphere": {
           "radius": 0.5
         },
@@ -164,12 +144,15 @@
           ],
           "restitution": 0.0
         },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/physicstest.lua"
+        },
         "Transform": {
           "rotate": [
-            0.0,
-            0.0,
-            0.0,
-            1.0
+            -0.5578107833862305,
+            -0.013553425669670105,
+            -0.43748876452445984,
+            -0.7051717042922974
           ],
           "scale": [
             1.0,
@@ -177,9 +160,9 @@
             1.0
           ],
           "translate": [
-            0.0,
-            2.5,
-            -0.10000000149011612
+            -9.45142936706543,
+            -9.352484703063965,
+            12.250982284545898
           ]
         }
       }
@@ -272,10 +255,10 @@
         },
         "Transform": {
           "rotate": [
-            -0.0,
-            0.0,
-            0.0,
-            1.0
+            0.7700172066688538,
+            -0.08732183277606964,
+            0.3628564774990082,
+            0.5174781084060669
           ],
           "scale": [
             1.0,
@@ -283,9 +266,9 @@
             1.0
           ],
           "translate": [
-            0.0,
-            4.28000020980835,
-            0.0
+            -3.937000036239624,
+            -5.313000202178955,
+            -0.9300000071525574
           ]
         }
       }
@@ -332,9 +315,9 @@
             1.0
           ],
           "translate": [
-            0.8999999761581421,
-            2.4800000190734863,
-            0.6000000238418579
+            0.9000028967857361,
+            -10.010002136230469,
+            0.5999900698661804
           ]
         }
       }
@@ -345,13 +328,13 @@
           "isAlive": true
         },
         "MeshComponent": {
-          "path": "Assets/Meshes/Suzanne.gltf"
+          "path": "Assets/Meshes/thomas_the_train/scene.gltf"
         },
         "NameComponent": {
           "name": "static_entity"
         },
         "PhysicsShapeMesh": {
-          "path": "Assets/Meshes/Suzanne.gltf"
+          "path": "Assets/Meshes/thomas_the_train/scene.gltf"
         },
         "RigidBody": {
           "friction": 0.20000000298023224,
@@ -370,10 +353,93 @@
         },
         "Transform": {
           "rotate": [
-            -0.24530602991580963,
-            0.24286481738090515,
-            0.0683087408542633,
-            0.9360424876213074
+            -2.141054267212894e-08,
+            0.8345394134521484,
+            -2.141054267212894e-08,
+            0.5509482026100159
+          ],
+          "scale": [
+            15.0,
+            15.0,
+            15.0
+          ],
+          "translate": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "NameComponent": {
+          "name": "particle"
+        },
+        "ParticleEmitter": {
+          "acceleration": [
+            0.0,
+            14.199999809265137,
+            0.0
+          ],
+          "alpha": 0.4901960790157318,
+          "azimuthRange": [
+            56.70000076293945,
+            345.70001220703125
+          ],
+          "coneAngleRange": [
+            70.0,
+            180.0
+          ],
+          "directionAxis": [
+            5.0,
+            0.0,
+            0.0
+          ],
+          "emitMax": 1000,
+          "emitRate": 78.4000015258789,
+          "frameIndex": 0,
+          "lifetimeMax": 9.100000381469727,
+          "lifetimeMin": 9.100000381469727,
+          "oneShot": false,
+          "particleScaleMax": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "particleScaleMin": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "rotationMax": 3.9000000953674316,
+          "rotationMin": 3.9000000953674316,
+          "rotationSpeedMax": 0.20000000298023224,
+          "rotationSpeedMin": 0.20000000298023224,
+          "scale": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "sheetColumns": 1,
+          "sheetRows": 1,
+          "speedMax": 1.0,
+          "speedMin": 1.0,
+          "tintColor": [
+            0.1029900312423706,
+            1.0,
+            0.2579551339149475
+          ]
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
           ],
           "scale": [
             1.0,
@@ -381,9 +447,9 @@
             1.0
           ],
           "translate": [
-            0.30000001192092896,
-            -3.299999952316284,
-            -0.6000000238418579
+            -15.0,
+            0.0,
+            0.0
           ]
         }
       }

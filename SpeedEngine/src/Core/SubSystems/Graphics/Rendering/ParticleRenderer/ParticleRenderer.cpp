@@ -66,7 +66,14 @@ namespace SE
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
 		glBlendEquation(GL_FUNC_ADD);
-		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		
+		// additive and alpha blend modes
+		if (blendMode == ParticleBlendMode::Additive) {
+			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else {
+			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		}
 
 		const CameraFrustum& camera = context.viewport.getCameraFrustum();
 		m_bbShader.bind();
