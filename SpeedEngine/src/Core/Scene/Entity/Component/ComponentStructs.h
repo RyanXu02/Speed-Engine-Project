@@ -105,4 +105,18 @@ namespace SE
 			member("isPrimary", &CameraComponent::isPrimary)
 		);
 	};
+
+	struct LightComponent
+	{
+		LightComponent() = default;
+
+		glm::vec3 color{ 1.0f };
+		float intensity{ 300.0f };
+
+		DEFINE_TYPE(
+			LightComponent,
+			member("color", &LightComponent::color),
+			member("intensity", &LightComponent::intensity)
+		);
+	};
 }

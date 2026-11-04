@@ -82,35 +82,12 @@ namespace SE
 		Scene* currentScene = sceneSystem->getCurrentScene();
 		currentScene->loadScene("Assets/Data/default-scene.json");
 
-		auto* sceneRenderer = getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
-		
 		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
-
 		uint32_t fontid = resourceManager->loadFont({ 
 			.path = "fonts/Quicksand-Regular.ttf", 
 			.pixelHeight = 32, 
 			.name = "QSfont" });
 		QSfont = resourceManager->getResource<Font>(fontid)->getHandle();
-
-		uint32_t defaultShaderId = resourceManager->loadShader({
-			.vertexShaderPath = "Assets/Shaders/default.vert",
-			.fragmentShaderPath = "Assets/Shaders/default.frag",
-			.name = "defaultShader"
-		});
-		sceneRenderer->setDefaultShaderId(defaultShaderId);
-		
-		const uint32_t defaultTextureId = resourceManager->loadTexture({
-			.path = "Assets/Textures/default-texture-128.png",
-			.name = "defaultTexture"
-		});
-		const TextureBinding defaultTextures[] = {
-			{ .usage = TextureType::Albedo, .textureId = defaultTextureId }
-		};
-		uint32_t defaultMaterialId = resourceManager->createMaterial({ 
-			.shaderId = defaultShaderId, 
-			.textures = defaultTextures, 
-			.name = "defaultMaterial" });
-		sceneRenderer->setDefaultMaterialId(defaultMaterialId);
 	}
 
 	void Engine::run()

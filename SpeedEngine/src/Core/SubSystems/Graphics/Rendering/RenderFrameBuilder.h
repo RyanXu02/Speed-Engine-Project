@@ -50,6 +50,8 @@ namespace SE
 		};
 		std::unordered_map<uint32_t, DrawItemHistory> m_drawItemHistories;
 
+		std::vector<PointLight> m_lights;
+
 		CameraSnapshot m_camera;
 
 		const Scene* m_lastScene = nullptr;
