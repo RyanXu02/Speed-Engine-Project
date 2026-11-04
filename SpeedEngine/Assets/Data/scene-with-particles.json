@@ -216,7 +216,7 @@
           ],
           "translate": [
             3.0847742557525635,
-            -47370.98046875,
+            -51602.59375,
             60.495811462402344
           ]
         }
@@ -322,7 +322,7 @@
           ],
           "translate": [
             -9.735034942626953,
-            -26739.068359375,
+            -30970.6796875,
             52.132057189941406
           ]
         }
@@ -371,7 +371,7 @@
           ],
           "translate": [
             14.735172271728516,
-            -29800.56640625,
+            -34032.17578125,
             52.02497100830078
           ]
         }
@@ -387,6 +387,61 @@
         },
         "NameComponent": {
           "name": "static_entity"
+        },
+        "ParticleEmitter": {
+          "acceleration": [
+            0.0,
+            2.0,
+            0.0
+          ],
+          "alpha": 1.0,
+          "azimuthRange": [
+            0.0,
+            360.0
+          ],
+          "coneAngleRange": [
+            0.0,
+            180.0
+          ],
+          "directionAxis": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "emitMax": 6,
+          "emitRate": 1.0,
+          "frameIndex": 0,
+          "lifetimeMax": 1.0,
+          "lifetimeMin": 1.0,
+          "oneShot": true,
+          "particleScaleMax": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "particleScaleMin": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "rotationMax": 0.0,
+          "rotationMin": 0.0,
+          "rotationSpeedMax": 0.0,
+          "rotationSpeedMin": 0.0,
+          "scale": [
+            2.9000000953674316,
+            3.700000047683716,
+            5.099999904632568
+          ],
+          "sheetColumns": 1,
+          "sheetRows": 1,
+          "speedMax": 1.0,
+          "speedMin": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ]
         },
         "PhysicsShapeMesh": {
           "path": "Assets/Meshes/Suzanne.gltf"
@@ -419,9 +474,9 @@
             1.0
           ],
           "translate": [
-            0.30000001192092896,
-            -3.299999952316284,
-            -0.6000000238418579
+            14.100000381469727,
+            -1.899999976158142,
+            -9.300000190734863
           ]
         }
       }

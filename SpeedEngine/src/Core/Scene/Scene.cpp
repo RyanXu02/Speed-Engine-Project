@@ -61,8 +61,11 @@ namespace SE
 			{
 				PEComponent->acquireTransform(entity.getComponent<Transform>());
 				PEComponent->update(deltaTime);
-				if (PEComponent->GetOneShot() && PEComponent->AmIDone()) //oneshot is done, time to KILL MY PARENT >:)
+				if (PEComponent->GetOneShot() && PEComponent->AmIDone()) { //oneshot is done, time to KILL MY PARENT >:) or stop emitter :)
 					removeEntity(entity.id());
+					//PEComponent->StopEmitter();
+				}
+
 			}
 		}
 

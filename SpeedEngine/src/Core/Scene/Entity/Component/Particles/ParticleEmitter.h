@@ -61,7 +61,11 @@ namespace SE
         float GetEmitRate() const { return mEmitRate; }
         void SetEmitRate(float v) { mEmitRate = v; }
         unsigned GetEmitMax() const { return mEmitMax; }
-        void SetEmitMax(unsigned v) { mEmitMax = v; }
+        void SetEmitMax(unsigned v)
+        {
+            mEmitMax = v;
+            mContainer.reset();  // update() recreates it with the new size via finalize()
+        }
         float GetLifetimeMin() const { return mLifetimeMin; }
         void SetLifetimeMin(float v) { mLifetimeMin = v; }
         float GetLifetimeMax() const { return mLifetimeMax; }
@@ -79,7 +83,11 @@ namespace SE
         float GetRotationMax() const { return mRotationMax; }
         void SetRotationMax(float v) { mRotationMax = v; }
         bool GetOneShot() const { return mOneShot; }
-        void SetOneShot(bool v) { mOneShot = v; }
+        void SetOneShot(bool v)
+		{
+            mOneShot = v;
+            mContainer.reset();  // the container bakes in the one-shot flag
+        }
         bool GetIsRunning() const { return mIsRunning; }
 
         bool AmIDone() const { return mIsDone; }
