@@ -44,11 +44,11 @@ namespace SE
 		glm::vec4 color;
 	};
 
-	// @brief One billboard particle, already simulated on the CPU
+	//billboard particle
 	struct ParticleInstance
 	{
 		glm::vec3 position;
-		float size;
+		glm::vec2 size;
 		float rotation; // radians, around the view axis
 		glm::vec4 color;
 	};

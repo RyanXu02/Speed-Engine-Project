@@ -351,7 +351,7 @@ namespace SE
 				//cone angle range
 			    auto coneAngleRange = component.GetConeAngleRange();
 					//limit to 180. cuz its half angle, 180 on both sides = 360 around axis
-			    if (ImGui::DragFloat2("Cone Angle Range", &coneAngleRange.x, 0.1f, 0.f, 180.f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				if (ImGui::DragFloatRange2("Cone Angle Range", &coneAngleRange.x, &coneAngleRange.y, 0.1f, 0.f, 180.f, "%.3f", "%.3f", ImGuiSliderFlags_AlwaysClamp))
 				    component.SetConeAngleRange(coneAngleRange);
 				//azimuth range
 			    auto azimuthRange = component.GetAzimuthRange();
