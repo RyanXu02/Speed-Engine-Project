@@ -6,6 +6,7 @@ namespace SE
 {
 	class Scene;
 	class InputSystem;
+	class ButtonActivated;
 
 	enum class UICommand
 	{
@@ -24,10 +25,17 @@ namespace SE
 		bool activateCanvas(uint32_t canvasId);
 		// @brief Set focus to a specific UI element. Returns true if the element was successfully focused
 		bool setFocus(uint32_t elementId);
-
 		
 		uint32_t getActiveCanvas() const { return m_activeCanvas; }
+		
+		// @brief A focused element is an element targetted by commands
+		// @brief e.g. arrowkeys, joystick, submit, etc.
 		uint32_t getFocusedElement() const { return m_focusedElement; }
+		// @brief A hovered element is an element currently under the pointer
+		uint32_t getHoveredElement() const { return m_hoveredElement; }
+		// @brief A captured element is an element that is being pressed
+		// @brief A captured element can lost its pressed state while the pointer is dragged off it
+		uint32_t getCapturedElement() const { return m_capturedElement; }
 
 		// @brief Process a UI command (e.g. navigation, submit, cancel)
 		void processCommand(UICommand command);
@@ -43,12 +51,20 @@ namespace SE
 
 		// @brief Change focus to a specific element in the scene
 		void _changeFocus(Scene& scene, uint32_t elementId);
+
+		void _cancelCapture(Scene& scene);
+		void _clearPointer(Scene& scene);
+
+		void _processCommand(UICommand command, std::vector<ButtonActivated>& activations);
 		
-		// @brief process keyboard input for commands
-		void _processKeyboard(const InputSystem& input);
+		// @brief process inputs for commands
+		void _processKeyboard(const InputSystem& input, std::vector<ButtonActivated>& activations);
+		void _processPointer(Scene& scene, const InputSystem& input, std::vector<ButtonActivated>& activations);
 
 		uint32_t m_activeCanvas{ 0 };
 		uint32_t m_focusedElement{ 0 };
+		uint32_t m_hoveredElement{ 0 };
+		uint32_t m_capturedElement{ 0 };
 		uint64_t m_sceneRevision{ 0 };
 	};
 }

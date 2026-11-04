@@ -4,6 +4,7 @@
 #include "UILayout.h"
 #include "Core/Engine.h"
 #include "Core/EngineStates.h"
+#include "Core/SubSystems/Events/EventSystem.h"
 #include "Core/SubSystems/Input/InputSystem.h"
 #include "Core/SubSystems/Scenes/SceneSystem.h"
 
@@ -61,16 +62,82 @@ namespace SE
 			const float perpendicular = std::abs(delta.x * direction.y - delta.y * direction.x);
 			return forward > 0.0f ? forward + 2.0f * perpendicular : std::numeric_limits<float>::infinity();
 		}
-	}
+
+		static uint32_t hitTest(Entity canvasEntity, const std::vector<Entity>& candidates, const InputSystem& input)
+		{
+			if (!input.isPointerInInputRegion())
+				return 0;
+			const auto pointer = input.getPointerPositionInInputRegion();
+			const auto& canvas = *canvasEntity.getComponent<UICanvasComponent>();
+			if (!pointer || canvas.referenceResolution.x <= 0.0f || canvas.referenceResolution.y <= 0.0f)
+				return 0;
+			const auto layout = resolveUICanvasLayout(glm::vec2(input.getInputRegion().renderTargetSize), canvas.referenceResolution);
+			uint32_t hit = 0;
+			int topOrder = std::numeric_limits<int>::min();
+			for (auto entity : candidates)
+			{
+				const auto rect = resolveUIRectLayout(*entity.getComponent<UIRectComponent>(), layout);
+				const auto max = rect.pixelTopLeft + rect.pixelSize;
+				const int order = entity.getComponent<UIElementComponent>()->drawOrder;
+				if (pointer->x >= rect.pixelTopLeft.x && pointer->y >= rect.pixelTopLeft.y && pointer->x < max.x && pointer->y < max.y &&
+					(order > topOrder || (order == topOrder && entity.id() > hit)))
+				{
+					hit = entity.id();
+					topOrder = order;
+				}
+			}
+			return hit;
+		}
+
+		static void activateButton(Entity entity, std::vector<ButtonActivated>& activations)
+		{
+			if (!entity.getComponent<UIButtonComponent>() || std::ranges::any_of(activations,
+				[&](const ButtonActivated& activation) { return activation.entityId == entity.id(); }))
+				return;
+			const auto& element = *entity.getComponent<UIElementComponent>();
+			activations.emplace_back(entity.id(), element.canvasKey, element.elementKey);
+		}
+
+		static void publishActivations(std::vector<ButtonActivated>& activations)
+		{
+			auto* events = Engine::Instance().getSubSystem<EventSystem>();
+			for (auto& activation : activations)
+				events->publish(std::make_unique<ButtonActivated>(std::move(activation)));
+		}
+
+		static void setFlag(Scene& scene, uint32_t id, bool UISelectableComponent::*flag, bool value)
+		{
+			if (scene.hasEntity(id))
+				if (auto* selectable = scene.getEntity(id).getComponent<UISelectableComponent>(); selectable && selectable->*flag != value)
+					selectable->*flag = value;
+		}
+
+		static void changeSelection(Scene& scene, uint32_t& currentId, uint32_t id, bool UISelectableComponent::*flag)
+		{
+			if (currentId == id)
+				return;
+			setFlag(scene, currentId, flag, false);
+			currentId = id;
+			setFlag(scene, currentId, flag, true);
+		}
+	} // Helper functions for UISystem
+
 
 	void UISystem::_changeFocus(Scene& scene, uint32_t elementId)
 	{
-		if (scene.hasEntity(m_focusedElement))
-			if (auto* selectable = scene.getEntity(m_focusedElement).getComponent<UISelectableComponent>())
-				selectable->focused = false;
-		m_focusedElement = elementId;
-		if (elementId != 0)
-			scene.getEntity(elementId).getComponent<UISelectableComponent>()->focused = true;
+		changeSelection(scene, m_focusedElement, elementId, &UISelectableComponent::focused);
+	}
+
+	void UISystem::_cancelCapture(Scene& scene)
+	{
+		setFlag(scene, m_capturedElement, &UISelectableComponent::pressed, false);
+		m_capturedElement = 0;
+	}
+
+	void UISystem::_clearPointer(Scene& scene)
+	{
+		changeSelection(scene, m_hoveredElement, 0, &UISelectableComponent::hovered);
+		_cancelCapture(scene);
 	}
 
 	Scene* UISystem::_refreshFocus()
@@ -81,17 +148,16 @@ namespace SE
 		{
 			m_activeCanvas = 0;
 			m_focusedElement = 0;
+			m_hoveredElement = 0;
+			m_capturedElement = 0;
 			m_sceneRevision = scenes->getSceneRevision();
-			if (scene)
-				scene->forEntitiesWith<UISelectableComponent>([](Entity entity)
-				{
-					entity.getComponent<UISelectableComponent>()->focused = false;
-				});
 		}
 		if (!scene)
 		{
 			m_activeCanvas = 0;
 			m_focusedElement = 0;
+			m_hoveredElement = 0;
+			m_capturedElement = 0;
 			return nullptr;
 		}
 
@@ -99,6 +165,7 @@ namespace SE
 		{
 			m_activeCanvas = 0;
 			_changeFocus(*scene, 0);
+			_clearPointer(*scene);
 			scene->forEntitiesWith<UICanvasComponent>([&](Entity entity)
 			{
 				if (isEligibleCanvas(*scene, entity) && (m_activeCanvas == 0 || entity.id() < m_activeCanvas))
@@ -110,12 +177,18 @@ namespace SE
 		{
 			auto canvas = scene->getEntity(m_activeCanvas);
 			const auto candidates = getCandidates(*scene, canvas);
-			const bool validFocus = std::ranges::any_of(candidates, [this](Entity entity)
+			const auto eligible = [&](uint32_t id)
 			{
-				return entity.id() == m_focusedElement;
-			});
-			_changeFocus(*scene, validFocus ? m_focusedElement : defaultFocus(canvas, candidates));
+				return std::ranges::any_of(candidates, [id](Entity entity) { return entity.id() == id; });
+			};
+			_changeFocus(*scene, eligible(m_focusedElement) ? m_focusedElement : defaultFocus(canvas, candidates));
+			if (!eligible(m_hoveredElement))
+				changeSelection(*scene, m_hoveredElement, 0, &UISelectableComponent::hovered);
+			if (!eligible(m_capturedElement) || !scene->getEntity(m_capturedElement).getComponent<UIButtonComponent>())
+				_cancelCapture(*scene);
 		}
+		if (!isAcceptingCommands())
+			_clearPointer(*scene);
 
 		return scene;
 	}
@@ -126,6 +199,8 @@ namespace SE
 		if (!scene || !scene->hasEntity(canvasId) || !isEligibleCanvas(*scene, scene->getEntity(canvasId)))
 			return false;
 
+		if (m_activeCanvas != canvasId)
+			_clearPointer(*scene);
 		m_activeCanvas = canvasId;
 		auto canvas = scene->getEntity(canvasId);
 		_changeFocus(*scene, defaultFocus(canvas, getCandidates(*scene, canvas)));
@@ -154,6 +229,13 @@ namespace SE
 
 	void UISystem::processCommand(UICommand command)
 	{
+		std::vector<ButtonActivated> activations;
+		_processCommand(command, activations);
+		publishActivations(activations);
+	}
+
+	void UISystem::_processCommand(UICommand command, std::vector<ButtonActivated>& activations)
+	{
 		auto* scene = _refreshFocus();
 		if (!scene || !isAcceptingCommands() || m_focusedElement == 0)
 			return;
@@ -181,6 +263,8 @@ namespace SE
 			return;
 
 		case UICommand::Submit:
+			activateButton(currentEntity, activations);
+			return;
 		case UICommand::Cancel:
 			return;
 		}
@@ -222,25 +306,55 @@ namespace SE
 		_changeFocus(*scene, best);
 	}
 
-	void UISystem::_processKeyboard(const InputSystem& input)
+	void UISystem::_processPointer(Scene& scene, const InputSystem& input, std::vector<ButtonActivated>& activations)
 	{
-		if (input.isKeyRising(KEY_UP)) processCommand(UICommand::NavigateUp);
-		if (input.isKeyRising(KEY_DOWN)) processCommand(UICommand::NavigateDown);
-		if (input.isKeyRising(KEY_LEFT)) processCommand(UICommand::NavigateLeft);
-		if (input.isKeyRising(KEY_RIGHT)) processCommand(UICommand::NavigateRight);
+		auto canvas = scene.getEntity(m_activeCanvas);
+		const auto candidates = getCandidates(scene, canvas);
+		const uint32_t hit = hitTest(canvas, candidates, input);
+		changeSelection(scene, m_hoveredElement, hit, &UISelectableComponent::hovered);
+
+		if (input.isMouseRising(MOUSE_BUTTON_LEFT) && m_capturedElement == 0 && hit != 0)
+		{
+			_changeFocus(scene, hit);
+			if (scene.getEntity(hit).getComponent<UIButtonComponent>())
+				m_capturedElement = hit;
+		}
+		if (m_capturedElement != 0)
+		{
+			setFlag(scene, m_capturedElement, &UISelectableComponent::pressed, hit == m_capturedElement);
+			if (input.isMouseFalling(MOUSE_BUTTON_LEFT))
+			{
+				if (hit == m_capturedElement)
+					activateButton(scene.getEntity(m_capturedElement), activations);
+				_cancelCapture(scene);
+			}
+		}
+	}
+
+	void UISystem::_processKeyboard(const InputSystem& input, std::vector<ButtonActivated>& activations)
+	{
+		if (input.isKeyRising(KEY_UP)) _processCommand(UICommand::NavigateUp, activations);
+		if (input.isKeyRising(KEY_DOWN)) _processCommand(UICommand::NavigateDown, activations);
+		if (input.isKeyRising(KEY_LEFT)) _processCommand(UICommand::NavigateLeft, activations);
+		if (input.isKeyRising(KEY_RIGHT)) _processCommand(UICommand::NavigateRight, activations);
 
 		const bool shiftDown = input.isKeyDown(KEY_LEFT_SHIFT) || input.isKeyDown(KEY_RIGHT_SHIFT);
-		if (input.isKeyRising(KEY_TAB)) processCommand(shiftDown ? UICommand::Previous : UICommand::Next);
+		if (input.isKeyRising(KEY_TAB)) _processCommand(shiftDown ? UICommand::Previous : UICommand::Next, activations);
 
-		if (input.isKeyRising(KEY_ENTER) || input.isKeyRising(KEY_SPACE)) processCommand(UICommand::Submit);
+		if (input.isKeyRising(KEY_ENTER) || input.isKeyRising(KEY_SPACE)) _processCommand(UICommand::Submit, activations);
 
-		if (input.isKeyRising(KEY_ESCAPE)) processCommand(UICommand::Cancel);
+		if (input.isKeyRising(KEY_ESCAPE)) _processCommand(UICommand::Cancel, activations);
 	}
 
 	void UISystem::update(double deltaTime)
 	{
-		_refreshFocus();
-		if (isAcceptingCommands())
-			_processKeyboard(*Engine::Instance().getSubSystem<InputSystem>());
+		auto* scene = _refreshFocus();
+		if (!isAcceptingCommands())
+			return;
+		const auto& input = *Engine::Instance().getSubSystem<InputSystem>();
+		std::vector<ButtonActivated> activations;
+		_processPointer(*scene, input, activations);
+		_processKeyboard(input, activations);
+		publishActivations(activations);
 	}
 }

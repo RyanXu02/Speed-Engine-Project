@@ -55,7 +55,10 @@ namespace SE
 				const auto& rect = *member.entity.getComponent<UIRectComponent>();
 				glm::vec4 tint{ 1.0f };
 				if (const auto* selectable = member.entity.getComponent<UISelectableComponent>())
-					tint = !member.entity.getComponent<UIElementComponent>()->enabled ? selectable->disabledColor : selectable->focused ? selectable->focusedColor : selectable->normalColor;
+					tint = !member.entity.getComponent<UIElementComponent>()->enabled ? selectable->disabledColor :
+						selectable->pressed ? selectable->pressedColor :
+						selectable->focused ? selectable->focusedColor :
+						selectable->hovered ? selectable->hoverColor : selectable->normalColor;
 				const auto* image = member.entity.getComponent<UIImageComponent>();
 				const bool hasBackground = image && image->color.a > 0.0f;
 				if (hasBackground)
@@ -71,7 +74,7 @@ namespace SE
 				}
 			}
 		}
-	}
+	} // Helper to append all UI elements in the scene to RenderFrame
 
 	void RenderFrameBuilder::submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color)
 	{

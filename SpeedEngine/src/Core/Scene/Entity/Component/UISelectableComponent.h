@@ -9,6 +9,8 @@ namespace SE
 	{
 		int navigationOrder{ 0 };
 		bool focused{ false };
+		bool hovered{ false };
+		bool pressed{ false };
 
 		// Optional keys in UIElementComponent's canvas
 		// empty means unassigned
