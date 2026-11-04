@@ -13,6 +13,7 @@
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
 
 #include "Core/ResourceManagers/Material/Material.h"
 #include "Core/Engine.h"
@@ -111,6 +112,13 @@ namespace SE
 		FBO& sceneColor = createRenderTarget("SceneColor", Descriptor{ .colors = { hdrAttachment } });
 		auto& sceneRenderer = addRenderer<SceneRenderer>("DeferredColor");
 		addPass(RenderPass{ .renderer = sceneRenderer, .output = sceneColor, .clearMask = 0 });
+
+		// Billboard particles draw on top of SceneColor, depth tested against the scene
+		auto& particleRenderer = addRenderer<ParticleRenderer>();
+		addPass(RenderPass{
+			.renderer = particleRenderer,
+			.output = sceneColor,
+			.clearMask = 0 });
 
 		// Tonemap pass, HDR SceneColor to the 8 bit display ready FinalColor, also copies the depth
 		FBO& finalColor = createRenderTarget("FinalColor", Descriptor{});

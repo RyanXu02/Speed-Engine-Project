@@ -4,6 +4,7 @@
 #include "../../Scenes/SceneSystem.h"
 #include "Engine.h"
 #include "SceneInfoWidget.h"
+#include "MainWidget.h"
 #include "imgui.h"
 
 namespace SE
@@ -34,6 +35,11 @@ namespace SE
 		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
 		    [this](Event& event)
 		    {
+				m_selectedEntities.clear();
+				m_renameEntityId = 0;
+				m_focusRename = false;
+				m_renameBuffer.clear();
+				m_requestDelete = false;
 			    if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 				    m_entityNameCache = scene->getEntityList();
 			    else
@@ -59,6 +65,7 @@ namespace SE
 			return;
 		}
 		auto entities = scene->getEntitiesWith<NameComponent>();
+		ImGui::BeginDisabled(MainWidget::isSceneEditingBlocked());
 
 		m_requestDelete = false;
 		for (auto& entity : entities)
@@ -90,9 +97,14 @@ namespace SE
 				for (uint32_t id : m_selectedEntities)
 				{
 					Entity entity = scene->getEntity(id);
-					auto name = entity.getComponent<NameComponent>()->name;
+					auto* nameComponent = entity.getComponent<NameComponent>();
+					if (!nameComponent)
+						continue;
+					auto name = nameComponent->name;
 
-					scene->removeEntity(id);
+					if (!scene->removeEntity(id))
+						continue;
+					MainWidget::markSceneDirty();
 
 					EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
 					auto event = std::make_unique<ActiveSceneModified>(MT::Remove, id, name);
@@ -102,6 +114,7 @@ namespace SE
 			m_selectedEntities.clear();
 		}
 
+		ImGui::EndDisabled();
 		ImGui::End();
 	}
 
@@ -133,6 +146,7 @@ namespace SE
 			if (ImGui::MenuItem("Rename", "F2", false, !multiSelected))
 			{
 				m_renameEntityId = id;
+				m_focusRename = true;
 				m_renameBuffer.clear();
 
 				m_renameBuffer = name;
@@ -181,7 +195,11 @@ namespace SE
 
 	void SceneInfoWidget::_renamingHandle(uint32_t id)
 	{
-		ImGui::SetKeyboardFocusHere();
+		if (m_focusRename && !MainWidget::isSceneEditingBlocked())
+		{
+			ImGui::SetKeyboardFocusHere();
+			m_focusRename = false;
+		}
 
 		const ImGuiInputTextFlags flags = ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue;
 		const bool enterPressed = ImGui::InputText("##EntityRename", m_renameBuffer.data(), m_renameBuffer.size(), flags);
@@ -206,11 +224,14 @@ namespace SE
 				{
 					Entity entity = scene->getEntity(id);
 					NameComponent* name = entity.getComponent<NameComponent>();
-					name->name = newName;
-
-					EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
-					auto event = std::make_unique<ActiveSceneModified>(MT::Rename, id, newName);
-					eventSystem->publish(std::move(event));
+					if (name && name->name != newName)
+					{
+						name->name = newName;
+						MainWidget::markSceneDirty();
+						EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
+						auto event = std::make_unique<ActiveSceneModified>(MT::Rename, id, newName);
+						eventSystem->publish(std::move(event));
+					}
 				}
 			}
 
@@ -227,6 +248,7 @@ namespace SE
 		if (isItemFocused && isF2Pressed && !multiSelected)
 		{
 			m_renameEntityId = id;
+			m_focusRename = true;
 			m_renameBuffer.clear();
 
 			m_renameBuffer = name;

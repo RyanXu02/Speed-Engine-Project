@@ -5,6 +5,7 @@
 #include "../../Scenes/SceneSystem.h"
 #include "Engine.h"
 #include "PropertiesWidget.h"
+#include "MainWidget.h"
 #include "ResourceManagers/ResourceManager.h"
 #include "imgui.h"
 #include "imgui_stdlib.h"
@@ -13,6 +14,13 @@
 
 namespace SE
 {
+	static bool authoredEdit(bool changed)
+	{
+		if (changed)
+			MainWidget::markSceneDirty();
+		return changed;
+	}
+
 	PropertiesWidget::PropertiesWidget()
 		: VisibleWidget("PropertiesWidget")
 	{
@@ -37,11 +45,11 @@ namespace SE
 			    auto position = component.getTranslation();
 			    auto rotation = component.getRotation();
 			    auto scale = component.getScale();
-			    if (ImGui::DragFloat3("Position", &position.x, 0.1f))
+				if (authoredEdit(ImGui::DragFloat3("Position", &position.x, 0.1f)))
 				    component.setPosition(position);
-			    if (ImGui::DragFloat3("Rotation (radians)", &rotation.x, 0.01f))
+				if (authoredEdit(ImGui::DragFloat3("Rotation (radians)", &rotation.x, 0.01f)))
 				    component.setRotation(rotation);
-			    if (ImGui::DragFloat3("Scale", &scale.x, 0.01f))
+				if (authoredEdit(ImGui::DragFloat3("Scale", &scale.x, 0.01f)))
 				    component.setScale(scale);
 		    });
 
@@ -66,6 +74,7 @@ namespace SE
 				    {
 					    component.path = m_meshPathDraft;
 					    component.meshResourceID = resource;
+						MainWidget::markSceneDirty();
 					    m_meshPathError.clear();
 				    }
 				    else
@@ -130,7 +139,7 @@ namespace SE
 					for (unsigned int i = 0; i < IM_COUNTOF(motionTypes); ++i)
 					{
 					    const bool isSelected = typeIndex == i;
-					    if (ImGui::Selectable(motionTypes[i], isSelected))
+						if (authoredEdit(ImGui::Selectable(motionTypes[i], isSelected) && !isSelected))
 					    {
 						    if (i == 0)
 							    component.setMotionType(JPH::EMotionType::Dynamic);
@@ -146,11 +155,11 @@ namespace SE
 				}
 
 				auto offset = component.getOffset();
-			    if (ImGui::DragFloat3("Offset", &offset.x, 0.1f))
+				if (authoredEdit(ImGui::DragFloat3("Offset", &offset.x, 0.1f)))
 				    component.setOffset(offset);
 
 				auto isActive = component.isActive();
-				if (ImGui::Checkbox("Active", &isActive))
+				if (authoredEdit(ImGui::Checkbox("Active", &isActive)))
 				{
 				    if (isActive)
 					    component.activateBody();
@@ -159,19 +168,19 @@ namespace SE
 				}
 
 				auto maxLinearVelocity = component.getMaxLinearVelocity();
-			    if (ImGui::DragFloat("Max Linear Velocity", &maxLinearVelocity, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Max Linear Velocity", &maxLinearVelocity, 0.1f)))
 				    component.setMaxLinearVelocity(maxLinearVelocity);
 			    auto maxAngularVelocity = component.getMaxAngularVelocity();
-			    if (ImGui::DragFloat("Max Angular Velocity", &maxAngularVelocity, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Max Angular Velocity", &maxAngularVelocity, 0.1f)))
 				    component.setMaxAngularVelocity(maxAngularVelocity);
 			    auto restitution = component.getRestitution();
-			    if (ImGui::DragFloat("Restitution", &restitution, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Restitution", &restitution, 0.1f)))
 				    component.setRestitution(restitution);
 			    auto friction = component.getFriction();
-			    if (ImGui::DragFloat("Friction", &friction, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Friction", &friction, 0.1f)))
 				    component.setFriction(friction);
 			    auto gravityFactor = component.getGravityFactor();
-			    if (ImGui::DragFloat("Gravity Factor", &gravityFactor, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Gravity Factor", &gravityFactor, 0.1f)))
 				    component.setGravityFactor(gravityFactor);
 		    });
 
@@ -179,7 +188,7 @@ namespace SE
 		    [](Entity&, PhysicsShapeBox& component)
 		    {
 			    auto halfExtents = component.getHalfExtents();
-			    if (ImGui::DragFloat3("Half Extents", &halfExtents.x, 0.1f))
+				if (authoredEdit(ImGui::DragFloat3("Half Extents", &halfExtents.x, 0.1f)))
 				    component.setHalfExtents(halfExtents);
 		    });
 
@@ -187,10 +196,10 @@ namespace SE
 		    [](Entity&, PhysicsShapeCapsule& component)
 		    {
 			    auto halfHeight = component.getHalfHeight();
-			    if (ImGui::DragFloat("Half Height", &halfHeight, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Half Height", &halfHeight, 0.1f)))
 				    component.setHalfHeight(halfHeight);
 			    auto radius = component.getRadius();
-			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Radius", &radius, 0.1f)))
 				    component.setRadius(radius);
 		    });
 
@@ -198,7 +207,7 @@ namespace SE
 		    [](Entity&, PhysicsShapeSphere& component)
 		    {
 			    auto radius = component.getRadius();
-			    if (ImGui::DragFloat("Radius", &radius, 0.1f))
+				if (authoredEdit(ImGui::DragFloat("Radius", &radius, 0.1f)))
 				    component.setRadius(radius);
 		    });
 
@@ -214,7 +223,10 @@ namespace SE
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
 			    // user confirmed a new path
 			    if ((enter || deactivated) && m_physicsShapeMeshPathDraft != component.getPath())
+				{
 				    component.setPath(m_physicsShapeMeshPathDraft);
+					MainWidget::markSceneDirty();
+				}
 		    });
 
 		m_inspectors.registerComponent<AudioSFXComponent>("AudioSFXComponent", true, 
@@ -234,6 +246,8 @@ namespace SE
 				    {
 					    if (!component.createSound(component.pathDraft, component.isGameSFX()))
 							component.pathDraft = path;
+						else
+							MainWidget::markSceneDirty();
 					    component.pathError.clear();
 				    }
 				    else
@@ -246,7 +260,8 @@ namespace SE
 				ImGui::BeginDisabled(path.empty());
 			    if (ImGui::Checkbox("Is Game SFX", &isGameSFX))
 			    {
-				    component.createSound(component.getFilepath(), isGameSFX);
+					if (component.createSound(component.getFilepath(), isGameSFX))
+						MainWidget::markSceneDirty();
 			    }
 			    ImGui::EndDisabled();
 				//for testing 
@@ -279,6 +294,8 @@ namespace SE
 				    {
 					    if (!component.createTrack(component.pathDraft))
 						    component.pathDraft = path;
+						else
+							MainWidget::markSceneDirty();
 					    component.pathError.clear();
 				    }
 				    else
@@ -298,6 +315,109 @@ namespace SE
 			    }
 		    });
 
+		m_inspectors.registerComponent<ParticleEmitter>("ParticleEmitter", true, 
+			[](Entity&, ParticleEmitter& component) 
+			{
+				//color + alpha selection
+			    static float tintcolorRGBA[4]{ 0.f };
+				auto temp = component.GetTintColor();
+			    tintcolorRGBA[0] = temp.x, tintcolorRGBA[1] = temp.y, tintcolorRGBA[2] = temp.z;
+			    tintcolorRGBA[3] = component.GetAlpha();
+				if (ImGui::ColorEdit4("Tint Color + Alpha", tintcolorRGBA))
+				{
+				    component.SetTintColor(glm::vec3(tintcolorRGBA[0], tintcolorRGBA[1], tintcolorRGBA[2]));
+				    component.SetAlpha(tintcolorRGBA[3]);
+				}
+				//emitter scale
+			    auto emitterScale = component.GetEmitterScale();
+			    if (ImGui::DragFloat3("Emitter Scale", &emitterScale.x, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetEmitterScale(emitterScale);
+				//particle scale min and max
+			    auto particleScaleMin = component.GetScaleMin();
+			    auto particleScaleMax = component.GetScaleMax();
+					//must be bound >= 0
+			    if (ImGui::DragFloat3("Particle Scale Min", &particleScaleMin.x, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetScaleMin(particleScaleMin);
+			    if (ImGui::DragFloat3("Particle Scale Max", &particleScaleMax.x, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetScaleMax(particleScaleMax);
+				//acceleration
+			    auto accel = component.GetAcceleration();
+			    if (ImGui::DragFloat3("Acceleration", &accel.x, 0.1f))
+				    component.SetAcceleration(accel);
+				//direction axis
+			    auto dirAxis = component.GetDirectionAxis();
+			    if (ImGui::DragFloat3("Direction Axis", &dirAxis.x, 0.1f))
+				    component.SetDirectionAxis(dirAxis);
+				//cone angle range
+			    auto coneAngleRange = component.GetConeAngleRange();
+					//limit to 180. cuz its half angle, 180 on both sides = 360 around axis
+				if (ImGui::DragFloatRange2("Cone Angle Range", &coneAngleRange.x, &coneAngleRange.y, 0.1f, 0.f, 180.f, "%.3f", "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetConeAngleRange(coneAngleRange);
+				//azimuth range
+			    auto azimuthRange = component.GetAzimuthRange();
+					//also limit, but to 360. 360 azimuth = all around. 
+				if (ImGui::DragFloat2("Azimuth Range", &azimuthRange.x, 0.1f, 0.f, 360.f, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetAzimuthRange(azimuthRange);
+				//emit rate
+			    auto emitRate = component.GetEmitRate();
+					//greater than 0 cuz cant have negative emit rate
+			    if (ImGui::DragFloat("Emit Rate", &emitRate, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetEmitRate(emitRate);
+				//emit max (max particles to emit)
+			    auto emitMax = component.GetEmitMax();
+					//greater than 0
+			    unsigned min = 0, max = UINT_MAX;
+			    if (ImGui::DragScalar("Max Particles to Emit", ImGuiDataType_U32, &emitMax, 1, &min, &max, "%u"))
+				    component.SetEmitMax(emitMax);
+				//lifetime min and max
+			    auto lifetimeMin = component.GetLifetimeMin();
+					//greater than 0
+			    if (ImGui::DragFloat("Lifetime Min", &lifetimeMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetLifetimeMin(lifetimeMin);
+				    component.SetLifetimeMax(lifetimeMin);
+			    }
+			    auto lifetimeMax = component.GetLifetimeMax();
+			    if (ImGui::DragFloat("Lifetime Max", &lifetimeMax, 0.1f, lifetimeMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetLifetimeMax(lifetimeMax);
+				//speed min and max
+			    auto speedMin = component.GetSpeedMin();
+					//greater than 0
+			    if (ImGui::DragFloat("Speed Min", &speedMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetSpeedMin(speedMin);
+				    component.SetSpeedMax(speedMin);
+			    }
+			    auto speedMax = component.GetSpeedMax();
+			    if (ImGui::DragFloat("Speed Max", &speedMax, 0.1f, speedMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetSpeedMax(speedMax);
+				//rotation speed min and max
+			    auto rotSpeedMin = component.GetRotationSpeedMin();
+					//greater than 0
+			    if (ImGui::DragFloat("Rotation Speed Min", &rotSpeedMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetRotationSpeedMin(rotSpeedMin);
+				    component.SetRotationSpeedMax(rotSpeedMin);
+			    }
+			    auto rotSpeedMax = component.GetRotationSpeedMax();
+			    if (ImGui::DragFloat("Rotation Speed Max", &rotSpeedMax, 0.1f, rotSpeedMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetRotationSpeedMax(rotSpeedMax);
+				//rotation min and max
+			    auto rotMin = component.GetRotationMin();
+			    if (ImGui::DragFloat("Rotation Min", &rotMin, 0.1f, 0.f, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+			    {
+				    component.SetRotationMin(rotMin);
+				    component.SetRotationMax(rotMin);
+			    }
+			    auto rotMax = component.GetRotationMax();
+			    if (ImGui::DragFloat("Rotation Max", &rotMax, 0.1f, rotMin, FLT_MAX, "%.3f", ImGuiSliderFlags_AlwaysClamp))
+				    component.SetRotationMax(rotMax);
+				//oneshot status
+			    auto oneShot = component.GetOneShot();
+			    if (ImGui::Checkbox("Is OneShot", &oneShot))
+				    component.SetOneShot(oneShot);
+			});
+
 #pragma endregion RegisterComponentEditors
 
 
@@ -308,6 +428,7 @@ namespace SE
 		    {
 			    const EntitySelected& entitySelectedEvent = static_cast<const EntitySelected&>(event);
 			    m_selectedEntityId = entitySelectedEvent.id;
+				m_physicsShapeMeshDraftInitialized = false;
 			    m_meshDraftInitialized = false;
 			    m_meshPathError.clear();
 		    });
@@ -319,6 +440,7 @@ namespace SE
 			    {
 				    m_selectedEntityId = 0;
 				    m_meshDraftInitialized = false;
+					m_physicsShapeMeshDraftInitialized = false;
 			    }
 		    });
 		m_SceneChangedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
@@ -326,6 +448,7 @@ namespace SE
 		    {
 			    m_selectedEntityId = 0;
 			    m_meshDraftInitialized = false;
+				m_physicsShapeMeshDraftInitialized = false;
 			    m_meshPathError.clear();
 		    });
 
@@ -370,6 +493,7 @@ namespace SE
 		}
 
 		ImGui::PushID(static_cast<int>(entity.id()));
+		ImGui::BeginDisabled(MainWidget::isSceneEditingBlocked());
 		ImGui::Text("Entity ID: %u", entity.id());
 
 		const auto* components = entity.getComponentRegistry();
@@ -427,11 +551,15 @@ namespace SE
 		if (remove)
 		{
 			remove->remove(entity);
+			if (!remove->has(entity))
+				MainWidget::markSceneDirty();
 			if (remove->type == typeid(MeshComponent))
 			{
 				m_meshDraftInitialized = false;
 				m_meshPathError.clear();
 			}
+			if (remove->type == typeid(PhysicsShapeMesh))
+				m_physicsShapeMeshDraftInitialized = false;
 		}
 
 		// Add component popup
@@ -447,7 +575,11 @@ namespace SE
 				available = true;
 				ImGui::PushID(&entry);
 				if (ImGui::MenuItem(entry.name.c_str()))
+				{
 					entry.add(entity);
+					if (entry.has(entity))
+						MainWidget::markSceneDirty();
+				}
 				ImGui::PopID();
 			}
 			if (!available)
@@ -455,6 +587,7 @@ namespace SE
 			ImGui::EndPopup();
 		}
 
+		ImGui::EndDisabled();
 		ImGui::PopID();
 		ImGui::End();
 	}

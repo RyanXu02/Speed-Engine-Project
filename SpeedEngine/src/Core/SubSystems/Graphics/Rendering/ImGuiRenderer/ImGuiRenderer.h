@@ -60,6 +60,10 @@ namespace SE
 
 		std::unordered_map<uint32_t, std::unique_ptr<Widget>> m_widgets;
 
+#if defined(COMPILE_WITH_EDITOR)
+		uint32_t m_mainWidgetId = 0;
+#endif
+
 		std::atomic<uint32_t> m_ids{ 0 };
 		uint32_t _assignID() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
 

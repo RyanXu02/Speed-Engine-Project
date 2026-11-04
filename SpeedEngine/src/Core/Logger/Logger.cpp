@@ -56,6 +56,6 @@ namespace SE
 
 	void Logger::shutdown()
 	{
-		spdlog::shutdown();
+		m_spdlogger.reset();
 	}
 } // namespace SE

@@ -23,36 +23,43 @@
 #include "Core/SubSystems/Audio/AudioSystem.h"
 
 #include <imgui.h>
+#include <imgui_stdlib.h>
 
 namespace SE
 {
+	void MainWidget::beginEditorFrame()
+	{
+		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
+		if (m_sceneRevision != scenes->getSceneRevision())
+		{
+			m_sceneRevision = scenes->getSceneRevision();
+			s_dirty = false;
+		}
+		s_editsBlocked = scenes->hasPendingTransition() || m_action != Action::None || m_dialog != Dialog::None;
+	}
+
 	void MainWidget::render()
 	{
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
+		auto* scene = scenes->getCurrentScene();
+		const bool available = !s_editsBlocked;
 
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				const std::string path = "Assets/Data/default-scene.json"; //TODO: hard code scene path for now
-
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
-				{
-					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
-					{
-						scene->saveScene(path);
-					}
-				}
-				if (ImGui::MenuItem("Load", "Ctrl+O"))
-				{
-					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
-					{
-						// load scene does not defer to next frame so it will crash running systems on null references
-						// reload does defer request so use it for now 
-						//scene->loadScene(path);
-						scene->reloadScene();
-					}
-				}
+				if (ImGui::MenuItem("New Scene", "Ctrl+N", false, available))
+					queueAction(Action::New);
+				if (ImGui::MenuItem("Open Scene...", "Ctrl+O", false, available))
+					queueAction(Action::Open);
+				if (ImGui::MenuItem("Save", "Ctrl+S", false, available && scene))
+					queueAction(Action::Save);
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S", false, available && scene))
+					queueAction(Action::SaveAs);
+				if (ImGui::MenuItem("Reload Scene", "Ctrl+R", false, available && scene && !scene->getSourcePath().empty()))
+					queueAction(Action::Reload);
+				ImGui::Separator();
 				if (ImGui::MenuItem("mute test"))
 				{
 					auto AS = Engine::Instance().getSubSystem<AudioSystem>();
@@ -77,11 +84,12 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Entity"))
 			{
-				if (ImGui::MenuItem("Create Empty"))
+				if (ImGui::MenuItem("Create Empty", nullptr, false, !s_editsBlocked && scene))
 				{
 					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
 						scene->addEntity("New Empty");
+						markSceneDirty();
 					}
 				}
 				// add prefabs later
@@ -230,9 +238,289 @@ namespace SE
 			const bool debugEnabled = EngineStates::isDebugRenderingEnabled();
 			if (ImGui::Button(debugEnabled ? "Debug Rendering: On" : "Debug Rendering: Off"))
 				EngineStates::setDebugRenderingEnabled(!debugEnabled);
+			if (scene)
+			{
+				ImGui::SameLine();
+				ImGui::Text("%s%s%s", scene->getName().c_str(), s_dirty ? " *" : "",
+					scene->getSourcePath().empty() ? " (unsaved)" : "");
+			}
 		}
 		ImGui::EndMainMenuBar();
 	}
+
+	void MainWidget::queueAction(Action action)
+	{
+		if (m_action != Action::None || m_dialog != Dialog::None
+			|| Engine::Instance().getSubSystem<SceneSystem>()->hasPendingTransition())
+			return;
+		m_action = action;
+		m_actionFrame = ImGui::GetFrameCount();
+		m_actionRevision = m_sceneRevision;
+		m_error.clear();
+	}
+
+	void MainWidget::finishAction()
+	{
+		m_action = Action::None;
+		m_dialog = Dialog::None;
+		m_openDialog = false;
+		m_confirmOverwrite = false;
+		m_error.clear();
+	}
+
+	void MainWidget::performAction()
+	{
+		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
+		switch (m_action)
+		{
+		case Action::New:
+			scenes->requestNewScene("Untitled");
+			break;
+		case Action::Open:
+			prepDialog(Dialog::Open);
+			return;
+		case Action::Reload:
+			scenes->requestReloadScene();
+			break;
+		default:
+			break;
+		}
+		finishAction();
+	}
+
+	bool MainWidget::saveScene(const std::string& path)
+	{
+		auto* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		if (!scene || !scene->saveScene(path))
+		{
+			m_error = "Save failed. The scene was not replaced. Check the path and console, then retry or cancel.";
+			return false;
+		}
+		s_dirty = false;
+		m_error.clear();
+		return true;
+	}
+
+	void MainWidget::refreshSceneFiles()
+	{
+		m_sceneFiles.clear();
+		try
+		{
+			for (const auto& file : std::filesystem::directory_iterator(m_folder))
+			{
+				const auto extension = file.path().extension().string();
+				if (file.is_regular_file() && (extension == ".json" || extension == ".JSON"))
+					m_sceneFiles.push_back(file.path().filename().string());
+			}
+			std::ranges::sort(m_sceneFiles);
+		}
+		catch (const std::filesystem::filesystem_error& error)
+		{
+			m_error = error.what();
+		}
+	}
+
+	void MainWidget::prepDialog(Dialog dialog)
+	{
+		m_dialog = dialog;
+		m_openDialog = true;
+		m_confirmOverwrite = false;
+		if (dialog == Dialog::Open || dialog == Dialog::SavePath)
+		{
+			auto* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+			m_filename = dialog == Dialog::SavePath ? "untitled.json" : "";
+			if (scene && !scene->getSourcePath().empty())
+			{
+				const std::filesystem::path source(scene->getSourcePath());
+				m_folder = source.parent_path().string();
+				if (dialog == Dialog::SavePath)
+					m_filename = source.filename().string();
+			}
+			refreshSceneFiles();
+		}
+	}
+
+	void MainWidget::finishEditorFrame()
+	{
+		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
+		if (m_action != Action::None && m_actionRevision != scenes->getSceneRevision() && m_dialog == Dialog::None)
+			finishAction();
+		const auto& io = ImGui::GetIO();
+		if (!s_editsBlocked && io.KeyCtrl && !io.KeyAlt && !io.KeySuper && !io.WantTextInput
+			&& !ImGui::IsAnyItemActive() && !ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel))
+		{
+			if (!io.KeyShift && ImGui::IsKeyPressed(ImGuiKey_N, false))
+				queueAction(Action::New);
+			else if (!io.KeyShift && ImGui::IsKeyPressed(ImGuiKey_O, false))
+				queueAction(Action::Open);
+			else if (!io.KeyShift && scenes->getCurrentScene() && !scenes->getCurrentScene()->getSourcePath().empty()
+				&& ImGui::IsKeyPressed(ImGuiKey_R, false))
+				queueAction(Action::Reload);
+			else if (scenes->getCurrentScene() && ImGui::IsKeyPressed(ImGuiKey_S, false))
+				queueAction(io.KeyShift ? Action::SaveAs : Action::Save);
+		}
+
+		if (m_dialog == Dialog::None && m_action != Action::None && !scenes->hasPendingTransition()
+			&& ImGui::GetFrameCount() > m_actionFrame)
+		{
+			auto* scene = scenes->getCurrentScene();
+			if (m_action == Action::SaveAs || (m_action == Action::Save && (!scene || scene->getSourcePath().empty())))
+				prepDialog(Dialog::SavePath);
+			else if (m_action == Action::Save)
+			{
+				if (saveScene(scene->getSourcePath()))
+					performAction();
+				else
+					prepDialog(Dialog::SavePath);
+			}
+			else if (s_dirty)
+				prepDialog(Dialog::Confirm);
+			else
+				performAction();
+		}
+		drawActiveDialog();
+		s_editsBlocked = scenes->hasPendingTransition() || m_action != Action::None || m_dialog != Dialog::None;
+	}
+
+	void MainWidget::drawActiveDialog()
+	{
+		if (m_dialog == Dialog::None)
+			return;
+		const bool confirm = m_dialog == Dialog::Confirm;
+		const char* title = confirm ? "Unsaved scene changes" : "Scene file";
+		if (m_openDialog)
+		{
+			ImGui::OpenPopup(title);
+			m_openDialog = false;
+		}
+		ImGui::SetNextWindowSize(ImVec2(560, 0), ImGuiCond_Appearing);
+		if (!ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+			return;
+
+		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
+		if (m_actionRevision != scenes->getSceneRevision())
+		{
+			ImGui::CloseCurrentPopup();
+			finishAction();
+			ImGui::EndPopup();
+			return;
+		}
+		ImGui::BeginDisabled(scenes->hasPendingTransition());
+		if (confirm)
+		{
+			ImGui::TextWrapped("Save your changes before continuing?");
+			if (!m_error.empty())
+				ImGui::TextWrapped("%s", m_error.c_str());
+			if (ImGui::Button("Save"))
+			{
+				auto* scene = scenes->getCurrentScene();
+				if (!scene || scene->getSourcePath().empty())
+				{
+					ImGui::CloseCurrentPopup();
+					prepDialog(Dialog::SavePath);
+				}
+				else if (saveScene(scene->getSourcePath()))
+				{
+					ImGui::CloseCurrentPopup();
+					m_dialog = Dialog::None;
+					performAction();
+				}
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Discard"))
+			{
+				ImGui::CloseCurrentPopup();
+				m_dialog = Dialog::None;
+				performAction();
+			}
+		}
+		else
+		{
+			const bool saving = m_dialog == Dialog::SavePath;
+			ImGui::TextUnformatted(saving ? "Save scene as" : "Open scene");
+			ImGui::BeginDisabled(m_confirmOverwrite);
+			if (ImGui::InputText("Folder", &m_folder, ImGuiInputTextFlags_EnterReturnsTrue))
+				refreshSceneFiles();
+			ImGui::SameLine();
+			if (ImGui::Button("Refresh"))
+			{
+				m_error.clear();
+				refreshSceneFiles();
+			}
+			ImGui::BeginChild("SceneFiles", ImVec2(520, 160), true);
+			for (const auto& file : m_sceneFiles)
+				if (ImGui::Selectable(file.c_str(), m_filename == file))
+					m_filename = file;
+			ImGui::EndChild();
+			if (ImGui::IsWindowAppearing())
+				ImGui::SetKeyboardFocusHere();
+			const bool enter = ImGui::InputText("Filename / path", &m_filename, ImGuiInputTextFlags_EnterReturnsTrue);
+			ImGui::EndDisabled();
+			if (!m_error.empty())
+				ImGui::TextWrapped("%s", m_error.c_str());
+
+			if (m_confirmOverwrite)
+			{
+				ImGui::TextWrapped("File already exists. Overwrite it?");
+				if (ImGui::Button("Overwrite") && saveScene(m_selectedPath))
+				{
+					ImGui::CloseCurrentPopup();
+					m_dialog = Dialog::None;
+					performAction();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Back"))
+					m_confirmOverwrite = false;
+			}
+			else if (ImGui::Button(saving ? "Save" : "Open") || enter)
+			{
+				try
+				{
+					if (m_filename.empty())
+						m_error = "Enter a filename or choose a scene file.";
+					else
+					{
+						std::filesystem::path filename(m_filename);
+						if (saving && !filename.has_extension())
+							filename += ".json";
+						m_selectedPath = (std::filesystem::path(m_folder) / filename).lexically_normal().generic_string();
+						if (!saving)
+						{
+							if (std::filesystem::is_regular_file(m_selectedPath))
+							{
+								scenes->requestOpenScene(m_selectedPath);
+								ImGui::CloseCurrentPopup();
+								finishAction();
+							}
+							else
+								m_error = "Scene file does not exist.";
+						}
+						else if (std::filesystem::exists(m_selectedPath))
+							m_confirmOverwrite = true;
+						else if (saveScene(m_selectedPath))
+						{
+							ImGui::CloseCurrentPopup();
+							m_dialog = Dialog::None;
+							performAction();
+						}
+					}
+				}
+				catch (const std::filesystem::filesystem_error& error)
+				{
+					m_error = error.what();
+				}
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape, false))
+		{
+			ImGui::CloseCurrentPopup();
+			finishAction();
+		}
+		ImGui::EndDisabled();
+		ImGui::EndPopup();
+	}
+
 	void MainWidget::shutdown()
 	{
 		_setStatus("Shutting down MainWidget");

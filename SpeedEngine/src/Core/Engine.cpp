@@ -77,10 +77,7 @@ namespace SE
 		m_shutdownRequested.store(false);
 
 		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
-		sceneSystem->newScene("TestScene");
-		sceneSystem->setCurrentScene("TestScene");
-		Scene* currentScene = sceneSystem->getCurrentScene();
-		currentScene->loadScene("Assets/Data/default-scene.json");
+		sceneSystem->setCurrentScene("Assets/Data/default-scene.json");
 
 		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
 		uint32_t fontid = resourceManager->loadFont({ 
@@ -140,6 +137,7 @@ namespace SE
 	void Engine::updateSimulation(double deltaTime, int physicsSteps)
 	{
 		m_frameBuilder.beginSimulation();
+		getSubSystem<SceneSystem>()->processPendingTransition();
 		getSubSystem<InputSystem>()->update(deltaTime);
 		getSubSystem<EventSystem>()->update(deltaTime);
 		getSubSystem<SceneSystem>()->update(deltaTime);

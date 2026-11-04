@@ -52,7 +52,7 @@ namespace SE
 		else if (value.is_string())
 		{
 			std::string field = value.get<std::string>();
-			if (ImGui::InputText(label, &field, ImGuiInputTextFlags_EnterReturnsTrue))
+			if (ImGui::InputText(label, &field))
 			{
 				value = field;
 				changed = true;
