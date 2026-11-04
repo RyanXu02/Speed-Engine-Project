@@ -333,12 +333,10 @@
     <None Include="Assets\Shaders\grayscale.frag" />
     <None Include="Assets\Shaders\tonemap.vert" />
     <None Include="Assets\Shaders\tonemap.frag" />
-    <None Include="Assets\Shaders\iblEquirectToCube.comp" />
-    <None Include="Assets\Shaders\iblSHProject.comp" />
-    <None Include="Assets\Shaders\iblPrefilter.comp" />
-    <None Include="Assets\Shaders\iblBRDF.comp" />
-    <None Include="Assets\Shaders\skybox.vert" />
-    <None Include="Assets\Shaders\skybox.frag" />
+    <None Include="Assets\Shaders\equirectangularToCubemap.comp" />
+    <None Include="Assets\Shaders\irradianceSH.comp" />
+    <None Include="Assets\Shaders\prefilter.comp" />
+    <None Include="Assets\Shaders\brdf.comp" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
     <None Include="Assets\Shaders\gpass.vert" />

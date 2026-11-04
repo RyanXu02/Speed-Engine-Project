@@ -12,8 +12,6 @@
 
 namespace SE
 {
-	// IBL maps go after the 7 slots used by the materials (forward) and the G-buffer, shadow map and noise (deferred)
-	static constexpr int IBL_FIRST_SLOT = 7;
 
 	void SceneRenderer::init()
 	{
@@ -150,11 +148,28 @@ namespace SE
 
 		shader.setFloat("ambientStrength", m_lightingSettings.ambientStrength);
 
-		if (auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>()) {
-			ibl->bindLighting(shader, IBL_FIRST_SLOT);
+		// the samplers always get their own slots, a cube and a 2D sampler sharing slot 0 fails the draw
+		shader.setInt("prefilterMap", TextureSlots::IBL_PREFILTER);
+		shader.setInt("brdfLUT", TextureSlots::IBL_BRDF_LUT);
+
+		auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
+		if (!ibl || !ibl->isReady()) {
+			shader.setBool("useIBL", false);
+			return;
 		}
-		else {
-			ImageBasedRenderer::bindDisabled(shader, IBL_FIRST_SLOT);
+
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::IBL_PREFILTER);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->getPrefilterMap());
+		glActiveTexture(GL_TEXTURE0 + TextureSlots::IBL_BRDF_LUT);
+		glBindTexture(GL_TEXTURE_2D, ibl->getBRDFLUTTexture());
+		glActiveTexture(GL_TEXTURE0);
+
+		// lighting still records the set intensity and SH even with IBL off
+		shader.setBool("useIBL", ibl->enabled);
+		shader.setFloat("iblIntensity", ibl->intensity);
+		const auto& shIrradiance = ibl->getSHIrradiance();
+		for (size_t i = 0; i < shIrradiance.size(); ++i) {
+			shader.setVec3(fmt::format("shIrradiance[{}]", i), shIrradiance[i]);
 		}
 	}
 

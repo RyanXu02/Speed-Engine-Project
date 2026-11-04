@@ -235,13 +235,18 @@ float calculateShadow(vec3 worldPos, vec3 N, vec3 L)
 
 // image based lighting from the ImageBasedRenderer, falls back to the flat ambient when off
 uniform bool useIBL;
-uniform vec3 shIrradiance[9];    // irradiance SH, already cosine convolved and divided by PI
-uniform samplerCube prefilterMap; // GGX prefiltered environment, mip = roughness * prefilterMaxLod
-uniform sampler2D brdfLUT;        // split sum scale and bias on F0
-uniform float prefilterMaxLod;
+uniform vec3 shIrradiance[9];       // stands in for irradianceMap, cosine convolved and divided by PI
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
 uniform float iblIntensity;
 
-// same basis as iblSHProject.comp
+const float MAX_REFLECTION_LOD = 4.0; // prefilterMap mips - 1
+
+uniform bool useSky;
+uniform samplerCube environmentMap;
+uniform int skySource;
+uniform mat4 skyInverseViewProj;
+
 vec3 evaluateSH(vec3 n)
 {
     return shIrradiance[0] * 0.282095
@@ -267,24 +272,46 @@ vec3 calculateAmbient(vec3 N, vec3 V, vec3 F0, vec3 albedo, float metallic, floa
         return vec3(ambientStrength) * albedo * ao;
     }
 
-    float NdotV = max(dot(N, V), 0.0);
-    vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
-    vec3 kD = (1.0 - F) * (1.0 - metallic);
-
-    // diffuse, irradiance from the SH around the normal
-    vec3 diffuse = max(evaluateSH(N), vec3(0.0)) * albedo;
-
-    // specular, split sum: prefiltered radiance along R times the BRDF integral
     vec3 R = reflect(-V, N);
-    vec3 prefiltered = textureLod(prefilterMap, R, roughness * prefilterMaxLod).rgb;
-    vec2 envBRDF = texture(brdfLUT, vec2(NdotV, roughness)).rg;
-    vec3 specular = prefiltered * (F0 * envBRDF.x + envBRDF.y);
+
+    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 irradiance = max(evaluateSH(N), vec3(0.0));
+    vec3 diffuse = irradiance * albedo;
+
+    // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F0 * brdf.x + brdf.y); // LearnOpenGL uses F here? the splitsum from Karis paper uses F0
 
     return (kD * diffuse + specular) * ao * iblIntensity;
 }
 
+vec3 sampleSky()
+{
+    // world direction through this pixel on the far plane
+    vec4 farPoint = skyInverseViewProj * vec4(TexCoords * 2.0 - 1.0, 1.0, 1.0);
+    vec3 WorldPos = normalize(farPoint.xyz / farPoint.w);
+
+    vec3 envColor = skySource == 1
+        ? max(evaluateSH(WorldPos), vec3(0.0))
+        : textureLod(environmentMap, WorldPos, 0.0).rgb;
+    return envColor * iblIntensity;
+}
+
 void main()
 {
+    // the G-buffer clears to 0 and geometry always writes a unit normal, so no normal means nothing was drawn
+    vec3 rawNormal = texture(gNormal, TexCoords).xyz;
+    if (dot(rawNormal, rawNormal) < 1e-6) {
+        FragColor = vec4(useSky ? sampleSky() : vec3(0.0), 1.0);
+        return;
+    }
+
     float ao = texture(gMaterial, TexCoords).r;
     float roughness = texture(gMaterial, TexCoords).g;
     float metallic = texture(gMaterial, TexCoords).b;
@@ -294,7 +321,7 @@ void main()
     vec3 albedo = texture(gAlbedo, TexCoords).rgb;
     float alpha = texture(gAlbedo, TexCoords).a;
     
-    vec3 N = normalize(texture(gNormal, TexCoords).xyz);
+    vec3 N = normalize(rawNormal);
     vec3 V = normalize(camPos - WorldPos);
     
     vec3 F0 = vec3(0.04);

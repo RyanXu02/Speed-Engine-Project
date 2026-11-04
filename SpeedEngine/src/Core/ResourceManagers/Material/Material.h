@@ -28,8 +28,7 @@ namespace SE
 	};
 
 	// @brief Represents a material that can be applied to 3D objects in the scene
-	// A material consists of a shader and a set of textures that define its
-	// appearance.
+	// A material consists of a shader and a set of textures that define its appearance.
 	class Material : public Resource
 	{
 	public:

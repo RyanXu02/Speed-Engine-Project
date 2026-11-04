@@ -123,13 +123,13 @@ vec3 calculateLo(vec3 N, vec3 V, vec3 L, vec3 radiance, vec3 F0, vec3 albedo, fl
 
 // image based lighting from the ImageBasedRenderer, falls back to the flat ambient when off
 uniform bool useIBL;
-uniform vec3 shIrradiance[9];       // irradiance SH, already cosine convolved and divided by PI
-uniform samplerCube prefilterMap;   // GGX prefiltered environment, mip = roughness * prefilterMaxLod
-uniform sampler2D brdfLUT;          // split sum scale and bias on F0
-uniform float prefilterMaxLod;
+uniform vec3 shIrradiance[9];       // stands in for irradianceMap, cosine convolved and divided by PI
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
 uniform float iblIntensity;
 
-// same basis as iblSHProject.comp
+const float MAX_REFLECTION_LOD = 4.0; // prefilterMap mips - 1
+
 vec3 evaluateSH(vec3 n)
 {
     return shIrradiance[0] * 0.282095
@@ -155,18 +155,22 @@ vec3 calculateAmbient(vec3 N, vec3 V, vec3 F0, vec3 albedo, float metallic, floa
         return vec3(ambientStrength) * albedo * ao;
     }
 
-    float NdotV = max(dot(N, V), 0.0);
-    vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
-    vec3 kD = (1.0 - F) * (1.0 - metallic);
-
-    // diffuse, irradiance from the SH around the normal
-    vec3 diffuse = max(evaluateSH(N), vec3(0.0)) * albedo;
-
-    // specular, split sum: prefiltered radiance along R times the BRDF integral
     vec3 R = reflect(-V, N);
-    vec3 prefiltered = textureLod(prefilterMap, R, roughness * prefilterMaxLod).rgb;
-    vec2 envBRDF = texture(brdfLUT, vec2(NdotV, roughness)).rg;
-    vec3 specular = prefiltered * (F0 * envBRDF.x + envBRDF.y);
+
+    // ambient lighting (we now use IBL as the ambient term)
+    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 irradiance = max(evaluateSH(N), vec3(0.0)); // texture(irradianceMap, N).rgb in LearnOpenGL
+    vec3 diffuse = irradiance * albedo;
+
+    // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F0 * brdf.x + brdf.y); // LearnOpenGL uses F here, F0 is the split sum from Karis 2013
 
     return (kD * diffuse + specular) * ao * iblIntensity;
 }

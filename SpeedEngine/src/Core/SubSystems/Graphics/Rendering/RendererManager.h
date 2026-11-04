@@ -9,6 +9,20 @@ namespace SE
 {
 	class TextRenderer;
 
+	namespace TextureSlots
+	{
+		extern const int G_POSITION;
+		extern const int G_NORMAL;
+		extern const int G_ALBEDO;
+		extern const int G_MATERIAL;
+		extern const int G_EMISSIVE;
+		extern const int SHADOW_MAP;
+		extern const int BLUE_NOISE;
+		extern const int IBL_PREFILTER;
+		extern const int IBL_BRDF_LUT;
+		extern const int SKY;
+	}
+
 	// @brief Use this to define a render pass
 	// @brief A render pass is a single rendering operation that uses a specific renderer and outputs to a specific FBO
 	// @param renderer The renderer to use for this pass
