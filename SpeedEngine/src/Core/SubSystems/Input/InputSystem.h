@@ -5,7 +5,7 @@
 
 namespace SE
 {
-	// @brief 0 at top left corner, measured in screen space (sub)pixels
+	// @brief Window content coordinates in logical units, with (0,0) at the top left.
 	struct MousePos
 	{
 		double x;
@@ -26,6 +26,17 @@ namespace SE
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
+		bool hasFocus() const { return m_hasFocus; }
+
+		// @brief Gets the region in the window where input events are accepted and mapped to a render target
+		const InputRegion& getInputRegion() const { return m_inputRegion; }
+
+		bool isAcceptingInput() const { return m_hasFocus && m_inputRegion.acceptsInput; }
+
+		// @brief Check if the mouse pointer is inside the input region
+		bool isPointerInInputRegion() const;
+		// @brief Get the mouse pointer position in the input region, 
+		std::optional<glm::vec2> getPointerPositionInInputRegion() const;
 
 		// @brief Rising edge (key 0 -> 1)
 		bool isKeyRising(KeyCodes key) const;
@@ -45,7 +56,8 @@ namespace SE
 		// @brief Mouse button is currently up (button 0)
 		bool isMouseUp(MouseCodes key) const;
 
-		// @brief Get mouse position in screen space (0,0 top left corner)
+		// @brief Get mouse position in GLFW screen coordinates, with (0,0) at the top left of the window
+		// @brief Use getPointerPositionInInputRegion() for render target coordinates
 		const MousePos& getMousePosition() const;
 		// @brief Get mouse position delta between last and this frame
 		const MousePos& getMouseDelta() const;
@@ -59,6 +71,9 @@ namespace SE
 
 		InputEventQueue& m_inputEvents;
 		std::vector<InputEvent> m_pendingEvents;
+		bool m_hasFocus{ true };
+
+		InputRegion m_inputRegion;
 
 		std::bitset<512> m_keyCurrState{ 0 };
 		std::bitset<512> m_keyPrevState{ 0 };

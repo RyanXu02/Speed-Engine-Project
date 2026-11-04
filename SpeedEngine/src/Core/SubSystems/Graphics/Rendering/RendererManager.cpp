@@ -217,8 +217,8 @@ namespace SE
 			pass.renderer.render(context);
 		}
 
-		// text after final output
-		if (!frame.textDraws.empty())
+		// UI and text go on top the selected final output
+		if (!frame.uiDraws.empty() || !frame.textDraws.empty())
 		{
 			resetPassState();
 			m_finalSceneOutput->bind();
@@ -256,12 +256,45 @@ namespace SE
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 #endif
+
 		context.output = nullptr;
+
+		_prepareGameInputRegion(width, height);
+
 		m_imguiRenderer->beginFrame();
 		m_imguiRenderer->render(context);
+
+		_publishGameInputRegion();
+
 		m_imguiRenderer->finalizeFrame();
 
+
 		m_window->swapBuffers();
+	}
+
+	void RendererManager::_prepareGameInputRegion(int framebufferWidth, int framebufferHeight)
+	{
+#if defined(COMPILE_WITH_EDITOR)
+		m_gameInputRegion = {};
+#else
+		int windowWidth = 0;
+		int windowHeight = 0;
+		glfwGetWindowSize(m_window->getWindow(), &windowWidth, &windowHeight);
+		setGameInputRegion({ { 0.0f, 0.0f },
+			{ static_cast<float>(windowWidth), static_cast<float>(windowHeight) }, getFinalSceneSize(),
+			windowWidth > 0 && windowHeight > 0 && framebufferWidth > 0 && framebufferHeight > 0 });
+#endif
+	}
+
+	void RendererManager::_publishGameInputRegion()
+	{
+#if defined(COMPILE_WITH_EDITOR)
+		m_gameInputRegion.acceptsInput &= EngineStates::isGameInputActive();
+#endif
+		m_gameInputRegion.acceptsInput &= !m_imguiRenderer->isBlockingGameInput(m_scenePreviewItemActive);
+		InputEvent inputRegionEvent{ InputEvent::Type::InputRegion };
+		inputRegionEvent.inputRegion = m_gameInputRegion;
+		Engine::Instance().getSubSystem<Window>()->inputEvents().push(inputRegionEvent);
 	}
 
 	FBO& RendererManager::createRenderTarget(const std::string& name, Descriptor descriptor, RenderTargetSize size)

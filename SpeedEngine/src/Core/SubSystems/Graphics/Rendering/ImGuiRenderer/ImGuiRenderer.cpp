@@ -199,6 +199,19 @@ namespace SE
 #endif
 	}
 
+
+	bool ImGuiRenderer::isBlockingGameInput(bool gameItemActive) const
+	{
+#if defined(COMPILE_WITH_EDITOR)
+		const bool blocked = MainWidget::isSceneEditingBlocked();
+#else
+		const bool blocked = ImGui::GetIO().WantCaptureMouse;
+#endif
+
+		return blocked || (ImGui::IsAnyItemActive() && !gameItemActive) ||
+			ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+	}
+
 	void ImGuiRenderer::finalizeFrame() const
 	{
 		ImGui::Render();

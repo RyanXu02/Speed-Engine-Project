@@ -2,6 +2,9 @@
 
 #include "Presentation.h"
 #include "Core/ResourceManagers/Font/Font.h"
+#include "Core/Scene/Entity/Component/UIRectComponent.h"
+#include "Core/Scene/Entity/Component/UIImageComponent.h"
+#include "Core/Scene/Entity/Component/UITextComponent.h"
 
 namespace SE
 {
@@ -34,14 +37,28 @@ namespace SE
 	struct TextDraw
 	{
 		TextDraw(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color,
-			std::pmr::memory_resource* resource)
-			: font(std::move(font)), text(text, resource), position(position), color(color)
+			std::pmr::memory_resource* resource, float scale = 1.0f)
+			: font(std::move(font)), text(text, resource), position(position), color(color), scale(scale)
 		{}
 
 		FontHandle font;
 		std::pmr::string text;
 		glm::vec2 position;
 		glm::vec4 color;
+		float scale;
+	};
+
+	struct UIRectDraw
+	{
+		UIRectDraw(const UIRectComponent& rect, glm::vec2 referenceResolution, const UIImageComponent& image,
+			std::pmr::memory_resource* resource)
+			: rect(rect), referenceResolution(referenceResolution), color(image.color), texturePath(image.texturePath, resource)
+		{}
+
+		UIRectComponent rect;
+		glm::vec2 referenceResolution;
+		glm::vec4 color;
+		std::pmr::string texturePath;
 	};
 
 	//billboard particle
@@ -53,10 +70,38 @@ namespace SE
 		glm::vec4 color;
 	};
 
+	struct UITextDraw
+	{
+		UITextDraw(const UIRectComponent& rect, glm::vec2 referenceResolution, const UITextComponent& label,
+			std::pmr::memory_resource* resource)
+			: rect(rect), referenceResolution(referenceResolution), text(label.text, resource), fontPath(label.fontPath, resource),
+			fontPixelHeight(label.fontPixelHeight), fontSize(label.fontSize), color(label.color),
+			horizontalAlignment(label.horizontalAlignment), verticalAlignment(label.verticalAlignment)
+		{}
+
+		UIRectComponent rect;
+		glm::vec2 referenceResolution;
+		std::pmr::string text;
+		std::pmr::string fontPath;
+		uint32_t fontPixelHeight;
+		float fontSize;
+		glm::vec4 color;
+		UIHorizontalAlignment horizontalAlignment;
+		UIVerticalAlignment verticalAlignment;
+	};
+
+	using UIDraw = std::variant<UIRectDraw, UITextDraw>;
+
 	struct RenderFrame
 	{
 		explicit RenderFrame(std::pmr::memory_resource* resource = std::pmr::get_default_resource())
-			: draws(resource), lights(resource), debugLines(resource), debugTriangles(resource), textDraws(resource), particles(resource)
+			: draws(resource),
+			lights(resource),
+			debugLines(resource),
+			debugTriangles(resource),
+			textDraws(resource),
+			uiDraws(resource),
+			particles(resource)
 		{}
 
 		void addDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
@@ -77,5 +122,6 @@ namespace SE
 		std::pmr::vector<DebugVertex> debugTriangles;
 		std::pmr::vector<TextDraw> textDraws;
 		std::pmr::vector<ParticleInstance> particles; // billboards, sorted back to front
+		std::pmr::vector<UIDraw> uiDraws;
 	};
 } // namespace SE

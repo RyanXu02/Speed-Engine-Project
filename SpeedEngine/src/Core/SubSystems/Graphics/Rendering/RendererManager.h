@@ -4,6 +4,7 @@
 #include "Core/SubSystems/Graphics/Rendering/ImGuiRenderer/ImGuiRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
 #include "Core/SubSystems/Graphics/Rendering/Renderer.h"
+#include "Core/SubSystems/Input/InputEvent.h"
 
 namespace SE
 {
@@ -94,11 +95,25 @@ namespace SE
 		// @return The texture ID of the final scene output
 		uint32_t getFinalSceneTexture() const { return m_finalSceneOutput->getColorTexture(m_finalColorAttachment); }
 
+		glm::uvec2 getFinalSceneSize() const
+		{
+			return { m_finalSceneOutput->getWidth(), m_finalSceneOutput->getHeight() };
+		}
+
 		// @brief Gets the scene viewport, which defines the size and camera of the scene being rendered
 		// @return A reference to the scene viewport
 		const Viewport& getSceneViewport() const { return *m_sceneViewport; }
 
 		void requestSceneResize(uint32_t width, uint32_t height);
+
+		// @brief Sets the input region for the game, which defines the area of the window that will receive input events
+		// @param inputRegion The input region to set
+		// @param scenePreviewItemActive Used for the weird input conflict with ImGui
+		void setGameInputRegion(const InputRegion& inputRegion, bool scenePreviewItemActive = false)
+		{
+			m_gameInputRegion = inputRegion;
+			m_scenePreviewItemActive = scenePreviewItemActive;
+		}
 
 		// @brief Gets the scene's single directional light, passed to every pass through the RenderContext
 		// @return reference to the sun data
@@ -119,6 +134,11 @@ namespace SE
 
 		void _applySceneResize();
 
+		// @brief Prepares the game input region based on the current framebuffer size
+		void _prepareGameInputRegion(int framebufferWidth, int framebufferHeight);
+		// @brief Publishes the game input region to the window's input event queue
+		void _publishGameInputRegion();
+
 		std::unique_ptr<Viewport> m_sceneViewport;
 
 		std::unique_ptr<MeshGPUCache> m_meshes;
@@ -130,6 +150,9 @@ namespace SE
 		std::vector<std::unique_ptr<Renderer>> m_renderers;
 		TextRenderer* m_textRenderer = nullptr; // owned by m_renderers
 		std::unique_ptr<ImGuiRenderer> m_imguiRenderer; // imgui is special
+
+		InputRegion m_gameInputRegion;
+		bool m_scenePreviewItemActive{ false };
 
 		std::vector<RenderPass> m_passes;
 

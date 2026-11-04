@@ -72,7 +72,7 @@
         },
         "ParticleEmitter": {
           "acceleration": [
-            2.4000000953674316,
+            5.0,
             0.0,
             0.0
           ],
@@ -90,21 +90,21 @@
             0.0,
             0.0
           ],
-          "emitMax": 3000,
-          "emitRate": 25.0,
+          "emitMax": 10000,
+          "emitRate": 500.0,
           "frameIndex": 0,
           "lifetimeMax": 5.0,
-          "lifetimeMin": 1.0,
+          "lifetimeMin": 5.0,
           "oneShot": false,
           "particleScaleMax": [
-            1.0,
-            1.0,
-            1.0
+            0.05000000074505806,
+            0.05000000074505806,
+            0.05000000074505806
           ],
           "particleScaleMin": [
-            0.25,
-            0.25,
-            0.25
+            0.0,
+            0.0,
+            0.0
           ],
           "rotationMax": 68.30000305175781,
           "rotationMin": 0.0,
@@ -117,12 +117,12 @@
           ],
           "sheetColumns": 1,
           "sheetRows": 1,
-          "speedMax": 6.800000190734863,
+          "speedMax": 10.0,
           "speedMin": 1.0,
           "tintColor": [
-            0.8538205623626709,
-            0.6892970204353333,
-            0.6892970204353333
+            1.0,
+            0.8235294222831726,
+            1.0
           ]
         },
         "PhysicsShapeCapsule": {
@@ -162,7 +162,7 @@
           "translate": [
             -7.104677200317383,
             0.699999988079071,
-            -1.4767171144485474
+            -1.454880714416504
           ]
         }
       }
@@ -216,7 +216,7 @@
           ],
           "translate": [
             3.0847742557525635,
-            -51602.59375,
+            -71812.0,
             60.495811462402344
           ]
         }
@@ -322,7 +322,7 @@
           ],
           "translate": [
             -9.735034942626953,
-            -30970.6796875,
+            -51180.2734375,
             52.132057189941406
           ]
         }
@@ -371,112 +371,8 @@
           ],
           "translate": [
             14.735172271728516,
-            -34032.17578125,
+            -54241.765625,
             52.02497100830078
-          ]
-        }
-      }
-    },
-    {
-      "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
-        "MeshComponent": {
-          "path": "Assets/Meshes/Suzanne.gltf"
-        },
-        "NameComponent": {
-          "name": "static_entity"
-        },
-        "ParticleEmitter": {
-          "acceleration": [
-            0.0,
-            2.0,
-            0.0
-          ],
-          "alpha": 1.0,
-          "azimuthRange": [
-            0.0,
-            360.0
-          ],
-          "coneAngleRange": [
-            0.0,
-            180.0
-          ],
-          "directionAxis": [
-            0.0,
-            1.0,
-            0.0
-          ],
-          "emitMax": 6,
-          "emitRate": 1.0,
-          "frameIndex": 0,
-          "lifetimeMax": 1.0,
-          "lifetimeMin": 1.0,
-          "oneShot": true,
-          "particleScaleMax": [
-            2.0,
-            1.0,
-            3.0
-          ],
-          "particleScaleMin": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "rotationMax": 0.0,
-          "rotationMin": 0.0,
-          "rotationSpeedMax": 0.0,
-          "rotationSpeedMin": 0.0,
-          "scale": [
-            2.9000000953674316,
-            3.700000047683716,
-            5.099999904632568
-          ],
-          "sheetColumns": 1,
-          "sheetRows": 1,
-          "speedMax": 1.0,
-          "speedMin": 1.0,
-          "tintColor": [
-            1.0,
-            1.0,
-            1.0
-          ]
-        },
-        "PhysicsShapeMesh": {
-          "path": "Assets/Meshes/Suzanne.gltf"
-        },
-        "RigidBody": {
-          "friction": 0.20000000298023224,
-          "gravityFactor": 1.0,
-          "isActive": false,
-          "maxAngularVelocity": 47.12385177612305,
-          "maxLinearVelocity": 500.0,
-          "motionType": 0,
-          "needsMassOverride": true,
-          "offset": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "restitution": 0.0
-        },
-        "Transform": {
-          "rotate": [
-            -0.24530602991580963,
-            0.24286481738090515,
-            0.0683087408542633,
-            0.9360424876213074
-          ],
-          "scale": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "translate": [
-            14.100000381469727,
-            -1.899999976158142,
-            -9.300000190734863
           ]
         }
       }

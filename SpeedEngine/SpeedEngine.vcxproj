@@ -193,6 +193,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
+    <ClCompile Include="src\Core\SubSystems\UI\UISystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Presentation.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
     <ClInclude Include="src\Core\EngineStates.h" />
+    <ClInclude Include="src\Core\SubSystems\UI\UISystem.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.h" />
@@ -280,6 +282,14 @@
     <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h" />
     <ClInclude Include="src\Core\Features\Serializable.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UICanvasComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIRectComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIElementComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIImageComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UITextComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISelectableComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIButtonComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISliderComponent.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
@@ -292,6 +302,7 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\KeyCodes.h" />
     <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h" />
+    <ClInclude Include="src\Core\SubSystems\UI\UILayout.h" />
     <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
     <ClInclude Include="src\Core\Scene\Scene.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
