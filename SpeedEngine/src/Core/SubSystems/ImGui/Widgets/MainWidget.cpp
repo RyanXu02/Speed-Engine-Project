@@ -3,6 +3,7 @@
 #if defined(COMPILE_WITH_EDITOR)
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
+#include "../../Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
 #include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
 #include "../../Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
@@ -175,6 +176,18 @@ namespace SE
 					ImGui::SliderFloat("Normal Offset", &shadow->normalOffset, 0.0f, 0.5f, "%.3f");
 					ImGui::SliderFloat("Penumbra Scale", &shadow->penumbraScale, 0.0f, 1.0f, "%.3f");
 					ImGui::SliderFloat("Search Radius", &shadow->searchRadius, 0.0f, 0.1f, "%.3f");
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Particles"))
+			{
+				auto* particles = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ParticleRenderer>();
+				if (particles)
+				{
+					int mode = static_cast<int>(particles->blendMode);
+					if (ImGui::Combo("Blend", &mode, "Alpha\0Additive\0")) {
+						particles->blendMode = static_cast<ParticleBlendMode>(mode);
+					}
 				}
 				ImGui::EndMenu();
 			}
