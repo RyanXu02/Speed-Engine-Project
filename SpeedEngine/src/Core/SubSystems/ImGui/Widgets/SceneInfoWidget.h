@@ -22,6 +22,7 @@ namespace SE
 		EventSubscription m_sceneChanged;
 
 		uint32_t m_renameEntityId = 0;
+		bool m_focusRename = false;
 		std::string m_renameBuffer{};
 
 		bool m_requestDelete = false;

@@ -34,18 +34,20 @@ namespace SE
 		
 		//TODO: break down export to multiple files or compile time will go up
 		sol::table sceneSystemTable = m_luaState.create_named_table("SceneSystem");
-		sceneSystemTable["newScene"] = [&](const std::string& name) -> void
+		sceneSystemTable["requestNewScene"] = [&](const std::string& name) -> void
 		{
-			sceneSystem->newScene(name);
+			sceneSystem->requestNewScene(name);
 		};
-		sceneSystemTable["unloadScene"] = [&](Scene* scene) -> void
+		sceneSystemTable["requestOpenScene"] = [&](const std::string& path) -> void
 		{
-			sceneSystem->unloadScene(scene);
+			sceneSystem->requestOpenScene(path);
 		};
-		sceneSystemTable["setCurrentScene"] = [&](const std::string& name) -> void
+		sceneSystemTable["requestReloadScene"] = [&]() -> void
 		{
-			sceneSystem->setCurrentScene(name);
+			sceneSystem->requestReloadScene();
 		};
+		sceneSystemTable["newScene"] = sceneSystemTable["requestNewScene"];
+		sceneSystemTable["setCurrentScene"] = sceneSystemTable["requestOpenScene"];
 		sceneSystemTable["getCurrentScene"] = [&]() -> Scene*
 		{
 			return sceneSystem->getCurrentScene();

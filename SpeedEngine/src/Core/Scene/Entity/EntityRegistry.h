@@ -14,7 +14,7 @@ namespace SE
 		typedef std::unordered_map<std::type_index, std::any> ComponentRegistry;
 		typedef std::unordered_map<uint32_t, ComponentRegistry> Registry;
 
-		EntityRegistry();
+		explicit EntityRegistry(const LoggerProxy& logger);
 		~EntityRegistry();
 
 		uint32_t addEntity();
@@ -87,6 +87,7 @@ namespace SE
 
 
 	private:
+		const LoggerProxy& m_logger;
 		Registry m_registry;
 		std::atomic<uint32_t> m_entityID{ 1 }; // reserve 0 for invalid entity
 
