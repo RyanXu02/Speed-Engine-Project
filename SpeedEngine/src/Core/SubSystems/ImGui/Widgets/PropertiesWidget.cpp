@@ -9,6 +9,7 @@
 #include "ResourceManagers/ResourceManager.h"
 #include "imgui.h"
 #include "imgui_stdlib.h"
+#include <map>
 #include <SubSystems/Scriptings/ScriptingSystem.h>
 //#include <SubSystems/Audio/AudioSystem.h>
 
@@ -30,7 +31,7 @@ namespace SE
 		// EXAMPLE:
 		// Registers a component type without passing the editor function.
 		// But provides an onEdited function that is called when the component is edited
-		m_inspectors.registerComponent<NameComponent>("Name", false, {},
+		m_inspectors.registerComponent<NameComponent>("Name", "General", false, {},
 		    [this](Entity& entity, NameComponent& component)
 		    {
 			    Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ActiveSceneModified>(ActiveSceneModified::ModifyType::Rename, entity.id(), component.name));
@@ -39,7 +40,7 @@ namespace SE
 		// EXAMPLE:
 		// Registers a component type with an editor function for components that need special handling
 		// onEdited function will not be called since the editor function is provided
-		m_inspectors.registerComponent<Transform>("Transform", false,
+		m_inspectors.registerComponent<Transform>("Transform", "General", false,
 		    [](Entity&, Transform& component)
 		    {
 			    auto position = component.getTranslation();
@@ -53,7 +54,7 @@ namespace SE
 				    component.setScale(scale);
 		    });
 
-		m_inspectors.registerComponent<MeshComponent>("Mesh", true,
+		m_inspectors.registerComponent<MeshComponent>("Mesh", "Rendering", true,
 		    [this](Entity&, MeshComponent& component)
 		    {
 			    if (!m_meshDraftInitialized)
@@ -94,7 +95,7 @@ namespace SE
 				    ImGui::Text("Child %zu: %u", i, component.children[i]);
 		    });
 
-		m_inspectors.registerComponent<ScriptComponent>("ScriptComponent", false,
+		m_inspectors.registerComponent<ScriptComponent>("Script", "Scripting", false,
 		    [](Entity&, ScriptComponent& component)
 		    {
 			    auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
@@ -110,20 +111,20 @@ namespace SE
 				    scriptingSystem->reloadScript(component.path);
 				}
 		    });
-		m_inspectors.registerComponent<CameraComponent>("CameraComponent", false,
+		m_inspectors.registerComponent<CameraComponent>("Camera", "Rendering", false,
 		    [](Entity&, CameraComponent& component)
 		    {
 			    
 		    });
 
-		m_inspectors.registerComponent<LightComponent>("LightComponent", true,
+		m_inspectors.registerComponent<LightComponent>("Light", "Rendering", true,
 		    [](Entity&, LightComponent& component)
 		    {
 			    ImGui::ColorEdit3("Color", &component.color.x);
 			    ImGui::DragFloat("Intensity", &component.intensity, 1.0f, 0.0f, 10000.0f);
 		    });
 
-		m_inspectors.registerComponent<RigidBody>("RigidBody", true,
+		m_inspectors.registerComponent<RigidBody>("Rigid Body", "Physics", true,
 		    [](Entity&, RigidBody& component)
 		    {
 			    auto motionType = component.getMotionType();
@@ -184,7 +185,7 @@ namespace SE
 				    component.setGravityFactor(gravityFactor);
 		    });
 
-		m_inspectors.registerComponent<PhysicsShapeBox>("PhysicsShapeBox", true,
+		m_inspectors.registerComponent<PhysicsShapeBox>("Box Collider", "Physics", true,
 		    [](Entity&, PhysicsShapeBox& component)
 		    {
 			    auto halfExtents = component.getHalfExtents();
@@ -192,7 +193,7 @@ namespace SE
 				    component.setHalfExtents(halfExtents);
 		    });
 
-		m_inspectors.registerComponent<PhysicsShapeCapsule>("PhysicsShapeCapsule", true,
+		m_inspectors.registerComponent<PhysicsShapeCapsule>("Capsule Collider", "Physics", true,
 		    [](Entity&, PhysicsShapeCapsule& component)
 		    {
 			    auto halfHeight = component.getHalfHeight();
@@ -203,7 +204,7 @@ namespace SE
 				    component.setRadius(radius);
 		    });
 
-		m_inspectors.registerComponent<PhysicsShapeSphere>("PhysicsShapeSphere", true,
+		m_inspectors.registerComponent<PhysicsShapeSphere>("Sphere Collider", "Physics", true,
 		    [](Entity&, PhysicsShapeSphere& component)
 		    {
 			    auto radius = component.getRadius();
@@ -211,7 +212,7 @@ namespace SE
 				    component.setRadius(radius);
 		    });
 
-		m_inspectors.registerComponent<PhysicsShapeMesh>("PhysicsShapeMesh", true,
+		m_inspectors.registerComponent<PhysicsShapeMesh>("Mesh Collider", "Physics", true,
 		    [this](Entity&, PhysicsShapeMesh& component)
 		    {
 			    if (!m_physicsShapeMeshDraftInitialized)
@@ -229,7 +230,7 @@ namespace SE
 				}
 		    });
 
-		m_inspectors.registerComponent<AudioSFXComponent>("AudioSFXComponent", true, 
+		m_inspectors.registerComponent<AudioSFXComponent>("Sound Effect", "Audio", true,
 			[](Entity& e, AudioSFXComponent& component) {
 			    const std::string path = component.getFilepath();
 			    if (!component.drafInitialized)
@@ -276,7 +277,7 @@ namespace SE
 			    }
 			});
 
-		m_inspectors.registerComponent<AudioMusicComponent>("AudioMusicComponent", true,
+		m_inspectors.registerComponent<AudioMusicComponent>("Music", "Audio", true,
 		    [](Entity&, AudioMusicComponent& component)
 		    {
 			    const std::string path = component.getFilepath();
@@ -315,14 +316,14 @@ namespace SE
 			    }
 		    });
 
-		m_inspectors.registerComponent<UICanvasComponent>("UICanvasComponent");
-		m_inspectors.registerComponent<UIRectComponent>("UIRectComponent");
-		m_inspectors.registerComponent<UIElementComponent>("UIElementComponent");
-		m_inspectors.registerComponent<UIImageComponent>("UIImageComponent");
-		m_inspectors.registerComponent<UITextComponent>("UITextComponent");
-		m_inspectors.registerComponent<UISelectableComponent>("UISelectableComponent");
-		m_inspectors.registerComponent<UIButtonComponent>("UIButtonComponent");
-		m_inspectors.registerComponent<UISliderComponent>("UISliderComponent");
+		m_inspectors.registerComponent<UICanvasComponent>("Canvas", "UI");
+		m_inspectors.registerComponent<UIRectComponent>("Rect", "UI");
+		m_inspectors.registerComponent<UIElementComponent>("Element", "UI");
+		m_inspectors.registerComponent<UIImageComponent>("Image", "UI");
+		m_inspectors.registerComponent<UITextComponent>("Text", "UI");
+		m_inspectors.registerComponent<UISelectableComponent>("Selectable", "UI");
+		m_inspectors.registerComponent<UIButtonComponent>("Button", "UI");
+		m_inspectors.registerComponent<UISliderComponent>("Slider", "UI");
 
 #pragma endregion RegisterComponentEditors
 
@@ -473,22 +474,31 @@ namespace SE
 			ImGui::OpenPopup("AddComponent");
 		if (ImGui::BeginPopup("AddComponent"))
 		{
-			bool available = false;
+			std::map<std::string, std::vector<const ComponentInspectorRegistry::Entry*>> categories;
 			for (const auto& entry : m_inspectors.getEntries())
 			{
 				if (!entry.addable || entry.has(entity))
 					continue;
-				available = true;
-				ImGui::PushID(&entry);
-				if (ImGui::MenuItem(entry.name.c_str()))
-				{
-					entry.add(entity);
-					if (entry.has(entity))
-						MainWidget::markSceneDirty();
-				}
-				ImGui::PopID();
+				categories[entry.category].push_back(&entry);
 			}
-			if (!available)
+			for (const auto& [category, entries] : categories)
+			{
+				if (!ImGui::BeginMenu(category.c_str()))
+					continue;
+				for (const auto* entry : entries)
+				{
+					ImGui::PushID(entry);
+					if (ImGui::MenuItem(entry->name.c_str()))
+					{
+						entry->add(entity);
+						if (entry->has(entity))
+							MainWidget::markSceneDirty();
+					}
+					ImGui::PopID();
+				}
+				ImGui::EndMenu();
+			}
+			if (categories.empty())
 				ImGui::TextDisabled("No more components available");
 			ImGui::EndPopup();
 		}
