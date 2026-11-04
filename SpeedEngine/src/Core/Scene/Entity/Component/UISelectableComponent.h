@@ -8,6 +8,7 @@ namespace SE
 	struct UISelectableComponent
 	{
 		int navigationOrder{ 0 };
+		bool focused{ false };
 
 		// Optional keys in UIElementComponent's canvas
 		// empty means unassigned

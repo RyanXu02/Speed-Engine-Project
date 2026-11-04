@@ -12,49 +12,64 @@
 
 namespace SE
 {
-	// Helper to append all UI elements in the scene to RenderFrame
-	static void appendUIDraws(Scene& scene, RenderFrame& frame)
+	namespace // Helper to append all UI elements in the scene to RenderFrame
 	{
-		std::unordered_map<std::string, glm::vec2> canvases;
-		scene.forEntitiesWith<UICanvasComponent>([&](Entity entity)
+		static void appendUIDraws(Scene & scene, RenderFrame & frame)
 		{
-			const auto& canvas = *entity.getComponent<UICanvasComponent>();
-			if (canvas.visible && !canvas.canvasKey.empty() &&
-				canvas.referenceResolution.x > 0.0f && canvas.referenceResolution.y > 0.0f)
-				canvases.emplace(canvas.canvasKey, canvas.referenceResolution);
-		});
+			std::unordered_map<std::string, glm::vec2> canvases;
+			scene.forEntitiesWith<UICanvasComponent>(
+			    [&](Entity entity)
+			    {
+				    const auto& canvas = *entity.getComponent<UICanvasComponent>();
+				    if (canvas.visible && !canvas.canvasKey.empty() && canvas.referenceResolution.x > 0.0f && canvas.referenceResolution.y > 0.0f)
+					    canvases.emplace(canvas.canvasKey, canvas.referenceResolution);
+			    });
 
-		struct Member
-		{
-			Entity entity;
-			glm::vec2 referenceResolution;
-			int drawOrder;
-		};
-		std::vector<Member> members;
-		scene.forEntitiesWith<UIElementComponent, UIRectComponent>([&](Entity entity)
-		{
-			const auto& element = *entity.getComponent<UIElementComponent>();
-			const auto& rect = *entity.getComponent<UIRectComponent>();
-			const auto canvas = canvases.find(element.canvasKey);
-			if (element.visible && canvas != canvases.end() && rect.size.x > 0.0f && rect.size.y > 0.0f)
-				members.push_back({ entity, canvas->second, element.drawOrder });
-		});
-		std::ranges::sort(members, [](const Member& a, const Member& b)
-		{
-			if (a.drawOrder != b.drawOrder)
-				return a.drawOrder < b.drawOrder;
-			return a.entity.id() < b.entity.id();
-		});
+			struct Member
+			{
+				Entity entity;
+				glm::vec2 referenceResolution;
+				int drawOrder;
+			};
+			std::vector<Member> members;
+			scene.forEntitiesWith<UIElementComponent, UIRectComponent>(
+			    [&](Entity entity)
+			    {
+				    const auto& element = *entity.getComponent<UIElementComponent>();
+				    const auto& rect = *entity.getComponent<UIRectComponent>();
+				    const auto canvas = canvases.find(element.canvasKey);
+				    if (element.visible && canvas != canvases.end() && rect.size.x > 0.0f && rect.size.y > 0.0f)
+					    members.push_back({ entity, canvas->second, element.drawOrder });
+			    });
+			std::ranges::sort(members,
+			    [](const Member& a, const Member& b)
+			    {
+				    if (a.drawOrder != b.drawOrder)
+					    return a.drawOrder < b.drawOrder;
+				    return a.entity.id() < b.entity.id();
+			    });
 
-		auto* resource = frame.uiDraws.get_allocator().resource();
-		for (auto& member : members)
-		{
-			const auto& rect = *member.entity.getComponent<UIRectComponent>();
-			if (const auto* image = member.entity.getComponent<UIImageComponent>(); image && image->color.a > 0.0f)
-				frame.uiDraws.emplace_back(std::in_place_type<UIRectDraw>, rect, member.referenceResolution, *image, resource);
-			if (const auto* text = member.entity.getComponent<UITextComponent>(); text && !text->text.empty() &&
-				!text->fontPath.empty() && text->fontPixelHeight > 0 && text->fontSize > 0.0f && text->color.a > 0.0f)
-				frame.uiDraws.emplace_back(std::in_place_type<UITextDraw>, rect, member.referenceResolution, *text, resource);
+			auto* resource = frame.uiDraws.get_allocator().resource();
+			for (auto& member : members)
+			{
+				const auto& rect = *member.entity.getComponent<UIRectComponent>();
+				glm::vec4 tint{ 1.0f };
+				if (const auto* selectable = member.entity.getComponent<UISelectableComponent>())
+					tint = !member.entity.getComponent<UIElementComponent>()->enabled ? selectable->disabledColor : selectable->focused ? selectable->focusedColor : selectable->normalColor;
+				const auto* image = member.entity.getComponent<UIImageComponent>();
+				const bool hasBackground = image && image->color.a > 0.0f;
+				if (hasBackground)
+				{
+					frame.uiDraws.emplace_back(std::in_place_type<UIRectDraw>, rect, member.referenceResolution, *image, resource);
+					std::get<UIRectDraw>(frame.uiDraws.back()).color *= tint;
+				}
+				if (const auto* text = member.entity.getComponent<UITextComponent>(); text && !text->text.empty() && !text->fontPath.empty() && text->fontPixelHeight > 0 && text->fontSize > 0.0f && text->color.a > 0.0f)
+				{
+					frame.uiDraws.emplace_back(std::in_place_type<UITextDraw>, rect, member.referenceResolution, *text, resource);
+					if (!hasBackground)
+						std::get<UITextDraw>(frame.uiDraws.back()).color *= tint;
+				}
+			}
 		}
 	}
 

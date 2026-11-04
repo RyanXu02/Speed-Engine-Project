@@ -202,7 +202,7 @@ namespace SE
 
 #if defined(COMPILE_WITH_EDITOR)
 		main->finishEditorFrame();
-		m_inputRegion.acceptsInput &= EngineStates::isPlaying() && !MainWidget::isSceneEditingBlocked();
+		m_inputRegion.acceptsInput &= EngineStates::isGameInputActive() && !MainWidget::isSceneEditingBlocked();
 #else
 		m_inputRegion.acceptsInput &= !ImGui::GetIO().WantCaptureMouse;
 #endif
