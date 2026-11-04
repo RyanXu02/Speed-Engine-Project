@@ -39,6 +39,41 @@
     },
     {
       "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "LightComponent": {
+          "color": [
+            1.0,
+            0.9,
+            0.8
+          ],
+          "intensity": 50.0
+        },
+        "NameComponent": {
+          "name": "point light"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            4.0,
+            4.0
+          ]
+        }
+      }
+    },
+    {
+      "components": {
         "AudioSFXComponent": {
           "filepath": "Assets/Audio/shaco_death.wav",
           "isGameSFX": true
@@ -47,7 +82,7 @@
           "isAlive": true
         },
         "MeshComponent": {
-          "path": "Assets/Meshes/Suzanne.gltf"
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
         "NameComponent": {
           "name": "player"
@@ -103,7 +138,7 @@
           "isAlive": true
         },
         "MeshComponent": {
-          "path": "Assets/Meshes/bunny.obj"
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
         "NameComponent": {
           "name": "entity"
@@ -212,7 +247,7 @@
           "isAlive": true
         },
         "MeshComponent": {
-          "path": "Assets/Meshes/bunny.obj"
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
         "NameComponent": {
           "name": "entity2"
@@ -261,7 +296,7 @@
           "isAlive": true
         },
         "MeshComponent": {
-          "path": "Assets/Meshes/bunny.obj"
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
         "NameComponent": {
           "name": "entity3"

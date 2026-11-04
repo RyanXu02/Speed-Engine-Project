@@ -91,6 +91,10 @@ namespace SE
 
 		void requestSceneResize(uint32_t width, uint32_t height);
 
+		// @brief Gets the scene's single directional light, passed to every pass through the RenderContext
+		// @return reference to the sun data
+		DirectionalLight& getSun() { return m_sun; }
+
 		void init() override;
 		void shutdown() override;
 
@@ -111,6 +115,8 @@ namespace SE
 		std::unique_ptr<MeshGPUCache> m_meshes;
 
 		RenderTargets m_targets;
+
+		DirectionalLight m_sun;
 
 		std::vector<std::unique_ptr<Renderer>> m_renderers;
 		TextRenderer* m_textRenderer = nullptr; // owned by m_renderers

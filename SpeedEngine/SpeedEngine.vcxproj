@@ -156,6 +156,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsContactListener.cpp" />
     <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
     <ClCompile Include="src\Core\Features\CameraController.cpp" />
@@ -205,6 +206,8 @@
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GeometryRenderer\GeometryRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DeferredLightingRenderer\DeferredLightingRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
@@ -233,6 +236,7 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsContactListener.h" />
     <ClInclude Include="src\Core\Features\CameraFrustum.h" />
     <ClInclude Include="src\Core\Features\CameraState.h" />
@@ -301,6 +305,8 @@
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GeometryRenderer\GeometryRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DeferredLightingRenderer\DeferredLightingRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.h" />
@@ -334,6 +340,10 @@
     <None Include="Assets\Shaders\grayscale.frag" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
+    <None Include="Assets\Shaders\gpass.vert" />
+    <None Include="Assets\Shaders\gpass.frag" />
+    <None Include="Assets\Shaders\deferredLighting.vert" />
+    <None Include="Assets\Shaders\deferredLighting.frag" />
     <None Include="Assets\Shaders\text.frag" />
     <None Include="Assets\Shaders\text.vert" />
   </ItemGroup>

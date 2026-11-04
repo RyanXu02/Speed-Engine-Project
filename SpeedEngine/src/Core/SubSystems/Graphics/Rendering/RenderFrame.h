@@ -19,6 +19,12 @@ namespace SE
 		CameraState current;
 	};
 
+	struct PointLight
+	{
+		glm::vec3 position;
+		glm::vec3 radiance; // color * intensity
+	};
+
 	struct DebugVertex
 	{
 		glm::vec3 position;
@@ -41,7 +47,7 @@ namespace SE
 	struct RenderFrame
 	{
 		explicit RenderFrame(std::pmr::memory_resource* resource = std::pmr::get_default_resource())
-			: draws(resource), debugLines(resource), debugTriangles(resource), textDraws(resource)
+			: draws(resource), lights(resource), debugLines(resource), debugTriangles(resource), textDraws(resource)
 		{}
 
 		void addDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
@@ -57,6 +63,7 @@ namespace SE
 		CameraSnapshot camera;
 		std::chrono::steady_clock::time_point tickTime{};
 		std::pmr::vector<DrawItem> draws;
+		std::pmr::vector<PointLight> lights;
 		std::pmr::vector<DebugVertex> debugLines;
 		std::pmr::vector<DebugVertex> debugTriangles;
 		std::pmr::vector<TextDraw> textDraws;

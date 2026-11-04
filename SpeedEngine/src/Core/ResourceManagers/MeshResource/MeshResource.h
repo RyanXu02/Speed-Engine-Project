@@ -3,6 +3,8 @@
 #include "../Resource.h"
 #include "glm/glm.hpp"
 
+struct aiScene;
+
 namespace SE
 {
 	// @brief Represents a vertex in a 3D mesh
@@ -21,7 +23,30 @@ namespace SE
 		uint32_t indexOffset; // start of "mesh". index into m_indices
 		uint32_t indexCount; // how many indices are contained in "mesh"
 		uint32_t vertexCount; // how many vertices are contained in "mesh"
+		uint32_t vertexOffset; // start of "mesh" vertices. index into m_vertices
 		int32_t materialIndex; // index into materials container?????
+	};
+
+	struct PBRMaterial
+	{
+		static constexpr int roughnessChannel = 1;
+		static constexpr int metallicChannel = 2;
+
+		std::string name;
+
+		std::string albedoPath;
+		std::string normalPath;
+		std::string aoPath;
+		std::string emissivePath;
+		std::string roughnessPath;
+		std::string metallicPath;
+
+		glm::vec4 albedoFactor{ 1.f };
+		glm::vec3 emissiveFactor{ 0.f };
+		float roughnessFactor{ 1.f };
+		float metallicFactor{ 1.f };
+		float aoStrength{ 1.f };
+		float normalScale{ 1.f };
 	};
 
 	// @brief Represents a 3D mesh resource
@@ -46,11 +71,15 @@ namespace SE
 		const std::vector<Vertex>& getVertices() const { return m_vertices; }
 		const std::vector<SubMesh>& getSubMeshes() const { return m_submeshes; }
 		const std::vector<uint32_t>& getIndices() const { return m_indices; }
+		const std::vector<PBRMaterial>& getMaterials() const { return m_materials; }
 
 	private:
+		void _loadMaterials(const aiScene* scene, std::string_view meshPath);
+
 		std::vector<Vertex> m_vertices;
 		std::vector<SubMesh> m_submeshes;
 		std::vector<uint32_t> m_indices;
+		std::vector<PBRMaterial> m_materials;
 
 		LoggerProxy m_logger;
 	};
