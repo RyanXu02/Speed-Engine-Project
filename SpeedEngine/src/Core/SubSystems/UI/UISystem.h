@@ -11,7 +11,7 @@ namespace SE
 	enum class UICommand
 	{
 		NavigateUp, NavigateDown, NavigateLeft, NavigateRight,
-		Next, Previous, Submit, Cancel
+		Next, Previous, SubmitPressed, SubmitReleased, Cancel
 	};
 
 	class UISystem : public SubSystem
@@ -31,8 +31,6 @@ namespace SE
 		// @brief A focused element is an element targetted by commands
 		// @brief e.g. arrowkeys, joystick, submit, etc.
 		uint32_t getFocusedElement() const { return m_focusedElement; }
-		// @brief A hovered element is an element currently under the pointer
-		uint32_t getHoveredElement() const { return m_hoveredElement; }
 		// @brief A captured element is an element that is being pressed
 		// @brief A captured element can lost its pressed state while the pointer is dragged off it
 		uint32_t getCapturedElement() const { return m_capturedElement; }
@@ -46,14 +44,21 @@ namespace SE
 	private:
 		UISystem() : SubSystem("UISystem") {}
 
+		enum class CaptureSource { Pointer, Command };
+
 		// @brief Refresh the focus state based on the current scene. Returns the current scene
 		Scene* _refreshFocus();
 
 		// @brief Change focus to a specific element in the scene
 		void _changeFocus(Scene& scene, uint32_t elementId);
 
+		// @brief Begin pressing a specific element in the scene
+		void _beginPress(Scene& scene, uint32_t elementId, CaptureSource source);
+		// @brief Release pressing a specific element in the scene
+		void _releasePress(Scene& scene, uint32_t elementId, CaptureSource source, std::vector<ButtonActivated>& activations);
+		
+		// @brief Cancel the current capture
 		void _cancelCapture(Scene& scene);
-		void _clearPointer(Scene& scene);
 
 		void _processCommand(UICommand command, std::vector<ButtonActivated>& activations);
 		
@@ -63,8 +68,12 @@ namespace SE
 
 		uint32_t m_activeCanvas{ 0 };
 		uint32_t m_focusedElement{ 0 };
-		uint32_t m_hoveredElement{ 0 };
 		uint32_t m_capturedElement{ 0 };
+
+		// Who started the current press?
+		CaptureSource m_captureSource{ CaptureSource::Pointer };
+		bool m_submitDown{ false };
+
 		uint64_t m_sceneRevision{ 0 };
 	};
 }

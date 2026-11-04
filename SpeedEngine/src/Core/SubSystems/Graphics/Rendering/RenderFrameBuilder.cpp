@@ -57,8 +57,7 @@ namespace SE
 				if (const auto* selectable = member.entity.getComponent<UISelectableComponent>())
 					tint = !member.entity.getComponent<UIElementComponent>()->enabled ? selectable->disabledColor :
 						selectable->pressed ? selectable->pressedColor :
-						selectable->focused ? selectable->focusedColor :
-						selectable->hovered ? selectable->hoverColor : selectable->normalColor;
+						selectable->focused ? selectable->hoverColor : selectable->normalColor;
 				const auto* image = member.entity.getComponent<UIImageComponent>();
 				const bool hasBackground = image && image->color.a > 0.0f;
 				if (hasBackground)

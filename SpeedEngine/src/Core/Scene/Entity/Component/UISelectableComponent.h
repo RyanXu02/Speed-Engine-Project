@@ -9,7 +9,6 @@ namespace SE
 	{
 		int navigationOrder{ 0 };
 		bool focused{ false };
-		bool hovered{ false };
 		bool pressed{ false };
 
 		// Optional keys in UIElementComponent's canvas
@@ -21,7 +20,6 @@ namespace SE
 
 		glm::vec4 normalColor{ 0.8f, 0.8f, 1.0f, 1.0f };
 		glm::vec4 hoverColor{ 0.4f, 0.4f, 1.0f, 1.0f };
-		glm::vec4 focusedColor{ 0.8f, 0.9f, 1.0f, 1.0f };
 		glm::vec4 pressedColor{ 0.7f, 0.7f, 0.7f, 1.0f };
 		glm::vec4 disabledColor{ 0.5f, 0.5f, 0.5f, 1.0f };
 
@@ -34,7 +32,6 @@ namespace SE
 			member("rightElementKey", &UISelectableComponent::rightElementKey),
 			member("normalColor", &UISelectableComponent::normalColor),
 			member("hoverColor", &UISelectableComponent::hoverColor),
-			member("focusedColor", &UISelectableComponent::focusedColor),
 			member("pressedColor", &UISelectableComponent::pressedColor),
 			member("disabledColor", &UISelectableComponent::disabledColor)
 		);

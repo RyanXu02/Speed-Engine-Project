@@ -19,7 +19,11 @@ namespace SE
 		void render(RenderContext& context) override;
 		void shutdown() override;
 
-		void setInputRegion(const InputRegion& inputRegion) { m_inputRegion = inputRegion; }
+		void setInputRegion(const InputRegion& inputRegion, bool itemActive)
+		{
+			m_inputRegion = inputRegion;
+			m_inputRegionItemActive = itemActive;
+		}
 
 		// @brief Creates a widget of the specified type
 		// @tparam T The type of the widget to create
@@ -73,5 +77,6 @@ namespace SE
 		const Window* m_window{ nullptr };
 
 		InputRegion m_inputRegion;
+		bool m_inputRegionItemActive{ false };
 	};
 } // namespace SE

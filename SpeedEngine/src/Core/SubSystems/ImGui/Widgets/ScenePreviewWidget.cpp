@@ -35,16 +35,19 @@ namespace SE
 			ImVec2 framebufferScale = ImGui::GetIO().DisplayFramebufferScale;
 			rendererManager->requestSceneResize(static_cast<uint32_t>(viewportSize.x * framebufferScale.x),
 				static_cast<uint32_t>(viewportSize.y * framebufferScale.y));
-			ImGui::Image(imguiTexId, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+			// Weird ImGui mouse conflict with scene preview
+			// Consume viewport clicks so ImGui don't start moving the preview window
+			ImGui::InvisibleButton("##SceneInput", viewportSize);
 
 			const ImVec2 imageMin = ImGui::GetItemRectMin();
 			const ImVec2 imageMax = ImGui::GetItemRectMax();
+			ImGui::GetWindowDrawList()->AddImage(imguiTexId, imageMin, imageMax, ImVec2(0, 1), ImVec2(1, 0));
 			const ImVec2 windowOrigin = ImGui::GetMainViewport()->Pos;
 
 			rendererManager->getRenderer<ImGuiRenderer>()->setInputRegion({
 				{ imageMin.x - windowOrigin.x, imageMin.y - windowOrigin.y },
 				{ imageMax.x - imageMin.x, imageMax.y - imageMin.y }, rendererManager->getFinalSceneSize(),
-				ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) });
+				ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) }, ImGui::IsItemActive());
 		}
 
 		ImGui::End();

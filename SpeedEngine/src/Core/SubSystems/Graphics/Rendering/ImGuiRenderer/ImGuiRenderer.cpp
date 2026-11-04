@@ -170,6 +170,7 @@ namespace SE
 
 	void ImGuiRenderer::beginFrame()
 	{
+		m_inputRegionItemActive = false;
 #if defined(COMPILE_WITH_EDITOR)
 		m_inputRegion = {};
 #endif
@@ -207,7 +208,7 @@ namespace SE
 		m_inputRegion.acceptsInput &= !ImGui::GetIO().WantCaptureMouse;
 #endif
 
-		m_inputRegion.acceptsInput &= !ImGui::IsAnyItemActive() &&
+		m_inputRegion.acceptsInput &= (!ImGui::IsAnyItemActive() || m_inputRegionItemActive) &&
 			!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
 		InputEvent viewportEvent{ InputEvent::Type::InputRegion };
 		viewportEvent.inputRegion = m_inputRegion;
