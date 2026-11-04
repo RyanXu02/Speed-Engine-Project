@@ -56,5 +56,6 @@ namespace SE
 		static HookFunction _onSFXComponentAdded();
 		static HookFunction _onMusicComponentAdded();
 		static HookFunction _onPhysicsShapeMeshComponentAdded();
+		static HookFunction _onParticleEmitterAdded();
 	};
 } // namespace SE

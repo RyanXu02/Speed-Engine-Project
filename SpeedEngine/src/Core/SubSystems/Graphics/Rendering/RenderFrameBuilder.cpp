@@ -115,6 +115,22 @@ namespace SE
 			m_lights.push_back({ entity.getComponent<Transform>()->getTranslation(), light->color * light->intensity });
 		});
 
+		//capture particles
+		m_particles.clear();
+		scene.forEntitiesWith<Transform, ParticleEmitter>([&](Entity entity)
+		{
+			//go thru each emitter and for each particle in ParticleContainer, add it to m_particles
+			ParticleEmitter* emitter = entity.getComponent<ParticleEmitter>();
+			const glm::vec4 color(emitter->GetTintColor(), emitter->GetAlpha());
+
+			emitter->ForEachParticle([&](Particle& p, float)
+			{
+				if (p.lifetime > 0.0f)
+					m_particles.push_back({ p.position, glm::vec2(p.scale), p.rotation, color });
+			},
+			0.0f);
+		});
+
 		// capture camera state
 		const CameraFrustum* activeCamera = EngineStates::getActiveCamera();
 		const CameraState camera = activeCamera->getState();
@@ -132,6 +148,7 @@ namespace SE
 		frame.debugLines.clear();
 		frame.debugTriangles.clear();
 		frame.textDraws.clear();
+		frame.particles.clear();
 		frame.uiDraws.clear();
 
 		frame.textDraws.reserve(m_textSubmissions.size());
@@ -144,6 +161,8 @@ namespace SE
 			frame.draws.push_back(entry.drawItem);
 
 		frame.lights.assign(m_lights.begin(), m_lights.end());
+
+		frame.particles.assign(m_particles.begin(), m_particles.end());
 
 		frame.camera = m_camera;
 		frame.tickTime = m_tickTime;

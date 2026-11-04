@@ -61,6 +61,15 @@ namespace SE
 		std::pmr::string texturePath;
 	};
 
+	//billboard particle
+	struct ParticleInstance
+	{
+		glm::vec3 position;
+		glm::vec2 size;
+		float rotation; // radians, around the view axis
+		glm::vec4 color;
+	};
+
 	struct UITextDraw
 	{
 		UITextDraw(const UIRectComponent& rect, glm::vec2 referenceResolution, const UITextComponent& label,
@@ -91,7 +100,8 @@ namespace SE
 			debugLines(resource),
 			debugTriangles(resource),
 			textDraws(resource),
-			uiDraws(resource)
+			uiDraws(resource),
+			particles(resource)
 		{}
 
 		void addDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
@@ -111,6 +121,7 @@ namespace SE
 		std::pmr::vector<DebugVertex> debugLines;
 		std::pmr::vector<DebugVertex> debugTriangles;
 		std::pmr::vector<TextDraw> textDraws;
+		std::pmr::vector<ParticleInstance> particles; // billboards, sorted back to front
 		std::pmr::vector<UIDraw> uiDraws;
 	};
 } // namespace SE

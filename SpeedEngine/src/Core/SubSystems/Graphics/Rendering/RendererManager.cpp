@@ -11,6 +11,7 @@
 #include "Core/SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/GrayscaleRenderer/GrayscaleRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
 
 #include "Core/Engine.h"
 #include "Core/EngineStates.h"
@@ -86,7 +87,15 @@ namespace SE
 		auto& sceneRenderer = addRenderer<SceneRenderer>("DeferredColor");
 		addPass(RenderPass{ .renderer = sceneRenderer, .output = sceneColor, .clearMask = 0 });
 
-		// Example: A render pass that draws on top of SceneColor
+		// Billboard particles draw on top of SceneColor, depth tested against the scene
+		auto& particleRenderer = addRenderer<ParticleRenderer>();
+		addPass(RenderPass{
+			.renderer = particleRenderer,
+			.output = sceneColor,
+			.clearMask = 0 });
+
+		// Example:
+		// A render pass that draws on top of SceneColor
 		auto& debugRenderer = addRenderer<DebugRenderer>();
 		addPass(RenderPass{ .renderer = debugRenderer,  .output = sceneColor,  .clearMask = 0, .debugOnly = true });
 

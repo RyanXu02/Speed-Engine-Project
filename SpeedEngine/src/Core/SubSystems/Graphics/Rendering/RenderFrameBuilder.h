@@ -51,6 +51,7 @@ namespace SE
 		std::unordered_map<uint32_t, DrawItemHistory> m_drawItemHistories;
 
 		std::vector<PointLight> m_lights;
+		std::vector<ParticleInstance> m_particles;
 
 		CameraSnapshot m_camera;
 
