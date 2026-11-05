@@ -55,6 +55,24 @@ namespace SE
 				const std::string label = entry.path().filename().string() + (folder ? "/" : "");
 
 				ImGui::PushID(i);
+				const float size = ImGui::GetTextLineHeight();
+				const ImVec2 icon = ImGui::GetCursorScreenPos();
+				ImDrawList* draw = ImGui::GetWindowDrawList();
+				if (folder)
+				{
+					const ImU32 color = IM_COL32(220, 180, 80, 255);
+					draw->AddRectFilled(ImVec2(icon.x, icon.y + size * 0.15f), ImVec2(icon.x + size * 0.45f, icon.y + size * 0.4f), color);
+					draw->AddRectFilled(ImVec2(icon.x, icon.y + size * 0.3f), ImVec2(icon.x + size, icon.y + size * 0.85f), color, size * 0.08f);
+				}
+				else
+				{
+					const ImU32 color = ImGui::GetColorU32(ImGuiCol_Text);
+					draw->AddRect(ImVec2(icon.x + size * 0.15f, icon.y + size * 0.1f), ImVec2(icon.x + size * 0.85f, icon.y + size * 0.9f), color);
+					draw->AddLine(ImVec2(icon.x + size * 0.3f, icon.y + size * 0.4f), ImVec2(icon.x + size * 0.7f, icon.y + size * 0.4f), color);
+					draw->AddLine(ImVec2(icon.x + size * 0.3f, icon.y + size * 0.6f), ImVec2(icon.x + size * 0.7f, icon.y + size * 0.6f), color);
+				}
+				ImGui::Dummy(ImVec2(size, size));
+				ImGui::SameLine();
 				ImGui::SetNextItemSelectionUserData(i);
 				ImGui::Selectable(label.c_str(), m_selection.Contains(static_cast<ImGuiID>(i)), ImGuiSelectableFlags_AllowDoubleClick);
 				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
