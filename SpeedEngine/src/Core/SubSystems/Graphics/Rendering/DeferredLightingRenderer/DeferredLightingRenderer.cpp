@@ -122,6 +122,7 @@ namespace SE
 		m_shader.setFloat("G", phaseG);
 		m_shader.setFloat("scatteringScale", scatteringScale);
 		m_shader.setFloat("fogMaxDistance", fogMaxDistance);
+		m_shader.setInt("numSteps", numSteps);
 		glBindVertexArray(m_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 

@@ -45,6 +45,7 @@ uniform vec3 camPos;
 uniform float G;                // G scattering term
 uniform float scatteringScale;  // for stronger scattering
 uniform float fogMaxDistance;   // caps the march, sky pixels have no surface to stop at
+uniform int numSteps;
 
 // tunables
 uniform float ambientStrength;
@@ -328,7 +329,6 @@ vec3 marchVolume(vec3 rayDir, float maxDist, out float transmittance)
         return vec3(0.0);
     }
 
-    const int numSteps = 16;
     float stepSize = maxDist / float(numSteps);
     float dither = useBlueNoise
         ? texelFetch(blueNoise, ivec2(gl_FragCoord.xy) % textureSize(blueNoise, 0), 0).r
@@ -341,7 +341,9 @@ vec3 marchVolume(vec3 rayDir, float maxDist, out float transmittance)
     // cosTheta is between the view ray and the direction toward the light, so G > 0 peaks looking into the sun
     float phase = mieScattering(dot(rayDir, -dirLightDirection), G);
     float absorptionCoefficient = 0.15;
-    vec3 scattering = dirLightColor * phase * absorptionCoefficient;
+    // tint the fog with the irradiance, the L0 SH band is the average over all directions
+    vec3 irradianceColor = max(shIrradiance[0] * 0.282095, vec3(0.0)) * iblIntensity;
+    vec3 scattering = dirLightColor * irradianceColor * phase * absorptionCoefficient;
 
     vec3 volume = vec3(0.0);
     for(int i = 0; i < numSteps; i++) {
