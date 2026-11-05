@@ -106,12 +106,15 @@ namespace SE
 
 		void addDebugLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
 		{
-			debugLines.insert(debugLines.end(), { { from, color }, { to, color } });
+			debugLines.push_back({ from, color });
+			debugLines.push_back({ to, color });
 		}
 
 		void addDebugTriangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& color)
 		{
-			debugTriangles.insert(debugTriangles.end(), { { a, color }, { b, color }, { c, color } });
+			debugTriangles.push_back({ a, color });
+			debugTriangles.push_back({ b, color });
+			debugTriangles.push_back({ c, color });
 		}
 
 		CameraSnapshot camera;

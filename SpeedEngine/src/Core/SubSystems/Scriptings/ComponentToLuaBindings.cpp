@@ -93,6 +93,8 @@ namespace SE
 			"addTorque", &RigidBody::addTorque, 
 			"addImpulse", &RigidBody::addImpulse, 
 			"addAngularImpulse", &RigidBody::addAngularImpulse,
+		    "activateBody", &RigidBody::activateBody,
+		    "deactivateBody", &RigidBody::deactivateBody,
 			"getMaxLinearVelocity", &RigidBody::getMaxLinearVelocity, 
 			"setMaxLinearVelocity", &RigidBody::setMaxLinearVelocity, 
 			"getMaxAngularVelocity", &RigidBody::getMaxAngularVelocity,
@@ -104,7 +106,7 @@ namespace SE
 			"getGravityFactor", &RigidBody::getGravityFactor,
 			"setGravityFactor", &RigidBody::setGravityFactor);
 
-		componentGetters["RigidBody"] = [](sol::state_view lua, Entity e) -> sol::object
+		componentGetters[RigidBody::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
 		{
 			RigidBody* component = e.getComponent<RigidBody>();
 			if (component)
@@ -113,7 +115,107 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
+		componentAdders[RigidBody::getStaticType()] = [](Entity e, sol::table luaTable)
+		{
+			e.addComponent<RigidBody>();
+		};
+		componentRemovers[RigidBody::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<RigidBody>();
+		};
+
+
+		luaState.new_usertype<PhysicsShapeBox>("PhysicsShapeBox",
+			"setHalfExtents", &PhysicsShapeBox::setHalfExtents);
+
+		componentGetters[PhysicsShapeBox::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			PhysicsShapeBox* component = e.getComponent<PhysicsShapeBox>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[PhysicsShapeBox::getStaticType()] = [](Entity e, sol::table luaTable)
+		{
+			e.addComponent<PhysicsShapeBox>();
+		};
+		componentRemovers[PhysicsShapeBox::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<PhysicsShapeBox>();
+		};
+
+
+		luaState.new_usertype<PhysicsShapeSphere>("PhysicsShapeSphere",
+			"setRadius", &PhysicsShapeSphere::setRadius);
+
+		componentGetters[PhysicsShapeSphere::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			PhysicsShapeSphere* component = e.getComponent<PhysicsShapeSphere>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[PhysicsShapeSphere::getStaticType()] = [](Entity e, sol::table luaTable)
+		{
+			e.addComponent<PhysicsShapeSphere>();
+		};
+		componentRemovers[PhysicsShapeSphere::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<PhysicsShapeSphere>();
+		};
+
+
+		luaState.new_usertype<PhysicsShapeCapsule>("PhysicsShapeSphere",
+			"setHalfHeight", &PhysicsShapeCapsule::setHalfHeight,
+			"setRadius", &PhysicsShapeCapsule::setRadius);
+
+		componentGetters[PhysicsShapeCapsule::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			PhysicsShapeCapsule* component = e.getComponent<PhysicsShapeCapsule>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[PhysicsShapeCapsule::getStaticType()] = [](Entity e, sol::table luaTable)
+		{
+			e.addComponent<PhysicsShapeCapsule>();
+		};
+		componentRemovers[PhysicsShapeCapsule::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<PhysicsShapeCapsule>();
+		};
+
+
+		luaState.new_usertype<MeshComponent>("MeshComponent",
+			"setPath", &MeshComponent::setPath);
+
+		componentGetters[MeshComponent::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			MeshComponent* component = e.getComponent<MeshComponent>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[MeshComponent::getStaticType()] = [](Entity e, sol::table luaTable)
+		{
+			e.addComponent<MeshComponent>();
+		};
+		componentRemovers[MeshComponent::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<MeshComponent>();
+		};
 
 		_registerComponent<NameComponent>(luaState);
+		_registerComponent<LifeComponent>(luaState);
+		_registerComponent<PrefabComponent>(luaState);
+		_registerComponent<ScriptComponent>(luaState);
 	}
 }
