@@ -107,12 +107,6 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Lighting"))
 			{
-				// auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
-				// if (sceneRenderer)
-				// {
-				// 	LightingSettings& settings = sceneRenderer->getLightingSettings();
-				// 	ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f); // flat ambient, used while IBL is off
-				// }
 	
 				auto* deferredLightingRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<DeferredLightingRenderer>();
 				if (deferredLightingRenderer)
@@ -152,6 +146,12 @@ namespace SE
 					// ImGui::Checkbox("Dither", &tonemap->dither);
 				}
 
+				auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
+				// if (sceneRenderer)
+				// {
+				// 	LightingSettings& settings = sceneRenderer->getLightingSettings();
+				// 	ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f); // flat ambient, used while IBL is off
+				// }
 				if (sceneRenderer)
 				{
 
