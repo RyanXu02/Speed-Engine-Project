@@ -88,6 +88,10 @@ namespace SE
 			    {
 				    getSubSystem<SceneSystem>()->requestOpenScene("Assets/Data/scene-with-particles.json");
 			    }
+			    if (button.canvasKey == "main" && button.elementKey == "physics")
+			    {
+				    getSubSystem<SceneSystem>()->requestOpenScene("Assets/Data/physics-test.json");
+			    }
 		    });
 	}
 	void Engine::start()

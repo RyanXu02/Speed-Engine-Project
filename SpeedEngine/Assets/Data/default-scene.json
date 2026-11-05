@@ -304,10 +304,10 @@
         },
         "Transform": {
           "rotate": [
-            -0.0,
-            0.0,
-            0.0,
-            1.0
+            0.1541450172662735,
+            -0.05431792140007019,
+            0.008456872776150703,
+            0.9865177869796753
           ],
           "scale": [
             1.0,
@@ -315,9 +315,9 @@
             1.0
           ],
           "translate": [
-            0.9000057578086853,
-            -10.010002136230469,
-            0.5999900698661804
+            -4.400000095367432,
+            3.5899999141693115,
+            0.6000000238418579
           ]
         }
       }
@@ -332,24 +332,6 @@
         },
         "NameComponent": {
           "name": "static_entity"
-        },
-        "PhysicsShapeMesh": {
-          "path": "Assets/Meshes/thomas_the_train/scene.gltf"
-        },
-        "RigidBody": {
-          "friction": 0.20000000298023224,
-          "gravityFactor": 1.0,
-          "isActive": false,
-          "maxAngularVelocity": 47.12385177612305,
-          "maxLinearVelocity": 500.0,
-          "motionType": 0,
-          "needsMassOverride": true,
-          "offset": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "restitution": 0.0
         },
         "Transform": {
           "rotate": [

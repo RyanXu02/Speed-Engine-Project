@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Engine.h"
+#include "Core/ResourceManagers/ResourceManager.h"
 #include "Transform.h"
 #include "RigidBody.h"
 #include "PhysicsShape/PhysicsShapeBox.h"
@@ -42,6 +44,13 @@ namespace SE
 		MeshComponent(uint32_t meshId)
 		    : meshResourceID(meshId)
 		{}
+
+		void setPath(std::string p)
+		{
+			path = p;
+			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
+			meshResourceID = meshResourceManager->loadMesh({ .path = path, .name = path });
+		}
 
 		uint32_t meshResourceID{ 0 };
 		std::string path = "None";
