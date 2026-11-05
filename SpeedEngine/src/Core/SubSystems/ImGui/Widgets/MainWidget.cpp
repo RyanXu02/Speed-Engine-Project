@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
+#include "Core/SubSystems/Graphics/Window.h"
 #include "../../Graphics/Rendering/RendererManager.h"
 #include "../../Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "../../Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
@@ -237,14 +238,8 @@ namespace SE
 					EngineStates::setDebugRenderingEnabled(debugEnabled);
 				ImGui::EndMenu();
 			}
-			if (scene)
-			{
-				ImGui::SameLine();
-				ImGui::Text("%s%s%s", scene->getName().c_str(), m_session.isDirty() ? " *" : "",
-					scene->getSourcePath().empty() ? " (unsaved)" : "");
-			}
+			ImGui::EndMainMenuBar();
 		}
-		ImGui::EndMainMenuBar();
 		EngineStateWidget::render();
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 	}
@@ -381,6 +376,33 @@ namespace SE
 		}
 		drawActiveDialog();
 		s_editsBlocked = scenes->hasPendingTransition() || m_action != Action::None || m_dialog != Dialog::None;
+
+		updateWindowTitle();
+	}
+
+	void MainWidget::updateWindowTitle()
+	{
+		auto* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		const std::string_view sceneName = scene ? std::string_view(scene->getName()) : std::string_view{};
+		const std::string_view sourcePath = scene ? std::string_view(scene->getSourcePath()) : std::string_view{};
+		const bool unsaved = scene && (sourcePath.empty() || m_session.isDirty());
+		if (!m_windowTitle.empty() && sceneName == m_titleSceneName && sourcePath == m_titleSourcePath
+			&& unsaved == m_titleUnsaved)
+			return;
+
+		m_titleSceneName = sceneName;
+		m_titleSourcePath = sourcePath;
+		m_titleUnsaved = unsaved;
+		m_windowTitle = "Speed Engine";
+		if (scene)
+		{
+			m_windowTitle += " - ";
+			m_windowTitle += sourcePath.empty() ? m_titleSceneName
+				: std::filesystem::path(m_titleSourcePath).stem().string();
+			if (unsaved)
+				m_windowTitle += "*";
+		}
+		Engine::Instance().getSubSystem<Window>()->setTitle(m_windowTitle);
 	}
 
 	void MainWidget::drawActiveDialog()

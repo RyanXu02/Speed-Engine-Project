@@ -12,7 +12,7 @@ namespace SE
 {
 	void EngineStateWidget::render()
 	{
-		constexpr float toolbarVerticalPadding = 2.0f;
+		constexpr float toolbarVerticalPadding = 3.0f;
 		constexpr float controlVerticalPadding = 2.0f;
 		const ImGuiStyle& style = ImGui::GetStyle();
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(style.WindowPadding.x, toolbarVerticalPadding));

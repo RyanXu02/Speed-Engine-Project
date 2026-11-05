@@ -41,6 +41,9 @@ namespace SE
 		void prepDialog(Dialog dialog);
 		// @brief Renders any open dialogs, call this after rendering the main menu bar
 		void drawActiveDialog();
+
+		// @brief Updates the window title based on the current scene and editor state
+		void updateWindowTitle();
 		
 		// @brief Refreshes the list of scene files in the current folder
 		void refreshSceneFiles();
@@ -65,6 +68,11 @@ namespace SE
 		std::string m_selectedPath;
 		std::string m_error;
 		std::vector<std::string> m_sceneFiles;
+
+		std::string m_windowTitle;
+		std::string m_titleSceneName;
+		std::string m_titleSourcePath;
+		bool m_titleUnsaved = false;
 
 		static inline bool s_editsBlocked = false;
 
