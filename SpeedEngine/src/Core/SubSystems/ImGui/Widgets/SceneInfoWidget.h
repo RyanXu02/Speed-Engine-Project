@@ -20,15 +20,15 @@ namespace SE
 		EventSubscription m_sceneChanged;
 
 		uint32_t m_renameEntityId = 0;
+		std::vector<uint32_t> m_renameTargets;
 		bool m_focusRename = false;
 		std::string m_renameBuffer{};
 
 		bool m_requestDelete = false;
 
-		void _rightClickMenu(const std::string& name, uint32_t id);
-		void _leftClickHandle(const std::string& name, uint32_t id);
-		void _f2Handle(const std::string& name, uint32_t id);
-		void _renamingHandle(uint32_t id);
+		bool _rightClickMenu();
+		void _beginRename(const std::string& name, uint32_t id);
+		void _renamingHandle();
 	};
 } // namespace SE
 #endif
