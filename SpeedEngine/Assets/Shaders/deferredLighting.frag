@@ -42,8 +42,9 @@ uniform vec3 lightPositions[MAX_LIGHTS];
 uniform vec3 lightColors[MAX_LIGHTS];
 
 uniform vec3 camPos;
-uniform float G;     // G scattering term
-uniform float scatteringScale;
+uniform float G;                // G scattering term
+uniform float scatteringScale;  // for stronger scattering
+uniform float fogMaxDistance;   // caps the march, sky pixels have no surface to stop at
 
 // tunables
 uniform float ambientStrength;
@@ -319,12 +320,64 @@ float mieScattering(float cosTheta, float G) {
 	return numerator / denominator;
 }
 
+// volumetric light march from the camera along rayDir, returns in-scattered light, transmittance in the out param
+vec3 marchVolume(vec3 rayDir, float maxDist, out float transmittance)
+{
+    transmittance = 1.0;
+    if (!useDirLight || maxDist <= 0.0) {
+        return vec3(0.0);
+    }
+
+    const int numSteps = 16;
+    float stepSize = maxDist / float(numSteps);
+    float dither = useBlueNoise
+        ? texelFetch(blueNoise, ivec2(gl_FragCoord.xy) % textureSize(blueNoise, 0), 0).r
+        : DITHER_PATTERN[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4];
+
+    vec3 step = rayDir * stepSize;
+    vec3 rayPos = camPos + step * dither;
+
+    // phase only depends on the ray and the light, constant along the march
+    // cosTheta is between the view ray and the direction toward the light, so G > 0 peaks looking into the sun
+    float phase = mieScattering(dot(rayDir, -dirLightDirection), G);
+    float absorptionCoefficient = 0.15;
+    vec3 scattering = dirLightColor * phase * absorptionCoefficient;
+
+    vec3 volume = vec3(0.0);
+    for(int i = 0; i < numSteps; i++) {
+        vec4 fragPosLight = lightSpaceMatrix * vec4(rayPos, 1.0);   // where the ray position is at each step
+        vec3 rayProjCoordsNDC = fragPosLight.xyz / fragPosLight.w * 0.5 + 0.5;
+
+        // outside the shadow map counts as lit, otherwise lit when closer to the sun than the stored depth
+        bool outside = any(lessThan(rayProjCoordsNDC, vec3(0.0))) || any(greaterThan(rayProjCoordsNDC, vec3(1.0)));
+        float bias = 0.0005;
+        if(outside || texture(shadowMap, rayProjCoordsNDC.xy).r > rayProjCoordsNDC.z + bias) {
+            volume += scattering * transmittance * stepSize;   // stepSize already integrates, no divide by numSteps
+        }
+        transmittance *= exp(-absorptionCoefficient * stepSize);
+
+        if(transmittance <= 0.01) {
+            break;
+        }
+        rayPos += step;
+    }
+
+    return volume * scatteringScale;
+}
+
 void main()
 {
     // the G-buffer clears to 0 and geometry always writes a unit normal, so no normal means nothing was drawn
     vec3 rawNormal = texture(gNormal, TexCoords).xyz;
     if (dot(rawNormal, rawNormal) < 1e-6) {
-        FragColor = vec4(useSky ? sampleSky() : vec3(0.0), 1.0);
+        // world direction through this pixel, skyInverseViewProj is rotation only so this is a pure direction
+        vec4 farPoint = skyInverseViewProj * vec4(TexCoords * 2.0 - 1.0, 1.0, 1.0);
+        vec3 skyRay = normalize(farPoint.xyz / farPoint.w);
+
+        float skyTransmittance;
+        vec3 skyVolume = marchVolume(skyRay, fogMaxDistance, skyTransmittance);
+        vec3 sky = useSky ? sampleSky() : vec3(0.0);
+        FragColor = vec4(sky * skyTransmittance + skyVolume, 1.0);
         return;
     }
 
@@ -364,45 +417,12 @@ void main()
     vec3 ambient = calculateAmbient(N, V, F0, albedo, metallic, roughness, ao);
     vec3 finalColor   = ambient + Lo + emissive;
 
-    // volumetric light march
+    // volumetric light march, the fog dims the surface behind it and adds the in-scattered light on top
     vec3 viewRay = normalize(WorldPos - camPos);
-    float maxDist = length(WorldPos - camPos);
-    const int numSteps = 16;
-    float stepSize = maxDist / float(numSteps);
-    float dither = DITHER_PATTERN[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4]; //Bayer pattern
-    vec2 noiseUV = gl_FragCoord.xy / vec2(textureSize(blueNoise, 0));
-
-    vec3 rayPos = camPos;
-    vec3 step = viewRay * stepSize;
-    rayPos += step * dither;
-
-    vec3 volume = vec3(0.0);
-    vec4 color = vec4(0.0);
-    float transparency = 1.0;
-    float absorptionCoefficient = 0.15;
-    for(int i = 0; i < numSteps; i++) {
-        vec4 fragPosLight = lightSpaceMatrix * vec4(rayPos, 1.0);   // where the ray position is at each step
-        vec3 rayProjCoordsNDC = fragPosLight.xyz / fragPosLight.w * 0.5 + 0.5;
-        float shadowDepth = texture(shadowMap, rayProjCoordsNDC.xy).r;
-        
-        // if the point in the rayPos closer to the sun than the shadowmap
-        // shade and accumulate the volume when not in the shade
-        float bias = 0.0005;
-        if(shadowDepth > rayProjCoordsNDC.z + bias) {   
-            float phase = mieScattering(dot(viewRay, -dirLightDirection), G);
-            vec3 scattering = dirLightColor * phase * absorptionCoefficient;
-            volume += scattering * transparency * stepSize;
-        }
-        transparency *= exp(-absorptionCoefficient * stepSize);
-
-        if(transparency <= 0.01) {
-            break;
-        }
-        rayPos += step;
-    }
-
-    vec3 finalVolume = (volume / float(numSteps)) * scatteringScale;
-    finalColor += finalVolume;
+    float maxDist = min(length(WorldPos - camPos), fogMaxDistance);
+    float transmittance;
+    vec3 volume = marchVolume(viewRay, maxDist, transmittance);
+    finalColor = finalColor * transmittance + volume;
     
     FragColor = vec4(finalColor, 1.0);
 }

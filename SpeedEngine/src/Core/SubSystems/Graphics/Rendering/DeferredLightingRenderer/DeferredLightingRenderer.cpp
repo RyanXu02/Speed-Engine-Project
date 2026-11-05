@@ -104,12 +104,13 @@ namespace SE
 
 		// sky fills the pixels the G-buffer left empty, the cube sampler always gets its own slot
 		m_shader.setInt("environmentMap", TextureSlots::SKY);
+		// rotation only, so the sky doesn't move with camera, always set since the volume march on sky pixels needs the ray too
+		const glm::mat4 rotationOnlyView = glm::mat4(glm::mat3(camera.viewMatrix));
+		m_shader.setMat4("skyInverseViewProj", glm::inverse(camera.projectionMatrix * rotationOnlyView));
 		auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
 		if (ibl && ibl->isReady() && ibl->drawSkybox) {
-			const glm::mat4 rotationOnlyView = glm::mat4(glm::mat3(camera.viewMatrix));	// rotation only, so the sky doesn't move with camera
 			m_shader.setBool("useSky", true);
 			m_shader.setInt("skySource", static_cast<int>(ibl->skyboxSource));
-			m_shader.setMat4("skyInverseViewProj", glm::inverse(camera.projectionMatrix * rotationOnlyView));
 			glActiveTexture(GL_TEXTURE0 + TextureSlots::SKY);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, ibl->getEnvCubemap());
 			glActiveTexture(GL_TEXTURE0);
@@ -120,7 +121,7 @@ namespace SE
 
 		m_shader.setFloat("G", phaseG);
 		m_shader.setFloat("scatteringScale", scatteringScale);
-
+		m_shader.setFloat("fogMaxDistance", fogMaxDistance);
 		glBindVertexArray(m_VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 

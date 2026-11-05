@@ -119,7 +119,7 @@ namespace SE
 				{
 					ImGui::SliderFloat("G", &deferredLightingRenderer->phaseG, 0.0f, 1.0f);
 					ImGui::SliderFloat("scattering Scale", &deferredLightingRenderer->scatteringScale, 0.0f, 5.0f);
-				}
+					ImGui::SliderFloat("Fog Max Distance", &deferredLightingRenderer->fogMaxDistance, 1.0f, 200.0f);				}
 
 				auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
 				if (ibl)

@@ -18,7 +18,8 @@ namespace SE
 		void shutdown() override;
 
 		float phaseG = 0.7;
-		float scatteringScale = 0.2;
+		float scatteringScale = 1.0f;
+		float fogMaxDistance = 50.0f;	// march length for sky pixels and cap for far geometry
 
 	private:
 		std::string m_gBufferTarget;
