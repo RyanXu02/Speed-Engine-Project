@@ -94,5 +94,6 @@ namespace SE
 		EventSubscription m_cameraSwitchEvent;
 
 		FontHandle QSfont; // temporary
+		EventSubscription m_buttonSubscription;
 	};
 } // namespace SE

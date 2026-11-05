@@ -48,6 +48,10 @@ namespace SE
 		ImGui::SameLine();
 		ImGui::Text("State: %s", playing ? "Playing" : "Paused");
 
+		int inputMode = static_cast<int>(EngineStates::getInputMode());
+		if (ImGui::Combo("Input", &inputMode, "Game\0Editor\0"))
+			EngineStates::setInputMode(static_cast<EngineStates::InputMode>(inputMode));
+
 		ImGui::End();
 	}
 

@@ -33,6 +33,7 @@ namespace SE
 		CollisionAddedEvent,
 		CollisionPersistedEvent,
 		CollisionRemovedEvent,
+		ButtonActivated,
 #if defined(COMPILE_WITH_EDITOR)
 		EntitySelected, // An entity has been selected in the SceneInfoWidget
 		ResourceChanged, // A resource in the resource manager has been added or removed
@@ -158,6 +159,22 @@ namespace SE
 		EventType getEventType() const override { return EventType::ActiveSceneModified; }
 		std::string getName() const override { return "ActiveSceneModified"; }
 		std::string getDataAsString() const override { return std::format("modifytype {}, id {}, name {}", static_cast<int>(modifytype), id, name); }
+	};
+
+	class ButtonActivated : public Event
+	{
+	public:
+		uint32_t entityId;
+		std::string canvasKey;
+		std::string elementKey;
+
+		ButtonActivated(uint32_t entityId, std::string canvasKey, std::string elementKey)
+			: entityId(entityId), canvasKey(std::move(canvasKey)), elementKey(std::move(elementKey))
+		{}
+
+		EventType getEventType() const override { return EventType::ButtonActivated; }
+		std::string getName() const override { return "ButtonActivated"; }
+		std::string getDataAsString() const override { return std::format("entity {}, canvas {}, element {}", entityId, canvasKey, elementKey); }
 	};
 
 	// @brief Event that is triggered when two rigidbodies first collide

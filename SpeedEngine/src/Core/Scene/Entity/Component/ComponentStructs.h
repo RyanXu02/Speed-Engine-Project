@@ -11,6 +11,14 @@
 #include "Core/EngineStates.h"
 #include "AudioComponents.h"
 #include "Particles/ParticleEmitter.h"
+#include "UICanvasComponent.h"
+#include "UIRectComponent.h"
+#include "UIElementComponent.h"
+#include "UIImageComponent.h"
+#include "UITextComponent.h"
+#include "UISelectableComponent.h"
+#include "UIButtonComponent.h"
+#include "UISliderComponent.h"
 
 
 namespace SE

@@ -31,7 +31,7 @@ namespace SE
 		// @brief Builds a RenderFrame from the captured state and appends debug geometry from the physics system
 		// @param frame The RenderFrame to build
 		// @param physics The PhysicsSystem to append debug geometry from
-		void build(RenderFrame& frame, PhysicsSystem& physics) const;
+		void build(RenderFrame& frame, PhysicsSystem& physics, Scene& scene) const;
 
 	private:
 		struct TextSubmission

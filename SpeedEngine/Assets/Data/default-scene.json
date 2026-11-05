@@ -105,9 +105,9 @@
             1.0
           ],
           "translate": [
-            -3.799999952316284,
+            -4.235783576965332,
             0.699999988079071,
-            0.0
+            0.8948752284049988
           ]
         }
       }
@@ -160,8 +160,8 @@
             15.0
           ],
           "translate": [
-            -4.551000118255615,
-            9.947999954223633,
+            -9.45142936706543,
+            -9.33248233795166,
             12.250982284545898
           ]
         }
@@ -382,56 +382,56 @@
         "ParticleEmitter": {
           "acceleration": [
             0.0,
-            14.199999809265137,
+            -9.800000190734863,
             0.0
           ],
-          "alpha": 0.4901960790157318,
+          "alpha": 1.0,
           "azimuthRange": [
-            56.70000076293945,
-            345.70001220703125
+            0.0,
+            360.0
           ],
           "coneAngleRange": [
-            70.0,
+            0.0,
             180.0
           ],
           "directionAxis": [
-            5.0,
             0.0,
+            1.0,
             0.0
           ],
-          "emitMax": 1000,
-          "emitRate": 78.4000015258789,
+          "emitMax": 50000,
+          "emitRate": 3000.0,
           "frameIndex": 0,
-          "lifetimeMax": 9.100000381469727,
-          "lifetimeMin": 9.100000381469727,
+          "lifetimeMax": 5.0,
+          "lifetimeMin": 1.0,
           "oneShot": false,
           "particleScaleMax": [
-            0.5,
+            0.05000000074505806,
             0.5,
             0.5
           ],
           "particleScaleMin": [
+            0.004999999888241291,
+            0.05000000074505806,
+            0.05000000074505806
+          ],
+          "rotationMax": 90.0,
+          "rotationMin": 0.0,
+          "rotationSpeedMax": 0.0,
+          "rotationSpeedMin": 0.0,
+          "scale": [
             1.0,
             1.0,
             1.0
           ],
-          "rotationMax": 3.9000000953674316,
-          "rotationMin": 3.9000000953674316,
-          "rotationSpeedMax": 0.20000000298023224,
-          "rotationSpeedMin": 0.20000000298023224,
-          "scale": [
-            0.0,
-            0.0,
-            0.0
-          ],
           "sheetColumns": 1,
           "sheetRows": 1,
-          "speedMax": 1.0,
-          "speedMin": 1.0,
+          "speedMax": 10.0,
+          "speedMin": 3.0,
           "tintColor": [
-            0.1029900312423706,
-            1.0,
-            0.2579551339149475
+            0.11764705926179886,
+            0.10588235408067703,
+            0.25882354378700256
           ]
         },
         "Transform": {
@@ -447,9 +447,92 @@
             1.0
           ],
           "translate": [
-            -15.0,
+            -3.5999999046325684,
+            20.399999618530273,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "components": {
+        "LifeComponent": {
+          "isAlive": true
+        },
+        "NameComponent": {
+          "name": "thomas the dank engine"
+        },
+        "ParticleEmitter": {
+          "acceleration": [
+            0.0,
+            5.0,
+            -5.0
+          ],
+          "alpha": 0.3176470696926117,
+          "azimuthRange": [
+            0.0,
+            360.0
+          ],
+          "coneAngleRange": [
+            0.0,
+            59.099998474121094
+          ],
+          "directionAxis": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "emitMax": 50000,
+          "emitRate": 5000.0,
+          "frameIndex": 0,
+          "lifetimeMax": 3.0,
+          "lifetimeMin": 1.0,
+          "oneShot": false,
+          "particleScaleMax": [
+            0.10000000149011612,
+            0.10000000149011612,
+            0.10000000149011612
+          ],
+          "particleScaleMin": [
+            0.0,
             0.0,
             0.0
+          ],
+          "rotationMax": 0.0,
+          "rotationMin": 0.0,
+          "rotationSpeedMax": 0.0,
+          "rotationSpeedMin": 0.0,
+          "scale": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "sheetColumns": 1,
+          "sheetRows": 1,
+          "speedMax": 3.0,
+          "speedMin": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            5.400000095367432,
+            2.799999952316284,
+            1.2999999523162842
           ]
         }
       }

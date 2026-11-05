@@ -71,7 +71,8 @@ namespace SE
 				break;
 
 			case InputEvent::Type::Focus:
-				if (inputEvent.action == InputEvent::Action::Release)
+				m_hasFocus = inputEvent.action != InputEvent::Action::Release;
+				if (!m_hasFocus)
 				{
 					m_keyFalling |= m_keyCurrState;
 					m_mouseFalling |= m_mouseCurrState;
@@ -85,6 +86,10 @@ namespace SE
 			case InputEvent::Type::WindowClose:
 				ES->publish(std::make_unique<WindowClose>());
 				break;
+
+			case InputEvent::Type::InputRegion:
+				m_inputRegion = inputEvent.inputRegion;
+				break;
 			}
 		}
 	}
@@ -92,6 +97,23 @@ namespace SE
 	void InputSystem::shutdown()
 	{
 		SubSystem::shutdown();
+	}
+
+	bool InputSystem::isPointerInInputRegion() const
+	{
+		if (!m_hasMousePosition)
+			return false;
+		const glm::vec2 local = glm::vec2(m_mousePosition.x, m_mousePosition.y) - m_inputRegion.imageTopLeft;
+		return local.x >= 0.0f && local.y >= 0.0f && local.x < m_inputRegion.imageSize.x && local.y < m_inputRegion.imageSize.y;
+	}
+
+	std::optional<glm::vec2> InputSystem::getPointerPositionInInputRegion() const
+	{
+		if (!m_hasMousePosition || m_inputRegion.imageSize.x <= 0.0f || m_inputRegion.imageSize.y <= 0.0f ||
+			m_inputRegion.renderTargetSize.x == 0 || m_inputRegion.renderTargetSize.y == 0)
+			return std::nullopt;
+		const glm::vec2 local = glm::vec2(m_mousePosition.x, m_mousePosition.y) - m_inputRegion.imageTopLeft;
+		return local / m_inputRegion.imageSize * glm::vec2(m_inputRegion.renderTargetSize);
 	}
 
 	bool InputSystem::isKeyRising(KeyCodes key) const

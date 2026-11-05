@@ -14,6 +14,7 @@
 #include "SubSystems/Scenes/SceneSystem.h"
 #include "SubSystems/Physics/PhysicsSystem.h"
 #include "SubSystems/Audio/AudioSystem.h"
+#include "SubSystems/UI/UISystem.h"
 #include "SubSystems/SubSystem.h"
 #include "EngineStates.h"
 #include "Threading/FrameExchange.h"
@@ -51,6 +52,7 @@ namespace SE
 		m_subSystems.push_back(std::unique_ptr<SceneSystem>(new SceneSystem()));
 		m_subSystems.push_back(std::unique_ptr<ScriptingSystem>(new ScriptingSystem()));
 		m_subSystems.push_back(std::unique_ptr<AudioSystem>(new AudioSystem()));
+		m_subSystems.push_back(std::unique_ptr<UISystem>(new UISystem()));
 
 
 		// init all subsystems
@@ -71,20 +73,29 @@ namespace SE
 			    const SwitchCameraEvent& cameraEvent = static_cast<const SwitchCameraEvent&>(event);
 			    EngineStates::setCamera(cameraEvent.camera);
 		    });
+
+		// testing button event
+		m_buttonSubscription = getSubSystem<EventSystem>()->subscribe(EventType::ButtonActivated,
+		    [this](Event& event)
+		    {
+			    const auto& button = static_cast<const ButtonActivated&>(event);
+
+			    if (button.canvasKey == "main" && button.elementKey == "goto scene")
+			    {
+				    getSubSystem<SceneSystem>()->requestOpenScene("Assets/Data/default-scene.json");
+			    }
+			    if (button.canvasKey == "main" && button.elementKey == "goto particle")
+			    {
+				    getSubSystem<SceneSystem>()->requestOpenScene("Assets/Data/scene-with-particles.json");
+			    }
+		    });
 	}
 	void Engine::start()
 	{
 		m_shutdownRequested.store(false);
 
 		SceneSystem* sceneSystem = getSubSystem<SceneSystem>();
-		sceneSystem->setCurrentScene("Assets/Data/default-scene.json");
-
-		ResourceManager* resourceManager = getSubSystem<ResourceManager>();
-		uint32_t fontid = resourceManager->loadFont({ 
-			.path = "fonts/Quicksand-Regular.ttf", 
-			.pixelHeight = 32, 
-			.name = "QSfont" });
-		QSfont = resourceManager->getResource<Font>(fontid)->getHandle();
+		sceneSystem->setCurrentScene("Assets/Data/UI-scene.json");
 	}
 
 	void Engine::run()
@@ -145,11 +156,9 @@ namespace SE
 		for (int step = 0; step < physicsSteps; ++step)
 			getSubSystem<PhysicsSystem>()->step(simulationDeltaTime);
 		getSubSystem<AudioSystem>()->update(deltaTime);
-		if (EngineStates::isEditorCameraActive())
+		getSubSystem<UISystem>()->update(deltaTime);
+		if (EngineStates::isEditorCameraActive() && !getSubSystem<UISystem>()->isAcceptingCommands())
 			m_cameraController.update(EngineStates::getEditorCamera(), *getSubSystem<InputSystem>(), deltaTime);
-		
-		// temp test text
-		submitText(QSfont, "Hello text blah blah blah\nnew line: !@#$%^&*()_+-=,./;'[]<>?:{}|", { 20.0f, 20.0f });
 	}
 
 	void Engine::produceRenderFrame()
@@ -157,7 +166,7 @@ namespace SE
 		if (auto write = m_frameExchange.tryBeginWrite())
 		{
 			RenderFrame& frame = write.frame();
-			m_frameBuilder.build(frame, *getSubSystem<PhysicsSystem>());
+			m_frameBuilder.build(frame, *getSubSystem<PhysicsSystem>(), *getSubSystem<SceneSystem>()->getCurrentScene());
 			write.publish();
 		}
 	}
