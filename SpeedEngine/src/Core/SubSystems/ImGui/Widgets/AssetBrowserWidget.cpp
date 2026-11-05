@@ -4,6 +4,9 @@
 #include "AssetBrowserWidget.h"
 #include "AssetPathPayload.h"
 
+#include <shellapi.h>
+#pragma comment(lib, "Shell32.lib")
+
 namespace SE
 {
 	AssetBrowserWidget::AssetBrowserWidget() : VisibleWidget("AssetBrowserWidget")
@@ -54,8 +57,17 @@ namespace SE
 				ImGui::PushID(i);
 				ImGui::SetNextItemSelectionUserData(i);
 				ImGui::Selectable(label.c_str(), m_selection.Contains(static_cast<ImGuiID>(i)), ImGuiSelectableFlags_AllowDoubleClick);
-				if (folder && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-					nextDirectory = entry.path();
+				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+				{
+					if (folder)
+						nextDirectory = entry.path();
+					else
+					{
+						const auto extension = entry.path().extension();
+						if (extension == ".lua" || extension == ".json" || extension == ".vert" || extension == ".frag" || extension == ".comp")
+							ShellExecuteW(nullptr, L"open", std::filesystem::absolute(entry.path()).c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+					}
+				}
 
 				if (!folder && ImGui::BeginDragDropSource())
 				{
