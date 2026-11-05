@@ -367,7 +367,7 @@
           "name": "camera"
         },
         "ScriptComponent": {
-          "path": "Assets/Scripts/Camera.lua"
+          "path": "Assets/Scripts/cameraslow.lua"
         },
         "Transform": {
           "rotate": [

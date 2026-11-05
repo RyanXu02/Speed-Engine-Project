@@ -19,7 +19,7 @@ function physicstest:onUpdate(dt)
 
 	if Input.isKeyDown(KeyCodes.KEY_SPACE) then
 		local rigidbody = self.entity:getComponent("RigidBody")
-		rigidbody:addImpulse(vec3(0.0, 250.0, 0.0))
+		rigidbody:addForce(vec3(0.0, 100000.0, 0.0))
 	end
 end
 
