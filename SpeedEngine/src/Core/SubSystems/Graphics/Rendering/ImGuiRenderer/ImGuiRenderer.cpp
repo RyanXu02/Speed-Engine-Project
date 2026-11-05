@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "SubSystems/ImGui/Widgets/EngineStateWidget.h"
 #include "SubSystems/ImGui/Widgets/MainWidget.h"
 #include "SubSystems/ImGui/Widgets/MemoryWidget.h"
 #include "SubSystems/ImGui/Widgets/PropertiesWidget.h"
@@ -162,7 +161,6 @@ namespace SE
 		createWidget<ScenePreviewWidget>();
 		createWidget<SceneInfoWidget>(m_session);
 		createWidget<PropertiesWidget>(m_session);
-		createWidget<EngineStateWidget>();
 #endif
 		createWidget<ConsoleWidget>();
 		// ...

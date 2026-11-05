@@ -36,7 +36,6 @@ namespace SE
 
 	void MainWidget::render()
 	{
-		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
 		auto* scene = scenes->getCurrentScene();
 		const bool available = !s_editsBlocked;
@@ -213,11 +212,6 @@ namespace SE
 				{
 					SceneInfoWidget::setVisible(!sceneInfoVisible);
 				}
-				const bool engineStateVisible = EngineStateWidget::isVisible();
-				if (ImGui::MenuItem("Engine State", nullptr, engineStateVisible))
-				{
-					EngineStateWidget::setVisible(!engineStateVisible);
-				}
 				const bool scenePreviewVisible = ScenePreviewWidget::isVisible();
 				if (ImGui::MenuItem("Scene Preview", nullptr, scenePreviewVisible))
 				{
@@ -251,6 +245,8 @@ namespace SE
 			}
 		}
 		ImGui::EndMainMenuBar();
+		EngineStateWidget::render();
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 	}
 
 	void MainWidget::queueAction(Action action)
