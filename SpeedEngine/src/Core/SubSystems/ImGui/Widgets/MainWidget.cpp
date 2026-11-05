@@ -227,25 +227,22 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Physics"))
 			{
-				if (ImGui::MenuItem("Run Physics", nullptr))
+				if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
 				{
-					if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
+					bool running = physicsSystem->isRunning();
+					if (ImGui::Checkbox("Run Physics", &running))
 					{
-						physicsSystem->resume();
+						if (running)
+							physicsSystem->resume();
+						else
+							physicsSystem->pause();
 					}
 				}
-				if (ImGui::MenuItem("Pause Physics", nullptr))
-				{
-					if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
-					{
-						physicsSystem->pause();
-					}
-				}
+				bool debugEnabled = EngineStates::isDebugRenderingEnabled();
+				if (ImGui::Checkbox("Debug Rendering", &debugEnabled))
+					EngineStates::setDebugRenderingEnabled(debugEnabled);
 				ImGui::EndMenu();
 			}
-			const bool debugEnabled = EngineStates::isDebugRenderingEnabled();
-			if (ImGui::Button(debugEnabled ? "Debug Rendering: On" : "Debug Rendering: Off"))
-				EngineStates::setDebugRenderingEnabled(!debugEnabled);
 			if (scene)
 			{
 				ImGui::SameLine();
