@@ -64,9 +64,9 @@ namespace SE
 			    }
 			    const bool enter = ImGui::InputText("Path", &m_meshPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
-				acceptAssetPathPayload(m_meshPathDraft);
+				const bool dropped = acceptAssetPathPayload(m_meshPathDraft);
 			    // user confirmed a new path
-			    if ((enter || deactivated) && m_meshPathDraft != component.path)
+				if ((enter || deactivated || dropped) && m_meshPathDraft != component.path)
 			    {
 				    uint32_t resource = 0;
 				    const bool empty = m_meshPathDraft.empty() || m_meshPathDraft == "None";
@@ -223,9 +223,9 @@ namespace SE
 			    }
 			    const bool enter = ImGui::InputText("Path", &m_physicsShapeMeshPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
-				acceptAssetPathPayload(m_physicsShapeMeshPathDraft);
+				const bool dropped = acceptAssetPathPayload(m_physicsShapeMeshPathDraft);
 			    // user confirmed a new path
-			    if ((enter || deactivated) && m_physicsShapeMeshPathDraft != component.getPath())
+				if ((enter || deactivated || dropped) && m_physicsShapeMeshPathDraft != component.getPath())
 				{
 				    component.setPath(m_physicsShapeMeshPathDraft);
 					m_session.markDirty();
@@ -242,9 +242,9 @@ namespace SE
 			    }
 				const bool enter = ImGui::InputText("Path", &m_soundPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
-				acceptAssetPathPayload(m_soundPathDraft);
+				const bool dropped = acceptAssetPathPayload(m_soundPathDraft);
 			    // user confirmed a new path
-				if ((enter || deactivated) && m_soundPathDraft != path)
+				if ((enter || deactivated || dropped) && m_soundPathDraft != path)
 			    {
 					if (!m_soundPathDraft.empty())
 				    {
@@ -291,9 +291,9 @@ namespace SE
 			    }
 				const bool enter = ImGui::InputText("Path", &m_musicPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
-				acceptAssetPathPayload(m_musicPathDraft);
+				const bool dropped = acceptAssetPathPayload(m_musicPathDraft);
 			    // user confirmed a new path
-				if ((enter || deactivated) && m_musicPathDraft != path)
+				if ((enter || deactivated || dropped) && m_musicPathDraft != path)
 			    {
 					if (!m_musicPathDraft.empty())
 				    {
