@@ -26,7 +26,6 @@ namespace SE
 		settings.mDrawShape = true;
 		settings.mDrawShapeWireframe = true;
 		settings.mDrawVelocity = true;
-		settings.mDrawGetSupportingFace = true;
 		physics.DrawBodies(settings, this);
 
 		if (frame.debugLines.capacity() > m_debugLineCapacity)
