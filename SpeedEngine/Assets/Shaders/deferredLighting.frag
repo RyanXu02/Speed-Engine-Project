@@ -42,6 +42,8 @@ uniform vec3 lightPositions[MAX_LIGHTS];
 uniform vec3 lightColors[MAX_LIGHTS];
 
 uniform vec3 camPos;
+uniform float G;     // G scattering term
+uniform float scatteringScale;
 
 // tunables
 uniform float ambientStrength;
@@ -303,6 +305,20 @@ vec3 sampleSky()
     return envColor * iblIntensity;
 }
 
+const mat4 DITHER_PATTERN = mat4(
+    vec4(0.0, 0.5, 0.125, 0.625),
+    vec4(0.75, 0.22, 0.875, 0.375),
+    vec4(0.1875, 0.6875, 0.0625, 0.5625),
+    vec4(0.9375, 0.4375, 0.8125, 0.3125)
+);
+
+// Henyey-Greenstein phase function
+float mieScattering(float cosTheta, float G) {
+	float numerator = (1.0f - G*G);
+	float denominator =  (4.0f * PI * pow(1.0f + G * G - 2.0f * G * cosTheta, 1.5f));
+	return numerator / denominator;
+}
+
 void main()
 {
     // the G-buffer clears to 0 and geometry always writes a unit normal, so no normal means nothing was drawn
@@ -346,7 +362,47 @@ void main()
     }
 
     vec3 ambient = calculateAmbient(N, V, F0, albedo, metallic, roughness, ao);
-    vec3 color   = ambient + Lo + emissive;
+    vec3 finalColor   = ambient + Lo + emissive;
+
+    // volumetric light march
+    vec3 viewRay = normalize(WorldPos - camPos);
+    float maxDist = length(WorldPos - camPos);
+    const int numSteps = 16;
+    float stepSize = maxDist / float(numSteps);
+    float dither = DITHER_PATTERN[int(gl_FragCoord.x) % 4][int(gl_FragCoord.y) % 4]; //Bayer pattern
+    vec2 noiseUV = gl_FragCoord.xy / vec2(textureSize(blueNoise, 0));
+
+    vec3 rayPos = camPos;
+    vec3 step = viewRay * stepSize;
+    rayPos += step * dither;
+
+    vec3 volume = vec3(0.0);
+    vec4 color = vec4(0.0);
+    float transparency = 1.0;
+    float absorptionCoefficient = 0.15;
+    for(int i = 0; i < numSteps; i++) {
+        vec4 fragPosLight = lightSpaceMatrix * vec4(rayPos, 1.0);   // where the ray position is at each step
+        vec3 rayProjCoordsNDC = fragPosLight.xyz / fragPosLight.w * 0.5 + 0.5;
+        float shadowDepth = texture(shadowMap, rayProjCoordsNDC.xy).r;
+        
+        // if the point in the rayPos closer to the sun than the shadowmap
+        // shade and accumulate the volume when not in the shade
+        float bias = 0.0005;
+        if(shadowDepth > rayProjCoordsNDC.z + bias) {   
+            float phase = mieScattering(dot(viewRay, -dirLightDirection), G);
+            vec3 scattering = dirLightColor * phase * absorptionCoefficient;
+            volume += scattering * transparency * stepSize;
+        }
+        transparency *= exp(-absorptionCoefficient * stepSize);
+
+        if(transparency <= 0.01) {
+            break;
+        }
+        rayPos += step;
+    }
+
+    vec3 finalVolume = (volume / float(numSteps)) * scatteringScale;
+    finalColor += finalVolume;
     
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(finalColor, 1.0);
 }

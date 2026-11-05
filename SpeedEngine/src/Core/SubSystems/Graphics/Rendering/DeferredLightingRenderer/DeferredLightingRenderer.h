@@ -17,6 +17,9 @@ namespace SE
 		void render(RenderContext& context) override;
 		void shutdown() override;
 
+		float phaseG = 0.7;
+		float scatteringScale = 0.2;
+
 	private:
 		std::string m_gBufferTarget;
 		std::string m_shadowMapTarget;

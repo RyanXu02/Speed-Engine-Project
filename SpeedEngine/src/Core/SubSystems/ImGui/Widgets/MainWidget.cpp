@@ -1,13 +1,14 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "../../Graphics/Rendering/RendererManager.h"
-#include "../../Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
-#include "../../Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
-#include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
-#include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
-#include "../../Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
-#include "../../Scenes/SceneSystem.h"
+#include "SubSystems/Graphics/Rendering/RendererManager.h"
+#include "SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
+#include "SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
+#include "SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
+#include "SubSystems/Graphics/Rendering/DeferredLightingRenderer/DeferredLightingRenderer.h"
+#include "SubSystems/Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
+#include "SubSystems/Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
+#include "SubSystems/Scenes/SceneSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 #include "EngineStates.h"
@@ -111,6 +112,13 @@ namespace SE
 				{
 					LightingSettings& settings = sceneRenderer->getLightingSettings();
 					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f); // flat ambient, used while IBL is off
+				}
+	
+				auto* deferredLightingRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<DeferredLightingRenderer>();
+				if (deferredLightingRenderer)
+				{
+					ImGui::SliderFloat("G", &deferredLightingRenderer->phaseG, 0.0f, 1.0f);
+					ImGui::SliderFloat("scattering Scale", &deferredLightingRenderer->scatteringScale, 0.0f, 5.0f);
 				}
 
 				auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
