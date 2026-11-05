@@ -96,10 +96,67 @@ namespace SE
 		    });
 
 		m_inspectors.registerComponent<ScriptComponent>("Script", "Scripting", false,
-		    [](Entity&, ScriptComponent& component)
+		    [](Entity& entity, ScriptComponent& component)
 		    {
 			    auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
 			    ImGui::Text(component.path.c_str());
+
+				// an instance in lua is a table which itself is a map, member in the map can be modified and inspect
+			    sol::table instance = scriptingSystem->getScriptInstance(entity);
+			    if (instance.valid())
+			    {
+				    std::vector<std::string> names;
+				    for (const auto& [key, value] : instance)
+				    {
+					    if (key.get_type() != sol::type::string) {
+							continue;
+						}
+					    std::string name = key.as<std::string>();
+					    if (name == "entity" || name.starts_with("_")) {// the entity handle and private fields with _ are automatically skipped
+							continue;
+						}
+					    names.push_back(std::move(name));
+				    }
+			
+				    ImGui::SeparatorText("Script Fields");
+				    ImGui::PushID(static_cast<int>(entity.id()));
+				    for (const std::string& name : names) {
+					    sol::object value = instance[name];
+					    switch (value.get_type())
+					    {
+							case sol::type::number:
+							{
+								double number = value.as<double>();	// lua numbers are doubles
+								if (ImGui::DragFloat(name.c_str(), ImGuiDataType_Double, &number, 0.05f)) {
+									instance[name] = number;
+								}
+								break;
+							}
+							case sol::type::boolean:
+							{
+								bool flag = value.as<bool>();
+								if (ImGui::Checkbox(name.c_str(), &flag)) {
+									instance[name] = flag;
+								}
+								break;
+							}
+							case sol::type::userdata:
+								if (value.is<glm::vec3>()) {
+									glm::vec3& vec = value.as<glm::vec3&>();	// reference into the lua userdata, edits write through
+									ImGui::DragFloat3(name.c_str(), &vec.x, 0.05f);
+								}
+								break;
+							default:	// besides the above supported types, the rest are skipped for now
+								break;
+					    }
+				    }
+				    ImGui::PopID();
+			    }
+			    else
+			    {
+				    ImGui::TextDisabled("Script not loaded yet, fields show once it runs");
+			    }
+
 			    if (ImGui::Button("Test Load Single Time Script", ImVec2(-1.0f, 0.0f)))
 			    {
 					//TODO: hard code script path for now
