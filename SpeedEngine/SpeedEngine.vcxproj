@@ -292,6 +292,7 @@
     <ClInclude Include="src\Core\Scene\Entity\Component\UISliderComponent.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\EditorSession.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputEvent.h" />

@@ -31,11 +31,6 @@ namespace SE
 	void MainWidget::beginEditorFrame()
 	{
 		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
-		if (m_sceneRevision != scenes->getSceneRevision())
-		{
-			m_sceneRevision = scenes->getSceneRevision();
-			s_dirty = false;
-		}
 		s_editsBlocked = scenes->hasPendingTransition() || m_action != Action::None || m_dialog != Dialog::None;
 	}
 
@@ -90,7 +85,7 @@ namespace SE
 					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
 						scene->addEntity("New Empty");
-						markSceneDirty();
+						m_session.markDirty();
 					}
 				}
 				// add prefabs later
@@ -254,7 +249,7 @@ namespace SE
 			if (scene)
 			{
 				ImGui::SameLine();
-				ImGui::Text("%s%s%s", scene->getName().c_str(), s_dirty ? " *" : "",
+				ImGui::Text("%s%s%s", scene->getName().c_str(), m_session.isDirty() ? " *" : "",
 					scene->getSourcePath().empty() ? " (unsaved)" : "");
 			}
 		}
@@ -268,7 +263,7 @@ namespace SE
 			return;
 		m_action = action;
 		m_actionFrame = ImGui::GetFrameCount();
-		m_actionRevision = m_sceneRevision;
+		m_actionRevision = m_session.sceneRevision();
 		m_error.clear();
 	}
 
@@ -309,7 +304,7 @@ namespace SE
 			m_error = "Save failed. The scene was not replaced. Check the path and console, then retry or cancel.";
 			return false;
 		}
-		s_dirty = false;
+		m_session.clearDirty();
 		m_error.clear();
 		return true;
 	}
@@ -386,7 +381,7 @@ namespace SE
 				else
 					prepDialog(Dialog::SavePath);
 			}
-			else if (s_dirty)
+			else if (m_session.isDirty())
 				prepDialog(Dialog::Confirm);
 			else
 				performAction();

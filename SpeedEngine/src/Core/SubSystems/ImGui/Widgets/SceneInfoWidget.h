@@ -1,24 +1,22 @@
 #pragma once
-#include "../../../Scene/Entity/Entity.h"
+#if defined(COMPILE_WITH_EDITOR)
 #include "../../Events/EventSubscription.h"
 #include "../Widget.h"
+#include "Core/SubSystems/ImGui/EditorSession.h"
 
 namespace SE
 {
 	class SceneInfoWidget : public VisibleWidget<SceneInfoWidget>
 	{
 	public:
-		SceneInfoWidget();
+		explicit SceneInfoWidget(EditorSession& session);
 
 		void render() override;
 		void shutdown() override;
 
 	private:
-		std::unordered_map<uint32_t, std::string> m_entityNameCache;
+		EditorSession& m_session;
 
-		std::unordered_set<uint32_t> m_selectedEntities;
-
-		EventSubscription m_activeSceneModified;
 		EventSubscription m_sceneChanged;
 
 		uint32_t m_renameEntityId = 0;
@@ -33,3 +31,4 @@ namespace SE
 		void _renamingHandle(uint32_t id);
 	};
 } // namespace SE
+#endif

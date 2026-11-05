@@ -29,12 +29,6 @@ namespace SE
 			member("filepath", &AudioSFXComponent::m_filepath), 
 			member("isGameSFX", &AudioSFXComponent::m_isGameSFX));
 
-		//for use with the properties widget
-#ifdef COMPILE_WITH_EDITOR
-		std::string pathDraft;
-		std::string pathError;
-		bool drafInitialized{ false };
-#endif
 	private:
 		std::string m_filepath = "";
 		SFXId m_myId;
@@ -57,11 +51,6 @@ namespace SE
 
 		DEFINE_TYPE(AudioMusicComponent, member("filepath", &AudioMusicComponent::m_filepath));
 
-#ifdef COMPILE_WITH_EDITOR
-		std::string pathDraft;
-		std::string pathError;
-		bool drafInitialized{ false };
-#endif
 	private:
 		std::string m_filepath;
 		MusicId m_myId;

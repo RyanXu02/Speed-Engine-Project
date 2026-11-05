@@ -11,39 +11,17 @@ namespace SE
 {
 	using MT = ActiveSceneModified::ModifyType;
 
-	SceneInfoWidget::SceneInfoWidget()
+	SceneInfoWidget::SceneInfoWidget(EditorSession& session)
 		: VisibleWidget("Scene Info")
+		, m_session(session)
 	{
-		m_activeSceneModified = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::ActiveSceneModified,
-		    [this](Event& event)
-		    {
-			    ActiveSceneModified& asme = static_cast<ActiveSceneModified&>(event);
-			    if (asme.modifytype == MT::Add)
-			    {
-				    m_entityNameCache[asme.id] = asme.name;
-			    }
-			    else if (asme.modifytype == MT::Remove)
-			    {
-				    m_entityNameCache.erase(asme.id);
-			    }
-			    else if (asme.modifytype == MT::Rename)
-			    {
-				    m_entityNameCache[asme.id] = asme.name;
-			    }
-		    });
-
 		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
 		    [this](Event& event)
 		    {
-				m_selectedEntities.clear();
 				m_renameEntityId = 0;
 				m_focusRename = false;
 				m_renameBuffer.clear();
 				m_requestDelete = false;
-			    if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
-				    m_entityNameCache = scene->getEntityList();
-			    else
-				    m_entityNameCache.clear();
 		    });
 	}
 
@@ -94,7 +72,7 @@ namespace SE
 		{
 			if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 			{
-				for (uint32_t id : m_selectedEntities)
+				for (uint32_t id : m_session.selectedEntities())
 				{
 					Entity entity = scene->getEntity(id);
 					auto* nameComponent = entity.getComponent<NameComponent>();
@@ -104,14 +82,14 @@ namespace SE
 
 					if (!scene->removeEntity(id))
 						continue;
-					MainWidget::markSceneDirty();
+					m_session.markDirty();
 
 					EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
 					auto event = std::make_unique<ActiveSceneModified>(MT::Remove, id, name);
 					eventSystem->publish(std::move(event));
 				}
 			}
-			m_selectedEntities.clear();
+			m_session.clearSelection();
 		}
 
 		ImGui::EndDisabled();
@@ -120,21 +98,17 @@ namespace SE
 
 	void SceneInfoWidget::shutdown()
 	{
-		m_entityNameCache.clear();
 	}
 
 	void SceneInfoWidget::_rightClickMenu(const std::string& name, uint32_t id)
 	{
-		bool isSelected = m_selectedEntities.find(id) != m_selectedEntities.end();
-		bool multiSelected = m_selectedEntities.size() > 1;
+		bool isSelected = m_session.selectedEntities().contains(id);
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 		{
 			if (!isSelected)
-			{
-				m_selectedEntities.clear();
-				m_selectedEntities.insert(id);
-			}
+				m_session.select(id);
 		}
+		bool multiSelected = m_session.selectedEntities().size() > 1;
 
 		if (ImGui::BeginPopupContextItem("EntityRightClickMenu"))
 		{
@@ -162,33 +136,19 @@ namespace SE
 
 	void SceneInfoWidget::_leftClickHandle(const std::string& name, uint32_t id)
 	{
-		bool isSelected = m_selectedEntities.find(id) != m_selectedEntities.end();
+		bool isSelected = m_session.selectedEntities().contains(id);
 
 		if (ImGui::Selectable(name.c_str(), isSelected, ImGuiSelectableFlags_SelectOnNav))
 		{
 			if (ImGui::GetIO().KeyCtrl)
 			{
 				// Toggle selection on Ctrl+Click
-				if (isSelected)
-					m_selectedEntities.erase(id);
-				else
-					m_selectedEntities.insert(id);
+				m_session.toggle(id);
 			}
 			else
 			{
 				// Single selection on normal click
-				m_selectedEntities.clear();
-				m_selectedEntities.insert(id);
-			}
-
-			// Publish the EntitySelected event with the selected entity ID
-			if (m_selectedEntities.size() == 1)
-			{
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<EntitySelected>(*m_selectedEntities.begin()));
-			}
-			else
-			{
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<EntitySelected>(0));
+				m_session.select(id);
 			}
 		}
 	}
@@ -227,7 +187,7 @@ namespace SE
 					if (name && name->name != newName)
 					{
 						name->name = newName;
-						MainWidget::markSceneDirty();
+						m_session.markDirty();
 						EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
 						auto event = std::make_unique<ActiveSceneModified>(MT::Rename, id, newName);
 						eventSystem->publish(std::move(event));
@@ -242,7 +202,7 @@ namespace SE
 
 	void SceneInfoWidget::_f2Handle(const std::string& name, uint32_t id)
 	{
-		bool multiSelected = m_selectedEntities.size() > 1;
+		bool multiSelected = m_session.selectedEntities().size() > 1;
 		bool isItemFocused = ImGui::IsItemFocused();
 		bool isF2Pressed = ImGui::IsKeyPressed(ImGuiKey_F2);
 		if (isItemFocused && isF2Pressed && !multiSelected)

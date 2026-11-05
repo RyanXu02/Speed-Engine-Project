@@ -35,7 +35,6 @@ namespace SE
             "CollisionAddedEvent", EventType::CollisionAddedEvent,
             "CollisionPersistedEvent", EventType::CollisionPersistedEvent,
             "CollisionRemovedEvent", EventType::CollisionRemovedEvent
-			// "EntitySelected", EventType::EntitySelected 
 			// "ResourceChanged", EventType::ResourceChanged
 		);
 

@@ -2,7 +2,7 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 #include "Core/Scene/Entity/Entity.h"
-#include "MainWidget.h"
+#include "Core/SubSystems/ImGui/EditorSession.h"
 
 namespace SE
 {
@@ -20,6 +20,8 @@ namespace SE
 	class ComponentInspectorRegistry
 	{
 	public:
+		explicit ComponentInspectorRegistry(EditorSession& session) : m_session(session) {}
+
 		// @brief A component type to be displayed in the properties widget
 		struct Entry
 		{
@@ -45,7 +47,7 @@ namespace SE
 		void registerComponent(std::string name, std::string category = "General", bool removable = true, std::function<void(Entity&, T&)> editor = {}, std::function<void(Entity&, T&)> onEdited = {})
 		{
 			_addEntry<T>(std::move(name), std::move(category), std::is_default_constructible_v<T>, removable,
-			    [editor, onEdited](Entity& entity)
+				[this, editor, onEdited](Entity& entity)
 			    {
 				    auto* component = entity.getComponent<T>();
 				    if (!component)
@@ -59,7 +61,7 @@ namespace SE
 				    if (_editComponentJson("Properties", properties))
 				    {
 					    properties.get_to(*component);
-						MainWidget::markSceneDirty();
+						m_session.markDirty();
 					    if (onEdited)
 						    onEdited(entity, *component);
 				    }
@@ -128,6 +130,7 @@ namespace SE
 			    .render = std::move(render) });
 		}
 
+		EditorSession& m_session;
 		std::vector<Entry> m_entries;
 	};
 }

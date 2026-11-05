@@ -1,8 +1,7 @@
 #pragma once
+#if defined(COMPILE_WITH_EDITOR)
 #include "../Widget.h"
-#include <cstdint>
-#include <string>
-#include <vector>
+#include "Core/SubSystems/ImGui/EditorSession.h"
 
 namespace SE
 {
@@ -10,8 +9,8 @@ namespace SE
 	class MainWidget : public Widget
 	{
 	public:
-		MainWidget()
-		    : Widget("MainWidget"){};
+		explicit MainWidget(EditorSession& session)
+		    : Widget("MainWidget"), m_session(session){};
 
 		void render() override;
 		void shutdown() override;
@@ -21,7 +20,6 @@ namespace SE
 		// @brief Finishes the main widget rendering and performs any queued actions
 		void finishEditorFrame();
 
-		static void markSceneDirty() { s_dirty = true; }
 		static bool isSceneEditingBlocked() { return s_editsBlocked; }
 
 	private:
@@ -60,7 +58,6 @@ namespace SE
 
 		bool m_confirmOverwrite = false;
 
-		uint64_t m_sceneRevision = 0;
 		uint64_t m_actionRevision = 0;
 
 		std::string m_folder = "Assets/Data";
@@ -69,7 +66,9 @@ namespace SE
 		std::string m_error;
 		std::vector<std::string> m_sceneFiles;
 
-		static inline bool s_dirty = false;
 		static inline bool s_editsBlocked = false;
+
+		EditorSession& m_session;
 	};
 } // namespace SE
+#endif
