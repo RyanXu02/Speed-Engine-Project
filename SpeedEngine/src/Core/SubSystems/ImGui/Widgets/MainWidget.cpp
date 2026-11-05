@@ -15,7 +15,6 @@
 #include "MainWidget.h"
 #include "MemoryWidget.h"
 #include "ConsoleWidget.h"
-#include "EngineStateWidget.h"
 #include "PropertiesWidget.h"
 #include "AssetBrowserWidget.h"
 #include "SceneInfoWidget.h"
@@ -240,7 +239,6 @@ namespace SE
 			}
 			ImGui::EndMainMenuBar();
 		}
-		EngineStateWidget::render();
 		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 	}
 

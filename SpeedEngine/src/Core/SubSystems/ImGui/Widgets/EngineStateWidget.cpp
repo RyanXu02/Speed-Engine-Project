@@ -2,7 +2,6 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 #include <imgui.h>
-#include <imgui_internal.h>
 #include "EngineStates.h"
 #include "EngineStateWidget.h"
 #include "Engine.h"
@@ -17,15 +16,12 @@ namespace SE
 		const ImGuiStyle& style = ImGui::GetStyle();
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(style.WindowPadding.x, toolbarVerticalPadding));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, controlVerticalPadding));
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(style.WindowMinSize.x, 0.0f));
 		const float toolbarHeight = ImGui::GetFrameHeight() + toolbarVerticalPadding * 2.0f;
-		const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoSavedSettings;
-		if (!ImGui::BeginViewportSideBar("Engine Controls", ImGui::GetMainViewport(), ImGuiDir_Up, toolbarHeight, flags))
+		const ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+		if (!ImGui::BeginChild("Engine Controls", ImVec2(0.0f, toolbarHeight), ImGuiChildFlags_AlwaysUseWindowPadding, flags))
 		{
-			ImGui::End();
-			ImGui::PopStyleVar(3);
+			ImGui::EndChild();
+			ImGui::PopStyleVar(2);
 			return;
 		}
 
@@ -72,8 +68,8 @@ namespace SE
 		if (ImGui::Combo("Input", &inputMode, "Game\0Editor\0"))
 			EngineStates::setInputMode(static_cast<EngineStates::InputMode>(inputMode));
 
-		ImGui::End();
-		ImGui::PopStyleVar(3);
+		ImGui::EndChild();
+		ImGui::PopStyleVar(2);
 	}
 } // namespace SE
 #endif
