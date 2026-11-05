@@ -27,10 +27,9 @@ namespace SE
 
 		const float spacing = style.ItemSpacing.x;
 		const float buttonWidth = ImGui::CalcTextSize("Pause").x + style.FramePadding.x * 2.0f + ImGui::GetFontSize();
-		const float stateWidth = std::max(ImGui::CalcTextSize("State: Playing").x, ImGui::CalcTextSize("State: Paused").x);
 		const float inputWidth = ImGui::GetFontSize() * 10.0f;
-		const float controlsWidth = buttonWidth * 2.0f + stateWidth + inputWidth +
-			ImGui::CalcTextSize("Input").x + style.ItemInnerSpacing.x + spacing * 3.0f;
+		const float controlsWidth = buttonWidth * 2.0f + inputWidth +
+			ImGui::CalcTextSize("Input:").x + style.ItemInnerSpacing.x + spacing * 2.0f;
 		const float startX = ImGui::GetCursorPosX() + std::max(0.0f, (ImGui::GetContentRegionAvail().x - controlsWidth) * 0.5f);
 		ImGui::SetCursorPosX(startX);
 
@@ -60,12 +59,12 @@ namespace SE
 
 		ImGui::SameLine();
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("State: %s", EngineStates::isPlaying() ? "Playing" : "Paused");
+		ImGui::TextUnformatted("Input:");
 
-		ImGui::SameLine(startX + buttonWidth * 2.0f + stateWidth + spacing * 3.0f);
+		ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
 		ImGui::SetNextItemWidth(inputWidth);
 		int inputMode = static_cast<int>(EngineStates::getInputMode());
-		if (ImGui::Combo("Input", &inputMode, "Game\0Editor\0"))
+		if (ImGui::Combo("##Input", &inputMode, "Game\0Editor\0"))
 			EngineStates::setInputMode(static_cast<EngineStates::InputMode>(inputMode));
 
 		ImGui::EndChild();
