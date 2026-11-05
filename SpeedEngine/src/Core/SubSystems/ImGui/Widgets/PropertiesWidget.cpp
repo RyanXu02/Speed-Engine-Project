@@ -5,6 +5,7 @@
 #include "Core/SubSystems/Scenes/SceneSystem.h"
 #include "Engine.h"
 #include "PropertiesWidget.h"
+#include "AssetPathPayload.h"
 #include "MainWidget.h"
 #include "ResourceManagers/ResourceManager.h"
 #include "Core/SubSystems/Scriptings/ScriptingSystem.h"
@@ -63,6 +64,7 @@ namespace SE
 			    }
 			    const bool enter = ImGui::InputText("Path", &m_meshPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+				acceptAssetPathPayload(m_meshPathDraft);
 			    // user confirmed a new path
 			    if ((enter || deactivated) && m_meshPathDraft != component.path)
 			    {
@@ -221,6 +223,7 @@ namespace SE
 			    }
 			    const bool enter = ImGui::InputText("Path", &m_physicsShapeMeshPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+				acceptAssetPathPayload(m_physicsShapeMeshPathDraft);
 			    // user confirmed a new path
 			    if ((enter || deactivated) && m_physicsShapeMeshPathDraft != component.getPath())
 				{
@@ -239,6 +242,7 @@ namespace SE
 			    }
 				const bool enter = ImGui::InputText("Path", &m_soundPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+				acceptAssetPathPayload(m_soundPathDraft);
 			    // user confirmed a new path
 				if ((enter || deactivated) && m_soundPathDraft != path)
 			    {
@@ -287,6 +291,7 @@ namespace SE
 			    }
 				const bool enter = ImGui::InputText("Path", &m_musicPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
 			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+				acceptAssetPathPayload(m_musicPathDraft);
 			    // user confirmed a new path
 				if ((enter || deactivated) && m_musicPathDraft != path)
 			    {

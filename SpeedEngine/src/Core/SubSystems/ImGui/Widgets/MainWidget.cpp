@@ -16,7 +16,7 @@
 #include "ConsoleWidget.h"
 #include "EngineStateWidget.h"
 #include "PropertiesWidget.h"
-#include "ResourceBrowserWidget.h"
+#include "AssetBrowserWidget.h"
 #include "SceneInfoWidget.h"
 #include "ScenePreviewWidget.h"
 
@@ -203,10 +203,10 @@ namespace SE
 				{
 					PropertiesWidget::setVisible(!propertiesVisible);
 				}
-				const bool resourceBrowserVisible = ResourceBrowserWidget::isVisible();
-				if (ImGui::MenuItem("Resource Browser", nullptr, resourceBrowserVisible))
+				const bool assetBrowserVisible = AssetBrowserWidget::isVisible();
+				if (ImGui::MenuItem("Asset Browser", nullptr, assetBrowserVisible))
 				{
-					ResourceBrowserWidget::setVisible(!resourceBrowserVisible);
+					AssetBrowserWidget::setVisible(!assetBrowserVisible);
 				}
 				const bool sceneInfoVisible = SceneInfoWidget::isVisible();
 				if (ImGui::MenuItem("Scene Info", nullptr, sceneInfoVisible))

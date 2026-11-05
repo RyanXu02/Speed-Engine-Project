@@ -2,6 +2,7 @@
 #if defined(COMPILE_WITH_EDITOR)
 
 #include "ComponentInspectorRegistry.h"
+#include "AssetPathPayload.h"
 
 #include "imgui.h"
 #include "imgui_stdlib.h"
@@ -52,7 +53,8 @@ namespace SE
 		else if (value.is_string())
 		{
 			std::string field = value.get<std::string>();
-			if (ImGui::InputText(label, &field))
+			const bool edited = ImGui::InputText(label, &field);
+			if (acceptAssetPathPayload(field) || edited)
 			{
 				value = field;
 				changed = true;

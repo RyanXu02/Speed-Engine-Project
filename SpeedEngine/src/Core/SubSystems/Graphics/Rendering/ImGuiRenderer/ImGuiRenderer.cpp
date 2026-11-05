@@ -5,7 +5,7 @@
 #include "SubSystems/ImGui/Widgets/MainWidget.h"
 #include "SubSystems/ImGui/Widgets/MemoryWidget.h"
 #include "SubSystems/ImGui/Widgets/PropertiesWidget.h"
-#include "SubSystems/ImGui/Widgets/ResourceBrowserWidget.h"
+#include "SubSystems/ImGui/Widgets/AssetBrowserWidget.h"
 #include "SubSystems/ImGui/Widgets/SceneInfoWidget.h"
 #include "SubSystems/ImGui/Widgets/ScenePreviewWidget.h"
 #include "Core/SubSystems/Scenes/SceneSystem.h"
@@ -157,7 +157,7 @@ namespace SE
 	{
 #if defined(COMPILE_WITH_EDITOR)
 		m_mainWidgetId = createWidget<MainWidget>(m_session);
-		createWidget<ResourceBrowserWidget>();
+		createWidget<AssetBrowserWidget>();
 		createWidget<MemoryWidget>();
 		createWidget<ScenePreviewWidget>();
 		createWidget<SceneInfoWidget>(m_session);

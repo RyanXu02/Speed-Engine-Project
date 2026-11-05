@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsContactListener.cpp" />
     <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
     <ClCompile Include="src\Core\Features\CameraController.cpp" />
@@ -202,7 +203,6 @@
     <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
     <ClCompile Include="src\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
@@ -242,6 +242,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetPathPayload.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsContactListener.h" />
     <ClInclude Include="src\Core\Features\CameraFrustum.h" />
     <ClInclude Include="src\Core\Features\CameraState.h" />
@@ -307,7 +309,6 @@
     <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
     <ClInclude Include="src\Core\Scene\Scene.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.h" />
