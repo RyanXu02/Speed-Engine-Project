@@ -3,6 +3,7 @@
 
 #include "../../Events/EventSubscription.h"
 #include "../Widget.h"
+#include "../EditorSession.h"
 #include "ComponentInspectorRegistry.h"
 
 
@@ -13,24 +14,35 @@ namespace SE
 	class PropertiesWidget : public VisibleWidget<PropertiesWidget>
 	{
 	public:
-		PropertiesWidget();
+		explicit PropertiesWidget(EditorSession& session);
 
 		void render() override;
 		void shutdown() override;
 
 	private:
-		EventSubscription m_EntitySelectedSubscription;
-		EventSubscription m_ActiveSceneModifiedSubscription;
+		EditorSession& m_session;
 		EventSubscription m_SceneChangedSubscription;
 
-		uint32_t m_selectedEntityId{ 0 };
+		uint32_t m_inspectedEntityId{ 0 };
+		void resetDrafts();
+		bool authoredEdit(bool changed);
 
 		ComponentInspectorRegistry m_inspectors;
+
 		std::string m_meshPathDraft;
 		std::string m_meshPathError;
 		bool m_meshDraftInitialized{ false };
+
 		std::string m_physicsShapeMeshPathDraft;
 		bool m_physicsShapeMeshDraftInitialized{ false };
+
+		std::string m_soundPathDraft;
+		std::string m_soundPathError;
+		bool m_soundDraftInitialized{ false };
+
+		std::string m_musicPathDraft;
+		std::string m_musicPathError;
+		bool m_musicDraftInitialized{ false };
 
 	};
 } // namespace SE

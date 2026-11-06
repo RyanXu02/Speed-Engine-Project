@@ -171,4 +171,13 @@ namespace SE
 	{
 		glfwSetWindowSize(m_window, width, height);
 	}
+
+	void Window::setTitle(const std::string& title)
+	{
+		if (m_windowTitle == title)
+			return;
+		m_windowTitle = title;
+		if (m_window)
+			glfwSetWindowTitle(m_window, m_windowTitle.c_str());
+	}
 } // namespace SE

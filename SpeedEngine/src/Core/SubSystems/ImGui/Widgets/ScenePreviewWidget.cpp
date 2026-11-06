@@ -3,6 +3,7 @@
 #if defined(COMPILE_WITH_EDITOR)
 #include "Core/SubSystems/Graphics/Rendering/RendererManager.h"
 #include "Engine.h"
+#include "EngineStateWidget.h"
 #include "ScenePreviewWidget.h"
 
 #include <imgui.h>
@@ -19,12 +20,20 @@ namespace SE
 
 		_setStatus("Rendering ScenePreviewWidget");
 
+		constexpr float previewVerticalPadding = 2.0f;
+		constexpr float toolbarImageSpacing = 2.0f;
+		const ImGuiStyle& style = ImGui::GetStyle();
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(style.WindowPadding.x, previewVerticalPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, toolbarImageSpacing));
 		ImGuiWindowFlags window_flags = 0; // Default flags allow docking
 		if (!ImGui::Begin("ScenePreviewWidget", &s_visible, window_flags))
 		{
 			ImGui::End();
+			ImGui::PopStyleVar(2);
 			return;
 		}
+
+		EngineStateWidget::render();
 
 		auto* rendererManager = Engine::Instance().getSubSystem<RendererManager>();
 		ImTextureID imguiTexId = static_cast<ImTextureID>(rendererManager->getFinalSceneTexture());
@@ -51,6 +60,7 @@ namespace SE
 		}
 
 		ImGui::End();
+		ImGui::PopStyleVar(2);
 	}
 
 	void ScenePreviewWidget::shutdown()

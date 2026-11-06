@@ -1,13 +1,14 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "SubSystems/ImGui/Widgets/EngineStateWidget.h"
 #include "SubSystems/ImGui/Widgets/MainWidget.h"
 #include "SubSystems/ImGui/Widgets/MemoryWidget.h"
 #include "SubSystems/ImGui/Widgets/PropertiesWidget.h"
-#include "SubSystems/ImGui/Widgets/ResourceBrowserWidget.h"
+#include "SubSystems/ImGui/Widgets/AssetBrowserWidget.h"
 #include "SubSystems/ImGui/Widgets/SceneInfoWidget.h"
 #include "SubSystems/ImGui/Widgets/ScenePreviewWidget.h"
+#include "Core/SubSystems/Scenes/SceneSystem.h"
+#include "Engine.h"
 #endif
 
 #include "Core/SubSystems/ImGui/Widgets/ConsoleWidget.h"
@@ -154,13 +155,12 @@ namespace SE
 	void ImGuiRenderer::initWidgets()
 	{
 #if defined(COMPILE_WITH_EDITOR)
-		m_mainWidgetId = createWidget<MainWidget>();
-		createWidget<ResourceBrowserWidget>();
+		m_mainWidgetId = createWidget<MainWidget>(m_session);
+		createWidget<AssetBrowserWidget>();
 		createWidget<MemoryWidget>();
 		createWidget<ScenePreviewWidget>();
-		createWidget<SceneInfoWidget>();
-		createWidget<PropertiesWidget>();
-		createWidget<EngineStateWidget>();
+		createWidget<SceneInfoWidget>(m_session);
+		createWidget<PropertiesWidget>(m_session);
 #endif
 		createWidget<ConsoleWidget>();
 		// ...
@@ -177,6 +177,21 @@ namespace SE
 	void ImGuiRenderer::render(RenderContext& context)
 	{
 #if defined(COMPILE_WITH_EDITOR)
+		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
+		m_session.syncSceneRevision(scenes->getSceneRevision());
+		auto* scene = scenes->getCurrentScene();
+		for (auto it = m_session.selectedEntities().begin(); it != m_session.selectedEntities().end();)
+		{
+			const uint32_t id = *it++;
+			if (!scene || !scene->hasEntity(id) || scene->isEntityPendingRemoval(id))
+			{
+				m_session.removeSelected(id);
+				continue;
+			}
+			const auto* life = scene->getEntity(id).getComponent<LifeComponent>();
+			if (life && !life->isAlive)
+				m_session.removeSelected(id);
+		}
 		auto* main = getWidget<MainWidget>(m_mainWidgetId);
 		main->beginEditorFrame();
 		main->render();
