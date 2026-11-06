@@ -17,10 +17,10 @@ namespace SE
 		void render(RenderContext& context) override;
 		void shutdown() override;
 
-		float phaseG = 0.7;				// G term of the phase function
-		float scatteringScale = 1.0f;	// hack to make ray volume more strong
-		float fogMaxDistance = 50.0f;	// march length for sky pixels and cap for far geometry
-		int numSteps = 16;				// marching steps
+		float phaseG = 0.9;				// G term of the phase function
+		float scatteringScale = 0.55f;	// hack to make ray volume more strong
+		float fogMaxDistance = 10.0f;	// march length for sky pixels and cap for far geometry
+		int numSteps = 68;				// marching steps
 
 	private:
 		std::string m_gBufferTarget;
