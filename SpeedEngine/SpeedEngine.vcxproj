@@ -92,7 +92,9 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
@@ -124,7 +126,9 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,7 +156,9 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
