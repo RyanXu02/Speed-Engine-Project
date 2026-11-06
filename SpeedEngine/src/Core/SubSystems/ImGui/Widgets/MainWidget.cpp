@@ -1,13 +1,14 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
-#include "../../Graphics/Rendering/RendererManager.h"
-#include "../../Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
-#include "../../Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
-#include "../../Graphics/Rendering/SceneRenderer/SceneRenderer.h"
-#include "../../Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
-#include "../../Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
-#include "../../Scenes/SceneSystem.h"
+#include "SubSystems/Graphics/Rendering/RendererManager.h"
+#include "SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
+#include "SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
+#include "SubSystems/Graphics/Rendering/SceneRenderer/SceneRenderer.h"
+#include "SubSystems/Graphics/Rendering/DeferredLightingRenderer/DeferredLightingRenderer.h"
+#include "SubSystems/Graphics/Rendering/ShadowRenderer/ShadowRenderer.h"
+#include "SubSystems/Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
+#include "SubSystems/Scenes/SceneSystem.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 #include "EngineStates.h"
@@ -106,17 +107,22 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Lighting"))
 			{
-				auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
-				if (sceneRenderer)
+	
+				auto* deferredLightingRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<DeferredLightingRenderer>();
+				if (deferredLightingRenderer)
 				{
-					LightingSettings& settings = sceneRenderer->getLightingSettings();
-					ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f); // flat ambient, used while IBL is off
+					ImGui::SeparatorText("Volumetric lighting");
+					ImGui::SliderFloat("G", &deferredLightingRenderer->phaseG, 0.0f, 1.0f);
+					ImGui::SliderFloat("scattering Scale", &deferredLightingRenderer->scatteringScale, 0.0f, 5.0f);
+					ImGui::SliderFloat("Fog Max Distance", &deferredLightingRenderer->fogMaxDistance, 1.0f, 200.0f);
+					ImGui::SliderInt("March Steps", &deferredLightingRenderer->numSteps, 1, 100);
 				}
 
 				auto* ibl = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ImageBasedRenderer>();
 				if (ibl)
 				{
-					ImGui::Checkbox("IBL", &ibl->enabled);
+					ImGui::SeparatorText("ImageBase Lighting");
+					ImGui::Checkbox("Enabled##IBL", &ibl->enabled);
 					ImGui::SameLine();
 					ImGui::SliderFloat("IBL Intensity", &ibl->intensity, 0.0f, 4.0f, "%.2f");
 
@@ -137,15 +143,21 @@ namespace SE
 					}
 					ImGui::SliderFloat("Exposure", &tonemap->exposure, 0.0f, 8.0f, "%.2f");
 					ImGui::SliderFloat("Gamma", &tonemap->gamma, 1.0f, 3.0f);
-					ImGui::Checkbox("Dither", &tonemap->dither);
+					// ImGui::Checkbox("Dither", &tonemap->dither);
 				}
 
+				auto* sceneRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<SceneRenderer>();
+				// if (sceneRenderer)
+				// {
+				// 	LightingSettings& settings = sceneRenderer->getLightingSettings();
+				// 	ImGui::SliderFloat("Ambient", &settings.ambientStrength, 0.0f, 1.0f); // flat ambient, used while IBL is off
+				// }
 				if (sceneRenderer)
 				{
 
 					ImGui::SeparatorText("Sun");
 					DirectionalLight& sun = Engine::Instance().getSubSystem<RendererManager>()->getSun();
-					ImGui::Checkbox("Enabled", &sun.enabled);
+					ImGui::Checkbox("Enabled##Sun", &sun.enabled);
 					ImGui::ColorEdit3("Color", &sun.color.x);
 					ImGui::DragFloat("Intensity", &sun.intensity, 0.05f, 0.0f, 100.0f);
 				}
