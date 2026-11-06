@@ -127,7 +127,7 @@ namespace SE
 							case sol::type::number:
 							{
 								double number = value.as<double>();	// lua numbers are doubles
-								if (ImGui::DragFloat(name.c_str(), ImGuiDataType_Double, &number, 0.05f)) {
+								if (ImGui::DragScalar(name.c_str(), ImGuiDataType_Double, &number, 0.05f)) {
 									instance[name] = number;
 								}
 								break;
