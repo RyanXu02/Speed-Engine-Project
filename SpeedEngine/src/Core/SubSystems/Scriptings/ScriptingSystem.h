@@ -26,6 +26,8 @@ namespace SE
 		virtual void reloadScript(std::string_view path);
 		virtual void reset();
 
+		sol::table getScriptInstance(const Entity& entity) const;
+
 	private:
 		virtual void _initScript(ScriptComponent& scriptComponent);
 		virtual void _destroyAllScripts();
@@ -35,6 +37,7 @@ namespace SE
 		sol::state m_luaState;
 		std::unordered_map<std::string, sol::protected_function> m_scripts;
 		std::unordered_map<std::string, sol::table> m_scriptCache;
+		std::unordered_map<uint32_t, sol::table> m_scriptInstances;
 		SceneSystem* sceneSystem;
 	};
 

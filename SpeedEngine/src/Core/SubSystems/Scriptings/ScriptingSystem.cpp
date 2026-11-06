@@ -154,6 +154,7 @@ namespace SE
 		EngineStates::setCamera(nullptr);
 		m_scripts.clear();
 		m_scriptCache.clear();
+		m_scriptInstances.clear();
 
 		m_luaState["Entity"] = sol::nil;
 		m_luaState.collect_garbage();
@@ -254,6 +255,7 @@ namespace SE
 
 			// this is the instance we just created with the entity copied to it
 			sol::table luaInstance = result;
+			m_scriptInstances[entity.id()] = luaInstance;
 
 			sol::protected_function initFunc = luaInstance["onInit"];
 			if (initFunc.valid())
@@ -385,8 +387,17 @@ namespace SE
 		m_luaState.collect_garbage();
 	}
 
+	// the lua instance's new() call returned for this entity's script, return an invalid table when nothing is loaded
+	sol::table ScriptingSystem::getScriptInstance(const Entity& entity) const
+	{
+		auto it = m_scriptInstances.find(entity.id());
+		return it != m_scriptInstances.end() ? it->second : sol::table();
+	}
+
 	void ScriptingSystem::_destroyAllScripts()
 	{
+		m_scriptInstances.clear();	// in case entity ids get reused by different scenes
+
 		Scene* scene = sceneSystem ? sceneSystem->getCurrentScene() : nullptr;
 		if (!scene)
 		{
