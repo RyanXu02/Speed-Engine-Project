@@ -2,19 +2,12 @@
 
 #if defined(COMPILE_WITH_EDITOR)
 
-#include "../Widget.h"
-
 namespace SE
 {
-	class EngineStateWidget : public VisibleWidget<EngineStateWidget>
+	class EngineStateWidget
 	{
 	public:
-		EngineStateWidget()
-			: VisibleWidget("Engine State")
-		{}
-
-		void render() override;
-		void shutdown() override;
+		static void render();
 	};
 
 } // namespace SE

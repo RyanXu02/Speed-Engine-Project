@@ -110,6 +110,7 @@ namespace SE
 
 		void pause() { m_running = false; }
 		void resume() { m_running = true; }
+		bool isRunning() const { return m_running; }
 
 		// @brief Getter for BodyInterface, which is needed to interact with bodies in the physics world 
 		// @returns Reference to the BodyInterface

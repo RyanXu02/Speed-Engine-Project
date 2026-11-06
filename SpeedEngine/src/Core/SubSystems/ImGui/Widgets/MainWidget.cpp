@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #if defined(COMPILE_WITH_EDITOR)
+#include "Core/SubSystems/Graphics/Window.h"
 #include "SubSystems/Graphics/Rendering/RendererManager.h"
 #include "SubSystems/Graphics/Rendering/ImageBasedRenderer/ImageBasedRenderer.h"
 #include "SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
@@ -15,9 +16,8 @@
 #include "MainWidget.h"
 #include "MemoryWidget.h"
 #include "ConsoleWidget.h"
-#include "EngineStateWidget.h"
 #include "PropertiesWidget.h"
-#include "ResourceBrowserWidget.h"
+#include "AssetBrowserWidget.h"
 #include "SceneInfoWidget.h"
 #include "ScenePreviewWidget.h"
 
@@ -32,17 +32,11 @@ namespace SE
 	void MainWidget::beginEditorFrame()
 	{
 		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
-		if (m_sceneRevision != scenes->getSceneRevision())
-		{
-			m_sceneRevision = scenes->getSceneRevision();
-			s_dirty = false;
-		}
 		s_editsBlocked = scenes->hasPendingTransition() || m_action != Action::None || m_dialog != Dialog::None;
 	}
 
 	void MainWidget::render()
 	{
-		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
 		auto* scene = scenes->getCurrentScene();
 		const bool available = !s_editsBlocked;
@@ -91,7 +85,7 @@ namespace SE
 					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
 					{
 						scene->addEntity("New Empty");
-						markSceneDirty();
+						m_session.markDirty();
 					}
 				}
 				// add prefabs later
@@ -220,20 +214,15 @@ namespace SE
 				{
 					PropertiesWidget::setVisible(!propertiesVisible);
 				}
-				const bool resourceBrowserVisible = ResourceBrowserWidget::isVisible();
-				if (ImGui::MenuItem("Resource Browser", nullptr, resourceBrowserVisible))
+				const bool assetBrowserVisible = AssetBrowserWidget::isVisible();
+				if (ImGui::MenuItem("Asset Browser", nullptr, assetBrowserVisible))
 				{
-					ResourceBrowserWidget::setVisible(!resourceBrowserVisible);
+					AssetBrowserWidget::setVisible(!assetBrowserVisible);
 				}
 				const bool sceneInfoVisible = SceneInfoWidget::isVisible();
 				if (ImGui::MenuItem("Scene Info", nullptr, sceneInfoVisible))
 				{
 					SceneInfoWidget::setVisible(!sceneInfoVisible);
-				}
-				const bool engineStateVisible = EngineStateWidget::isVisible();
-				if (ImGui::MenuItem("Engine State", nullptr, engineStateVisible))
-				{
-					EngineStateWidget::setVisible(!engineStateVisible);
 				}
 				const bool scenePreviewVisible = ScenePreviewWidget::isVisible();
 				if (ImGui::MenuItem("Scene Preview", nullptr, scenePreviewVisible))
@@ -244,33 +233,25 @@ namespace SE
 			}
 			if (ImGui::BeginMenu("Physics"))
 			{
-				if (ImGui::MenuItem("Run Physics", nullptr))
+				if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
 				{
-					if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
+					bool running = physicsSystem->isRunning();
+					if (ImGui::Checkbox("Run Physics", &running))
 					{
-						physicsSystem->resume();
+						if (running)
+							physicsSystem->resume();
+						else
+							physicsSystem->pause();
 					}
 				}
-				if (ImGui::MenuItem("Pause Physics", nullptr))
-				{
-					if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
-					{
-						physicsSystem->pause();
-					}
-				}
+				bool debugEnabled = EngineStates::isDebugRenderingEnabled();
+				if (ImGui::Checkbox("Debug Rendering", &debugEnabled))
+					EngineStates::setDebugRenderingEnabled(debugEnabled);
 				ImGui::EndMenu();
 			}
-			const bool debugEnabled = EngineStates::isDebugRenderingEnabled();
-			if (ImGui::Button(debugEnabled ? "Debug Rendering: On" : "Debug Rendering: Off"))
-				EngineStates::setDebugRenderingEnabled(!debugEnabled);
-			if (scene)
-			{
-				ImGui::SameLine();
-				ImGui::Text("%s%s%s", scene->getName().c_str(), s_dirty ? " *" : "",
-					scene->getSourcePath().empty() ? " (unsaved)" : "");
-			}
+			ImGui::EndMainMenuBar();
 		}
-		ImGui::EndMainMenuBar();
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 	}
 
 	void MainWidget::queueAction(Action action)
@@ -280,7 +261,7 @@ namespace SE
 			return;
 		m_action = action;
 		m_actionFrame = ImGui::GetFrameCount();
-		m_actionRevision = m_sceneRevision;
+		m_actionRevision = m_session.sceneRevision();
 		m_error.clear();
 	}
 
@@ -321,7 +302,7 @@ namespace SE
 			m_error = "Save failed. The scene was not replaced. Check the path and console, then retry or cancel.";
 			return false;
 		}
-		s_dirty = false;
+		m_session.clearDirty();
 		m_error.clear();
 		return true;
 	}
@@ -398,13 +379,40 @@ namespace SE
 				else
 					prepDialog(Dialog::SavePath);
 			}
-			else if (s_dirty)
+			else if (m_session.isDirty())
 				prepDialog(Dialog::Confirm);
 			else
 				performAction();
 		}
 		drawActiveDialog();
 		s_editsBlocked = scenes->hasPendingTransition() || m_action != Action::None || m_dialog != Dialog::None;
+
+		updateWindowTitle();
+	}
+
+	void MainWidget::updateWindowTitle()
+	{
+		auto* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
+		const std::string_view sceneName = scene ? std::string_view(scene->getName()) : std::string_view{};
+		const std::string_view sourcePath = scene ? std::string_view(scene->getSourcePath()) : std::string_view{};
+		const bool unsaved = scene && (sourcePath.empty() || m_session.isDirty());
+		if (!m_windowTitle.empty() && sceneName == m_titleSceneName && sourcePath == m_titleSourcePath
+			&& unsaved == m_titleUnsaved)
+			return;
+
+		m_titleSceneName = sceneName;
+		m_titleSourcePath = sourcePath;
+		m_titleUnsaved = unsaved;
+		m_windowTitle = "Speed Engine";
+		if (scene)
+		{
+			m_windowTitle += " - ";
+			m_windowTitle += sourcePath.empty() ? m_titleSceneName
+				: std::filesystem::path(m_titleSourcePath).stem().string();
+			if (unsaved)
+				m_windowTitle += "*";
+		}
+		Engine::Instance().getSubSystem<Window>()->setTitle(m_windowTitle);
 	}
 
 	void MainWidget::drawActiveDialog()

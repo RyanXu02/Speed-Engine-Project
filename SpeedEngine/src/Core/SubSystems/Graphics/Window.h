@@ -44,6 +44,7 @@ namespace SE
 		unsigned int getHeight() const { return m_windowHeight; }
 
 		void setSize(int width, int height);
+		void setTitle(const std::string& title);
 
 		double getCurrentTime() const;
 

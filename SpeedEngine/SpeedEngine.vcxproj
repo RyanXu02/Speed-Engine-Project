@@ -92,7 +92,9 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
@@ -124,7 +126,9 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,11 +156,14 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsContactListener.cpp" />
     <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
     <ClCompile Include="src\Core\Features\CameraController.cpp" />
@@ -202,7 +209,6 @@
     <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
     <ClCompile Include="src\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
@@ -242,6 +248,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetPathPayload.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsContactListener.h" />
     <ClInclude Include="src\Core\Features\CameraFrustum.h" />
     <ClInclude Include="src\Core\Features\CameraState.h" />
@@ -292,6 +300,7 @@
     <ClInclude Include="src\Core\Scene\Entity\Component\UISliderComponent.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\EditorSession.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputEvent.h" />
@@ -306,7 +315,6 @@
     <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
     <ClInclude Include="src\Core\Scene\Scene.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.h" />
