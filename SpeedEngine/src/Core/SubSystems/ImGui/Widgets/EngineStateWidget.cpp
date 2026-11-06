@@ -11,18 +11,30 @@ namespace SE
 {
 	void EngineStateWidget::render()
 	{
-		if (!s_visible) return;
-
-		if (!ImGui::Begin("Engine State", &s_visible))
+		constexpr float toolbarVerticalPadding = 3.0f;
+		constexpr float controlVerticalPadding = 2.0f;
+		const ImGuiStyle& style = ImGui::GetStyle();
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(style.WindowPadding.x, toolbarVerticalPadding));
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, controlVerticalPadding));
+		const float toolbarHeight = ImGui::GetFrameHeight() + toolbarVerticalPadding * 2.0f;
+		const ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+		if (!ImGui::BeginChild("Engine Controls", ImVec2(0.0f, toolbarHeight), ImGuiChildFlags_AlwaysUseWindowPadding, flags))
 		{
-			ImGui::End();
+			ImGui::EndChild();
+			ImGui::PopStyleVar(2);
 			return;
 		}
 
-		const bool playing = EngineStates::isPlaying();
+		const float spacing = style.ItemSpacing.x;
+		const float buttonWidth = ImGui::CalcTextSize("Pause").x + style.FramePadding.x * 2.0f + ImGui::GetFontSize();
+		const float inputWidth = ImGui::GetFontSize() * 10.0f;
+		const float controlsWidth = buttonWidth * 2.0f + inputWidth +
+			ImGui::CalcTextSize("Input:").x + style.ItemInnerSpacing.x + spacing * 2.0f;
+		const float startX = ImGui::GetCursorPosX() + std::max(0.0f, (ImGui::GetContentRegionAvail().x - controlsWidth) * 0.5f);
+		ImGui::SetCursorPosX(startX);
 
-		ImGui::BeginDisabled(playing);
-		if (ImGui::Button("Play"))
+		ImGui::BeginDisabled(EngineStates::isPlaying());
+		if (ImGui::Button("Play", ImVec2(buttonWidth, 0.0f)))
 		{
 			EngineStates::play();
 			if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
@@ -34,8 +46,8 @@ namespace SE
 
 		ImGui::SameLine();
 
-		ImGui::BeginDisabled(!playing);
-		if (ImGui::Button("Pause"))
+		ImGui::BeginDisabled(!EngineStates::isPlaying());
+		if (ImGui::Button("Pause", ImVec2(buttonWidth, 0.0f)))
 		{
 			EngineStates::pause();
 			if (PhysicsSystem* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>())
@@ -46,17 +58,17 @@ namespace SE
 		ImGui::EndDisabled();
 
 		ImGui::SameLine();
-		ImGui::Text("State: %s", playing ? "Playing" : "Paused");
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted("Input:");
 
+		ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
+		ImGui::SetNextItemWidth(inputWidth);
 		int inputMode = static_cast<int>(EngineStates::getInputMode());
-		if (ImGui::Combo("Input", &inputMode, "Game\0Editor\0"))
+		if (ImGui::Combo("##Input", &inputMode, "Game\0Editor\0"))
 			EngineStates::setInputMode(static_cast<EngineStates::InputMode>(inputMode));
 
-		ImGui::End();
-	}
-
-	void EngineStateWidget::shutdown()
-	{
+		ImGui::EndChild();
+		ImGui::PopStyleVar(2);
 	}
 } // namespace SE
 #endif

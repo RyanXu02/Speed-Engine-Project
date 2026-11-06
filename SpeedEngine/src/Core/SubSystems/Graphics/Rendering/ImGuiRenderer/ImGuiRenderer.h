@@ -2,6 +2,10 @@
 #include "Core/SubSystems/ImGui/Widget.h"
 #include "Core/SubSystems/Graphics/Rendering/Renderer.h"
 
+#if defined(COMPILE_WITH_EDITOR)
+#include "Core/SubSystems/ImGui/EditorSession.h"
+#endif
+
 namespace SE
 {
 	class Window;
@@ -24,11 +28,11 @@ namespace SE
 		// @brief Creates a widget of the specified type
 		// @tparam T The type of the widget to create
 		// @return The ID of the created widget
-		template<typename T>
-		requires std::derived_from<T, Widget> uint32_t createWidget()
+		template<typename T, typename... Args>
+		requires std::derived_from<T, Widget> uint32_t createWidget(Args&&... args)
 		{
 			uint32_t id = _assignID();
-			m_widgets[id] = std::make_unique<T>();
+			m_widgets[id] = std::make_unique<T>(std::forward<Args>(args)...);
 			return id;
 		}
 
@@ -61,11 +65,12 @@ namespace SE
 		      m_window(&window)
 		{}
 
-		std::unordered_map<uint32_t, std::unique_ptr<Widget>> m_widgets;
-
 #if defined(COMPILE_WITH_EDITOR)
 		uint32_t m_mainWidgetId = 0;
+		EditorSession m_session;
 #endif
+
+		std::unordered_map<uint32_t, std::unique_ptr<Widget>> m_widgets;
 
 		std::atomic<uint32_t> m_ids{ 0 };
 		uint32_t _assignID() { return m_ids.fetch_add(1, std::memory_order_relaxed); }
