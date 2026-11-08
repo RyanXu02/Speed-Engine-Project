@@ -24,26 +24,6 @@ namespace SE
 	      m_registry(registry)
 	{}
 
-	Entity::HookFunction Entity::_onNameComponentAdded()
-	{
-		HookFunction function = [](Entity entity)
-		{
-			auto* nameComp = entity.getComponent<NameComponent>();
-			//printf("nameComponent added: %s\n", nameComp->name.c_str());
-		};
-		return function;
-	}
-
-	Entity::HookFunction Entity::_onNameComponentRemoved()
-	{
-		HookFunction function = [](Entity entity)
-		{
-			auto* nameComp = entity.getComponent<NameComponent>();
-			printf("nameComponent removed: %s", nameComp->name.c_str());
-		};
-		return function;
-	}
-
 	Entity::HookFunction Entity::_onMeshComponentAdded()
 	{
 		HookFunction function = [](Entity entity)

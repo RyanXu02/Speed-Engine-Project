@@ -43,15 +43,11 @@ namespace SE
 		m_inspectors.registerComponent<Transform>("Transform", "General", false,
 			[this](Entity&, Transform& component)
 		    {
-			    auto position = component.getTranslation();
-			    auto rotation = component.getRotation();
-			    auto scale = component.getScale();
-				if (authoredEdit(ImGui::DragFloat3("Position", &position.x, 0.1f)))
-				    component.setPosition(position);
+				auto rotation = glm::eulerAngles(component.rotate);
+				authoredEdit(ImGui::DragFloat3("Position", &component.translate.x, 0.1f));
 				if (authoredEdit(ImGui::DragFloat3("Rotation (radians)", &rotation.x, 0.01f)))
-				    component.setRotation(rotation);
-				if (authoredEdit(ImGui::DragFloat3("Scale", &scale.x, 0.01f)))
-				    component.setScale(scale);
+					component.rotate = glm::quat(rotation);
+				authoredEdit(ImGui::DragFloat3("Scale", &component.scale.x, 0.01f));
 		    });
 
 		m_inspectors.registerComponent<MeshComponent>("Mesh", "Rendering", true,
@@ -87,14 +83,6 @@ namespace SE
 		    });
 
 		m_inspectors.registerComponent<PrefabComponent>("Prefab");
-
-		m_inspectors.registerReadOnly<RelationshipComponent>("Relationship",
-		    [](Entity&, RelationshipComponent& component)
-		    {
-			    ImGui::Text("Parent ID: %u", component.parent);
-			    for (size_t i = 0; i < component.children.size(); ++i)
-				    ImGui::Text("Child %zu: %u", i, component.children[i]);
-		    });
 
 		m_inspectors.registerComponent<ScriptComponent>("Script", "Scripting", false,
 		    [](Entity& entity, ScriptComponent& component)
@@ -328,7 +316,7 @@ namespace SE
 				//for testing 
 			    if (ImGui::Button("Play Sound", ImVec2(-1.0f, 0.0f)))
 			    {
-				    const glm::vec3 initPos = e.getComponent<Transform>()->getTranslation();
+					const glm::vec3 initPos = e.getComponent<Transform>()->translate;
 				    component.PlayMySound(initPos);
 			    }
 			    if (ImGui::Button("Stop Sound", ImVec2(-1.0f, 0.0f)))

@@ -2,12 +2,12 @@
 
 #include "Scene.h"
 
-#include "Core/SubSystems/Events/EventSystem.h"
+#include "Engine.h"
+
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Core/SubSystems/Scenes/SceneSystem.h"
-#include "Engine.h"
-#include <SubSystems/Scriptings/ScriptingSystem.h>
-#include <SubSystems/Audio/AudioSystem.h>
+#include "SubSystems/Scriptings/ScriptingSystem.h"
+#include "SubSystems/Audio/AudioSystem.h"
 
 namespace SE
 {
@@ -39,19 +39,18 @@ namespace SE
 
 		for (auto& [id, components] : m_registry)
 		{
+			if (isEntityPendingRemoval(id))
+				continue;
+
 			Entity entity = getEntity(id);
-			auto* lifeComponent = entity.getComponent<LifeComponent>();
-			if (lifeComponent && !lifeComponent->isAlive)
-			{
-				removeEntity(entity.id());
-			}
 
 			//update all sfx components on entities
+			auto* transform = entity.getComponent<Transform>();
 			auto* sfxComponent = entity.getComponent<AudioSFXComponent>();
 			if (sfxComponent && sfxComponent->isGameSFX())
 			{
 				//do the position setting here....
-				const glm::vec3 pos = entity.getComponent<Transform>()->getTranslation();
+				const glm::vec3 pos = transform->translate;
 				sfxComponent->updateMyPosition(pos);
 			}
 
@@ -59,7 +58,7 @@ namespace SE
 			auto* PEComponent = entity.getComponent<ParticleEmitter>();
 			if (PEComponent)
 			{
-				PEComponent->acquireTransform(entity.getComponent<Transform>());
+				PEComponent->acquireTransform(transform);
 				PEComponent->update(deltaTime);
 				if (PEComponent->GetOneShot() && PEComponent->AmIDone()) { //oneshot is done, time to KILL MY PARENT >:) or stop emitter :)
 					removeEntity(entity.id());
@@ -85,19 +84,18 @@ namespace SE
 		uint32_t entityID = m_registry.addEntity();
 		Entity entity = getEntity(entityID);
 
-		entity.addComponent<Transform>(); // default values that all entities have
+		// default components that all entities should have
+		// DO NOT remove these components from an entity as their invariances are not enforced
+		entity.addComponent<Transform>();
 		entity.addComponent<NameComponent>(name);
-		entity.addComponent<LifeComponent>(true);
-		NameComponent* component = entity.getComponent<NameComponent>();
 
 		return entityID;
 	}
 
 	bool Scene::hasEntity(uint32_t id)
 	{
-		if (!m_registry.hasEntity(id))
+		if (isEntityPendingRemoval(id))
 		{
-			// m_logger.warn("there is no entity with given name");
 			return false;
 		}
 
@@ -118,7 +116,8 @@ namespace SE
 	{
 		if (m_registry.hasEntity(id))
 		{
-			m_entitiesToRemove.push_back(id);
+			if (!isEntityPendingRemoval(id))
+				m_entitiesToRemove.push_back(id);
 			return true;
 		}
 
@@ -220,8 +219,7 @@ namespace SE
 		for (auto& [id, components] : m_registry)
 		{
 			Entity entity = getEntity(id);
-			LifeComponent* life = entity.getComponent<LifeComponent>();
-			if (life && life->isAlive)
+			if (!isEntityPendingRemoval(id))
 			{
 				entityList[entity.id()] = entity.getComponent<NameComponent>()->name;
 			}

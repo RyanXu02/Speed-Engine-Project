@@ -46,8 +46,6 @@ namespace SE
 
 		friend class EntityRegistry;
 
-		static HookFunction _onNameComponentAdded();
-		static HookFunction _onNameComponentRemoved();
 		static HookFunction _onMeshComponentAdded();
 		static HookFunction _onMeshComponentRemoved();
 		static HookFunction _onScriptComponentAdded();

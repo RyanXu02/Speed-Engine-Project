@@ -58,26 +58,6 @@ namespace SE
 		DEFINE_TYPE(MeshComponent, member("path", &MeshComponent::path));
 	};
 
-	struct LifeComponent
-	{
-		LifeComponent() = default;
-		LifeComponent(bool alive)
-		    : isAlive(alive)
-		{}
-
-		bool isAlive{ true };
-
-		DEFINE_TYPE(LifeComponent, member("isAlive", &LifeComponent::isAlive));
-	};
-
-	struct RelationshipComponent
-	{
-		RelationshipComponent() = default;
-
-		uint32_t parent{ 0 };
-		std::vector<uint32_t> children;
-	};
-
 	struct PrefabComponent
 	{
 		PrefabComponent() = default;

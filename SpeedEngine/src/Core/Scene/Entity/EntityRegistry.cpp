@@ -30,8 +30,7 @@ namespace SE
 		: Serializable(),
 		  m_logger(logger)
 	{
-		REGISTER_COMPONENT(NameComponent, Entity::_onNameComponentAdded(), Entity::_onNameComponentRemoved());
-		REGISTER_COMPONENT(LifeComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(NameComponent, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(Transform, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), Entity::_onMeshComponentRemoved());
 		REGISTER_COMPONENT(PrefabComponent, NO_DEFINE, NO_DEFINE);
@@ -61,9 +60,10 @@ namespace SE
 
 	uint32_t EntityRegistry::addEntity()
 	{
-		m_registry.try_emplace(m_entityID, ComponentRegistry());
+		const uint32_t entityID = _assignID();
+		m_registry.try_emplace(entityID, ComponentRegistry{});
 
-		return _assignID();
+		return entityID;
 	}
 
 	const EntityRegistry::ComponentRegistry* EntityRegistry::getComponentRegistry(uint32_t entityID) const

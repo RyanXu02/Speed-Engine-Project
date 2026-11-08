@@ -2,7 +2,6 @@
 #include "Features/Serializable.h"
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <nlohmann/json.hpp>
 
@@ -75,52 +74,16 @@ namespace glm
 namespace SE
 {
 	// @brief Represents a transform component that can be attached to an entity
-	class Transform
+	struct Transform
 	{
-	public:
-		Transform() = default;
-
 		glm::vec3 translate{ 0.0f, 0.0f, 0.0f };
-		glm::quat rotate{1.0, 0.0f, 0.0f, 0.0f };
+		glm::quat rotate{ 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
-
-		void setPosition(const glm::vec3& p)
-		{
-			translate = p;
-			m_isDirty = true;
-		}
-		void setRotationQuat(const glm::quat& q) 
-		{ 
-			rotate = q;
-			m_isDirty = true;
-		}
-		void setRotation(const glm::vec3& eulerAngles)
-		{
-			rotate = glm::quat(eulerAngles);
-			m_isDirty = true;
-		}
-		void setScale(const glm::vec3& s)
-		{
-			scale = s;
-			m_isDirty = true;
-		}
-
-		const glm::vec3& getTranslation() const { return translate; }
-		const glm::vec3 getRotation() const { return glm::eulerAngles(rotate); }
-		const glm::quat& getRotationQuat() const { return rotate; }
-		const glm::vec3& getScale() const { return scale; }
-		const glm::mat4& getTransform();
 
 		DEFINE_TYPE(Transform,
 			member("translate", &Transform::translate),
 			member("rotate", &Transform::rotate),
 			member("scale", &Transform::scale)
 		);
-
-	private:
-		bool m_scaleLink{ true };
-
-		bool m_isDirty{ true };
-		glm::mat4 m_transform{ 1.0f };
 	};
 }

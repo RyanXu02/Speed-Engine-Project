@@ -68,8 +68,8 @@ namespace SE
 			{
 				rigidBody->setShape(shape->getShape(), needsMassOverride);
 				rigidBody->createBody();
-				rigidBody->setPosition(transform->getTranslation() + (rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
-				rigidBody->setRotation(transform->getRotationQuat());
+				rigidBody->setPosition(transform->translate + (rigidBody->getOffset() * glm::conjugate(transform->rotate)));
+				rigidBody->setRotation(transform->rotate);
 				ioBodies.push_back(rigidBody->getBodyID());
 			}
 		}
@@ -118,20 +118,20 @@ namespace SE
 				// Note: this is inefficient if many new entities are being created at once,
 				// In that case use createAndAddComponents to do it in a batch
 				rigidBody->createBody();
-				rigidBody->setPosition(transform->getTranslation() + (rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
-				rigidBody->setRotation(transform->getRotationQuat());
+				rigidBody->setPosition(transform->translate + (rigidBody->getOffset() * glm::conjugate(transform->rotate)));
+				rigidBody->setRotation(transform->rotate);
 				getBodyInterface()->AddBody(rigidBody->getBodyID(), rigidBody->isActive() ? EActivation::Activate : EActivation::DontActivate);
 			}
 			else if (rigidBody->getMotionType() == EMotionType::Static || !m_running)
 			{
 				// Allows for transform to be changed while physics is paused (or for static objects)
-				rigidBody->setPosition(transform->getTranslation() + (rigidBody->getOffset() * glm::conjugate(transform->getRotationQuat())));
-				rigidBody->setRotation(transform->getRotationQuat());
+				rigidBody->setPosition(transform->translate + (rigidBody->getOffset() * glm::conjugate(transform->rotate)));
+				rigidBody->setRotation(transform->rotate);
 			}
 			else
 			{
-				transform->setPosition(rigidBody->getPosition() + (-rigidBody->getOffset() * glm::conjugate(rigidBody->getRotation())));
-				transform->setRotationQuat(rigidBody->getRotation());
+				transform->translate = rigidBody->getPosition() + (-rigidBody->getOffset() * glm::conjugate(rigidBody->getRotation()));
+				transform->rotate = rigidBody->getRotation();
 			}
 		}
 	}

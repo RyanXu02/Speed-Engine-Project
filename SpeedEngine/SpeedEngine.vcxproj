@@ -196,7 +196,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\Features\MemoryTrackable.cpp" />
     <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
     <ClCompile Include="src\Core\Features\Serializable.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />

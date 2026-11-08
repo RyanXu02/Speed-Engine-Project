@@ -116,6 +116,8 @@ namespace SE
 			return;
 
 		auto func = [&](Entity entity) -> void {
+			if (scene->isEntityPendingRemoval(entity.id()))
+				return;
 			ScriptComponent* scriptComponent = entity.getComponent<ScriptComponent>();
 			_initScript(*scriptComponent);
 
@@ -176,7 +178,7 @@ namespace SE
 		{
 			if (!entity.getComponent<ScriptComponent>())
 			{
-				m_logger->error("ScriptComponent not found in entity {}", entity.getComponent<NameComponent>()->name);
+				m_logger->error("ScriptComponent not found in entity {}", entity.id());
 				return;
 			}
 

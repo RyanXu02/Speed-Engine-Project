@@ -58,25 +58,7 @@ namespace SE
 			e.removeComponent<CameraComponent>();
 		};
 
-		//had to manually register transform for custom functionality
-		//the macro only allow registering member data, not function because of nlohman
-		luaState.new_usertype<Transform>("Transform",
-			"getPosition", &Transform::getTranslation,
-			"setPosition", &Transform::setPosition,
-			"getRotation", &Transform::getRotation,
-			"setRotation", &Transform::setRotation,
-			"getScale", &Transform::getScale,
-			"setScale", &Transform::setScale
-		);
-
-		componentGetters["Transform"] = [](sol::state_view lua, Entity e) -> sol::object {
-			Transform* component = e.getComponent<Transform>();
-			if (component)
-			{
-				return sol::make_object(lua, component);
-			}
-			return sol::object(lua, sol::nil);
-		};
+		_registerComponent<Transform>(luaState);
 
 		luaState.new_usertype<RigidBody>("RigidBody", 
 			"getOffset", &RigidBody::getOffset, 
@@ -214,7 +196,6 @@ namespace SE
 		};
 
 		_registerComponent<NameComponent>(luaState);
-		_registerComponent<LifeComponent>(luaState);
 		_registerComponent<PrefabComponent>(luaState);
 		_registerComponent<ScriptComponent>(luaState);
 	}

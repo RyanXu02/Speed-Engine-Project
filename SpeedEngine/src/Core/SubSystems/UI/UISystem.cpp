@@ -12,16 +12,10 @@ namespace SE
 {
 	namespace // Helper functions for UISystem
 	{
-		static bool isAlive(Scene & scene, Entity entity)
-		{
-			const auto* life = entity.getComponent<LifeComponent>();
-			return !scene.isEntityPendingRemoval(entity.id()) && (!life || life->isAlive);
-		}
-
 		static bool isEligibleCanvas(Scene & scene, Entity entity)
 		{
 			const auto* canvas = entity.getComponent<UICanvasComponent>();
-			return canvas && canvas->visible && canvas->inputEnabled && isAlive(scene, entity);
+			return canvas && canvas->visible && canvas->inputEnabled && !scene.isEntityPendingRemoval(entity.id());
 		}
 
 		static std::vector<Entity> getCandidates(Scene & scene, Entity canvasEntity)
@@ -33,7 +27,7 @@ namespace SE
 			    {
 				    const auto& element = *entity.getComponent<UIElementComponent>();
 				    const auto& rect = *entity.getComponent<UIRectComponent>();
-				    if (element.canvasKey == canvas.canvasKey && element.visible && element.enabled && rect.size.x > 0.0f && rect.size.y > 0.0f && isAlive(scene, entity))
+				    if (element.canvasKey == canvas.canvasKey && element.visible && element.enabled && rect.size.x > 0.0f && rect.size.y > 0.0f && !scene.isEntityPendingRemoval(entity.id()))
 					    candidates.push_back(entity);
 			    });
 			std::ranges::sort(candidates,
