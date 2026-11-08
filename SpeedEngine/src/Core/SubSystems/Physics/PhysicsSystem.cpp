@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "Core/Scene/Scene.h"
 #include "Core/SubSystems/Scenes/SceneSystem.h"
-#include "Core/Scene/Entity/Component/Transform.h"
+#include "Core/Scene/Entity/Component/ComponentStructs.h"
 #include "Core/Scene/Entity/Component/RigidBody.h"
 #include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShape.h"
 #include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeBox.h"

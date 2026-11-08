@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ParticleEmitter.h"
+#include "Core/Scene/Entity/Component/ComponentStructs.h"
 #include "Core/Features/RNG.h"
 #include "Core/Features/Math.h"
 

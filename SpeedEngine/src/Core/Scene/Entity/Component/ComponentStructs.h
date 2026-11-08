@@ -2,7 +2,7 @@
 
 #include "Core/Engine.h"
 #include "Core/ResourceManagers/ResourceManager.h"
-#include "Transform.h"
+#include "Core/Features/MathToJSONBindings.h"
 #include "RigidBody.h"
 #include "PhysicsShape/PhysicsShapeBox.h"
 #include "PhysicsShape/PhysicsShapeCapsule.h"
@@ -34,6 +34,20 @@ namespace SE
 		std::string name = "Unknown";
 
 		DEFINE_TYPE(NameComponent, member("name", &NameComponent::name));
+	};
+
+	// @brief Represents a transform component that can be attached to an entity
+	struct Transform
+	{
+		glm::vec3 translate{ 0.0f, 0.0f, 0.0f };
+		glm::quat rotate{ 1.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
+
+		DEFINE_TYPE(Transform,
+			member("translate", &Transform::translate),
+			member("rotate", &Transform::rotate),
+			member("scale", &Transform::scale)
+		);
 	};
 
 	struct MeshComponent
