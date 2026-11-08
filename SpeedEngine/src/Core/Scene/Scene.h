@@ -1,15 +1,14 @@
 #pragma once
 
-#include "../Logger/LoggerProxy.h"
+#include "Logger/LoggerProxy.h"
 #include "Entity/Entity.h"
 #include "Entity/EntityRegistry.h"
 
-#include <Core/Features/Serializable.h>
+#include "Core/Features/Serializable.h"
 
 namespace SE
 {
-	// @brief Represents a scene in the engine, which contains a collection of
-	// entities
+	// @brief Represents a scene in the engine, which contains a collection of entities
 	class Scene : public Serializable
 	{
 	public:
@@ -27,11 +26,41 @@ namespace SE
 		const std::string& getName() const { return m_name; }
 		const std::string& getSourcePath() const { return m_path; }
 
+		// @brief Adds a new entity to the scene
+		// @param name The name of the entity
+		// @returns The runtime ID of the newly added entity
 		uint32_t addEntity(const std::string& name);
+
+		// @brief Get a Scene Serialization ID for a given runtime entity ID
+		// @param entityID The runtime entity ID
+		// @returns The Scene Serialization ID for the entity, or 0 if the entity does not exist
+		uint64_t getEntitySSID(uint32_t id) const
+		{
+			return isEntityPendingRemoval(id) ? 0 : m_registry.getEntitySSID(id);
+		}
+		// @brief Get a runtime entity ID for a given Scene Serialization ID
+		// @param ssid The Scene Serialization ID
+		// @returns The runtime entity ID for the entity, or 0 if the entity does not exist
+		uint32_t getEntityID(uint64_t ssid) const
+		{
+			const uint32_t id = m_registry.getEntityID(ssid);
+			return isEntityPendingRemoval(id) ? 0 : id;
+		}
+
+		// @brief Checks if an entity exists in the scene
+		// @param id The runtime entity ID
 		bool hasEntity(uint32_t id);
+		// @brief Retrieves an entity from the scene
+		// @param id The runtime entity ID
 		Entity getEntity(uint32_t id);
+		// @brief Removes an entity from the scene
+		// @param id The runtime entity ID
 		bool removeEntity(uint32_t id);
+
+		// @brief Checks if an entity is pending removal from the scene
+		// @param id The runtime entity ID
 		bool isEntityPendingRemoval(uint32_t id) const { return std::ranges::find(m_entitiesToRemove, id) != m_entitiesToRemove.end(); }
+		
 		bool readScene(std::string_view path, nlohmann::json& sceneJson) const;
 		bool saveScene(std::string_view path);
 		bool loadScene(std::string_view path);
@@ -64,9 +93,6 @@ namespace SE
 				}
 			};
 		}
-
-		// @brief For use with UI widget
-		std::unordered_map<uint32_t, std::string> getEntityList();
 
 		LoggerProxy& getLogger() { return m_logger; }
 

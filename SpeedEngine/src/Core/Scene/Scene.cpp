@@ -213,20 +213,6 @@ namespace SE
 		return true;
 	}
 
-	std::unordered_map<uint32_t, std::string> Scene::getEntityList()
-	{
-		std::unordered_map<uint32_t, std::string> entityList;
-		for (auto& [id, components] : m_registry)
-		{
-			Entity entity = getEntity(id);
-			if (!isEntityPendingRemoval(id))
-			{
-				entityList[entity.id()] = entity.getComponent<NameComponent>()->name;
-			}
-		}
-		return entityList;
-	}
-
 	void Scene::serialize(nlohmann::json& j) const
 	{
 		j = nlohmann::json::object();
@@ -250,7 +236,7 @@ namespace SE
 		Engine::Instance().getSubSystem<AudioSystem>()->clearSoundLibraries();
 
 		m_registry.deserialize(j["entities"]);
-
+		
 		if (!m_registry.empty())
 			Engine::Instance().getSubSystem<PhysicsSystem>()->createAndAddComponents();
 
@@ -272,6 +258,7 @@ namespace SE
 				[](const nlohmann::json& component) { return component.is_object(); });
 		};
 
+		std::unordered_set<uint64_t> serializedIDs;
 		for (size_t index = 0; index < j["entities"].size(); ++index)
 		{
 			const auto& entity = j["entities"][index];
@@ -281,6 +268,16 @@ namespace SE
 			{
 				m_logger.error("Scene entity {} needs a components object or string prefab_ref; component values must be objects", index);
 				return false;
+			}
+
+			if (entity.contains("id"))
+			{
+				const auto& id = entity["id"];
+				if (!id.is_number_integer() || id <= 0 || !serializedIDs.insert(id.get<uint64_t>()).second)
+				{
+					m_logger.error("Scene entity {} needs a unique positive integer id", index);
+					return false;
+				}
 			}
 
 			if (entity.contains("overrides")

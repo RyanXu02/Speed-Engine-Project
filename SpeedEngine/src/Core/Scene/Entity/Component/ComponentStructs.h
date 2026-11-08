@@ -58,6 +58,16 @@ namespace SE
 		DEFINE_TYPE(MeshComponent, member("path", &MeshComponent::path));
 	};
 
+	struct Parent
+	{
+		Parent() = default;
+
+		// Scene Serialization ID
+		uint64_t parent{ 0 };
+
+		DEFINE_TYPE(Parent, member("parent", &Parent::parent));
+	};
+
 	struct PrefabComponent
 	{
 		PrefabComponent() = default;

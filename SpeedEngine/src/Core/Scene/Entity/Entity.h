@@ -18,7 +18,12 @@ namespace SE
 
 		operator uint32_t() { return m_id; }
 
+		// @brief Returns the runtime ID of the entity
 		uint32_t id() const { return m_id; }
+		// @brief Returns the Scene Serialization ID of the entity
+		// @brief This ID used for serialization and deserialization of the entity only
+		uint64_t ssid() const { return m_registry->getEntitySSID(m_id); }
+
 		const EntityRegistry::ComponentRegistry* getComponentRegistry() const { return m_registry->getComponentRegistry(m_id); }
 
 		template<typename T, typename... Args>

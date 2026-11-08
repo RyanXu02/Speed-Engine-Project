@@ -544,7 +544,7 @@ namespace SE
 
 		ImGui::PushID(static_cast<int>(entity.id()));
 		ImGui::BeginDisabled(MainWidget::isSceneEditingBlocked());
-		ImGui::Text("Entity ID: %u", entity.id());
+		ImGui::Text("Entity SSID: %llu", entity.ssid());
 
 		const auto* components = entity.getComponentRegistry();
 		const ComponentInspectorRegistry::Entry* remove = nullptr;
