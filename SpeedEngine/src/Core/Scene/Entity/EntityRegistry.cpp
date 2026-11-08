@@ -30,8 +30,7 @@ namespace SE
 		: Serializable(),
 		  m_logger(logger)
 	{
-		REGISTER_COMPONENT(NameComponent, Entity::_onNameComponentAdded(), Entity::_onNameComponentRemoved());
-		REGISTER_COMPONENT(LifeComponent, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(NameComponent, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(Transform, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), Entity::_onMeshComponentRemoved());
 		REGISTER_COMPONENT(PrefabComponent, NO_DEFINE, NO_DEFINE);
@@ -61,9 +60,31 @@ namespace SE
 
 	uint32_t EntityRegistry::addEntity()
 	{
-		m_registry.try_emplace(m_entityID, ComponentRegistry());
+		while (m_entitySSID == 0 || m_serializedToRuntime.contains(m_entitySSID))
+			++m_entitySSID;
+		return _addEntity(m_entitySSID++);
+	}
 
-		return _assignID();
+	uint32_t EntityRegistry::_addEntity(uint64_t entitySSID)
+	{
+		const uint32_t entityID = _assignID();
+		m_registry.try_emplace(entityID, ComponentRegistry{});
+		m_runtimeToSerialized.emplace(entityID, entitySSID);
+		m_serializedToRuntime.emplace(entitySSID, entityID);
+
+		return entityID;
+	}
+
+	uint64_t EntityRegistry::getEntitySSID(uint32_t entityID) const
+	{
+		auto it = m_runtimeToSerialized.find(entityID);
+		return it != m_runtimeToSerialized.end() ? it->second : 0;
+	}
+
+	uint32_t EntityRegistry::getEntityID(uint64_t entitySSID) const
+	{
+		auto it = m_serializedToRuntime.find(entitySSID);
+		return it != m_serializedToRuntime.end() ? it->second : 0;
 	}
 
 	const EntityRegistry::ComponentRegistry* EntityRegistry::getComponentRegistry(uint32_t entityID) const
@@ -89,6 +110,8 @@ namespace SE
 			return false;
 		}
 
+		m_serializedToRuntime.erase(m_runtimeToSerialized.at(entityID));
+		m_runtimeToSerialized.erase(entityID);
 		m_registry.erase(entityID);
 
 		return true;
@@ -97,6 +120,9 @@ namespace SE
 	void EntityRegistry::clear()
 	{
 		m_registry.clear();
+		m_runtimeToSerialized.clear();
+		m_serializedToRuntime.clear();
+		m_entitySSID = 1;
 	}
 
 	bool EntityRegistry::empty()
@@ -148,6 +174,7 @@ namespace SE
 			}
 
 			nlohmann::json entityObj;
+			entityObj["id"] = getEntitySSID(entityID);
 			if (isPrefabEntity)
 			{
 				entityObj["prefab_ref"] = prefabPath;
@@ -169,9 +196,23 @@ namespace SE
 	{
 		assert(j.is_array() && !j.is_null() && !j.is_discarded() && "Registry: failed to deserialize json");
 
+		std::vector<uint32_t> runtimeIDs;
+		runtimeIDs.reserve(j.size());
 		for (const auto& entity : j)
 		{
-			uint32_t entityID = addEntity();
+			runtimeIDs.push_back(entity.contains("id") ? _addEntity(entity["id"].get<uint64_t>()) : 0);
+		}
+		for (auto& entityID : runtimeIDs)
+		{
+			if (entityID == 0)
+				entityID = addEntity();
+		}
+
+		// Resolve ids before components can reference other entities
+		for (size_t index = 0; index < j.size(); ++index)
+		{
+			const auto& entity = j[index];
+			const uint32_t entityID = runtimeIDs[index];
 			auto componentsJson = entity.value("components", nlohmann::json::object());
 
 			if (entity.contains("prefab_ref"))

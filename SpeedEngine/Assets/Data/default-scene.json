@@ -8,9 +8,6 @@
           "isPrimary": true,
           "nearPlane": 0.10000000149011612
         },
-        "LifeComponent": {
-          "isAlive": true
-        },
         "NameComponent": {
           "name": "camera"
         },
@@ -42,9 +39,6 @@
         "AudioSFXComponent": {
           "filepath": "Assets/Audio/shaco_death.wav",
           "isGameSFX": true
-        },
-        "LifeComponent": {
-          "isAlive": true
         },
         "MeshComponent": {
           "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
@@ -99,9 +93,6 @@
         "AudioMusicComponent": {
           "filepath": "Assets/Audio/funkytown.wav"
         },
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
@@ -155,9 +146,6 @@
           "filepath": "Assets/Audio/shaco_death_nongame.wav",
           "isGameSFX": false
         },
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/cube.obj"
         },
@@ -208,9 +196,6 @@
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
@@ -257,9 +242,6 @@
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
@@ -306,9 +288,6 @@
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/thomas_the_train/scene.gltf"
         },
@@ -337,9 +316,6 @@
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "NameComponent": {
           "name": "particle"
         },
@@ -420,9 +396,6 @@
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "NameComponent": {
           "name": "thomas the dank engine"
         },

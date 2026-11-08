@@ -29,8 +29,8 @@ function Player:onUpdate(dt)
 	end
 
 	local transform = self.entity:getComponent("Transform")
-	local p = transform:getPosition()
-	transform:setPosition(vec3(p.x + dx * self.moveSpeed * dt, p.y, p.z + dz * self.moveSpeed * dt))
+	local p = transform.translate
+	transform.translate = vec3(p.x + dx * self.moveSpeed * dt, p.y, p.z + dz * self.moveSpeed * dt)
 end
 
 function Player:onDestroy()

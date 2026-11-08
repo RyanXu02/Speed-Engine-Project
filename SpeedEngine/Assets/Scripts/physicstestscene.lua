@@ -50,8 +50,8 @@ function physicstestscene:onUpdate(dt)
 			end
 
 			local transform = entityNew:getComponent("Transform")
-			transform:setPosition(vec3((self.numAdded % 10 - 5.0), 15 + (self.numAdded // 100), (self.numAdded // 10) % 10))
-			transform:setScale(vec3(0.5, 0.5, 0.5))
+			transform.translate = vec3((self.numAdded % 10 - 5.0), 15 + (self.numAdded // 100), (self.numAdded // 10) % 10)
+			transform.scale = vec3(0.5, 0.5, 0.5)
 
 			self.numAdded = self.numAdded + 1
 		end

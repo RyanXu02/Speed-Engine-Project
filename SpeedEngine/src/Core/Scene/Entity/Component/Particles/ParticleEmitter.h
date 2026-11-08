@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Features/Serializable.h"
-#include "Core/Scene/Entity/Component/Transform.h"
+#include "Core/Features/MathToJSONBindings.h"
 #include "ParticleContainer.h"
 
 #include <glm/vec2.hpp>
@@ -9,6 +9,7 @@
 namespace SE
 {
     // Forward Declaration
+    struct Transform;
 
     class ParticleEmitter
     {

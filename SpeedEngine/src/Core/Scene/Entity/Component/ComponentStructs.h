@@ -2,7 +2,7 @@
 
 #include "Core/Engine.h"
 #include "Core/ResourceManagers/ResourceManager.h"
-#include "Transform.h"
+#include "Core/Features/MathToJSONBindings.h"
 #include "RigidBody.h"
 #include "PhysicsShape/PhysicsShapeBox.h"
 #include "PhysicsShape/PhysicsShapeCapsule.h"
@@ -36,6 +36,20 @@ namespace SE
 		DEFINE_TYPE(NameComponent, member("name", &NameComponent::name));
 	};
 
+	// @brief Represents a transform component that can be attached to an entity
+	struct Transform
+	{
+		glm::vec3 translate{ 0.0f, 0.0f, 0.0f };
+		glm::quat rotate{ 1.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec3 scale{ 1.0f, 1.0f, 1.0f };
+
+		DEFINE_TYPE(Transform,
+			member("translate", &Transform::translate),
+			member("rotate", &Transform::rotate),
+			member("scale", &Transform::scale)
+		);
+	};
+
 	struct MeshComponent
 	{
 		MeshComponent() = default;
@@ -58,24 +72,14 @@ namespace SE
 		DEFINE_TYPE(MeshComponent, member("path", &MeshComponent::path));
 	};
 
-	struct LifeComponent
+	struct Parent
 	{
-		LifeComponent() = default;
-		LifeComponent(bool alive)
-		    : isAlive(alive)
-		{}
+		Parent() = default;
 
-		bool isAlive{ true };
+		// Scene Serialization ID
+		uint64_t parent{ 0 };
 
-		DEFINE_TYPE(LifeComponent, member("isAlive", &LifeComponent::isAlive));
-	};
-
-	struct RelationshipComponent
-	{
-		RelationshipComponent() = default;
-
-		uint32_t parent{ 0 };
-		std::vector<uint32_t> children;
+		DEFINE_TYPE(Parent, member("parent", &Parent::parent));
 	};
 
 	struct PrefabComponent

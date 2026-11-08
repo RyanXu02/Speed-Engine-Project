@@ -94,7 +94,7 @@ namespace SE
 				return;
 
 			const Transform& transform = *entity.getComponent<Transform>();
-			const TransformState transformState{ transform.getTranslation(), transform.getRotationQuat(), transform.getScale() };
+			const TransformState transformState{ transform.translate, transform.rotate, transform.scale };
 
 			auto [it,_] = m_drawItemHistories.try_emplace(entity.id(), 
 				DrawItemHistory{ { meshId, entity.id(), transformState, transformState }, m_tick });
@@ -112,7 +112,7 @@ namespace SE
 		scene.forEntitiesWith<Transform, LightComponent>([&](Entity entity)
 		{
 			const LightComponent* light = entity.getComponent<LightComponent>();
-			m_lights.push_back({ entity.getComponent<Transform>()->getTranslation(), light->color * light->intensity });
+			m_lights.push_back({ entity.getComponent<Transform>()->translate, light->color * light->intensity });
 		});
 
 		//capture particles

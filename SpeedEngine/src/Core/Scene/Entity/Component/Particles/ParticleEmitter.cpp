@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ParticleEmitter.h"
+#include "Core/Scene/Entity/Component/ComponentStructs.h"
 #include "Core/Features/RNG.h"
 #include "Core/Features/Math.h"
 
@@ -84,7 +85,7 @@ namespace SE
             // Set position of particle randomly within the bounds of the emitter (Point, Line,
             // Square all work here)
             //Transform* transform = GetGameObject()->GetComponent<Transform>();
-            glm::vec3 translation = myTransform->getTranslation();
+            glm::vec3 translation = myTransform->translate;
             float xMin = translation.x - (mEmitterScale.x / 2);
             float xMax = translation.x + (mEmitterScale.x / 2);
             float yMin = translation.y - (mEmitterScale.y / 2);

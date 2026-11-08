@@ -184,12 +184,6 @@ namespace SE
 		{
 			const uint32_t id = *it++;
 			if (!scene || !scene->hasEntity(id) || scene->isEntityPendingRemoval(id))
-			{
-				m_session.removeSelected(id);
-				continue;
-			}
-			const auto* life = scene->getEntity(id).getComponent<LifeComponent>();
-			if (life && !life->isAlive)
 				m_session.removeSelected(id);
 		}
 		auto* main = getWidget<MainWidget>(m_mainWidgetId);
