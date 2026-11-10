@@ -4,6 +4,7 @@
 
 #include "Component/ComponentStructs.h"
 #include "Core/SubSystems/Events/EventSystem.h"
+#include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 #include "ResourceManagers/ResourceManager.h"
 #include <SubSystems/Scriptings/ScriptingSystem.h>
@@ -29,20 +30,8 @@ namespace SE
 		HookFunction function = [](Entity entity)
 		{
 			auto* meshComponent = entity.getComponent<MeshComponent>();
-
-			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-			meshComponent->meshResourceID = meshResourceManager->loadMesh({ .path = meshComponent->path, .name = meshComponent->path });
-		};
-		return function;
-	}
-
-	Entity::HookFunction Entity::_onMeshComponentRemoved()
-	{
-		HookFunction function = [](Entity entity)
-		{
-			auto* meshComponent = entity.getComponent<MeshComponent>();
-			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-			//meshResourceManager->removeResource(meshComponent->meshResourceID);
+			if (meshComponent->meshResourceID == 0 && !meshComponent->path.empty() && meshComponent->path != "None")
+				meshComponent->setPath(meshComponent->path);
 		};
 		return function;
 	}
@@ -62,9 +51,8 @@ namespace SE
 	{
 		HookFunction function = [](Entity entity)
 		{
-			auto* scriptComponent = entity.getComponent<ScriptComponent>();
 			auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
-			scriptingSystem->removeScript(scriptComponent->path);
+			scriptingSystem->removeScript(entity);
 		};
 		return function;
 	}
@@ -80,12 +68,31 @@ namespace SE
 		};
 		return function;
 	}
+
+	Entity::HookFunction Entity::_onCameraComponentRemoved()
+	{
+		return [](Entity entity)
+		{
+			EngineStates::releaseCamera(&entity.getComponent<CameraComponent>()->frustum);
+		};
+	}
+
+	Entity::HookFunction Entity::_onRigidBodyComponentAdded()
+	{
+		return [](Entity entity)
+		{
+			auto* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>();
+			entity.getComponent<RigidBody>()->initialize(physicsSystem->getBodyInterface());
+		};
+	}
+
 	Entity::HookFunction Entity::_onSFXComponentAdded()
 	{
 		HookFunction function = [](Entity entity)
 		{
 			auto* sfxComponent = entity.getComponent<AudioSFXComponent>();
-			sfxComponent->createSound(sfxComponent->getFilepath(), sfxComponent->isGameSFX());
+			if (!sfxComponent->getFilepath().empty() && sfxComponent->getFilepath() != "None")
+				sfxComponent->createSound(sfxComponent->getFilepath(), sfxComponent->isGameSFX());
 		};
 		return function;
 	}
@@ -94,10 +101,19 @@ namespace SE
 	{
 		HookFunction function = [](Entity entity)
 		{
-			auto* sfxComponent = entity.getComponent<AudioMusicComponent>();
-			sfxComponent->createTrack(sfxComponent->getFilepath());
+			auto* musicComponent = entity.getComponent<AudioMusicComponent>();
+			if (!musicComponent->getFilepath().empty() && musicComponent->getFilepath() != "None")
+				musicComponent->createTrack(musicComponent->getFilepath());
 		};
 		return function;
+	}
+
+	Entity::HookFunction Entity::_onSFXComponentRemoved()
+	{
+		return [](Entity entity)
+		{
+			entity.getComponent<AudioSFXComponent>()->StopMySound();
+		};
 	}
 
 
@@ -106,9 +122,11 @@ namespace SE
 		HookFunction function = [](Entity entity)
 		{
 			auto* physicsShapeMeshComponent = entity.getComponent<PhysicsShapeMesh>();
-
-			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-			physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->loadMesh({ .path = physicsShapeMeshComponent->getPath(), .name = physicsShapeMeshComponent->getPath() }));
+			if (physicsShapeMeshComponent->getMeshResourceID() == 0 && !physicsShapeMeshComponent->getPath().empty() && physicsShapeMeshComponent->getPath() != "None")
+			{
+				auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
+				physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->loadMesh({ .path = physicsShapeMeshComponent->getPath(), .name = physicsShapeMeshComponent->getPath() }));
+			}
 		};
 		return function;
 	}

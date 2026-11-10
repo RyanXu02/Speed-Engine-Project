@@ -22,7 +22,7 @@ namespace SE
 		virtual void loadScript(Entity& entity, std::string_view path);
 		virtual void loadScript(std::string_view path);
 		virtual void runScript(std::string_view path);
-		virtual void removeScript(std::string_view path);
+		virtual void removeScript(Entity& entity);
 		virtual void reloadScript(std::string_view path);
 		virtual void reset();
 

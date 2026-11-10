@@ -4,8 +4,9 @@
 
 #include <nlohmann/json.hpp>
 
-//move away from nlohman intrusive type, use a custom one
-//while maintaining nlohman type registration
+// @brief Describe which fields are serialized and how an individual component converts to and from JSON
+// @param ClassName The name of the class to define serialization for
+// @param ... The fields of the class to serialize
 #define DEFINE_TYPE(ClassName, ...)										\
 	static const char* getStaticType()									\
 	{																	\
@@ -34,9 +35,12 @@
 		ClassName::visitFields(resolver);								\
 	}
 
-// register the behavior of the type on construction and destruction
-#define REGISTER_TYPE(Type, ConstructorFunc, DesctructorFunc)				\
-	m_typeResolver.Register<Type>(#Type, ConstructorFunc, DesctructorFunc);	\
+// @brief Register the factory used to create the type from JSON
+// @brief Component life cycle stuff are registered in the EntityRegistry, this is just for serialization and deserialization
+// @param Type the type to register
+// @param ComponentFactory the factory function that takes an entity ID and a JSON object and creates the component
+#define REGISTER_TYPE(Type, ComponentFactory)				\
+	m_typeResolver.Register<Type>(#Type, ComponentFactory);
 
 namespace SE
 {
@@ -64,14 +68,12 @@ namespace SE
 	};
 
 	typedef std::pair<std::any, std::any> SerializerPair; //first serializer, second: deserializer
-	typedef std::function<void(uint32_t, const nlohmann::json&)> ConstructorFunc;
-	typedef std::function<void(uint32_t, const nlohmann::json&)> DestructorFunc;
-	typedef std::pair<ConstructorFunc, DestructorFunc> TypeFactory;
+	typedef std::function<void(uint32_t, const nlohmann::json&)> ComponentFactory;
 
 	class MetaType
 	{
 	public:
-		MetaType(std::any data, std::any constructor)
+		MetaType(std::any data, ComponentFactory constructor)
 		    : m_serializer(std::move(data)),
 		      m_constructor(std::move(constructor))
 		{}
@@ -116,40 +118,18 @@ namespace SE
 		}
 
 		// invoke the registered construction function
-		template<typename InvokeFunc, typename... Args>
-		void invoke(Args&&... args)
+		void invoke(uint32_t entityID, const nlohmann::json& data)
 		{
-			if (!m_constructor.has_value())
+			if (m_constructor)
 			{
-				return;
-			}
-
-			auto* typeConstructor = std::any_cast<TypeFactory>(&m_constructor);
-			if (!typeConstructor)
-			{
-				throw std::runtime_error("MetaType invoke: Failed to cast to desired type");
-			}
-
-			if (typeid(InvokeFunc) == typeid(ConstructorFunc))
-			{
-				auto constructorFunc = typeConstructor->first;
-				constructorFunc(std::forward<Args>(args)...);
-			}
-			else if (typeid(InvokeFunc) == typeid(DestructorFunc))
-			{
-				auto destructorFunc = typeConstructor->second;
-				destructorFunc(std::forward<Args>(args)...);
-			}
-			else
-			{
-				throw std::runtime_error("MetaType invoke: Failed to invoke to desired function");
+				m_constructor(entityID, data);
 			}
 		}
 
 
 	private:
 		std::any m_serializer;
-		std::any m_constructor;
+		ComponentFactory m_constructor;
 	};
 
 
@@ -171,19 +151,19 @@ namespace SE
 					return MetaType(typeSerializerIt->second, nullptr);
 				}
 			}
-			return MetaType{ std::any{}, std::any{} };
+			return MetaType{ std::any{}, {} };
 		}
 
 		template<typename T>
-		void Register(std::string_view name, ConstructorFunc loadFunc, DestructorFunc unloadFunc)
+		void Register(std::string_view name, ComponentFactory loadFunc)
 		{
 			m_typeSerializers.try_emplace(name.data(), &TypeSerializer<T>::Serialize, &TypeSerializer<T>::Deserialize);
-			m_typeFactory.try_emplace(name.data(), loadFunc, unloadFunc);
+			m_typeFactory.try_emplace(name.data(), std::move(loadFunc));
 		}
 
 	private:
 		std::unordered_map<std::string, SerializerPair> m_typeSerializers;
-		std::unordered_map<std::string, TypeFactory> m_typeFactory;
+		std::unordered_map<std::string, ComponentFactory> m_typeFactory;
 	};
 
 

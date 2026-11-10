@@ -59,9 +59,18 @@ namespace SE
 				return nullptr;
 			}
 			ComponentRegistry& components = it->second;
-			auto [componentIt, status] = components.try_emplace(typeid(T), T(std::forward<Args>(args)...));
+			auto [componentIt, status] = components.try_emplace(typeid(T), std::in_place_type<T>, std::forward<Args>(args)...);
+			auto* component = std::any_cast<T>(&componentIt->second);
+			if (status)
+			{
+				auto hookIt = m_componentHooks.find(typeid(T));
+				if (hookIt != m_componentHooks.end())
+				{
+					hookIt->second.onAdded(entityID);
+				}
+			}
 
-			return std::any_cast<T>(&componentIt->second);
+			return component;
 		}
 
 		template<typename T>
@@ -100,7 +109,13 @@ namespace SE
 				return false;
 			}
 
-			components.erase(componentIt);
+			auto hookIt = m_componentHooks.find(typeid(T));
+			if (hookIt != m_componentHooks.end())
+			{
+				hookIt->second.onRemoved(entityID);
+			}
+
+			components.erase(typeid(T));
 			return true;
 		}
 
@@ -120,8 +135,14 @@ namespace SE
 		std::unordered_map<uint32_t, uint64_t> m_runtimeToSerialized;
 		std::unordered_map<uint64_t, uint32_t> m_serializedToRuntime;
 
-		typedef std::function<void(uint32_t, const nlohmann::json&)> OnComponentAdded;
-		typedef std::function<void(uint32_t, const nlohmann::json&)> OnComponentRemoved;
+		typedef std::function<void(uint32_t)> OnComponentAdded;
+		typedef std::function<void(uint32_t)> OnComponentRemoved;
+		struct ComponentHooks
+		{
+			OnComponentAdded onAdded;
+			OnComponentRemoved onRemoved;
+		};
+		std::unordered_map<std::type_index, ComponentHooks> m_componentHooks;
 
 		// @brief Adds an entity with a Scene Serialization ID
 		// @param entitySSID The Scene Serialization ID

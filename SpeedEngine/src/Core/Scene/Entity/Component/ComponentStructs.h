@@ -110,7 +110,6 @@ namespace SE
 	struct CameraComponent
 	{
 		CameraComponent() = default;
-		~CameraComponent() { EngineStates::releaseCamera(&frustum); }
 
 		CameraFrustum frustum;
 
