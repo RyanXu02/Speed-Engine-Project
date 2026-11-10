@@ -52,15 +52,22 @@ namespace SE
 		friend class EntityRegistry;
 
 		static HookFunction _onMeshComponentAdded();
+
 		static HookFunction _onScriptComponentAdded();
 		static HookFunction _onScriptComponentRemoved();
+
 		static HookFunction _onCameraComponentAdded();
 		static HookFunction _onCameraComponentRemoved();
+
 		static HookFunction _onRigidBodyComponentAdded();
+
 		static HookFunction _onSFXComponentAdded();
 		static HookFunction _onSFXComponentRemoved();
+
 		static HookFunction _onMusicComponentAdded();
+
 		static HookFunction _onPhysicsShapeMeshComponentAdded();
+
 		static HookFunction _onParticleEmitterAdded();
 	};
 } // namespace SE
