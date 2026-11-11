@@ -14,8 +14,10 @@ namespace SE
 	class RigidBody
 	{
 	public:
-		RigidBody();
+		RigidBody() = default;
 		~RigidBody();
+
+		void initialize(JPH::BodyInterface* bodyInterface);
 
 		JPH::BodyID getBodyID() const;
 		bool isCreated() const;

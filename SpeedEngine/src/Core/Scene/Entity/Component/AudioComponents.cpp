@@ -17,11 +17,7 @@ namespace SE
 	      m_isGameSFX(isGameSFX),
 	      m_myId({ 0xFFFFFFFF, NONGAME_SFX }),
 	      m_myHandle({ 0xFFFFFFFF, 0 })
-	{
-		//just call ts with member var params
-		//this func has params because we need to recreate sound if filepath is changed in editor
-		createSound(m_filepath, m_isGameSFX);
-	}
+	{}
 
 	AudioSFXComponent::~AudioSFXComponent()
 	{
@@ -67,9 +63,7 @@ namespace SE
 	AudioMusicComponent::AudioMusicComponent(std::string_view filepath)
 	    : m_filepath(filepath),
 	      m_myId({ 0xFFFFFFFF })
-	{
-		createTrack(m_filepath);
-	}
+	{}
 
 	bool AudioMusicComponent::createTrack(const std::string& filepath) {
 		//register sound with audio system and give back an SFXId

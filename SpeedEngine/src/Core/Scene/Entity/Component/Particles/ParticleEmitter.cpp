@@ -8,7 +8,7 @@ namespace SE
 {
     void ParticleEmitter::update(float dt)
     {
-        // the added-hook only runs for deserialized components, so make sure the container exists
+        // Recreate the container after emission settings change
         finalize();
 
         // lambda function to update a particle

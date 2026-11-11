@@ -136,22 +136,7 @@ namespace SE
 		SubSystem::shutdown();
 
 		// release every lua instance held by script components while EventSystem is still alive
-		Scene* scene = sceneSystem ? sceneSystem->getCurrentScene() : nullptr;
-		if (scene)
-		{
-			auto func = [&](Entity entity) -> void {
-				ScriptComponent* scriptComponent = entity.getComponent<ScriptComponent>();
-				if (scriptComponent->onDestroy)
-				{
-					scriptComponent->onDestroy();
-				}
-				scriptComponent->onInit = []() {};
-				scriptComponent->onUpdate = [](double) {};
-				scriptComponent->onDestroy = []() {};
-				scriptComponent->initilized = false;
-			};
-			scene->forEntitiesWith<ScriptComponent>(func);
-		}
+		_destroyAllScripts();
 
 		EngineStates::setCamera(nullptr);
 		m_scripts.clear();
@@ -352,8 +337,18 @@ namespace SE
 		}
 	}
 
-	void ScriptingSystem::removeScript(std::string_view path) {
-	
+	void ScriptingSystem::removeScript(Entity& entity)
+	{
+		auto* scriptComponent = entity.getComponent<ScriptComponent>();
+		if (scriptComponent->onDestroy)
+		{
+			scriptComponent->onDestroy();
+		}
+		scriptComponent->onInit = []() {};
+		scriptComponent->onUpdate = [](double) {};
+		scriptComponent->onDestroy = []() {};
+		scriptComponent->initilized = false;
+		m_scriptInstances.erase(entity.id());
 	}
 
 	void ScriptingSystem::reloadScript(std::string_view path) {
@@ -406,16 +401,8 @@ namespace SE
 			return;
 		}
 
-		scene->forEntitiesWith<ScriptComponent>([](Entity entity) {
-			ScriptComponent* scriptComponent = entity.getComponent<ScriptComponent>();
-			if (scriptComponent->onDestroy)
-			{
-				scriptComponent->onDestroy();
-			}
-			scriptComponent->onInit = []() {};
-			scriptComponent->onUpdate = [](double) {};
-			scriptComponent->onDestroy = []() {};
-			scriptComponent->initilized = false;
+		scene->forEntitiesWith<ScriptComponent>([this](Entity entity) {
+			removeScript(entity);
 		});
 	}
 

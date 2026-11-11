@@ -30,8 +30,9 @@ namespace SE
 	{
 		if (!m_entitiesToRemove.empty())
 		{
-			for (uint32_t id : m_entitiesToRemove)
+			for (size_t index = 0; index < m_entitiesToRemove.size(); ++index)
 			{
+				const uint32_t id = m_entitiesToRemove[index];
 				m_registry.removeEntity(id);
 			}
 			m_entitiesToRemove.clear();

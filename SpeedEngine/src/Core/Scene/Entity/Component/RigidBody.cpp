@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "RigidBody.h"
 
-#include "Engine.h"
-#include "Core/SubSystems/Physics/PhysicsSystem.h"
-
 #include <glm/gtc/quaternion.hpp>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/Body.h>
@@ -36,8 +33,9 @@ inline JPH::Mat44 toJPH(const glm::mat4& mat) {
 namespace SE
 {
 
-	RigidBody::RigidBody() { 
-		m_bodyInterface = Engine::Instance().getSubSystem<PhysicsSystem>()->getBodyInterface();
+	void RigidBody::initialize(JPH::BodyInterface* bodyInterface)
+	{
+		m_bodyInterface = bodyInterface;
 	}
 
 	RigidBody::~RigidBody()
@@ -83,7 +81,7 @@ namespace SE
 		bodySettings.mAllowDynamicOrKinematic = true;
 		if (m_needsMassOverride)
 		{
-			bodySettings.mOverrideMassProperties = EOverrideMassProperties::MassAndInertiaProvided;
+			bodySettings.mOverrideMassProperties = JPH::EOverrideMassProperties::MassAndInertiaProvided;
 			bodySettings.mMassPropertiesOverride.mMass = 1.0f;
 			bodySettings.mMassPropertiesOverride.mInertia = JPH::Mat44::sIdentity();
 		}

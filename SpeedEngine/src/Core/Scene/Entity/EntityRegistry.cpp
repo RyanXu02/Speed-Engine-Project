@@ -6,21 +6,29 @@
 #include "Entity.h"
 
 
-//loadHook determines what needs to be done after a component is loaded
-//unloadHook determines what needs to be done after a component is unloaded
-#define REGISTER_COMPONENT(Type, LoadHook, UnloadHook)        \
-	REGISTER_TYPE(                                            \
-	    Type,                                                 \
-	    [this](uint32_t entityID, const nlohmann::json& data) \
-	    {                                                     \
-		    addComponent<Type>(entityID, data.get<Type>());   \
-		    LoadHook(Entity(entityID, this));                 \
-	    },                                                    \
-	    [this](uint32_t entityID, const nlohmann::json& data) \
-	    {                                                     \
-		    /* TODO: add unload unloadfunction if needed */   \
-		    UnloadHook(Entity(entityID, this));               \
-	    })
+// @brief Registers a component type with the EntityRegistry for serialzation, deserialization, and lifecycle hooks when the component is added or removed
+// @brief Your component should use this macro to provide its necessary onAdd and onRemove behaviour if it needs to be specially handled when added or removed from an entity
+// @param LoadHook The callback function that is called when the component is added to an entity
+// @param UnloadHook The callback function that is called when the component is removed from an entity
+#define REGISTER_COMPONENT(Type, LoadHook, UnloadHook)                       \
+	do                                                                       \
+	{                                                                        \
+		REGISTER_TYPE(                                                       \
+			Type,                                                            \
+			[this](uint32_t entityID, const nlohmann::json& data)            \
+			{                                                                \
+				Entity(entityID, this).addComponent<Type>(data.get<Type>()); \
+			});                                                              \
+		m_componentHooks.try_emplace(typeid(Type), ComponentHooks{           \
+			[this](uint32_t entityID)                                        \
+			{                                                                \
+				LoadHook(Entity(entityID, this));                            \
+			},                                                               \
+			[this](uint32_t entityID)                                        \
+			{                                                                \
+				UnloadHook(Entity(entityID, this));                          \
+			}});                                                             \
+	} while (false)
 
 #define NO_DEFINE [](Entity entity) {}
 
@@ -32,16 +40,16 @@ namespace SE
 	{
 		REGISTER_COMPONENT(NameComponent, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(Transform, NO_DEFINE, NO_DEFINE);
-		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), Entity::_onMeshComponentRemoved());
+		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(PrefabComponent, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(ScriptComponent, Entity::_onScriptComponentAdded(), Entity::_onScriptComponentRemoved());
-		REGISTER_COMPONENT(CameraComponent, Entity::_onCameraComponentAdded(), NO_DEFINE);
-		REGISTER_COMPONENT(RigidBody, NO_DEFINE, NO_DEFINE);
+		REGISTER_COMPONENT(CameraComponent, Entity::_onCameraComponentAdded(), Entity::_onCameraComponentRemoved());
+		REGISTER_COMPONENT(RigidBody, Entity::_onRigidBodyComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeBox, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeCapsule, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeSphere, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeMesh, Entity::_onPhysicsShapeMeshComponentAdded(), NO_DEFINE);
-		REGISTER_COMPONENT(AudioSFXComponent, Entity::_onSFXComponentAdded(), NO_DEFINE);
+		REGISTER_COMPONENT(AudioSFXComponent, Entity::_onSFXComponentAdded(), Entity::_onSFXComponentRemoved());
 		REGISTER_COMPONENT(AudioMusicComponent, Entity::_onMusicComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(ParticleEmitter, Entity::_onParticleEmitterAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(LightComponent, NO_DEFINE, NO_DEFINE);
@@ -56,7 +64,10 @@ namespace SE
 
 	}
 
-	EntityRegistry::~EntityRegistry() {}
+	EntityRegistry::~EntityRegistry()
+	{
+		clear();
+	}
 
 	uint32_t EntityRegistry::addEntity()
 	{
@@ -110,6 +121,20 @@ namespace SE
 			return false;
 		}
 
+		std::vector<const OnComponentRemoved*> removalHooks;
+		for (const auto& [type, component] : it->second)
+		{
+			auto hookIt = m_componentHooks.find(type);
+			if (hookIt != m_componentHooks.end())
+			{
+				removalHooks.push_back(&hookIt->second.onRemoved);
+			}
+		}
+		for (const auto* hook : removalHooks)
+		{
+			(*hook)(entityID);
+		}
+
 		m_serializedToRuntime.erase(m_runtimeToSerialized.at(entityID));
 		m_runtimeToSerialized.erase(entityID);
 		m_registry.erase(entityID);
@@ -119,7 +144,8 @@ namespace SE
 
 	void EntityRegistry::clear()
 	{
-		m_registry.clear();
+		while (!m_registry.empty())
+			removeEntity(m_registry.begin()->first);
 		m_runtimeToSerialized.clear();
 		m_serializedToRuntime.clear();
 		m_entitySSID = 1;
@@ -233,7 +259,7 @@ namespace SE
 				try
 				{
 
-					typeResult.invoke<ConstructorFunc>(entityID, json);
+					typeResult.invoke(entityID, json);
 				}
 				catch (const nlohmann::json::exception& e)
 				{
