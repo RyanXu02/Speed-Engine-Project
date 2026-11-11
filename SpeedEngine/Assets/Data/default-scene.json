@@ -32,14 +32,11 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 1
     },
     {
       "components": {
-        "AudioSFXComponent": {
-          "filepath": "Assets/Audio/shaco_death.wav",
-          "isGameSFX": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
         },
@@ -81,12 +78,13 @@
             1.0
           ],
           "translate": [
-            -5.475366592407227,
-            0.699999988079071,
-            1.6437968015670776
+            -17.606767654418945,
+            -0.8999999761581421,
+            -3.5698659420013428
           ]
         }
-      }
+      },
+      "id": 2
     },
     {
       "components": {
@@ -134,18 +132,15 @@
           ],
           "translate": [
             -9.45142936706543,
-            -982.2235107421875,
+            -86350.3203125,
             12.250982284545898
           ]
         }
-      }
+      },
+      "id": 3
     },
     {
       "components": {
-        "AudioSFXComponent": {
-          "filepath": "Assets/Audio/shaco_death_nongame.wav",
-          "isGameSFX": false
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/cube.obj"
         },
@@ -192,7 +187,8 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 4
     },
     {
       "components": {
@@ -238,7 +234,8 @@
             -0.9299945831298828
           ]
         }
-      }
+      },
+      "id": 5
     },
     {
       "components": {
@@ -280,11 +277,12 @@
           ],
           "translate": [
             0.9000086188316345,
-            -10.010002136230469,
+            -85743.03125,
             0.5999897718429565
           ]
         }
-      }
+      },
+      "id": 6
     },
     {
       "components": {
@@ -312,7 +310,8 @@
             1.0
           ]
         }
-      }
+      },
+      "id": 7
     },
     {
       "components": {
@@ -392,7 +391,8 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 8
     },
     {
       "components": {
@@ -472,7 +472,41 @@
             2.700000047683716
           ]
         }
-      }
+      },
+      "id": 9
+    },
+    {
+      "components": {
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death.wav",
+          "isGameSFX": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/Ball.glb"
+        },
+        "NameComponent": {
+          "name": "sound test"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            -11.300000190734863,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "id": 10
     }
   ],
   "scene_name": "default"
