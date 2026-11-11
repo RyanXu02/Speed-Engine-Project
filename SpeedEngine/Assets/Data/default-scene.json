@@ -78,9 +78,9 @@
             1.0
           ],
           "translate": [
-            -17.606767654418945,
+            0.8650579452514648,
             -0.8999999761581421,
-            -3.5698659420013428
+            -1.3863747119903564
           ]
         }
       },
@@ -132,7 +132,7 @@
           ],
           "translate": [
             -9.45142936706543,
-            -86350.3203125,
+            -119110.828125,
             12.250982284545898
           ]
         }
@@ -277,7 +277,7 @@
           ],
           "translate": [
             0.9000086188316345,
-            -85743.03125,
+            -120534.9140625,
             0.5999897718429565
           ]
         }
@@ -485,7 +485,7 @@
           "path": "Assets/Meshes/Ball.glb"
         },
         "NameComponent": {
-          "name": "sound test"
+          "name": "3d sound test with player"
         },
         "Transform": {
           "rotate": [
@@ -507,6 +507,45 @@
         }
       },
       "id": 10
+    },
+    {
+      "components": {
+        "AudioMusicComponent": {
+          "filepath": "Assets/Audio/funkytown.wav"
+        },
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death_nongame.wav",
+          "isGameSFX": false
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/cube.obj"
+        },
+        "NameComponent": {
+          "name": "sound scripting test"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/soundtest.lua"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            -7.599999904632568,
+            0.0
+          ]
+        }
+      },
+      "id": 11
     }
   ],
   "scene_name": "default"

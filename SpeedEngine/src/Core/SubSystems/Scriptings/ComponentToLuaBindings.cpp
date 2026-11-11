@@ -200,8 +200,8 @@ namespace SE
 
 
 		luaState.new_usertype<AudioSFXComponent>("AudioSFXComponent", 
-			"playMySound", &AudioSFXComponent::PlayMySound, 
-			"stopMySound", &AudioSFXComponent::StopMySound, 
+			"PlayMySound", &AudioSFXComponent::PlayMySound, 
+			"StopMySound", &AudioSFXComponent::StopMySound, 
 			"updateMyPosition", &AudioSFXComponent::updateMyPosition);
 
 		componentGetters[AudioSFXComponent::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
@@ -224,8 +224,8 @@ namespace SE
 
 
 		luaState.new_usertype<AudioMusicComponent>("AudioMusicComponent", 
-			"playMyTrack", &AudioMusicComponent::PlayMyTrack, 
-			"stopMyTrack", &AudioMusicComponent::StopMyTrack);
+			"PlayMyTrack", &AudioMusicComponent::PlayMyTrack, 
+			"StopMyTrack", &AudioMusicComponent::StopMyTrack);
 
 		componentGetters[AudioMusicComponent::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
 		{
