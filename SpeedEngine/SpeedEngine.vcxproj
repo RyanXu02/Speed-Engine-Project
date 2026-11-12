@@ -162,6 +162,8 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\ResourceManagers\Terrain\Terrain.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Terrain\TerrainManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsContactListener.cpp" />
@@ -246,6 +248,8 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Terrain\Terrain.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Terrain\TerrainManager.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetPathPayload.h" />

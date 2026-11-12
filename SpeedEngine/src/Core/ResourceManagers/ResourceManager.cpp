@@ -15,6 +15,7 @@ namespace SE
 		m_shaderManager.init();
 		m_materialManager.init();
 		m_meshManager.init();
+		m_terrainManager.init();
 		m_fontManager.init();
 	}
 
@@ -27,6 +28,7 @@ namespace SE
 		m_textures.clear();
 		m_texturePaths.clear();
 		m_meshManager.shutdown();
+		m_terrainManager.shutdown();
 		m_fontManager.shutdown();
 		m_resourceTypes.clear();
 		m_stringCache.clear();
@@ -51,6 +53,18 @@ namespace SE
 		{
 #if defined(COMPILE_WITH_EDITOR)
 			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::MeshResource, true));
+#endif
+		}
+		return id;
+	}
+
+	uint32_t ResourceManager::loadTerrain(const TerrainLoadDesc& desc)
+	{
+		uint32_t id = m_terrainManager.addTerrain(generateId(), desc.name, desc.path);
+		if (id != 0 && m_resourceTypes.emplace(id, ResourceType::Terrain).second)
+		{
+#if defined(COMPILE_WITH_EDITOR)
+			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Terrain, true));
 #endif
 		}
 		return id;
@@ -171,6 +185,10 @@ namespace SE
 			{
 				return m_meshManager.getMeshResource(id);
 			}
+			else if (it->second == ResourceType::Terrain)
+			{
+				return m_terrainManager.getTerrain(id);
+			}
 			else if (it->second == ResourceType::Font)
 			{
 				return m_fontManager.getFont(id);
@@ -198,6 +216,7 @@ namespace SE
 		case ResourceType::Shader: removed = m_shaderManager.removeShader(id); break;
 		case ResourceType::Material: removed = m_materialManager.removeMaterial(id); break;
 		case ResourceType::MeshResource: removed = m_meshManager.removeMeshResource(id); break;
+		case ResourceType::Terrain: removed = m_terrainManager.removeTerrain(id); break;
 		case ResourceType::Font: removed = m_fontManager.removeFont(id); break;
 		case ResourceType::Texture: return false; // Cached textures cannot be removed individually, they live until shutdown
 		}
