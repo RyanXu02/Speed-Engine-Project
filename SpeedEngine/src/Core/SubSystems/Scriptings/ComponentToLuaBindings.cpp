@@ -213,7 +213,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[AudioSFXComponent::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[AudioSFXComponent::getStaticType()] = [](Entity e, sol::table)
 		{
 			e.addComponent<AudioSFXComponent>();
 		};
@@ -236,7 +236,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[AudioMusicComponent::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[AudioMusicComponent::getStaticType()] = [](Entity e, sol::table)
 		{
 			e.addComponent<AudioMusicComponent>();
 		};
