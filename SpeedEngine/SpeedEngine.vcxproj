@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Editor|x64">
@@ -42,7 +42,10 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <Import Project="$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.props')" />
+  <PropertyGroup>
+    <VcpkgRoot Condition="'$(VcpkgRoot)' == ''">$(VCInstallDir)vcpkg\</VcpkgRoot>
+  </PropertyGroup>
+  <Import Project="$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props')" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
@@ -58,7 +61,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <VcpkgRoot Condition="'$(VcpkgRoot)' == ''">$(VCInstallDir)vcpkg\</VcpkgRoot>
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
     <VcpkgManifestRoot>$(MSBuildProjectDirectory)\</VcpkgManifestRoot>
     <VcpkgTriplet Condition="'$(Platform)' == 'x64' and '$(VcpkgTriplet)' == ''">x64-windows</VcpkgTriplet>
@@ -74,7 +76,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
@@ -112,7 +114,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
@@ -148,7 +150,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp23</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -248,7 +250,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
-    <ClCompile Include="ThirdParty\pch.cpp">
+    <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -358,7 +360,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />
-    <ClInclude Include="ThirdParty\pch.h" />
+    <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
@@ -387,7 +389,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <None Include="Assets\Shaders\text.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <Import Project="$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.targets" Condition="Exists('$(VcpkgRoot)scripts\buildsystems\msbuild\vcpkg.targets')" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

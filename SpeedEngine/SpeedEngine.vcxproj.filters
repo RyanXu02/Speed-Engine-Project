@@ -67,7 +67,7 @@
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
-    <ClCompile Include="ThirdParty\pch.cpp" />
+    <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
@@ -94,7 +94,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdParty\pch.cpp">
+    <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Logger\Logger.cpp">
@@ -318,7 +318,7 @@
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />
-    <ClInclude Include="ThirdParty\pch.h" />
+    <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
