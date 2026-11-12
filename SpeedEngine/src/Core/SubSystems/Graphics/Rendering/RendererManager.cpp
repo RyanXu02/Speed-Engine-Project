@@ -272,7 +272,7 @@ namespace SE
 		m_window->swapBuffers();
 	}
 
-	void RendererManager::_prepareGameInputRegion(int framebufferWidth, int framebufferHeight)
+	void RendererManager::_prepareGameInputRegion([[maybe_unused]] int framebufferWidth, [[maybe_unused]] int framebufferHeight)
 	{
 #if defined(COMPILE_WITH_EDITOR)
 		m_gameInputRegion = {};

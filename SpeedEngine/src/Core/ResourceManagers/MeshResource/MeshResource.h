@@ -1,7 +1,7 @@
 #pragma once
 #include "../../Logger/LoggerProxy.h"
 #include "../Resource.h"
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 struct aiScene;
 

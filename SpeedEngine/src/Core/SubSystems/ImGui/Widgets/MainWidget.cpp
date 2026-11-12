@@ -82,11 +82,8 @@ namespace SE
 			{
 				if (ImGui::MenuItem("Create Empty", nullptr, false, !s_editsBlocked && scene))
 				{
-					if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
-					{
-						scene->addEntity("New Empty");
-						m_session.markDirty();
-					}
+					scene->addEntity("New Empty");
+					m_session.markDirty();
 				}
 				// add prefabs later
 				ImGui::EndMenu();

@@ -20,7 +20,7 @@
 #include "Threading/FrameExchange.h"
 
 // temp
-#include <SubSystems/Scriptings/ScriptingSystem.h>
+#include "SubSystems/Scriptings/ScriptingSystem.h"
 
 #include <Jolt/Core/Memory.h>
 
@@ -63,7 +63,7 @@ namespace SE
 
 		// subscribe to window close event
 		m_windowCloseEvent = getSubSystem<EventSystem>()->subscribe(EventType::WindowClose,
-		    [this](const Event& event)
+		    [this](const Event&)
 		    {
 				m_shutdownRequested.store(true);
 		    });

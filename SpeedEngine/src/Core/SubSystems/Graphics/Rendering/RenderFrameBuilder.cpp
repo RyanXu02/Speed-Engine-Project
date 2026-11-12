@@ -123,7 +123,7 @@ namespace SE
 			ParticleEmitter* emitter = entity.getComponent<ParticleEmitter>();
 			const glm::vec4 color(emitter->GetTintColor(), emitter->GetAlpha());
 
-			emitter->ForEachParticle([&](Particle& p, float)
+			emitter->ForEachParticle([&](Particle& p, double)
 			{
 				if (p.lifetime > 0.0f)
 					m_particles.push_back({ p.position, glm::vec2(p.scale), p.rotation, color });

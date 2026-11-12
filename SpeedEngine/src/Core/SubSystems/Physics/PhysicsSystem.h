@@ -62,7 +62,11 @@ public:
 
 	virtual BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer inLayer) const override
 	{
-		JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
+		if (inLayer >= Layers::NUM_LAYERS)
+		{
+			JPH_ASSERT(false);
+			return BroadPhaseLayers::NON_MOVING;
+		}
 		return mObjectToBroadPhase[inLayer];
 	}
 
