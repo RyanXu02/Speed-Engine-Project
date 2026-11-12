@@ -82,8 +82,6 @@ namespace SE
 				    ImGui::TextWrapped("%s", m_meshPathError.c_str());
 		    });
 
-		m_inspectors.registerComponent<PrefabComponent>("Prefab");
-
 		m_inspectors.registerComponent<ScriptComponent>("Script", "Scripting", false,
 		    [](Entity& entity, ScriptComponent& component)
 		    {

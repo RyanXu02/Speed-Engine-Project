@@ -214,6 +214,34 @@ namespace SE
 		return true;
 	}
 
+	bool Scene::savePrefab(uint32_t id, const std::string& path) const
+	{
+		try
+		{
+			std::filesystem::create_directories(std::filesystem::path(path).parent_path());
+			std::ofstream out(path);
+			out << nlohmann::json{{ "components", m_registry.serializeComponents(id) }}.dump(2) << '\n';
+			out.close();
+			return !out.fail();
+		}
+		catch (const std::exception& e)
+		{
+			m_logger.warn("Failed saving prefab '{}': {}", path, e.what());
+			return false;
+		}
+	}
+
+	uint32_t Scene::instantiatePrefab(const std::string& path)
+	{
+		nlohmann::json j;
+		if (!loadJson(path, m_logger, j) || !j.is_object() || !j.contains("components") || !j["components"].is_object())
+			return 0;
+
+		const uint32_t id = addEntity("New Empty");
+		m_registry.deserializeComponents(id, j["components"]);
+		return id;
+	}
+
 	void Scene::serialize(nlohmann::json& j) const
 	{
 		j = nlohmann::json::object();
@@ -263,11 +291,9 @@ namespace SE
 		for (size_t index = 0; index < j["entities"].size(); ++index)
 		{
 			const auto& entity = j["entities"][index];
-			if (!entity.is_object() || (!entity.contains("components") && !entity.contains("prefab_ref"))
-				|| (entity.contains("components") && !validComponents(entity["components"]))
-				|| (entity.contains("prefab_ref") && !entity["prefab_ref"].is_string()))
+			if (!entity.is_object() || !entity.contains("components") || !validComponents(entity["components"]))
 			{
-				m_logger.error("Scene entity {} needs a components object or string prefab_ref; component values must be objects", index);
+				m_logger.error("Scene entity {} needs a components object; component values must be objects", index);
 				return false;
 			}
 
@@ -281,13 +307,6 @@ namespace SE
 				}
 			}
 
-			if (entity.contains("overrides")
-				&& (!entity.contains("prefab_ref") || !entity["overrides"].is_object()
-					|| (entity["overrides"].contains("components") && !validComponents(entity["overrides"]["components"]))))
-			{
-				m_logger.error("Scene entity {} has invalid prefab overrides; expected an object with optional components object", index);
-				return false;
-			}
 		}
 		return true;
 	}

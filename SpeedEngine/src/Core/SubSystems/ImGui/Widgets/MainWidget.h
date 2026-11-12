@@ -26,7 +26,7 @@ namespace SE
 		// @brief The actions that can be performed in the main widget
 		enum class Action { None, New, Open, Save, SaveAs, Reload };
 		// @brief The dialogs that can be shown in the main widget
-		enum class Dialog { None, Confirm, Open, SavePath };
+		enum class Dialog { None, Confirm, Open, SavePath, SavePrefab };
 
 		// @brief Queues an action to be performed
 		// @param action The action to be performed

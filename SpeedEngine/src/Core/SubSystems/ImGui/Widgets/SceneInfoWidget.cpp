@@ -89,7 +89,7 @@ namespace SE
 					ImGui::SetNextItemSelectionUserData(index);
 					ImGui::Selectable((name + "###Entity").c_str(), m_session.selectedEntities().contains(id));
 					const bool f2 = ImGui::IsItemFocused() && ImGui::IsKeyPressed(ImGuiKey_F2);
-					if (_rightClickMenu() || f2)
+					if (_rightClickMenu(id) || f2)
 					{
 						renameEntityId = id;
 						renameName = name;
@@ -140,7 +140,7 @@ namespace SE
 	{
 	}
 
-	bool SceneInfoWidget::_rightClickMenu()
+	bool SceneInfoWidget::_rightClickMenu(uint32_t id)
 	{
 		bool rename = false;
 		if (ImGui::BeginPopupContextItem("EntityRightClickMenu"))
@@ -148,6 +148,8 @@ namespace SE
 			if (ImGui::MenuItem("Delete"))
 				m_requestDelete = true;
 			rename = ImGui::MenuItem("Rename", "F2");
+			if (ImGui::MenuItem("Save as Prefab..."))
+				m_session.requestSavePrefab(id);
 			ImGui::EndPopup();
 		}
 		return rename;
