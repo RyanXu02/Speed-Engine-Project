@@ -19,9 +19,9 @@ namespace SE
 	{
 		// Deserialize terrain path
 		TerrainMaterial terrainMat;
-		json j = terrainMat;
-		_loadTerrainJson(terrainPath.data(), j);
-		terrainMat = j.get<TerrainMaterial>();
+		json jsonTemp = terrainMat;
+		_loadTerrainJson(terrainPath.data(), jsonTemp);
+		terrainMat = jsonTemp.get<TerrainMaterial>();
 
 		// Load terrain height map
 		int width = 0, height = 0, channels = 0;
@@ -43,8 +43,8 @@ namespace SE
 			{
 				float t = j / r;
 				Vertex v;
-				float height = (static_cast<float>(heightMap[((i * n) + j) * 3]) / 255.0f) * terrainMat.heightScale;
-				v.position = { s * 2.0 * r - r, t * 2.0 * r - r, height};
+				float vertexHeight = (static_cast<float>(heightMap[((i * n) + j) * 3]) / 255.0f) * terrainMat.heightScale;
+				v.position = { s * 2.0 * r - r, t * 2.0 * r - r, vertexHeight };
 				v.normal = { 0.0, 0.0, 1.0 };
 				v.uv = { s, t };
 				m_vertices.push_back(v);
