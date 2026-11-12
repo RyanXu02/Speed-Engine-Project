@@ -5,8 +5,8 @@
 #include "Engine.h"
 #include "SceneInfoWidget.h"
 #include "MainWidget.h"
-#include "imgui.h"
-#include "imgui_stdlib.h"
+#include <imgui.h>
+#include <imgui_stdlib.h>
 
 namespace SE
 {
@@ -17,7 +17,7 @@ namespace SE
 		, m_session(session)
 	{
 		m_sceneChanged = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
-		    [this](Event& event)
+		    [this](Event&)
 		    {
 				m_renameEntityId = 0;
 				m_renameTargets.clear();
@@ -109,24 +109,21 @@ namespace SE
 
 		if (m_requestDelete)
 		{
-			if (Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene())
+			for (uint32_t id : m_session.selectedEntities())
 			{
-				for (uint32_t id : m_session.selectedEntities())
-				{
-					Entity entity = scene->getEntity(id);
-					auto* nameComponent = entity.getComponent<NameComponent>();
-					if (!nameComponent)
-						continue;
-					auto name = nameComponent->name;
+				Entity entity = scene->getEntity(id);
+				auto* nameComponent = entity.getComponent<NameComponent>();
+				if (!nameComponent)
+					continue;
+				auto name = nameComponent->name;
 
-					if (!scene->removeEntity(id))
-						continue;
-					m_session.markDirty();
+				if (!scene->removeEntity(id))
+					continue;
+				m_session.markDirty();
 
-					EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
-					auto event = std::make_unique<ActiveSceneModified>(MT::Remove, id, name);
-					eventSystem->publish(std::move(event));
-				}
+				EventSystem* eventSystem = Engine::Instance().getSubSystem<EventSystem>();
+				auto event = std::make_unique<ActiveSceneModified>(MT::Remove, id, name);
+				eventSystem->publish(std::move(event));
 			}
 			m_session.clearSelection();
 			m_renameEntityId = 0;

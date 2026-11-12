@@ -13,7 +13,7 @@
 		return #ClassName;												\
 	}																	\
 	template <typename Member>											\
-	static void visitFields(Member&& member)							\
+	static void visitFields([[maybe_unused]] Member&& member)			\
 	{																	\
 		__VA_ARGS__;													\
 	}																	\

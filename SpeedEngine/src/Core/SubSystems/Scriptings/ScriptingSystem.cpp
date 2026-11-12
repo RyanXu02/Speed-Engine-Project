@@ -66,6 +66,13 @@ namespace SE
 		inputTable["isKeyDown"] = [](KeyCodes key) {
 			return Engine::Instance().getSubSystem<InputSystem>()->isKeyDown(key);
 		};
+		inputTable["isKeyRising"] = [](KeyCodes key) {
+			return Engine::Instance().getSubSystem<InputSystem>()->isKeyRising(key);
+		};
+		inputTable["isKeyFalling"] = [](KeyCodes key)
+		{
+			return Engine::Instance().getSubSystem<InputSystem>()->isKeyFalling(key);
+		};
 		inputTable["isMouseDown"] = [](MouseCodes button) {
 			return Engine::Instance().getSubSystem<InputSystem>()->isMouseDown(button);
 		};
@@ -93,6 +100,16 @@ namespace SE
 			"getFarPlane", &CameraFrustum::getFarPlane,
 			"setFarPlane", &CameraFrustum::setFarPlane
 		);
+
+		
+		sol::table audioTable = m_luaState.create_named_table("Audio");
+		audioTable["setListenerData"] = [](const glm::vec3& pos, const glm::vec3& fwd, const glm::vec3& up) {
+			Engine::Instance().getSubSystem<AudioSystem>()->SetListener(pos, fwd, up);
+		};
+		audioTable["setListenerCone"] = [](float innerAngleDeg, float outerAngleDeg, float outerGain) {
+			Engine::Instance().getSubSystem<AudioSystem>()->SetListenerCone(innerAngleDeg, outerAngleDeg, outerGain);
+		};
+		//not sure if we are going to script or hardcode cpp volume sliders n shit. if scripting will add them here.
 	}
 
 	void SE::ScriptingSystem::update(double deltaTime)

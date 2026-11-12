@@ -5,7 +5,7 @@
 #include "SubSystems/Scenes/SceneSystem.h"
 
 #define MINIAUDIO_IMPLEMENTATION
-#include "miniaudio.h"
+#include <miniaudio.h>
 
 namespace SE
 {
@@ -145,7 +145,7 @@ namespace SE
 		m_imp->initialized = true;
 	}
 
-	void AudioSystem::update(double dt) {
+	void AudioSystem::update(double) {
 		//check pending list for sound that are done being loaded
 		for (auto it = m_loadPendingList.begin(); it != m_loadPendingList.end();)
 		{

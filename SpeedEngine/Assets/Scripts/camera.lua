@@ -24,7 +24,7 @@ function Camera:onUpdate(dt)
 		return
 	end
 
-	self.angle = self.angle + self.speed * dt
+	--self.angle = self.angle + self.speed * dt
 
 	local cam = self.entity:getComponent("CameraComponent")
 	cam.frustum:setTarget(self.center)

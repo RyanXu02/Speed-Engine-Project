@@ -14,14 +14,14 @@ inline glm::vec3 toGLM(const JPH::Vec3& vec)
 
 namespace SE
 {
-	void PhysicsContactListener::OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings) 
+	void PhysicsContactListener::OnContactAdded(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, [[maybe_unused]] ContactSettings& ioSettings) 
 	{
 		const std::lock_guard lock(m_mutex);
 		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<CollisionAddedEvent>(
 		    inBody1.GetID().GetIndexAndSequenceNumber(), inBody2.GetID().GetIndexAndSequenceNumber(), toGLM(inManifold.mWorldSpaceNormal), toGLM(inBody1.GetLinearVelocity()), toGLM(inBody2.GetLinearVelocity())));
 	}
 
-	void PhysicsContactListener::OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, ContactSettings& ioSettings)
+	void PhysicsContactListener::OnContactPersisted(const Body& inBody1, const Body& inBody2, const ContactManifold& inManifold, [[maybe_unused]] ContactSettings& ioSettings)
 	{
 		const std::lock_guard lock(m_mutex);
 		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<CollisionPersistedEvent>(inBody1.GetID().GetIndexAndSequenceNumber(), inBody2.GetID().GetIndexAndSequenceNumber(), toGLM(inManifold.mWorldSpaceNormal)));

@@ -43,8 +43,19 @@ namespace SE
 		{
 			return m_registry->removeComponent<T>(m_id);
 		}
+		// @brief Direction vectors from the entity's transform rotation (local space)
+		glm::vec3 forward() { return _rotated(glm::vec3(0.f, 0.f, -1.f)); }
+		glm::vec3 up() { return _rotated(glm::vec3(0.f, 1.f, 0.f)); }
+		glm::vec3 right() { return _rotated(glm::vec3(1.f, 0.f, 0.f)); }
 
 	private:
+		glm::vec3 _rotated(const glm::vec3& axis)
+		{
+			//Transform* t = getComponent<Transform>();
+			//return t ? glm::normalize(t->rotate * axis) : axis;
+			return glm::normalize(getComponent<Transform>()->rotate * axis);
+		}
+
 		uint32_t m_id;
 		EntityRegistry* m_registry;
 		typedef std::function<void(Entity)> HookFunction;

@@ -4,12 +4,15 @@
 namespace SE
 {
 
-	void ComponentToLuaBindings::exportComponents(Logger* logger, sol::state& luaState) {
+	void ComponentToLuaBindings::exportComponents(Logger*, sol::state& luaState) {
 
 		luaState.new_usertype<Entity>("Entity",
 			"id", [] (Entity& self) {
 				return self.id();
 			},
+			"forward", &Entity::forward,
+			"up", &Entity::up,
+			"right", &Entity::right,
 			"addComponent", [&] (Entity& self, const std::string& componentName, sol::object luaTable) {
 				auto it = componentAdders.find(std::string(componentName));
 				if (it != componentAdders.end()) {
@@ -49,7 +52,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[CameraComponent::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[CameraComponent::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<CameraComponent>();
 		};
@@ -97,7 +100,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[RigidBody::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[RigidBody::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<RigidBody>();
 		};
@@ -119,7 +122,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[PhysicsShapeBox::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[PhysicsShapeBox::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<PhysicsShapeBox>();
 		};
@@ -141,7 +144,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[PhysicsShapeSphere::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[PhysicsShapeSphere::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<PhysicsShapeSphere>();
 		};
@@ -164,7 +167,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[PhysicsShapeCapsule::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[PhysicsShapeCapsule::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<PhysicsShapeCapsule>();
 		};
@@ -186,13 +189,60 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[MeshComponent::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[MeshComponent::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<MeshComponent>();
 		};
 		componentRemovers[MeshComponent::getStaticType()] = [](Entity e)
 		{
 			e.removeComponent<MeshComponent>();
+		};
+
+
+		luaState.new_usertype<AudioSFXComponent>("AudioSFXComponent", 
+			"PlayMySound", &AudioSFXComponent::PlayMySound, 
+			"StopMySound", &AudioSFXComponent::StopMySound, 
+			"updateMyPosition", &AudioSFXComponent::updateMyPosition);
+
+		componentGetters[AudioSFXComponent::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			AudioSFXComponent* component = e.getComponent<AudioSFXComponent>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[AudioSFXComponent::getStaticType()] = [](Entity e, sol::table)
+		{
+			e.addComponent<AudioSFXComponent>();
+		};
+		componentRemovers[AudioSFXComponent::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<AudioSFXComponent>();
+		};
+
+
+		luaState.new_usertype<AudioMusicComponent>("AudioMusicComponent", 
+			"PlayMyTrack", &AudioMusicComponent::PlayMyTrack, 
+			"StopMyTrack", &AudioMusicComponent::StopMyTrack);
+
+		componentGetters[AudioMusicComponent::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			AudioMusicComponent* component = e.getComponent<AudioMusicComponent>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[AudioMusicComponent::getStaticType()] = [](Entity e, sol::table)
+		{
+			e.addComponent<AudioMusicComponent>();
+		};
+		componentRemovers[AudioMusicComponent::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<AudioMusicComponent>();
 		};
 
 		_registerComponent<NameComponent>(luaState);
