@@ -50,6 +50,11 @@ namespace SE
 		virtual void serialize(nlohmann::json& j) const override;
 		virtual void deserialize(const nlohmann::json& j) override;
 
+		// @brief Serializes one entity's components without its ID
+		nlohmann::json serializeComponents(uint32_t entityID) const;
+		// @brief Loads component values using the registered component factories
+		void deserializeComponents(uint32_t entityID, const nlohmann::json& j);
+
 		template<typename T, typename... Args>
 		T* addComponent(uint32_t entityID, Args&&... args)
 		{

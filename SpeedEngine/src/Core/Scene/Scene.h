@@ -65,6 +65,11 @@ namespace SE
 		bool saveScene(std::string_view path);
 		bool loadScene(std::string_view path);
 
+		// @brief Saves one entity as an independent component template
+		bool savePrefab(uint32_t id, const std::string& path) const;
+		// @brief Creates an ordinary entity from a component template with fresh IDs
+		uint32_t instantiatePrefab(const std::string& path);
+
 		template<typename... Ts>
 		std::vector<Entity> getEntitiesWith()
 		{
