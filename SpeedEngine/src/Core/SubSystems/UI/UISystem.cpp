@@ -369,7 +369,7 @@ namespace SE
 		if (input.isKeyRising(KEY_ESCAPE)) _processCommand(UICommand::Cancel, activations);
 	}
 
-	void UISystem::update(double deltaTime)
+	void UISystem::update(double)
 	{
 		auto* scene = _refreshFocus();
 		const auto& input = *Engine::Instance().getSubSystem<InputSystem>();

@@ -11,7 +11,7 @@ namespace SE
 	{
 	public:
 		ScriptingSystem(const std::string& name = "ScriptingSystem")
-		    : SubSystem(name)
+		    : SubSystem(name), sceneSystem(nullptr)
 		{}
 		~ScriptingSystem() override = default;
 

@@ -6,7 +6,7 @@
 
 namespace SE
 {
-    void ParticleEmitter::update(float dt)
+    void ParticleEmitter::update(double dt)
     {
         // Recreate the container after emission settings change
         finalize();
@@ -33,9 +33,9 @@ namespace SE
         };
 
         // pass lambda function to container update
-        mContainer->Update(lambda, dt);
+        mContainer->Update(lambda, static_cast<float>(dt));
 
-        mEmitAccumulator += mEmitRate * dt;
+        mEmitAccumulator += mEmitRate * static_cast<float>(dt);
         while (mEmitAccumulator > 0.0f)
         {
             if (!mContainer->IsFull())
@@ -139,10 +139,10 @@ namespace SE
         }
     }
 
-    void ParticleEmitter::ForEachParticle(std::function<void(Particle& particle, float dt)> const& lambda, float dt)
+    void ParticleEmitter::ForEachParticle(std::function<void(Particle& particle, double dt)> const& lambda, double dt)
     {
         finalize();
-        mContainer->Update(lambda, dt);
+        mContainer->Update(lambda, static_cast<float>(dt));
     }
 
     void ParticleEmitter::finalize() {

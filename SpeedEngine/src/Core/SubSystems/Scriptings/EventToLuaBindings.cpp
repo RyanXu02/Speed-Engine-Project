@@ -87,7 +87,7 @@ namespace SE
 		sol::usertype<SwitchCameraEvent> switchCameraType = luaState["SwitchCameraEvent"];
 		switchCameraType["camera"] = sol::readonly(&SwitchCameraEvent::camera);
 	}
-	void EventToLuaBindings::_exportKeyCodes(Logger* logger, sol::state& luaState)
+	void EventToLuaBindings::_exportKeyCodes(Logger*, sol::state& luaState)
 	{
 	
         luaState.new_enum("KeyCodes",

@@ -174,7 +174,7 @@ namespace SE
 		// ImGui::ShowDemoWindow(); // Don't show demo window! :(
 	}
 
-	void ImGuiRenderer::render(RenderContext& context)
+	void ImGuiRenderer::render(RenderContext&)
 	{
 #if defined(COMPILE_WITH_EDITOR)
 		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();

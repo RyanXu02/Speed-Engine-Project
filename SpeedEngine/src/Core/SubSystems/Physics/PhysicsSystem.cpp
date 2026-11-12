@@ -36,7 +36,7 @@ namespace SE
 		m_contact_listener = std::make_unique<PhysicsContactListener>();
 		m_physics_system->SetContactListener(m_contact_listener.get());
 
-		BodyInterface& body_interface = m_physics_system->GetBodyInterface();
+		// BodyInterface& body_interface = m_physics_system->GetBodyInterface();
 	}
 
 	void PhysicsSystem::createAndAddComponents() {

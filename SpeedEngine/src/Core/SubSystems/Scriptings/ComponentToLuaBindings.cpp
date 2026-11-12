@@ -4,7 +4,7 @@
 namespace SE
 {
 
-	void ComponentToLuaBindings::exportComponents(Logger* logger, sol::state& luaState) {
+	void ComponentToLuaBindings::exportComponents(Logger*, sol::state& luaState) {
 
 		luaState.new_usertype<Entity>("Entity",
 			"id", [] (Entity& self) {
@@ -49,7 +49,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[CameraComponent::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[CameraComponent::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<CameraComponent>();
 		};
@@ -97,7 +97,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[RigidBody::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[RigidBody::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<RigidBody>();
 		};
@@ -119,7 +119,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[PhysicsShapeBox::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[PhysicsShapeBox::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<PhysicsShapeBox>();
 		};
@@ -141,7 +141,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[PhysicsShapeSphere::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[PhysicsShapeSphere::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<PhysicsShapeSphere>();
 		};
@@ -164,7 +164,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[PhysicsShapeCapsule::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[PhysicsShapeCapsule::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<PhysicsShapeCapsule>();
 		};
@@ -186,7 +186,7 @@ namespace SE
 			}
 			return sol::object(lua, sol::nil);
 		};
-		componentAdders[MeshComponent::getStaticType()] = [](Entity e, sol::table luaTable)
+		componentAdders[MeshComponent::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 		{
 			e.addComponent<MeshComponent>();
 		};

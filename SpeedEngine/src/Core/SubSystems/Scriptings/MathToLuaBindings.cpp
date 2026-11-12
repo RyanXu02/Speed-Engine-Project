@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "MathToLuaBindings.h"
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 void MathToLuaBindings::exportMath(sol::state& luaState)
 {

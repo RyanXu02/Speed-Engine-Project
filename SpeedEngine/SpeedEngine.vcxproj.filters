@@ -27,7 +27,6 @@
     <ClCompile Include="src\Core\Features\MemoryTrackable.cpp" />
     <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
     <ClCompile Include="src\Core\Features\Serializable.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
@@ -41,7 +40,6 @@
     <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
     <ClCompile Include="src\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
@@ -82,6 +80,15 @@
     <ClCompile Include="src\Core\Scene\Entity\Component\AudioComponents.cpp" />
     <ClCompile Include="src\Core\SubSystems\Audio\AudioSystem.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsContactListener.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Font\Font.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Font\FontManager.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\UI\UISystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -245,9 +252,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Features\CameraFrustum.h" />
     <ClInclude Include="src\Core\EngineStates.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.h" />
@@ -271,7 +275,6 @@
     <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h" />
     <ClInclude Include="src\Core\Features\Serializable.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
@@ -284,7 +287,6 @@
     <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
     <ClInclude Include="src\Core\Scene\Scene.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.h" />
@@ -322,6 +324,29 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetPathPayload.h" />
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsContactListener.h" />
+    <ClInclude Include="src\Core\Features\RNG.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Font\Font.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Font\FontManager.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\UI\UISystem.h" />
+    <ClInclude Include="src\Core\Features\MathToJSONBindings.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UICanvasComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIRectComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIElementComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIImageComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UITextComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISelectableComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIButtonComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISliderComponent.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\EditorSession.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\UI\UILayout.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\debug.frag" />
@@ -334,5 +359,15 @@
     <None Include="Assets\Shaders\gpass.frag" />
     <None Include="Assets\Shaders\deferredLighting.vert" />
     <None Include="Assets\Shaders\deferredLighting.frag" />
+    <None Include="Assets\Shaders\tonemap.vert" />
+    <None Include="Assets\Shaders\tonemap.frag" />
+    <None Include="Assets\Shaders\equirectangularToCubemap.comp" />
+    <None Include="Assets\Shaders\irradianceSH.comp" />
+    <None Include="Assets\Shaders\prefilter.comp" />
+    <None Include="Assets\Shaders\brdf.comp" />
+    <None Include="Assets\Shaders\particle_billboard.frag" />
+    <None Include="Assets\Shaders\particle_billboard.vert" />
+    <None Include="Assets\Shaders\text.frag" />
+    <None Include="Assets\Shaders\text.vert" />
   </ItemGroup>
 </Project>

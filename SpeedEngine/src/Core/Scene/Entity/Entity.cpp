@@ -7,7 +7,7 @@
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
 #include "ResourceManagers/ResourceManager.h"
-#include <SubSystems/Scriptings/ScriptingSystem.h>
+#include "SubSystems/Scriptings/ScriptingSystem.h"
 
 namespace SE
 {
@@ -122,10 +122,11 @@ namespace SE
 		HookFunction function = [](Entity entity)
 		{
 			auto* physicsShapeMeshComponent = entity.getComponent<PhysicsShapeMesh>();
-			if (physicsShapeMeshComponent->getMeshResourceID() == 0 && !physicsShapeMeshComponent->getPath().empty() && physicsShapeMeshComponent->getPath() != "None")
+			const auto path = physicsShapeMeshComponent->getPath();
+			if (physicsShapeMeshComponent->getMeshResourceID() == 0 && !path.empty() && path != "None")
 			{
 				auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-				physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->loadMesh({ .path = physicsShapeMeshComponent->getPath(), .name = physicsShapeMeshComponent->getPath() }));
+				physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->loadMesh({ .path = path, .name = path }));
 			}
 		};
 		return function;

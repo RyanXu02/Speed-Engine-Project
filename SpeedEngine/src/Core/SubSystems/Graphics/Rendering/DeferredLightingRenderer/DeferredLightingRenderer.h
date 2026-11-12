@@ -17,7 +17,7 @@ namespace SE
 		void render(RenderContext& context) override;
 		void shutdown() override;
 
-		float phaseG = 0.9;				// G term of the phase function
+		float phaseG = 0.9f;			// G term of the phase function
 		float scatteringScale = 0.55f;	// hack to make ray volume more strong
 		float fogMaxDistance = 10.0f;	// march length for sky pixels and cap for far geometry
 		int numSteps = 68;				// marching steps
