@@ -10,6 +10,9 @@ namespace SE
 			"id", [] (Entity& self) {
 				return self.id();
 			},
+			"forward", &Entity::forward,
+			"up", &Entity::up,
+			"right", &Entity::right,
 			"addComponent", [&] (Entity& self, const std::string& componentName, sol::object luaTable) {
 				auto it = componentAdders.find(std::string(componentName));
 				if (it != componentAdders.end()) {
@@ -193,6 +196,53 @@ namespace SE
 		componentRemovers[MeshComponent::getStaticType()] = [](Entity e)
 		{
 			e.removeComponent<MeshComponent>();
+		};
+
+
+		luaState.new_usertype<AudioSFXComponent>("AudioSFXComponent", 
+			"PlayMySound", &AudioSFXComponent::PlayMySound, 
+			"StopMySound", &AudioSFXComponent::StopMySound, 
+			"updateMyPosition", &AudioSFXComponent::updateMyPosition);
+
+		componentGetters[AudioSFXComponent::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			AudioSFXComponent* component = e.getComponent<AudioSFXComponent>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[AudioSFXComponent::getStaticType()] = [](Entity e, sol::table)
+		{
+			e.addComponent<AudioSFXComponent>();
+		};
+		componentRemovers[AudioSFXComponent::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<AudioSFXComponent>();
+		};
+
+
+		luaState.new_usertype<AudioMusicComponent>("AudioMusicComponent", 
+			"PlayMyTrack", &AudioMusicComponent::PlayMyTrack, 
+			"StopMyTrack", &AudioMusicComponent::StopMyTrack);
+
+		componentGetters[AudioMusicComponent::getStaticType()] = [](sol::state_view lua, Entity e) -> sol::object
+		{
+			AudioMusicComponent* component = e.getComponent<AudioMusicComponent>();
+			if (component)
+			{
+				return sol::make_object(lua, component);
+			}
+			return sol::object(lua, sol::nil);
+		};
+		componentAdders[AudioMusicComponent::getStaticType()] = [](Entity e, sol::table)
+		{
+			e.addComponent<AudioMusicComponent>();
+		};
+		componentRemovers[AudioMusicComponent::getStaticType()] = [](Entity e)
+		{
+			e.removeComponent<AudioMusicComponent>();
 		};
 
 		_registerComponent<NameComponent>(luaState);

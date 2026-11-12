@@ -31,6 +31,7 @@ function Player:onUpdate(dt)
 	local transform = self.entity:getComponent("Transform")
 	local p = transform.translate
 	transform.translate = vec3(p.x + dx * self.moveSpeed * dt, p.y, p.z + dz * self.moveSpeed * dt)
+	Audio.setListenerData(transform.translate, self.entity:forward(), self.entity:up())
 end
 
 function Player:onDestroy()
