@@ -54,7 +54,7 @@ C++23 game engine project. The Visual Studio project builds the engine and copie
 ## Build
 - Open `SpeedEngine/SpeedEngine.vcxproj` in Visual Studio and build `Debug|x64`.
 - Visual Studio restores the vcpkg manifest dependencies on the first build.
-- The project requires VS2026 anduses the MSVC v145 toolset and C++23.
+- The project requires VS2026 and uses the MSVC v145 toolset and C++23.
 - `SpeedEngine/src/pch.h` and `SpeedEngine/src/pch.cpp` provide the precompiled header.
 
 ## Project Layout
