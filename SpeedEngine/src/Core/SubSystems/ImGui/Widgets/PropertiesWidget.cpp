@@ -157,11 +157,7 @@ namespace SE
 				    scriptingSystem->reloadScript(component.path);
 				}
 		    });
-		m_inspectors.registerComponent<CameraComponent>("Camera", "Rendering", false,
-		    [](Entity&, CameraComponent& component)
-		    {
-			    
-		    });
+		m_inspectors.registerComponent<CameraComponent>("Camera", "Rendering", false);
 
 		m_inspectors.registerComponent<LightComponent>("Light", "Rendering", true,
 			[this](Entity&, LightComponent& component)
@@ -483,7 +479,7 @@ namespace SE
 #pragma region EventSubscriptions
 
 		m_SceneChangedSubscription = Engine::Instance().getSubSystem<EventSystem>()->subscribe(EventType::SceneChanged,
-		    [this](const Event& event)
+		    [this](const Event&)
 		    {
 				m_inspectedEntityId = 0;
 				resetDrafts();

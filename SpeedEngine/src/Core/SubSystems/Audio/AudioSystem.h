@@ -2,7 +2,7 @@
 #include "Core/SubSystems/Subsystem.h"
 
 //for vec3
-#include "glm/vec3.hpp"
+#include <glm/vec3.hpp>
 
 namespace SE
 {

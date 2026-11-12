@@ -16,11 +16,11 @@ namespace SE
     public:
 		ParticleEmitter() = default;
 
-		void update(float dt);
+		void update(double dt);
 
         void SetFrame(int frameIndex, Particle* particle);
         void EmitParticle();
-        void ForEachParticle(std::function<void(Particle& particle, float dt)> const& lambda, float dt);
+        void ForEachParticle(std::function<void(Particle& particle, double dt)> const& lambda, double dt);
 
         //@brief This exists because the container has know max particles to hold as well as if its a oneshot system.
         //@brief With our serialization, this gets called from the hook function when a PE is added.

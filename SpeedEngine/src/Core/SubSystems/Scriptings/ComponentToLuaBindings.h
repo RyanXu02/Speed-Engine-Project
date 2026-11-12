@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sol/sol.hpp>
-#include <Scene/Entity/Entity.h>
+#include "Scene/Entity/Entity.h"
 
 namespace SE
 {
@@ -46,9 +46,9 @@ namespace SE
 			};
 
 			// safe add component function to the lua table
-			componentAdders[T::getStaticType()] = [](Entity e, sol::table luaTable)
+			componentAdders[T::getStaticType()] = [](Entity e, [[maybe_unused]] sol::table luaTable)
 			{
-				T* comp = e.addComponent<T>(); //only default constructor support for now and less error prone
+				e.addComponent<T>(); //only default constructor support for now and less error prone
 			};
 
 			// safe remove component function to the lua table

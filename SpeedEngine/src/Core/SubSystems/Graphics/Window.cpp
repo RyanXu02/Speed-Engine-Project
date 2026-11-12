@@ -118,14 +118,14 @@ namespace SE
 		    });
 
 		glfwSetKeyCallback(m_window,
-		    [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		    [](GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
 		    {
 				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push(
 					{ InputEvent::Type::Key, key, static_cast<InputEvent::Action>(action) });
 			});
 
 		glfwSetMouseButtonCallback(m_window,
-			[](GLFWwindow* window, int button, int action, int mods)
+		    [](GLFWwindow* window, int button, int action, [[maybe_unused]] int mods)
 			{
 				static_cast<InputEventQueue*>(glfwGetWindowUserPointer(window))->push(
 					{ InputEvent::Type::MouseButton, button, static_cast<InputEvent::Action>(action) });

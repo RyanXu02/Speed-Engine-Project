@@ -30,7 +30,7 @@
 			}});                                                             \
 	} while (false)
 
-#define NO_DEFINE [](Entity entity) {}
+#define NO_DEFINE [](Entity) {}
 
 namespace SE
 {
