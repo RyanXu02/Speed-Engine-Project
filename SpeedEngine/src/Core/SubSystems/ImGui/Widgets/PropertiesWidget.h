@@ -33,6 +33,10 @@ namespace SE
 		std::string m_meshPathError;
 		bool m_meshDraftInitialized{ false };
 
+		std::string m_terrainPathDraft;
+		std::string m_terrainPathError;
+		bool m_terrainDraftInitialized{ false };
+
 		std::string m_physicsShapeMeshPathDraft;
 		bool m_physicsShapeMeshDraftInitialized{ false };
 

@@ -82,6 +82,38 @@ namespace SE
 				    ImGui::TextWrapped("%s", m_meshPathError.c_str());
 		    });
 
+		m_inspectors.registerComponent<TerrainComponent>("Terrain", "Rendering", true,
+		    [this](Entity&, TerrainComponent& component)
+		    {
+			    if (!m_terrainDraftInitialized)
+			    {
+				    m_terrainPathDraft = component.path;
+				    m_terrainDraftInitialized = true;
+			    }
+			    const bool enter = ImGui::InputText("Path", &m_terrainPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
+			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+			    const bool dropped = acceptAssetPathPayload(m_terrainPathDraft);
+			    // user confirmed a new path
+			    if ((enter || deactivated || dropped) && m_terrainPathDraft != component.path)
+			    {
+				    uint32_t resource = 0;
+				    const bool empty = m_terrainPathDraft.empty() || m_terrainPathDraft == "None";
+				    if (!empty)
+					    resource = Engine::Instance().getSubSystem<ResourceManager>()->loadTerrain({ .path = m_terrainPathDraft, .name = m_terrainPathDraft });
+				    if (empty || resource != 0)
+				    {
+					    component.path = m_terrainPathDraft;
+					    component.terrainResourceID = resource;
+					    m_session.markDirty();
+					    m_terrainPathError.clear();
+				    }
+				    else
+					    m_terrainPathError = "Terrain could not be loaded; previous terrain retained.";
+			    }
+			    if (!m_terrainPathError.empty())
+				    ImGui::TextWrapped("%s", m_terrainPathError.c_str());
+		    });
+
 		m_inspectors.registerComponent<PrefabComponent>("Prefab");
 
 		m_inspectors.registerComponent<ScriptComponent>("Script", "Scripting", false,
@@ -603,6 +635,11 @@ namespace SE
 			{
 				m_meshDraftInitialized = false;
 				m_meshPathError.clear();
+			}
+			if (remove->type == typeid(TerrainComponent))
+			{
+				m_terrainDraftInitialized = false;
+				m_terrainPathError.clear();
 			}
 			if (remove->type == typeid(PhysicsShapeMesh))
 				m_physicsShapeMeshDraftInitialized = false;

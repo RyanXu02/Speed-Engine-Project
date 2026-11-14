@@ -36,6 +36,17 @@ namespace SE
 		return function;
 	}
 
+	Entity::HookFunction Entity::_onTerrainComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* terrainComponent = entity.getComponent<TerrainComponent>();
+			if (terrainComponent->terrainResourceID == 0 && !terrainComponent->path.empty() && terrainComponent->path != "None")
+				terrainComponent->setPath(terrainComponent->path);
+		};
+		return function;
+	}
+
 	Entity::HookFunction Entity::_onScriptComponentAdded()
 	{
 		HookFunction function = [](Entity entity)

@@ -2,9 +2,6 @@
   "entities": [
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -51,13 +48,11 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 1
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -104,13 +99,11 @@
             15.0
           ]
         }
-      }
+      },
+      "id": 2
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -157,13 +150,11 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 3
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -210,13 +201,11 @@
             -15.0
           ]
         }
-      }
+      },
+      "id": 4
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -263,13 +252,11 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 5
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -314,18 +301,16 @@
             0.5
           ],
           "translate": [
-            -2.2340693703881698e-06,
+            -1.2280665032449178e-05,
             0.6000000238418579,
-            3.624067630880745e-06
+            1.9930857888539322e-05
           ]
         }
-      }
+      },
+      "id": 6
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "NameComponent": {
           "name": "physicstestscene"
         },
@@ -350,7 +335,8 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 7
     },
     {
       "components": {
@@ -359,9 +345,6 @@
           "fov": 90.0,
           "isPrimary": false,
           "nearPlane": 0.10000000149011612
-        },
-        "LifeComponent": {
-          "isAlive": true
         },
         "NameComponent": {
           "name": "camera"
@@ -387,7 +370,37 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 8
+    },
+    {
+      "components": {
+        "NameComponent": {
+          "name": "terrain"
+        },
+        "TerrainComponent": {
+          "path": "Assets/Terrain/MainTerrain/main-terrain.json"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            100.0,
+            30.0,
+            100.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "id": 9
     }
   ],
   "scene_name": "Untitled"

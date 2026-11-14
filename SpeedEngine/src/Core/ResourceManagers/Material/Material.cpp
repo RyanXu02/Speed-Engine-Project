@@ -11,7 +11,7 @@
 namespace SE
 {
 	// sampler names in the shaders, indexed by TextureType
-	static constexpr std::array<std::string_view, NUM_TEXTURE_TYPES> SAMPLER_NAMES = {
+	static constexpr std::array<std::string_view, 3*NUM_TEXTURE_TYPES> SAMPLER_NAMES = {
 		"albedoMap",
 		"normalMap",
 		"heightMap",
@@ -19,6 +19,22 @@ namespace SE
 		"roughnessMap",
 		"emissiveMap",
 		"metallicMap",
+
+		"albedoMap1",
+		"normalMap1",
+		"heightMap1",
+		"aoMap1",
+		"roughnessMap1",
+		"emissiveMap1",
+		"metallicMap1",
+
+		"albedoMap2",
+		"normalMap2",
+		"heightMap2",
+		"aoMap2",
+		"roughnessMap2",
+		"emissiveMap2",
+		"metallicMap2"
 	};
 
 	bool Material::init(uint32_t shaderId, std::span<const TextureBinding> textures)
@@ -45,12 +61,27 @@ namespace SE
 	// slots without a texture get the shared 1x1 fallback texture
 	void Material::bind()
 	{
+		bindOffset(0);
+	}
+
+	void Material::unbind()
+	{
+		unbindOffset(0);
+	}
+
+	// slot 0 = albedo, slot 1 = normal, slot 2 = height, slot 3 = ambient
+	// occlusion, slot 4 = roughness, slot 5 = emissive, slot 6 = metallic
+	// slots without a texture get the shared 1x1 fallback texture
+	void Material::bindOffset(size_t offset)
+	{
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
 
+		size_t fullOffset = offset * NUM_TEXTURE_TYPES;
 		std::array<unsigned int, NUM_TEXTURE_TYPES> slots{};
 		for (const auto& binding : m_textures)
 		{
-			if (auto* texture = resources->getResource<Texture>(binding.textureId)) {
+			if (auto* texture = resources->getResource<Texture>(binding.textureId))
+			{
 				slots[static_cast<size_t>(binding.usage)] = texture->getTextureId();
 			}
 		}
@@ -58,15 +89,16 @@ namespace SE
 		for (size_t slot = 0; slot < slots.size(); ++slot)
 		{
 			const unsigned int glTextureId = slots[slot] ? slots[slot] : _getDefaultTexture(static_cast<TextureType>(slot));
-			_bindTexture(static_cast<unsigned int>(slot), SAMPLER_NAMES[slot], glTextureId);
+			_bindTexture(static_cast<unsigned int>(slot + fullOffset), SAMPLER_NAMES[slot + fullOffset], glTextureId);
 		}
 	}
 
-	void Material::unbind()
+	void Material::unbindOffset(size_t offset)
 	{
+		size_t fullOffset = offset * NUM_TEXTURE_TYPES;
 		for (unsigned int slot = 0; slot < static_cast<unsigned int>(NUM_TEXTURE_TYPES); ++slot)
 		{
-			glActiveTexture(GL_TEXTURE0 + slot);
+			glActiveTexture(GL_TEXTURE0 + slot + static_cast<unsigned int>(fullOffset));
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}

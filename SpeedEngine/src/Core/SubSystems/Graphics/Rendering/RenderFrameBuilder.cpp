@@ -87,6 +87,7 @@ namespace SE
 		if (&scene != m_lastScene)
 			m_drawItemHistories.clear();
 
+		// Add Mesh resource draws
 		scene.forEntitiesWith<Transform, NameComponent, MeshComponent>([&](Entity entity)
 		{
 			const auto meshId = entity.getComponent<MeshComponent>()->meshResourceID;
@@ -97,13 +98,34 @@ namespace SE
 			const TransformState transformState{ transform.translate, transform.rotate, transform.scale };
 
 			auto [it,_] = m_drawItemHistories.try_emplace(entity.id(), 
-				DrawItemHistory{ { meshId, entity.id(), transformState, transformState }, m_tick });
+				DrawItemHistory{ { meshId, 0, entity.id(), transformState, transformState }, m_tick });
 			auto& entry = it->second;
 			entry.drawItem.previous = entry.drawItem.current;
 			entry.drawItem.current = transformState;
 			entry.drawItem.meshResourceId = meshId;
+			entry.drawItem.terrainResourceId = 0;
 			entry.lastSeenTick = m_tick;
 		});
+		// Add Terrain resource draws
+		scene.forEntitiesWith<Transform, NameComponent, TerrainComponent>(
+		    [&](Entity entity)
+		    {
+			    const auto terrainId = entity.getComponent<TerrainComponent>()->terrainResourceID;
+			    if (terrainId == 0)
+				    return;
+
+			    const Transform& transform = *entity.getComponent<Transform>();
+			    const TransformState transformState{ transform.translate, transform.rotate, transform.scale };
+
+			    auto [it, _] = m_drawItemHistories.try_emplace(entity.id(), 
+					DrawItemHistory{ { 0, terrainId, entity.id(), transformState, transformState }, m_tick });
+			    auto& entry = it->second;
+			    entry.drawItem.previous = entry.drawItem.current;
+			    entry.drawItem.current = transformState;
+			    entry.drawItem.meshResourceId = 0;
+			    entry.drawItem.terrainResourceId = terrainId;
+			    entry.lastSeenTick = m_tick;
+		    });
 		// Remove entries that were not present in this tick
 		std::erase_if(m_drawItemHistories, [this](const auto& entry) { return entry.second.lastSeenTick != m_tick; });
 

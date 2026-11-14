@@ -48,6 +48,13 @@ namespace SE
 		void bind();
 		void unbind();
 
+		// @brief Binds the material's shader and textures for rendering, allowing for multiple PBR materials per shader
+		// @param offset Offset to the start of the 7 PBR texture slots (0 = 0-6, 1 = 7-13, etc.)
+		void bindOffset(size_t offset);
+
+		// @param offset Offset to the start of the 7 PBR texture slots (0 = 0-6, 1 = 7-13, etc.)
+		void unbindOffset(size_t offset);
+
 		// @brief Deletes the shared 1x1 fallback textures from GPU
 		static void destroyDefaults();
 

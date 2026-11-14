@@ -14,6 +14,7 @@
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/TerrainRenderer/TerrainRenderer.h"
 
 #include "Core/ResourceManagers/Material/Material.h"
 #include "Core/Engine.h"
@@ -96,6 +97,10 @@ namespace SE
 		FBO& gBuffer = createRenderTarget("GBuffer", Descriptor{ .colors = { floatAttachment, floatAttachment, byteAttachment, byteAttachment, floatAttachment } });
 		auto& geometryRenderer = addRenderer<GeometryRenderer>();
 		addPass(RenderPass{ .renderer = geometryRenderer, .output = gBuffer, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, .clearColor = glm::vec4(0.0f) });
+
+		// Geometry pass for terrain, draws on top of gBuffer
+		auto& terrainRenderer = addRenderer<TerrainRenderer>();
+		addPass(RenderPass{ .renderer = terrainRenderer, .output = gBuffer, .clearMask = 0 });
 
 		//TODO: add an AO pass here
 

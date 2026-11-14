@@ -11,6 +11,7 @@ namespace SE
 	struct DrawItem
 	{
 		uint32_t meshResourceId;
+		uint32_t terrainResourceId;
 		uint32_t entityId;
 		TransformState previous;
 		TransformState current;

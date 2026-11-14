@@ -64,6 +64,8 @@ namespace SE
 
 		static HookFunction _onMeshComponentAdded();
 
+		static HookFunction _onTerrainComponentAdded();
+
 		static HookFunction _onScriptComponentAdded();
 		static HookFunction _onScriptComponentRemoved();
 

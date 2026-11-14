@@ -72,6 +72,28 @@ namespace SE
 		DEFINE_TYPE(MeshComponent, member("path", &MeshComponent::path));
 	};
 
+	struct TerrainComponent
+	{
+		TerrainComponent() = default;
+		TerrainComponent(std::string p)
+		    : path(p) {};
+		TerrainComponent(uint32_t meshId)
+		    : terrainResourceID(meshId)
+		{}
+
+		void setPath(std::string p)
+		{
+			path = p;
+			auto terrainManager = Engine::Instance().getSubSystem<ResourceManager>();
+			terrainResourceID = terrainManager->loadTerrain({ .path = path, .name = path });
+		}
+
+		uint32_t terrainResourceID{ 0 };
+		std::string path = "None";
+
+		DEFINE_TYPE(TerrainComponent, member("path", &TerrainComponent::path));
+	};
+
 	struct Parent
 	{
 		Parent() = default;

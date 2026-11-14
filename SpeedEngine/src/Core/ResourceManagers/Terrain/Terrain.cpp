@@ -18,42 +18,53 @@ namespace SE
 	bool Terrain::init(std::string_view terrainPath)
 	{
 		// Deserialize terrain path
-		TerrainMaterial terrainMat;
-		json jsonTemp = terrainMat;
+		json jsonTemp;
 		_loadTerrainJson(terrainPath.data(), jsonTemp);
-		terrainMat = jsonTemp.get<TerrainMaterial>();
+		TerrainMaterial terrainMat = jsonTemp.get<TerrainMaterial>();
 
 		// Load terrain height map
+		stbi_set_flip_vertically_on_load(true);
 		int width = 0, height = 0, channels = 0;
 		unsigned char* heightMap = stbi_load(terrainMat.heightMapPath.c_str(), &width, &height, &channels, 3);
 		if (!heightMap)
+		{
 			m_logger.warn("Failed to load terrain height map at {}", terrainMat.heightMapPath);
-
+			return false;
+		}
+		unsigned char* normalMap = stbi_load(terrainMat.normalMapPath.c_str(), &width, &height, &channels, 3);
+		if (!normalMap)
+		{
+			m_logger.warn("Failed to load terrain normal map at {}", terrainMat.normalMapPath);
+			return false;
+		}
 		// Build terrain mesh
 		unsigned int numVertices = terrainMat.resolution * terrainMat.resolution;
-		m_indices.reserve(numVertices*6);
+		m_indices.reserve((terrainMat.resolution - 1) * (terrainMat.resolution - 1) * 6);
 		m_vertices.reserve(numVertices);
 
 		float r = static_cast<float>(terrainMat.resolution - 1);
 		int n = terrainMat.resolution;
-		for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
 		{
-			float s = i / r;
-			for (int j = 0; j < n; j++)
+			float s = j / r;
+			for (int i = 0; i < n; i++)
 			{
-				float t = j / r;
+				float t = i / r;
 				Vertex v;
 				float vertexHeight = (static_cast<float>(heightMap[((i * n) + j) * 3]) / 255.0f) * terrainMat.heightScale;
-				v.position = { s * 2.0 * r - r, t * 2.0 * r - r, vertexHeight };
-				v.normal = { 0.0, 0.0, 1.0 };
+				v.position = { s * 2.0f - 1.0f, vertexHeight, t * 2.0f - 1.0f};
+				v.normal = {
+					static_cast<float>(normalMap[((i * n) + j) * 3] / 255.0f) * 2.0f - 1.0f,
+					0.0f,
+					static_cast<float>(normalMap[((i * n) + j) * 3 + 2] / 255.0f) * 2.0f - 1.0f };
 				v.uv = { s, t };
 				m_vertices.push_back(v);
 				if (i > 0 && j > 0)
 				{	// Triangulate quads
-					int idxI = (i - 1) * (n + 1) + (j - 1);
-					int idxJ = (i - 1) * (n + 1) + (j);
-					int idxK = (i) * (n + 1) + (j);
-					int idxL = (i) * (n + 1) + (j - 1);
+					int idxI = (i - 1) * (n) + (j - 1);
+					int idxJ = (i - 1) * (n) + (j);
+					int idxK = (i) * (n) + (j);
+					int idxL = (i) * (n) + (j - 1);
 					m_indices.push_back(idxI);
 					m_indices.push_back(idxJ);
 					m_indices.push_back(idxK);
@@ -80,6 +91,8 @@ namespace SE
 		_loadMaterial(TerrainMaterialType::HIGH, terrainMat.materialHighPath, importer);
 		_loadMaterial(TerrainMaterialType::MIDDLE, terrainMat.materialMiddlePath, importer);
 		_loadMaterial(TerrainMaterialType::LOW, terrainMat.materialLowPath, importer);
+
+		m_splatMapPath = terrainMat.splatMapPath;
 
 		m_logger.info("Loaded terrain: {} vertices, {} indices", m_vertices.size(), m_indices.size());
 

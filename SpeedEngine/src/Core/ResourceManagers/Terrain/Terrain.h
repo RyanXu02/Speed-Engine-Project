@@ -61,6 +61,7 @@ namespace SE
 		const std::vector<SubMesh>& getSubMeshes() const { return m_submeshes; }
 		const std::vector<uint32_t>& getIndices() const { return m_indices; }
 		const std::vector<PBRMaterial>& getMaterials() const { return m_materials; }
+		const std::string& getSplatMapPath() const { return m_splatMapPath; }
 
 	private:
 		void _loadMaterial(TerrainMaterialType materialType, std::string_view materialPath, Assimp::Importer& importer);
@@ -70,6 +71,7 @@ namespace SE
 		std::vector<SubMesh> m_submeshes;
 		std::vector<uint32_t> m_indices;
 		std::vector<PBRMaterial> m_materials;
+		std::string m_splatMapPath;
 
 		LoggerProxy m_logger;
 	};
