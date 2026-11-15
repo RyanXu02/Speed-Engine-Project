@@ -9,8 +9,6 @@
 
 #include <filesystem>
 
-#include <stb_image.h>
-
 using nlohmann::json;
 
 namespace SE

@@ -27,6 +27,8 @@ namespace SE
 
 		static bool isDebugRenderingEnabled() { return s_debugRenderingEnabled.load(std::memory_order_relaxed); }
 		static void setDebugRenderingEnabled(bool enabled) { s_debugRenderingEnabled.store(enabled, std::memory_order_relaxed); }
+		static bool isWireframeRenderingEnabled() { return s_wireframeRenderingEnabled.load(std::memory_order_relaxed); }
+		static void setWireframeRenderingEnabled(bool enabled) { s_wireframeRenderingEnabled.store(enabled, std::memory_order_relaxed); }
 		
 		static CameraFrustum* setCamera(CameraFrustum* camera) { return s_appCamera = camera ? camera : &s_editorCamera; }
 		static CameraFrustum* getActiveCamera() { return isPlaying() ? s_appCamera : &s_editorCamera; }
@@ -49,6 +51,7 @@ namespace SE
 #endif
 		};
 		static inline std::atomic<bool> s_debugRenderingEnabled{ false };
+		static inline std::atomic<bool> s_wireframeRenderingEnabled{ false };
 
 		// Simulation owns camera selection
 		static inline CameraFrustum s_editorCamera;

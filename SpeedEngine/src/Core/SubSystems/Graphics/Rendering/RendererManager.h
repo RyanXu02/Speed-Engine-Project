@@ -39,6 +39,7 @@ namespace SE
 		glm::vec4 clearColor{ 0.1f, 0.1f, 0.1f, 1.0f };
 		double clearDepth = 1.0;
 		bool debugOnly = false;
+		bool wireframeOnly = false;
 	};
 
 	// @brief Manager for all renderers in the engine

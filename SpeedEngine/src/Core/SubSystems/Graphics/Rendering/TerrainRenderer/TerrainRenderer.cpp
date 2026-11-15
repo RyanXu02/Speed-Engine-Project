@@ -55,7 +55,7 @@ namespace SE
 			Terrain* terrain = context.resources.getResource<Terrain>(terrainResourceId);
 			if (!terrain)
 			{
-				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", terrainResourceId, draw.entityId);
+				m_logger.warn("Terrain with ID {} not found, skipping entity {}", terrainResourceId, draw.entityId);
 				continue;
 			}
 

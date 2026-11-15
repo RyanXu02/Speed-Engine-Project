@@ -89,6 +89,10 @@
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\UI\UISystem.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Terrain\Terrain.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Terrain\TerrainManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -172,9 +176,6 @@
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -209,9 +210,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp">
@@ -347,6 +345,10 @@
     <ClInclude Include="src\Core\SubSystems\ImGui\EditorSession.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
     <ClInclude Include="src\Core\SubSystems\UI\UILayout.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Terrain\Terrain.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Terrain\TerrainManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\debug.frag" />
@@ -369,5 +371,6 @@
     <None Include="Assets\Shaders\particle_billboard.vert" />
     <None Include="Assets\Shaders\text.frag" />
     <None Include="Assets\Shaders\text.vert" />
+    <None Include="Assets\Terrain\MainTerrain\main-terrain.json" />
   </ItemGroup>
 </Project>
