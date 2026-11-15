@@ -16,7 +16,6 @@ namespace SE
 		std::string name;
 
 		std::string heightMapPath;
-		std::string normalMapPath;
 		std::string splatMapPath;
 
 		// Materials used based on splat map R, G, B respectively
@@ -28,7 +27,7 @@ namespace SE
 		int resolution{ 1024 };
 	};
 
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TerrainMaterial, name, heightMapPath, normalMapPath, splatMapPath, materialHighPath, materialMiddlePath, materialLowPath, heightScale, resolution);
+	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TerrainMaterial, name, heightMapPath, splatMapPath, materialHighPath, materialMiddlePath, materialLowPath, heightScale, resolution);
 
 	// @brief Represents a 3D mesh resource
 	// A mesh resource contains the vertex data, sub-meshes, and indices for a 3D
@@ -62,6 +61,8 @@ namespace SE
 		const std::vector<uint32_t>& getIndices() const { return m_indices; }
 		const std::vector<PBRMaterial>& getMaterials() const { return m_materials; }
 		const std::string& getSplatMapPath() const { return m_splatMapPath; }
+		const std::string& getHeightMapPath() const { return m_heightMapPath; }
+		float getHeightScale() const { return m_heightScale; }
 
 	private:
 		void _loadMaterial(TerrainMaterialType materialType, std::string_view materialPath, Assimp::Importer& importer);
@@ -72,6 +73,8 @@ namespace SE
 		std::vector<uint32_t> m_indices;
 		std::vector<PBRMaterial> m_materials;
 		std::string m_splatMapPath;
+		std::string m_heightMapPath;
+		float m_heightScale{ 0.0f };
 
 		LoggerProxy m_logger;
 	};

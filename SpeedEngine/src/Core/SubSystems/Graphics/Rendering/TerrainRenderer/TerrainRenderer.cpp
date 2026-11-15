@@ -15,7 +15,7 @@ namespace SE
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
 		m_defaultShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/terrain_gpass.vert", .fragmentShaderPath = "Assets/Shaders/terrain_gpass.frag", .name = "gBufferShader" });
 		m_defaultMaterialId = resources->createMaterial({ .shaderId = m_defaultShaderId, .textures = {}, .name = "defaultGBufferMaterial" });
-		m_defaultTextureId = resources->loadTexture({ .path = "Assets/Textures/default-texture-128.png", .name = "defaultSplatMapTexture" });
+		m_defaultTextureId = resources->loadTexture({ .path = "Assets/Textures/default-texture-128.png", .name = "defaultTexture" });
 	}
 
 	void TerrainRenderer::shutdown()
@@ -72,6 +72,17 @@ namespace SE
 				splatMapTexture = context.resources.getResource<Texture>(m_defaultTextureId);
 			}
 
+			// Load height map texture
+			Texture* heightMapTexture = nullptr;
+			if (const uint32_t heightMapTextureId = context.resources.loadTexture({ .path = terrain->getHeightMapPath(), .name = terrain->getHeightMapPath() }))
+			{
+				heightMapTexture = context.resources.getResource<Texture>(heightMapTextureId);
+			}
+			if (!heightMapTexture)
+			{
+				heightMapTexture = context.resources.getResource<Texture>(m_defaultTextureId);
+			}
+
 			const std::vector<uint32_t>& terrainMaterials = _getTerrainMaterials(context, terrainResourceId, *terrain);
 			const std::vector<SubMesh>& subMeshes = terrain->getSubMeshes();
 			for (size_t i = 0; i < subMeshes.size(); ++i)
@@ -110,10 +121,20 @@ namespace SE
 						material->bindOffset(j);
 					}
 				}
+
+				// Load terrain specific textures
 				if (splatMapTexture) {
-					_bindSplatMapTexture(*splatMapTexture, *defaultShader);
+					_bindTexture(*splatMapTexture, *defaultShader, m_splatMapSlot, "terrainSplatMap");
+				}
+				if (heightMapTexture)
+				{
+					_bindTexture(*heightMapTexture, *defaultShader, m_heightMapSlot, "terrainHeightMap");
 				}
 
+				// Set height scale
+				defaultShader->setFloat("heightScale", terrain->getHeightScale());
+
+				// Draw call
 				context.meshes.draw(terrainResourceId, *terrain, i);
 
 				// Unbind 3 PBR materials
@@ -126,9 +147,15 @@ namespace SE
 					}
 					material->unbindOffset(j);
 				}
+
+				// Unbind terrain textures
 				if (splatMapTexture)
 				{
-					_unbindSplatMapTexture();
+					_unbindTexture(m_splatMapSlot);
+				}
+				if (heightMapTexture)
+				{
+					_unbindTexture(m_heightMapSlot);
 				}
 
 			}
@@ -183,16 +210,16 @@ namespace SE
 		return it->second;
 	}
 
-	void TerrainRenderer::_bindSplatMapTexture(const Texture& texture, Shader& shader)
+	void TerrainRenderer::_bindTexture(const Texture& texture, Shader& shader, const uint32_t slot, std::string name)
 	{
-		glActiveTexture(GL_TEXTURE0 + m_splatMapSlot);
+		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, texture.getTextureId());
-		shader.setInt("splatMap", m_splatMapSlot);
+		shader.setInt(name, slot);
 	}
 
-	void TerrainRenderer::_unbindSplatMapTexture()
+	void TerrainRenderer::_unbindTexture(const uint32_t slot)
 	{
-		glActiveTexture(GL_TEXTURE0 + m_splatMapSlot);
+		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

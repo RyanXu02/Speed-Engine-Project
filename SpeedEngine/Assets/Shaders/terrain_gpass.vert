@@ -11,10 +11,15 @@ out vec3 Normal;
 uniform mat4 model;
 uniform mat4 projectionView;
 
+uniform float heightScale;
+
+uniform sampler2D terrainHeightMap;
+
 void main()
 {
+    vec3 positionFinal = aPos + vec3(0.0, texture(terrainHeightMap, aTexCoords).x * heightScale ,0.0);
     TexCoords = aTexCoords;
-    WorldPos = vec3(model * vec4(aPos, 1.0));
+    WorldPos = vec3(model * vec4(positionFinal, 1.0));
     Normal = mat3(transpose(inverse(model))) * aNormal;
 
     gl_Position = projectionView * vec4(WorldPos, 1.0);

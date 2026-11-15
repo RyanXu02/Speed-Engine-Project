@@ -11,7 +11,8 @@ in vec2 TexCoords;
 in vec3 WorldPos;
 in vec3 Normal;
 
-uniform sampler2D splatMap;
+uniform sampler2D terrainSplatMap;
+uniform sampler2D terrainHeightMap;
 
 uniform sampler2D albedoMap, albedoMap1, albedoMap2;
 uniform sampler2D normalMap, normalMap1, normalMap2;
@@ -30,6 +31,21 @@ uniform vec3 emissiveFactor0, emissiveFactor1, emissiveFactor2;
 
 const float texScale = 50.0;
 
+vec3 filterNormal(vec2 uv, float texelSize)
+{
+    vec4 h;
+    h[0] = texture(terrainHeightMap, uv + texelSize*vec2( 0,-1)).r;
+    h[1] = texture(terrainHeightMap, uv + texelSize*vec2(-1, 0)).r;
+    h[2] = texture(terrainHeightMap, uv + texelSize*vec2( 1, 0)).r;
+    h[3] = texture(terrainHeightMap, uv + texelSize*vec2( 0, 1)).r;
+    vec3 n;
+    n.z = h[0] - h[3];
+    n.x = h[1] - h[2];
+    n.y = 2;
+
+    return normalize(n);
+} 
+
 vec3 getNormalFromMap(vec3 mixAmt)
 {
     vec3 tangentNormal0 = texture(normalMap, TexCoords * texScale).xyz * 2.0 - 1.0;
@@ -47,7 +63,7 @@ vec3 getNormalFromMap(vec3 mixAmt)
     vec2 st1 = dFdx(TexCoords);
     vec2 st2 = dFdy(TexCoords);
 
-    vec3 N   = normalize(Normal);
+    vec3 N   = filterNormal(TexCoords, 1.0 / 2017.0);
     vec3 T   = normalize(Q1 * st2.t - Q2 * st1.t);
     vec3 B   = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);
@@ -55,9 +71,12 @@ vec3 getNormalFromMap(vec3 mixAmt)
     return normalize(TBN * tangentNormal);
 }
 
+
 void main()
 {
-    vec3 mixAmount = texture(splatMap, TexCoords).xyz;
+    vec3 mixAmount = texture(terrainSplatMap, TexCoords).xyz;
+    // Normalize
+    mixAmount = mixAmount / (mixAmount.x + mixAmount.y + mixAmount.z);
 
     vec4 albedoSample0 = texture(albedoMap, TexCoords * texScale);
     vec4 albedoSample1 = texture(albedoMap1, TexCoords * texScale);

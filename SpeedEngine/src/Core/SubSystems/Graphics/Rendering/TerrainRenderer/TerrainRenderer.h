@@ -22,11 +22,12 @@ namespace SE
 		uint32_t m_defaultMaterialId = 0;
 		uint32_t m_defaultTextureId = 0;
 
-		const uint32_t m_splatMapSlot = 22; // pbr uses 3 * 0-6
+		const uint32_t m_splatMapSlot = 23; // pbr uses 3 * 0-6
+		const uint32_t m_heightMapSlot = 24;
 
 		std::unordered_map<uint32_t, std::vector<uint32_t>> m_terrainMaterials;
 		const std::vector<uint32_t>& _getTerrainMaterials(RenderContext& context, uint32_t terrainResourceId, const Terrain& terrain);
-		void _bindSplatMapTexture(const Texture& texture, Shader& shader);
-		void _unbindSplatMapTexture();
+		void _bindTexture(const Texture& texture, Shader& shader, const uint32_t slot, std::string name);
+		void _unbindTexture(const uint32_t slot);
 	};
 } // namespace SE

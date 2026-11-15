@@ -1,11 +1,10 @@
 {
 	"name": "main-terrain",
 	"heightMapPath": "Assets/Terrain/MainTerrain/heightmap.png",
-	"normalMapPath": "Assets/Terrain/MainTerrain/normalmap.png",
 	"splatMapPath": "Assets/Terrain/MainTerrain/splatmap.png",
-	"materialHighPath": "Assets/Terrain/MainTerrain/rocky_trail_02_2k.gltf/rocky_trail_02_2k.gltf",
-	"materialMiddlePath": "Assets/Terrain/MainTerrain/rocky_trail_02_2k.gltf/rocky_trail_02_2k.gltf",
 	"materialLowPath": "Assets/Terrain/MainTerrain/rocky_terrain_02_2k.gltf/rocky_terrain_02_2k.gltf",
-	"resolution": 1024,
-	"heightScale": 1.0
+	"materialMiddlePath": "Assets/Terrain/MainTerrain/rocky_terrain_02_2k.gltf/rocky_terrain_02_2k.gltf",
+	"materialHighPath": "Assets/Terrain/MainTerrain/sparse_grass_2k.gltf/sparse_grass_2k.gltf",
+	"resolution": 2017,
+	"heightScale": 0.1
 }
