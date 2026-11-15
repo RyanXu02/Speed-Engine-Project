@@ -26,7 +26,7 @@ namespace SE
 
 		bool m_requestDelete = false;
 
-		bool _rightClickMenu();
+		bool _rightClickMenu(uint32_t id);
 		void _beginRename(const std::string& name, uint32_t id);
 		void _renamingHandle();
 	};

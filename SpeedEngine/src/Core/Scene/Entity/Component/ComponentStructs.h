@@ -104,15 +104,6 @@ namespace SE
 		DEFINE_TYPE(Parent, member("parent", &Parent::parent));
 	};
 
-	struct PrefabComponent
-	{
-		PrefabComponent() = default;
-
-		std::string prefabPath = "None";
-
-		DEFINE_TYPE(PrefabComponent, member("prefabPath", &PrefabComponent::prefabPath));
-	};
-
 	struct ScriptComponent
 	{
 		ScriptComponent() = default;

@@ -42,7 +42,6 @@ namespace SE
 		REGISTER_COMPONENT(Transform, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(TerrainComponent, Entity::_onTerrainComponentAdded(), NO_DEFINE);
-		REGISTER_COMPONENT(PrefabComponent, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(ScriptComponent, Entity::_onScriptComponentAdded(), Entity::_onScriptComponentRemoved());
 		REGISTER_COMPONENT(CameraComponent, Entity::_onCameraComponentAdded(), Entity::_onCameraComponentRemoved());
 		REGISTER_COMPONENT(RigidBody, Entity::_onRigidBodyComponentAdded(), NO_DEFINE);
@@ -163,60 +162,33 @@ namespace SE
 
 		for (const auto& [entityID, components] : m_registry)
 		{
-			bool isPrefabEntity = false;
-			std::string prefabPath = "";
-			nlohmann::json componentsJson = nlohmann::json::object();
-
-			for (const auto& [typeID, component] : components)
-			{
-				std::string type = demagleTypeInfo(typeID);
-
-				auto typeResult = m_typeResolver.Get(type);
-				if (!typeResult.isValid())
-				{
-					continue;
-				}
-
-				// ideally avoid catching errors but this does not happen every frame
-				// nlohmann throws errors on fail parse which crash the app if left unhandled
-				try
-				{
-					nlohmann::json componentAsJson = typeResult.serialize(component);
-
-					if (type == "PrefabComponent")
-					{
-						isPrefabEntity = true;
-						prefabPath = componentAsJson.at("prefabPath").get<std::string>();
-					}
-					else
-					{
-						componentsJson[type] = componentAsJson;
-					}
-				}
-				catch (const nlohmann::json::exception& e)
-				{
-					m_logger.warn("failed to serialize {}: {}", type, e.what());
-					throw;
-				}
-			}
-
 			nlohmann::json entityObj;
 			entityObj["id"] = getEntitySSID(entityID);
-			if (isPrefabEntity)
+			entityObj["components"] = serializeComponents(entityID);
+			j.push_back(entityObj);
+		}
+	}
+
+	nlohmann::json EntityRegistry::serializeComponents(uint32_t entityID) const
+	{
+		nlohmann::json j = nlohmann::json::object();
+		for (const auto& [typeID, component] : m_registry.at(entityID))
+		{
+			const std::string type = demagleTypeInfo(typeID);
+			auto typeResult = m_typeResolver.Get(type);
+			if (!typeResult.isValid())
+				continue;
+			try
 			{
-				entityObj["prefab_ref"] = prefabPath;
-				if (!componentsJson.empty())
-				{
-					entityObj["overrides"]["components"] = componentsJson;
-				}
-				j.push_back(entityObj);
+				j[type] = typeResult.serialize(component);
 			}
-			else
+			catch (const nlohmann::json::exception& e)
 			{
-				entityObj["components"] = componentsJson;
-				j.push_back(entityObj);
+				m_logger.warn("failed to serialize {}: {}", type, e.what());
+				throw;
 			}
 		}
+		return j;
 	}
 
 	void EntityRegistry::deserialize(const nlohmann::json& j)
@@ -238,36 +210,30 @@ namespace SE
 		// Resolve ids before components can reference other entities
 		for (size_t index = 0; index < j.size(); ++index)
 		{
-			const auto& entity = j[index];
-			const uint32_t entityID = runtimeIDs[index];
-			auto componentsJson = entity.value("components", nlohmann::json::object());
+			deserializeComponents(runtimeIDs[index], j[index].value("components", nlohmann::json::object()));
+		}
+	}
 
-			if (entity.contains("prefab_ref"))
+	void EntityRegistry::deserializeComponents(uint32_t entityID, const nlohmann::json& j)
+	{
+		// Apply default component values before other components run their add hooks
+		if (auto* transform = getComponent<Transform>(entityID); transform && j.contains("Transform"))
+			j.at("Transform").get_to(*transform);
+		if (auto* name = getComponent<NameComponent>(entityID); name && j.contains("NameComponent"))
+			j.at("NameComponent").get_to(*name);
+
+		for (const auto& [type, json] : j.items())
+		{
+			auto typeResult = m_typeResolver.Get(type);
+			if (!typeResult.isValid())
+				continue;
+			try
 			{
-				addComponent<PrefabComponent>(entityID, entity["prefab_ref"]);
+				typeResult.invoke(entityID, json);
 			}
-
-			for (auto& [type, json] : componentsJson.items())
+			catch (const nlohmann::json::exception& e)
 			{
-				auto typeResult = m_typeResolver.Get(type);
-				if (!typeResult.isValid())
-				{
-					continue;
-				}
-
-				// ideally avoid catching errors but this does not happen every frame
-				// nlohmann throws errors on fail parse which crash the app if left unhandled
-				try
-				{
-
-					typeResult.invoke(entityID, json);
-				}
-				catch (const nlohmann::json::exception& e)
-				{
-					m_logger.warn("failed to deserialize {}: {}", type, e.what());
-
-					continue;
-				}
+				m_logger.warn("failed to deserialize {}: {}", type, e.what());
 			}
 		}
 	}

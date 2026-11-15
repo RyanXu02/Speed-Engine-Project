@@ -14,6 +14,14 @@ namespace SE
 		// @brief Returns the ID of the currently active entity, or 0 if no entity is active
 		uint32_t activeEntity() const { return m_activeEntity; }
 
+		void requestSavePrefab(uint32_t id) { m_savePrefabRequest = id; }
+		uint32_t takeSavePrefabRequest()
+		{
+			const uint32_t id = m_savePrefabRequest;
+			m_savePrefabRequest = 0;
+			return id;
+		}
+
 		// @brief Selects the specified entity ID, clearing any previous selection
 		void select(uint32_t id)
 		{
@@ -67,6 +75,7 @@ namespace SE
 			if (m_sceneRevision == revision)
 				return;
 			m_sceneRevision = revision;
+			m_savePrefabRequest = 0;
 			clearSelection();
 			clearDirty();
 		}
@@ -75,6 +84,7 @@ namespace SE
 		std::unordered_set<uint32_t> m_selectedEntities;
 
 		uint32_t m_activeEntity = 0;
+		uint32_t m_savePrefabRequest = 0;
 
 		bool m_dirty = false;
 

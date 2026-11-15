@@ -246,7 +246,6 @@ namespace SE
 		};
 
 		_registerComponent<NameComponent>(luaState);
-		_registerComponent<PrefabComponent>(luaState);
 		_registerComponent<ScriptComponent>(luaState);
 	}
 }

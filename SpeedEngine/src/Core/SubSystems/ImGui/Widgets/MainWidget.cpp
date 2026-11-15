@@ -85,7 +85,34 @@ namespace SE
 					scene->addEntity("New Empty");
 					m_session.markDirty();
 				}
-				// add prefabs later
+				if (ImGui::BeginMenu("Prefabs", available && scene))
+				{
+					std::vector<std::filesystem::path> prefabs;
+					if (std::filesystem::exists("Assets/Prefabs"))
+					{
+						for (const auto& file : std::filesystem::directory_iterator("Assets/Prefabs"))
+						{
+							const auto extension = file.path().extension();
+							if (file.is_regular_file() && (extension == ".json" || extension == ".JSON"))
+								prefabs.push_back(file.path());
+						}
+					}
+					std::ranges::sort(prefabs);
+					for (const auto& path : prefabs)
+					{
+						if (ImGui::MenuItem(path.stem().string().c_str()))
+						{
+							if (const uint32_t id = scene->instantiatePrefab(path.string()))
+							{
+								m_session.select(id);
+								m_session.markDirty();
+							}
+						}
+					}
+					if (prefabs.empty())
+						ImGui::TextDisabled("No prefabs");
+					ImGui::EndMenu();
+				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Camera"))
@@ -355,6 +382,19 @@ namespace SE
 	void MainWidget::finishEditorFrame()
 	{
 		auto* scenes = Engine::Instance().getSubSystem<SceneSystem>();
+		if (const uint32_t id = m_session.takeSavePrefabRequest(); id && !s_editsBlocked && !scenes->hasPendingTransition())
+		{
+			auto* scene = scenes->getCurrentScene();
+			if (scene && scene->hasEntity(id))
+			{
+				m_session.select(id);
+				m_filename = scene->getEntity(id).getComponent<NameComponent>()->name;
+				m_actionRevision = scenes->getSceneRevision();
+				m_error.clear();
+				prepDialog(Dialog::SavePrefab);
+				s_editsBlocked = true;
+			}
+		}
 		if (m_action != Action::None && m_actionRevision != scenes->getSceneRevision() && m_dialog == Dialog::None)
 			finishAction();
 		const auto& io = ImGui::GetIO();
@@ -426,7 +466,8 @@ namespace SE
 		if (m_dialog == Dialog::None)
 			return;
 		const bool confirm = m_dialog == Dialog::Confirm;
-		const char* title = confirm ? "Unsaved scene changes" : "Scene file";
+		const char* title = confirm ? "Unsaved scene changes"
+			: m_dialog == Dialog::SavePrefab ? "Save Selected as Prefab" : "Scene file";
 		if (m_openDialog)
 		{
 			ImGui::OpenPopup(title);
@@ -472,6 +513,31 @@ namespace SE
 				m_dialog = Dialog::None;
 				performAction();
 			}
+		}
+		else if (m_dialog == Dialog::SavePrefab)
+		{
+			ImGui::TextUnformatted("Save in Assets/Prefabs (existing files are replaced)");
+			if (ImGui::IsWindowAppearing())
+				ImGui::SetKeyboardFocusHere();
+			const bool enter = ImGui::InputText("Filename", &m_filename, ImGuiInputTextFlags_EnterReturnsTrue);
+			if (!m_error.empty())
+				ImGui::TextWrapped("%s", m_error.c_str());
+			ImGui::BeginDisabled(m_filename.empty());
+			if (ImGui::Button("Save") || (enter && !m_filename.empty()))
+			{
+				auto filename = std::filesystem::path(m_filename).filename();
+				filename.replace_extension(".json");
+				auto* scene = scenes->getCurrentScene();
+				if (scene && scene->hasEntity(m_session.activeEntity())
+					&& scene->savePrefab(m_session.activeEntity(), (std::filesystem::path("Assets/Prefabs") / filename).string()))
+				{
+					ImGui::CloseCurrentPopup();
+					finishAction();
+				}
+				else
+					m_error = "Could not save prefab. Check the filename and console.";
+			}
+			ImGui::EndDisabled();
 		}
 		else
 		{
