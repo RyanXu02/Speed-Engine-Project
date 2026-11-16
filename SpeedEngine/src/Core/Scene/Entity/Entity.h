@@ -64,6 +64,8 @@ namespace SE
 
 		static HookFunction _onMeshComponentAdded();
 
+		static HookFunction _onTerrainComponentAdded();
+
 		static HookFunction _onScriptComponentAdded();
 		static HookFunction _onScriptComponentRemoved();
 
@@ -78,6 +80,8 @@ namespace SE
 		static HookFunction _onMusicComponentAdded();
 
 		static HookFunction _onPhysicsShapeMeshComponentAdded();
+
+		static HookFunction _onPhysicsShapeTerrainComponentAdded();
 
 		static HookFunction _onParticleEmitterAdded();
 	};

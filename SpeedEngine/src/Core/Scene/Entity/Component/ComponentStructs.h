@@ -8,6 +8,7 @@
 #include "PhysicsShape/PhysicsShapeCapsule.h"
 #include "PhysicsShape/PhysicsShapeSphere.h"
 #include "PhysicsShape/PhysicsShapeMesh.h"
+#include "PhysicsShape/PhysicsShapeTerrain.h"
 #include "Core/features/Serializable.h"
 #include "Core/features/CameraFrustum.h"
 #include "Core/EngineStates.h"
@@ -70,6 +71,28 @@ namespace SE
 		std::string path = "None";
 
 		DEFINE_TYPE(MeshComponent, member("path", &MeshComponent::path));
+	};
+
+	struct TerrainComponent
+	{
+		TerrainComponent() = default;
+		TerrainComponent(std::string p)
+		    : path(p) {};
+		TerrainComponent(uint32_t meshId)
+		    : terrainResourceID(meshId)
+		{}
+
+		void setPath(std::string p)
+		{
+			path = p;
+			auto terrainManager = Engine::Instance().getSubSystem<ResourceManager>();
+			terrainResourceID = terrainManager->loadTerrain({ .path = path, .name = path });
+		}
+
+		uint32_t terrainResourceID{ 0 };
+		std::string path = "None";
+
+		DEFINE_TYPE(TerrainComponent, member("path", &TerrainComponent::path));
 	};
 
 	struct Parent

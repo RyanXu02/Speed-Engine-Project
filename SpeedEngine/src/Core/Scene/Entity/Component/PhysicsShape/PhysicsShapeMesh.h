@@ -21,7 +21,7 @@ namespace SE
 		DEFINE_TYPE(PhysicsShapeMesh, member("path", &PhysicsShapeMesh::m_path));
 
 	private:
-		void createShape() override;
+		void createUnscaledShape() override;
 
 		uint32_t m_meshResourceID{ 0 };
 		std::string m_path = "None";

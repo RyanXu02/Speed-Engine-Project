@@ -23,7 +23,8 @@ namespace SE
 		updateShape();
 	}
 
-	void PhysicsShapeCapsule::createShape() {
-		m_shape = new JPH::CapsuleShape(m_halfHeight, m_radius);
+	void PhysicsShapeCapsule::createUnscaledShape()
+	{
+		m_unscaledShape = new JPH::CapsuleShape(m_halfHeight, m_radius);
 	}
 }

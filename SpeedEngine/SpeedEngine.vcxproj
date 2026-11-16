@@ -177,7 +177,11 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\ResourceManagers\Terrain\Terrain.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Terrain\TerrainManager.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsContactListener.cpp" />
     <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
@@ -259,9 +263,14 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Terrain\Terrain.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Terrain\TerrainManager.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetPathPayload.h" />
     <ClInclude Include="src\Core\SubSystems\Physics\PhysicsContactListener.h" />
@@ -365,6 +374,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\debug.frag" />
@@ -387,6 +397,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <None Include="Assets\Shaders\deferredLighting.frag" />
     <None Include="Assets\Shaders\text.frag" />
     <None Include="Assets\Shaders\text.vert" />
+    <None Include="Assets\Terrain\MainTerrain\main-terrain.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

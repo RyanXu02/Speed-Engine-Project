@@ -119,7 +119,7 @@ namespace SE
 			}
 			else
 			{
-				m_bodyInterface->SetShape(getBodyID(), shape, true, JPH::EActivation::DontActivate);
+				m_bodyInterface->SetShape(getBodyID(), shape, !needsMassOverride, JPH::EActivation::DontActivate);
 			}
 		}
 	}

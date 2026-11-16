@@ -41,6 +41,7 @@ namespace SE
 		REGISTER_COMPONENT(NameComponent, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(Transform, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(MeshComponent, Entity::_onMeshComponentAdded(), NO_DEFINE);
+		REGISTER_COMPONENT(TerrainComponent, Entity::_onTerrainComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(ScriptComponent, Entity::_onScriptComponentAdded(), Entity::_onScriptComponentRemoved());
 		REGISTER_COMPONENT(CameraComponent, Entity::_onCameraComponentAdded(), Entity::_onCameraComponentRemoved());
 		REGISTER_COMPONENT(RigidBody, Entity::_onRigidBodyComponentAdded(), NO_DEFINE);
@@ -48,6 +49,7 @@ namespace SE
 		REGISTER_COMPONENT(PhysicsShapeCapsule, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeSphere, NO_DEFINE, NO_DEFINE);
 		REGISTER_COMPONENT(PhysicsShapeMesh, Entity::_onPhysicsShapeMeshComponentAdded(), NO_DEFINE);
+		REGISTER_COMPONENT(PhysicsShapeTerrain, Entity::_onPhysicsShapeTerrainComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(AudioSFXComponent, Entity::_onSFXComponentAdded(), Entity::_onSFXComponentRemoved());
 		REGISTER_COMPONENT(AudioMusicComponent, Entity::_onMusicComponentAdded(), NO_DEFINE);
 		REGISTER_COMPONENT(ParticleEmitter, Entity::_onParticleEmitterAdded(), NO_DEFINE);

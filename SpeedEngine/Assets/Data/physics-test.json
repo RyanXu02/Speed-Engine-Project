@@ -2,9 +2,6 @@
   "entities": [
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -13,9 +10,9 @@
         },
         "PhysicsShapeBox": {
           "halfExtents": [
-            15.0,
-            0.10000000149011612,
-            15.0
+            1.0,
+            1.0,
+            1.0
           ]
         },
         "RigidBody": {
@@ -51,13 +48,11 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 1
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -66,9 +61,9 @@
         },
         "PhysicsShapeBox": {
           "halfExtents": [
-            15.0,
-            2.5,
-            0.10000000149011612
+            1.0,
+            1.0,
+            1.0
           ]
         },
         "RigidBody": {
@@ -104,13 +99,11 @@
             15.0
           ]
         }
-      }
+      },
+      "id": 2
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -119,9 +112,9 @@
         },
         "PhysicsShapeBox": {
           "halfExtents": [
-            0.10000000149011612,
-            2.5,
-            15.0
+            1.0,
+            1.0,
+            1.0
           ]
         },
         "RigidBody": {
@@ -157,13 +150,11 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 3
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -172,9 +163,9 @@
         },
         "PhysicsShapeBox": {
           "halfExtents": [
-            15.0,
-            2.5,
-            0.10000000149011612
+            1.0,
+            1.0,
+            1.0
           ]
         },
         "RigidBody": {
@@ -210,13 +201,11 @@
             -15.0
           ]
         }
-      }
+      },
+      "id": 4
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -225,9 +214,9 @@
         },
         "PhysicsShapeBox": {
           "halfExtents": [
-            0.10000000149011612,
-            2.5,
-            15.0
+            1.0,
+            1.0,
+            1.0
           ]
         },
         "RigidBody": {
@@ -263,13 +252,11 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 5
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "MeshComponent": {
           "path": "Assets/Meshes/Cube.obj"
         },
@@ -278,15 +265,15 @@
         },
         "PhysicsShapeBox": {
           "halfExtents": [
-            0.5,
-            0.5,
-            0.5
+            1.0,
+            1.0,
+            1.0
           ]
         },
         "RigidBody": {
           "friction": 0.20000000298023224,
           "gravityFactor": 1.0,
-          "isActive": false,
+          "isActive": true,
           "maxAngularVelocity": 47.12385177612305,
           "maxLinearVelocity": 500.0,
           "motionType": 2,
@@ -303,9 +290,9 @@
         },
         "Transform": {
           "rotate": [
-            -1.5243355022676042e-08,
-            -0.0,
-            0.0,
+            2.4502804762960295e-07,
+            -1.8555127098807134e-05,
+            7.877078189721942e-08,
             1.0
           ],
           "scale": [
@@ -314,18 +301,16 @@
             0.5
           ],
           "translate": [
-            -2.2340693703881698e-06,
-            0.6000000238418579,
-            3.624067630880745e-06
+            -0.0007992983446456492,
+            4.199999809265137,
+            0.0009798412211239338
           ]
         }
-      }
+      },
+      "id": 6
     },
     {
       "components": {
-        "LifeComponent": {
-          "isAlive": true
-        },
         "NameComponent": {
           "name": "physicstestscene"
         },
@@ -350,7 +335,8 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 7
     },
     {
       "components": {
@@ -359,9 +345,6 @@
           "fov": 90.0,
           "isPrimary": false,
           "nearPlane": 0.10000000149011612
-        },
-        "LifeComponent": {
-          "isAlive": true
         },
         "NameComponent": {
           "name": "camera"
@@ -387,7 +370,55 @@
             0.0
           ]
         }
-      }
+      },
+      "id": 8
+    },
+    {
+      "components": {
+        "NameComponent": {
+          "name": "terrain"
+        },
+        "PhysicsShapeTerrain": {
+          "path": "Assets/Terrain/MainTerrain/main-terrain.json"
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": true,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "TerrainComponent": {
+          "path": "Assets/Terrain/MainTerrain/main-terrain.json"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            50.0,
+            50.0,
+            50.0
+          ],
+          "translate": [
+            0.0,
+            0.5,
+            0.0
+          ]
+        }
+      },
+      "id": 9
     }
   ],
   "scene_name": "Untitled"

@@ -33,6 +33,7 @@ namespace SE
 		Shader,
 		MeshResource,
 		Font,
-		Texture
+		Texture,
+		Terrain
 	};
 } // namespace SE

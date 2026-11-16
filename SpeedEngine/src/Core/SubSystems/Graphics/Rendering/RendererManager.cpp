@@ -14,6 +14,8 @@
 #include "Core/SubSystems/Graphics/Rendering/TextRenderer/TextRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/TonemapRenderer/TonemapRenderer.h"
 #include "Core/SubSystems/Graphics/Rendering/ParticleRenderer/ParticleRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/TerrainRenderer/TerrainRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/WireframeRenderer/WireframeRenderer.h"
 
 #include "Core/ResourceManagers/Material/Material.h"
 #include "Core/Engine.h"
@@ -97,6 +99,10 @@ namespace SE
 		auto& geometryRenderer = addRenderer<GeometryRenderer>();
 		addPass(RenderPass{ .renderer = geometryRenderer, .output = gBuffer, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, .clearColor = glm::vec4(0.0f) });
 
+		// Geometry pass for terrain, draws on top of gBuffer
+		auto& terrainRenderer = addRenderer<TerrainRenderer>();
+		addPass(RenderPass{ .renderer = terrainRenderer, .output = gBuffer, .clearMask = 0 });
+
 		//TODO: add an AO pass here
 
 		// Image based lighting, no pass of its own, interally precomputes its maps once in init and the lighting passes read them
@@ -124,6 +130,10 @@ namespace SE
 		FBO& finalColor = createRenderTarget("FinalColor", Descriptor{});
 		auto& tonemapRenderer = addRenderer<TonemapRenderer>("SceneColor");
 		addPass(RenderPass{ .renderer = tonemapRenderer, .output = finalColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT });
+
+		// Wireframe renderer, discards previous passes
+		auto& wireframeRenderer = addRenderer<WireframeRenderer>();
+		addPass(RenderPass{ .renderer = wireframeRenderer, .output = finalColor, .clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, .wireframeOnly = true });
 
 		// Example: A render pass that draws on top of FinalColor, after the tonemap so debug colors show as is
 		auto& debugRenderer = addRenderer<DebugRenderer>();
@@ -205,6 +215,9 @@ namespace SE
 		for (const auto& pass : m_passes)
 		{
 			if (pass.debugOnly && !EngineStates::isDebugRenderingEnabled())
+				continue;
+			// Don't do extra passes when wireframe mode is on
+			if (pass.wireframeOnly && !EngineStates::isWireframeRenderingEnabled() || !pass.wireframeOnly && EngineStates::isWireframeRenderingEnabled())
 				continue;
 
 			resetPassState();

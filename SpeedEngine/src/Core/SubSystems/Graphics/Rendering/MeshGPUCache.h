@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Logger/LoggerProxy.h"
 #include "Core/ResourceManagers/MeshResource/MeshResource.h"
+#include "Core/ResourceManagers/Terrain/Terrain.h"
 
 namespace SE
 {
@@ -26,7 +27,9 @@ namespace SE
 		MeshGPUCache& operator=(MeshGPUCache&&) = delete;
 
 		const MeshGPUData& getOrUpload(uint32_t meshId, const MeshResource& mesh);
+		const MeshGPUData& getOrUpload(uint32_t meshId, const Terrain& mesh);
 		void draw(uint32_t meshId, const MeshResource& mesh, size_t subMeshIndex);
+		void draw(uint32_t meshId, const Terrain& mesh, size_t subMeshIndex);
 		void remove(uint32_t meshId);
 		void clear();
 

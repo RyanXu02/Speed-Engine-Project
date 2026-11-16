@@ -36,6 +36,17 @@ namespace SE
 		return function;
 	}
 
+	Entity::HookFunction Entity::_onTerrainComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* terrainComponent = entity.getComponent<TerrainComponent>();
+			if (terrainComponent->terrainResourceID == 0 && !terrainComponent->path.empty() && terrainComponent->path != "None")
+				terrainComponent->setPath(terrainComponent->path);
+		};
+		return function;
+	}
+
 	Entity::HookFunction Entity::_onScriptComponentAdded()
 	{
 		HookFunction function = [](Entity entity)
@@ -127,6 +138,21 @@ namespace SE
 			{
 				auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
 				physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->loadMesh({ .path = path, .name = path }));
+			}
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onPhysicsShapeTerrainComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* physicsShapeTerrainComponent = entity.getComponent<PhysicsShapeTerrain>();
+			const auto path = physicsShapeTerrainComponent->getPath();
+			if (physicsShapeTerrainComponent->getTerrainID() == 0 && !path.empty() && path != "None")
+			{
+				auto terrainManager = Engine::Instance().getSubSystem<ResourceManager>();
+				physicsShapeTerrainComponent->setTerrainID(terrainManager->loadTerrain({ .path = path, .name = path }));
 			}
 		};
 		return function;

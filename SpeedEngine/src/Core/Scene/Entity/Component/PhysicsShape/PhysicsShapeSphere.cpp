@@ -16,8 +16,8 @@ namespace SE
 		updateShape();
 	}
 
-	void PhysicsShapeSphere::createShape()
+	void PhysicsShapeSphere::createUnscaledShape()
 	{
-		m_shape = new JPH::SphereShape(m_radius);
+		m_unscaledShape = new JPH::SphereShape(m_radius);
 	}
 }

@@ -268,9 +268,18 @@ namespace SE
 							physicsSystem->pause();
 					}
 				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Debug Rendering"))
+			{
 				bool debugEnabled = EngineStates::isDebugRenderingEnabled();
-				if (ImGui::Checkbox("Debug Rendering", &debugEnabled))
+				if (ImGui::Checkbox("Physics Debug", &debugEnabled))
 					EngineStates::setDebugRenderingEnabled(debugEnabled);
+
+				bool wireframeEnabled = EngineStates::isWireframeRenderingEnabled();
+				if (ImGui::Checkbox("Wireframe", &wireframeEnabled))
+					EngineStates::setWireframeRenderingEnabled(wireframeEnabled);
+
 				ImGui::EndMenu();
 			}
 			ImGui::EndMainMenuBar();

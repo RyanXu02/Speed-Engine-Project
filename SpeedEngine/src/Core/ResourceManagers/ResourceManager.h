@@ -6,6 +6,7 @@
 
 #include "Shader/ShaderManager.h"
 #include "MeshResource/MeshResourceManager.h"
+#include "Terrain/TerrainManager.h"
 #include "Material/MaterialManager.h"
 #include "Material/Texture.h"
 #include "Font/FontManager.h"
@@ -26,6 +27,12 @@ namespace SE
 	};
 
 	struct MeshLoadDesc
+	{
+		std::string_view path;
+		std::string_view name;
+	};
+
+	struct TerrainLoadDesc
 	{
 		std::string_view path;
 		std::string_view name;
@@ -73,6 +80,10 @@ namespace SE
 		// @param path path to the mesh file
 		// @param name name of the mesh
 		uint32_t loadMesh(const MeshLoadDesc& desc);
+		// @brief loads or reuses a terrain by file path. Name is only a display label
+		// @param path path to the terrain file
+		// @param name name of the terrain
+		uint32_t loadTerrain(const TerrainLoadDesc& desc);
 		// @brief loads or reuses a font by file path and pixel height. Name is only a display label
 		// @param path path to the font file
 		// @param pixelHeight height of the font in pixels
@@ -111,6 +122,10 @@ namespace SE
 				else if constexpr (std::is_same_v<T, MeshResource>)
 				{
 					return m_meshManager.getMeshResource(id);
+				}
+				else if constexpr (std::is_same_v<T, Terrain>)
+				{
+					return m_terrainManager.getTerrain(id);
 				}
 				else if constexpr (std::is_same_v<T, Font>)
 				{
@@ -162,6 +177,7 @@ namespace SE
 		ShaderManager m_shaderManager;
 		MaterialManager m_materialManager;
 		MeshResourceManager m_meshManager;
+		TerrainManager m_terrainManager;
 		FontManager m_fontManager;
 
 		// texture resource id -> texture object

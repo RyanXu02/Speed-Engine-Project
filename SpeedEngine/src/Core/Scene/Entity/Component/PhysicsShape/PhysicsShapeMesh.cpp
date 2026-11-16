@@ -8,11 +8,6 @@
 
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 
-inline JPH::Vec3 toJPH(const glm::vec3& vec)
-{
-	return JPH::Vec3(vec.x, vec.y, vec.z);
-}
-
 namespace SE
 {
 	void PhysicsShapeMesh::setMeshResourceID(uint32_t resourceID)
@@ -34,7 +29,7 @@ namespace SE
 		setMeshResourceID(resourceManager->loadMesh({ .path = m_path, .name = m_path }));
 	}
 
-	void PhysicsShapeMesh::createShape()
+	void PhysicsShapeMesh::createUnscaledShape()
 	{
 		if (m_meshResourceID == 0)
 			return;
@@ -57,6 +52,6 @@ namespace SE
 
 		JPH::MeshShapeSettings shapeSettings(triangleList);
 		JPH::Shape::ShapeResult result; // can be used for error checking
-		m_shape = new JPH::MeshShape(shapeSettings, result);
+		m_unscaledShape = new JPH::MeshShape(shapeSettings, result);
 	}
 }
