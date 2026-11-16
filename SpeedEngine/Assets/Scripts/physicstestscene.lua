@@ -42,11 +42,9 @@ function physicstestscene:onUpdate(dt)
 			if self.numAdded % 2 == 0 then
 				entityNew:addComponent("PhysicsShapeBox", {})
 				local boxCollider = entityNew:getComponent("PhysicsShapeBox")
-				boxCollider:setHalfExtents(vec3(0.5, 0.5, 0.5))
 			else
 				entityNew:addComponent("PhysicsShapeSphere", {})
 				local sphereCollider = entityNew:getComponent("PhysicsShapeSphere")
-				sphereCollider:setRadius(0.5)
 			end
 
 			local transform = entityNew:getComponent("Transform")

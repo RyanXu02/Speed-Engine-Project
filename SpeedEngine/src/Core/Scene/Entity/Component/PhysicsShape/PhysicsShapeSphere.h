@@ -18,7 +18,7 @@ namespace SE
 		DEFINE_TYPE(PhysicsShapeSphere, member("radius", &PhysicsShapeSphere::m_radius));
 
 	private:
-		void createShape() override;
+		void createUnscaledShape() override;
 
 		float m_radius{ 1.0f };
 	};

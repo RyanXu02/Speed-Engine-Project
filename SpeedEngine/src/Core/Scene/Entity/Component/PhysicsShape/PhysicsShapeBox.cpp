@@ -14,7 +14,7 @@ namespace SE
 		updateShape();
 	}
 
-	void PhysicsShapeBox::createShape() {
-		m_shape = new JPH::BoxShape(JPH::Vec3(m_halfExtents.x, m_halfExtents.y, m_halfExtents.z), JPH::cDefaultConvexRadius);
+	void PhysicsShapeBox::createUnscaledShape() {
+		m_unscaledShape = new JPH::BoxShape(JPH::Vec3(m_halfExtents.x, m_halfExtents.y, m_halfExtents.z), JPH::cDefaultConvexRadius);
 	}
 }

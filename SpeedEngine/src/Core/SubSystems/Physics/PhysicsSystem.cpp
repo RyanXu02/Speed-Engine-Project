@@ -11,6 +11,7 @@
 #include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeCapsule.h"
 #include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeSphere.h"
 #include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeMesh.h"
+#include "Core/Scene/Entity/Component/PhysicsShape/PhysicsShapeTerrain.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -60,12 +61,14 @@ namespace SE
 			if (!shape)
 			{
 				shape = entity.getComponent<PhysicsShapeMesh>();
+				if (!shape) shape = entity.getComponent<PhysicsShapeTerrain>();
 				if (shape) needsMassOverride = true;
 			}
 
 			// Only add if not already created/added and if it has a collider shape component
 			if (!rigidBody->isCreated() && shape)
 			{
+				shape->setScale(transform->scale);
 				rigidBody->setShape(shape->getShape(), needsMassOverride);
 				rigidBody->createBody();
 				rigidBody->setPosition(transform->translate + (rigidBody->getOffset() * glm::conjugate(transform->rotate)));
@@ -104,11 +107,13 @@ namespace SE
 			if (!shape)
 			{
 				shape = entity.getComponent<PhysicsShapeMesh>();
+				if (!shape) shape = entity.getComponent<PhysicsShapeTerrain>();
 				if (shape) needsMassOverride = true;
 			}
 
 			if (shape)
 			{
+				shape->setScale(transform->scale);
 				rigidBody->setShape(shape->getShape(), needsMassOverride);
 			}
 

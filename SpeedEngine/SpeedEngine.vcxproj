@@ -179,6 +179,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
   <ItemGroup>
     <ClCompile Include="src\Core\ResourceManagers\Terrain\Terrain.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Terrain\TerrainManager.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
@@ -267,6 +268,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
   <ItemGroup>
     <ClInclude Include="src\Core\ResourceManagers\Terrain\Terrain.h" />
     <ClInclude Include="src\Core\ResourceManagers\Terrain\TerrainManager.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.h" />

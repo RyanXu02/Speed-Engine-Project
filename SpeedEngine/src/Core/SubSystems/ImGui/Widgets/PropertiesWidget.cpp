@@ -41,13 +41,19 @@ namespace SE
 		// Registers a component type with an editor function for components that need special handling
 		// onEdited function will not be called since the editor function is provided
 		m_inspectors.registerComponent<Transform>("Transform", "General", false,
-			[this](Entity&, Transform& component)
+			[this](Entity& entity, Transform& component)
 		    {
 				auto rotation = glm::eulerAngles(component.rotate);
 				authoredEdit(ImGui::DragFloat3("Position", &component.translate.x, 0.1f));
 				if (authoredEdit(ImGui::DragFloat3("Rotation (radians)", &rotation.x, 0.01f)))
 					component.rotate = glm::quat(rotation);
-				authoredEdit(ImGui::DragFloat3("Scale", &component.scale.x, 0.01f));
+				if (authoredEdit(ImGui::DragFloat3("Scale", &component.scale.x, 0.01f)))
+				{
+					// For physics colliders, need to manually update scale
+				    auto* terrainCollider = entity.getComponent<PhysicsShapeTerrain>();
+				    if (terrainCollider)
+					    terrainCollider->setScale(component.scale);
+				}
 		    });
 
 		m_inspectors.registerComponent<MeshComponent>("Mesh", "Rendering", true,
@@ -301,6 +307,25 @@ namespace SE
 				    component.setPath(m_physicsShapeMeshPathDraft);
 					m_session.markDirty();
 				}
+		    });
+
+		m_inspectors.registerComponent<PhysicsShapeTerrain>("Terrain Collider", "Physics", true,
+		    [this](Entity&, PhysicsShapeTerrain& component)
+		    {
+			    if (!m_physicsShapeTerrainDraftInitialized)
+			    {
+				    m_physicsShapeTerrainPathDraft = component.getPath();
+				    m_physicsShapeTerrainDraftInitialized = true;
+			    }
+			    const bool enter = ImGui::InputText("Path", &m_physicsShapeTerrainPathDraft, ImGuiInputTextFlags_EnterReturnsTrue);
+			    const bool deactivated = ImGui::IsItemDeactivatedAfterEdit();
+			    const bool dropped = acceptAssetPathPayload(m_physicsShapeTerrainPathDraft);
+			    // user confirmed a new path
+			    if ((enter || deactivated || dropped) && m_physicsShapeTerrainPathDraft != component.getPath())
+			    {
+				    component.setPath(m_physicsShapeTerrainPathDraft);
+				    m_session.markDirty();
+			    }
 		    });
 
 		m_inspectors.registerComponent<AudioSFXComponent>("Sound Effect", "Audio", true,

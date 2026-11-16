@@ -81,6 +81,8 @@ namespace SE
 
 		static HookFunction _onPhysicsShapeMeshComponentAdded();
 
+		static HookFunction _onPhysicsShapeTerrainComponentAdded();
+
 		static HookFunction _onParticleEmitterAdded();
 	};
 } // namespace SE

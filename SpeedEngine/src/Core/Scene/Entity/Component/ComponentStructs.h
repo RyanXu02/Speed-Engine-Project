@@ -8,6 +8,7 @@
 #include "PhysicsShape/PhysicsShapeCapsule.h"
 #include "PhysicsShape/PhysicsShapeSphere.h"
 #include "PhysicsShape/PhysicsShapeMesh.h"
+#include "PhysicsShape/PhysicsShapeTerrain.h"
 #include "Core/features/Serializable.h"
 #include "Core/features/CameraFrustum.h"
 #include "Core/EngineStates.h"

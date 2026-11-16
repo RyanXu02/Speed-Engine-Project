@@ -143,6 +143,21 @@ namespace SE
 		return function;
 	}
 
+	Entity::HookFunction Entity::_onPhysicsShapeTerrainComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* physicsShapeTerrainComponent = entity.getComponent<PhysicsShapeTerrain>();
+			const auto path = physicsShapeTerrainComponent->getPath();
+			if (physicsShapeTerrainComponent->getTerrainID() == 0 && !path.empty() && path != "None")
+			{
+				auto terrainManager = Engine::Instance().getSubSystem<ResourceManager>();
+				physicsShapeTerrainComponent->setTerrainID(terrainManager->loadTerrain({ .path = path, .name = path }));
+			}
+		};
+		return function;
+	}
+
 	Entity::HookFunction Entity::_onParticleEmitterAdded()
 	{
 		HookFunction function = [](Entity entity)

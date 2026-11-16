@@ -56,13 +56,11 @@ namespace SE
 
 		// Only ever 1 submesh
 		m_submeshes.resize(1);
-		SubMesh subMesh;
-		subMesh.indexCount = static_cast<uint32_t>(m_indices.size());
-		subMesh.indexOffset = 0;
-		subMesh.vertexCount = static_cast<uint32_t>(m_vertices.size());
-		subMesh.vertexOffset = 0;
-		subMesh.materialIndex = 0;
-		m_submeshes.push_back(subMesh);
+		m_submeshes[0].indexCount = static_cast<uint32_t>(m_indices.size());
+		m_submeshes[0].indexOffset = 0;
+		m_submeshes[0].vertexCount = static_cast<uint32_t>(m_vertices.size());
+		m_submeshes[0].vertexOffset = 0;
+		m_submeshes[0].materialIndex = 0;
 
 		// Import materials
 		Assimp::Importer importer;

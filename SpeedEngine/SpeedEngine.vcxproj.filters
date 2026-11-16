@@ -93,6 +93,7 @@
     <ClCompile Include="src\Core\ResourceManagers\Terrain\TerrainManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -349,6 +350,7 @@
     <ClInclude Include="src\Core\ResourceManagers\Terrain\TerrainManager.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\debug.frag" />

@@ -40,6 +40,9 @@ namespace SE
 		std::string m_physicsShapeMeshPathDraft;
 		bool m_physicsShapeMeshDraftInitialized{ false };
 
+		std::string m_physicsShapeTerrainPathDraft;
+		bool m_physicsShapeTerrainDraftInitialized{ false };
+
 		std::string m_soundPathDraft;
 		std::string m_soundPathError;
 		bool m_soundDraftInitialized{ false };
