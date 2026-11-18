@@ -3,7 +3,7 @@
 
 namespace SE
 {
-	class MeshResource;
+	struct MeshResource;
 
 	// @brief Deferred geometry pass, draws the opaque submeshes into the G-buffer output
 	class GeometryRenderer : public Renderer

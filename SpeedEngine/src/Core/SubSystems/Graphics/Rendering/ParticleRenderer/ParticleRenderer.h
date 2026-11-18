@@ -17,7 +17,7 @@ namespace SE
 	public:
 		explicit ParticleRenderer(Logger& logger)
 		    : Renderer(logger, "ParticleRenderer"),
-		      m_bbShader(0, "ParticleRenderer")
+			  m_bbShader()
 		{}
 
 		void init() override;

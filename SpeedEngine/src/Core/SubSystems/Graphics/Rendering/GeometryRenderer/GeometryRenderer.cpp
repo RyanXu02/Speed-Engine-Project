@@ -13,7 +13,7 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		m_defaultShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/gpass.vert", .fragmentShaderPath = "Assets/Shaders/gpass.frag", .name = "gBufferShader" });
+		m_defaultShaderId = resources->requestShader({ "Assets/Shaders/gpass.vert", "Assets/Shaders/gpass.frag", "gBufferShader" });
 		m_defaultMaterialId = resources->createMaterial({ .shaderId = m_defaultShaderId, .textures = {}, .name = "defaultGBufferMaterial" });
 	}
 
@@ -30,14 +30,11 @@ namespace SE
 		const CameraFrustum& camera = context.viewport.getCameraFrustum();
 
 		// Get default shader
-		Shader* defaultShader = context.resources.getResource<Shader>(m_defaultShaderId);
+		Shader* defaultShader = context.gpu.shader(context.resources, m_defaultShaderId, m_logger);
 		if (!defaultShader)
-		{
-			m_logger.critical("G-buffer shader not found, cannot render");
 			return;
-		}
 		// Get default material
-		Material* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
+		const auto* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
 
 		// per frame uniforms
 		defaultShader->bind();
@@ -51,10 +48,9 @@ namespace SE
 				continue;
 			}
 
-			MeshResource* meshResource = context.resources.getResource<MeshResource>(meshResourceId);
+			const auto* meshResource = context.resources.getResource<MeshResource>(meshResourceId);
 			if (!meshResource)
 			{
-				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, draw.entityId);
 				continue;
 			}
 
@@ -72,7 +68,7 @@ namespace SE
 				if (pbr && pbr->albedoFactor.a < 1.0f)
 					continue;
 
-				Material* material = hasPBR ? context.resources.getResource<Material>(meshMaterials[materialIndex]) : nullptr;
+				const auto* material = hasPBR ? context.resources.getResource<Material>(meshMaterials[materialIndex]) : nullptr;
 				if (!material) {
 					material = defaultMaterial;
 				}
@@ -86,13 +82,13 @@ namespace SE
 				defaultShader->setFloat("normalScale", pbr ? pbr->normalScale : 1.0f);
 
 				if (material) {
-					material->bind();
+					context.gpu.bindMaterial(context.resources, *material, *defaultShader);
 				}
 
 				context.meshes.draw(meshResourceId, *meshResource, i);
 
 				if (material) {
-					material->unbind();
+					context.gpu.unbindMaterial();
 				}
 			}
 		}
@@ -127,7 +123,7 @@ namespace SE
 				if (path.empty()) {
 					continue;
 				}
-				if (const uint32_t textureId = context.resources.loadTexture({ .path = path, .name = path })) {
+				if (const auto textureId = context.resources.requestTexture({ path, path })) {
 					textures.push_back({ .usage = type, .textureId = textureId });
 				}
 			}
@@ -136,13 +132,13 @@ namespace SE
 			uint32_t materialId = 0;
 			if (!textures.empty() && pbr.albedoFactor.a >= 1.0f)
 			{
-				std::string materialName = fmt::format("{}_{}_{}", meshResource.getResourceName(), i, pbr.name);
+				std::string materialName = fmt::format("{}_{}_{}", meshResourceId, i, pbr.name);
 				materialId = context.resources.createMaterial({ .shaderId = m_defaultShaderId, .textures = textures, .name = materialName });
 			}
 			it->second.push_back(materialId);
 		}
 
-		m_logger.info("Created {} materials for mesh resource {}", it->second.size(), meshResource.getResourceName());
+		m_logger.info("Created {} materials for mesh resource {}", it->second.size(), meshResourceId);
 		return it->second;
 	}
 } // namespace SE

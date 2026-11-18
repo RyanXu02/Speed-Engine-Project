@@ -3,7 +3,7 @@
 
 namespace SE
 {
-	class MeshResource;
+	struct MeshResource;
 	class Shader;
 	struct DrawItem;
 
@@ -46,7 +46,7 @@ namespace SE
 		struct TransparentItem
 		{
 			const DrawItem* draw;
-			MeshResource* meshResource;
+			const MeshResource* meshResource;
 			size_t subMeshIndex;
 			float distanceSq; // distance from the camera, for sorting
 		};

@@ -1,9 +1,10 @@
 #pragma once
-#include "PhysicsShape.h"
+#include "Core/Features/Serializable.h"
+#include "Core/ResourceManagers/Resource.h"
 
 namespace SE
 {
-	class PhysicsShapeMesh : public PhysicsShape
+	class PhysicsShapeMesh
 	{
 	public:
 		PhysicsShapeMesh() {};
@@ -13,17 +14,15 @@ namespace SE
 		    : m_meshResourceID(meshId) {};
 		~PhysicsShapeMesh() = default;
 
-		uint32_t getMeshResourceID() { return m_meshResourceID; }
-		void setMeshResourceID(uint32_t resourceID);
-		std::string getPath() { return m_path; }
-		void setPath(std::string path);
+		ResourceID getMeshResourceID() const { return m_meshResourceID; }
+		void setMeshResourceID(ResourceID id) { m_meshResourceID = id; }
+		const std::string& getPath() const { return m_path; }
+		void setPath(std::string path, ResourceID id) { m_path = std::move(path); m_meshResourceID = id; }
 
 		DEFINE_TYPE(PhysicsShapeMesh, member("path", &PhysicsShapeMesh::m_path));
 
 	private:
-		void createUnscaledShape() override;
-
-		uint32_t m_meshResourceID{ 0 };
+		ResourceID m_meshResourceID{ 0 };
 		std::string m_path = "None";
 	};
 }

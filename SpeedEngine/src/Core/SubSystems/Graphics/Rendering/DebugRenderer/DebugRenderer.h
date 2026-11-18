@@ -1,5 +1,4 @@
 #pragma once
-#include "Core/ResourceManagers/Shader/Shader.h"
 #include "Core/SubSystems/Graphics/Rendering/RenderFrame.h"
 #include "Core/SubSystems/Graphics/Rendering/Renderer.h"
 
@@ -10,11 +9,11 @@ namespace SE
 	{
 	public:
 		explicit DebugRenderer(Logger& logger)
-			: Renderer(logger, "DebugRenderer"), m_shader(0, "DebugRenderer")
+			: Renderer(logger, "DebugRenderer")
 		{}
 
 		// Defer GPU allocation until the first enabled debug draw
-		void init() override {}
+		void init() override;
 		void shutdown() override;
 		void render(RenderContext& context) override;
 
@@ -24,6 +23,6 @@ namespace SE
 
 		unsigned int m_VAO = 0;
 		unsigned int m_VBO = 0;
-		Shader m_shader;
+		ResourceID m_shaderId = 0;
 	};
 } // namespace SE

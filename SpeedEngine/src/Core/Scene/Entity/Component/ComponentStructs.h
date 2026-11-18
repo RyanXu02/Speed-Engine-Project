@@ -64,10 +64,10 @@ namespace SE
 		{
 			path = p;
 			auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-			meshResourceID = meshResourceManager->loadMesh({ .path = path, .name = path });
+			meshResourceID = path.empty() || path == "None" ? 0 : meshResourceManager->requestMesh({ .path = path, .name = path });
 		}
 
-		uint32_t meshResourceID{ 0 };
+		ResourceID meshResourceID{ 0 };
 		std::string path = "None";
 
 		DEFINE_TYPE(MeshComponent, member("path", &MeshComponent::path));
@@ -86,10 +86,10 @@ namespace SE
 		{
 			path = p;
 			auto terrainManager = Engine::Instance().getSubSystem<ResourceManager>();
-			terrainResourceID = terrainManager->loadTerrain({ .path = path, .name = path });
+			terrainResourceID = path.empty() || path == "None" ? 0 : terrainManager->requestTerrain({ .path = path, .name = path });
 		}
 
-		uint32_t terrainResourceID{ 0 };
+		ResourceID terrainResourceID{ 0 };
 		std::string path = "None";
 
 		DEFINE_TYPE(TerrainComponent, member("path", &TerrainComponent::path));

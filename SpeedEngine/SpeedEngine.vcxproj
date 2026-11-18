@@ -178,8 +178,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\ResourceManagers\Terrain\Terrain.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Terrain\TerrainManager.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
@@ -188,7 +186,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\Features\CameraController.cpp" />
     <ClCompile Include="src\Core\Memory\FrameSlot.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Font\Font.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Font\FontManager.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.cpp" />
@@ -200,7 +197,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.cpp" />
     <ClCompile Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\AudioComponents.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.cpp" />
@@ -219,7 +215,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
     <ClCompile Include="src\Core\SubSystems\UI\UISystem.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp" />
@@ -239,20 +234,19 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DeferredLightingRenderer\DeferredLightingRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\Event.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Resource.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderSource.cpp" />
     <ClCompile Include="src\Core\Logger\Logger.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scriptings\ScriptingSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\AssetGPUCache.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -267,7 +261,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\ResourceManagers\Terrain\Terrain.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Terrain\TerrainManager.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.h" />
@@ -280,7 +273,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClInclude Include="src\Core\Features\RNG.h" />
     <ClInclude Include="src\Core\Memory\FrameSlot.h" />
     <ClInclude Include="src\Core\ResourceManagers\Font\Font.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Font\FontManager.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.h" />
     <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.h" />
@@ -328,7 +320,6 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputEvent.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputEventQueue.h" />
-    <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.h" />
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResource.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h" />
@@ -341,6 +332,7 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\AssetGPUCache.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.h" />
@@ -352,15 +344,13 @@ xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
     <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Events\Event.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Manager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Resource.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderSource.h" />
     <ClInclude Include="src\Core\Logger\Logger.h" />
     <ClInclude Include="src\Core\Engine.h" />
     <ClInclude Include="src\Core\EngineConfig.h" />

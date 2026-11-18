@@ -17,7 +17,7 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		m_shadowShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/shadow.vert", .fragmentShaderPath = "Assets/Shaders/shadow.frag", .name = "shadowShader" });
+		m_shadowShaderId = resources->requestShader({ "Assets/Shaders/shadow.vert", "Assets/Shaders/shadow.frag", "shadowShader" });
 	}
 
 	void ShadowRenderer::render(RenderContext& context)
@@ -29,12 +29,9 @@ namespace SE
 		if (!context.sun.enabled || context.frame.draws.empty())
 			return;
 
-		Shader* shadowShader = context.resources.getResource<Shader>(m_shadowShaderId);
+		Shader* shadowShader = context.gpu.shader(context.resources, m_shadowShaderId, m_logger);
 		if (!shadowShader)
-		{
-			m_logger.critical("Shadow shader not found, cannot render");
 			return;
-		}
 
 		// push depth back a little so lit surfaces don't shadow themselves (acne)
 		glEnable(GL_POLYGON_OFFSET_FILL);
@@ -49,7 +46,7 @@ namespace SE
 				continue;
 			}
 
-			MeshResource* meshResource = context.resources.getResource<MeshResource>(draw.meshResourceId);
+			const auto* meshResource = context.resources.getResource<MeshResource>(draw.meshResourceId);
 			if (!meshResource) {
 				continue;
 			}

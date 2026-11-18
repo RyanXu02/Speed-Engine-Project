@@ -137,7 +137,7 @@ namespace SE
 			if (physicsShapeMeshComponent->getMeshResourceID() == 0 && !path.empty() && path != "None")
 			{
 				auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
-				physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->loadMesh({ .path = path, .name = path }));
+				physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->requestMesh({ .path = path, .name = path }));
 			}
 		};
 		return function;
@@ -152,7 +152,7 @@ namespace SE
 			if (physicsShapeTerrainComponent->getTerrainID() == 0 && !path.empty() && path != "None")
 			{
 				auto terrainManager = Engine::Instance().getSubSystem<ResourceManager>();
-				physicsShapeTerrainComponent->setTerrainID(terrainManager->loadTerrain({ .path = path, .name = path }));
+				physicsShapeTerrainComponent->setTerrainID(terrainManager->requestTerrain({ .path = path, .name = path }));
 			}
 		};
 		return function;

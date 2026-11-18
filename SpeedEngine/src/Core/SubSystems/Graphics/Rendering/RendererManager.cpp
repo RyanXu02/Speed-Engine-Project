@@ -210,7 +210,7 @@ namespace SE
 		m_sceneViewport->setCamera(interpolateCamera(frame.camera.previous, frame.camera.current, t));
 		m_sceneViewport->updateMatrices();
 		RenderContext context{ frame,
-			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_targets, m_sun, t };
+			*m_sceneViewport, *Engine::Instance().getSubSystem<ResourceManager>(), *m_meshes, m_gpu, m_targets, m_sun, t };
 
 		for (const auto& pass : m_passes)
 		{
@@ -378,6 +378,7 @@ namespace SE
 		m_textRenderer = nullptr;
 		m_renderers.clear();
 		m_meshes.reset();
+		m_gpu.clear();
 		m_finalSceneOutput = nullptr;
 		m_targets.clear();
 		m_sceneViewport.reset();

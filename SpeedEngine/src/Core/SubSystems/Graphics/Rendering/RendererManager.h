@@ -143,6 +143,7 @@ namespace SE
 		std::unique_ptr<Viewport> m_sceneViewport;
 
 		std::unique_ptr<MeshGPUCache> m_meshes;
+		AssetGPUCache m_gpu;
 
 		RenderTargets m_targets;
 

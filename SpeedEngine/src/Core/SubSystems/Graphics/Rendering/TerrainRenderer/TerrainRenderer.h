@@ -3,9 +3,8 @@
 
 namespace SE
 {
-	class Terrain;
+	struct Terrain;
 	class Shader;
-	class Texture;
 
 	// @brief Deferred geometry pass, draws the opaque terrain mesh into the G-buffer output
 	class TerrainRenderer : public Renderer
@@ -27,7 +26,7 @@ namespace SE
 
 		std::unordered_map<uint32_t, std::vector<uint32_t>> m_terrainMaterials;
 		const std::vector<uint32_t>& _getTerrainMaterials(RenderContext& context, uint32_t terrainResourceId, const Terrain& terrain);
-		void _bindTexture(const Texture& texture, Shader& shader, const uint32_t slot, std::string name);
+		void _bindTexture(unsigned int texture, Shader& shader, const uint32_t slot, std::string_view name);
 		void _unbindTexture(const uint32_t slot);
 	};
 } // namespace SE

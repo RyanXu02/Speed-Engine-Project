@@ -14,9 +14,7 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		const std::string* vertexSource = resources->getString("Assets/Shaders/particle_billboard.vert");
-		const std::string* fragmentSource = resources->getString("Assets/Shaders/particle_billboard.frag");
-		GLCompStatus status = m_bbShader.init(*vertexSource, *fragmentSource);
+		const auto status = loadStartupShader(m_bbShader, *resources, { "Assets/Shaders/particle_billboard.vert", "Assets/Shaders/particle_billboard.frag", "particle" });
 		if (!status.success)
 		{
 			m_bbShader.destroy();

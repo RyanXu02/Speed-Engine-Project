@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Presentation.h"
-#include "Core/ResourceManagers/Font/Font.h"
+#include "Core/ResourceManagers/Resource.h"
 #include "Core/Scene/Entity/Component/UIRectComponent.h"
 #include "Core/Scene/Entity/Component/UIImageComponent.h"
 #include "Core/Scene/Entity/Component/UITextComponent.h"
@@ -10,8 +10,8 @@ namespace SE
 {
 	struct DrawItem
 	{
-		uint32_t meshResourceId;
-		uint32_t terrainResourceId;
+		ResourceID meshResourceId;
+		ResourceID terrainResourceId;
 		uint32_t entityId;
 		TransformState previous;
 		TransformState current;
@@ -37,12 +37,12 @@ namespace SE
 
 	struct TextDraw
 	{
-		TextDraw(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color,
+		TextDraw(ResourceID font, std::string_view text, glm::vec2 position, glm::vec4 color,
 			std::pmr::memory_resource* resource, float scale = 1.0f)
-			: font(std::move(font)), text(text, resource), position(position), color(color), scale(scale)
+			: font(font), text(text, resource), position(position), color(color), scale(scale)
 		{}
 
-		FontHandle font;
+		ResourceID font;
 		std::pmr::string text;
 		glm::vec2 position;
 		glm::vec4 color;
@@ -52,14 +52,14 @@ namespace SE
 	struct UIRectDraw
 	{
 		UIRectDraw(const UIRectComponent& rect, glm::vec2 referenceResolution, const UIImageComponent& image,
-			std::pmr::memory_resource* resource)
-			: rect(rect), referenceResolution(referenceResolution), color(image.color), texturePath(image.texturePath, resource)
+			ResourceID texture)
+			: rect(rect), referenceResolution(referenceResolution), color(image.color), texture(texture)
 		{}
 
 		UIRectComponent rect;
 		glm::vec2 referenceResolution;
 		glm::vec4 color;
-		std::pmr::string texturePath;
+		ResourceID texture;
 	};
 
 	//billboard particle
@@ -74,17 +74,16 @@ namespace SE
 	struct UITextDraw
 	{
 		UITextDraw(const UIRectComponent& rect, glm::vec2 referenceResolution, const UITextComponent& label,
-			std::pmr::memory_resource* resource)
-			: rect(rect), referenceResolution(referenceResolution), text(label.text, resource), fontPath(label.fontPath, resource),
-			fontPixelHeight(label.fontPixelHeight), fontSize(label.fontSize), color(label.color),
+			ResourceID font, std::pmr::memory_resource* resource)
+			: rect(rect), referenceResolution(referenceResolution), text(label.text, resource), font(font),
+			fontSize(label.fontSize), color(label.color),
 			horizontalAlignment(label.horizontalAlignment), verticalAlignment(label.verticalAlignment)
 		{}
 
 		UIRectComponent rect;
 		glm::vec2 referenceResolution;
 		std::pmr::string text;
-		std::pmr::string fontPath;
-		uint32_t fontPixelHeight;
+		ResourceID font;
 		float fontSize;
 		glm::vec4 color;
 		UIHorizontalAlignment horizontalAlignment;

@@ -13,9 +13,9 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		m_meshShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/mesh_wireframe.vert", .fragmentShaderPath = "Assets/Shaders/mesh_wireframe.frag", .name = "meshWireframeShader" });
-		m_terrainShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/terrain_wireframe.vert", .fragmentShaderPath = "Assets/Shaders/terrain_wireframe.frag", .name = "terrainWireframeShader" });
-		m_defaultTextureId = resources->loadTexture({ .path = "Assets/Textures/default-texture-128.png", .name = "defaultTexture" });
+		m_meshShaderId = resources->requestShader({ "Assets/Shaders/mesh_wireframe.vert", "Assets/Shaders/mesh_wireframe.frag", "meshWireframeShader" });
+		m_terrainShaderId = resources->requestShader({ "Assets/Shaders/terrain_wireframe.vert", "Assets/Shaders/terrain_wireframe.frag", "terrainWireframeShader" });
+		m_defaultTextureId = resources->requestTexture({ "Assets/Textures/default-texture-128.png", "defaultTexture" });
 	}
 
 	void WireframeRenderer::shutdown()
@@ -30,15 +30,11 @@ namespace SE
 
 		const CameraFrustum& camera = context.viewport.getCameraFrustum();
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		// Get mesh shader
-		Shader* meshShader = context.resources.getResource<Shader>(m_meshShaderId);
-		if (!meshShader)
-		{
-			m_logger.critical("Mesh wireframe shader not found, cannot render");
+		Shader* meshShader = context.gpu.shader(context.resources, m_meshShaderId, m_logger);
+		Shader* terrainShader = context.gpu.shader(context.resources, m_terrainShaderId, m_logger);
+		if (!meshShader || !terrainShader)
 			return;
-		}
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// per frame uniforms
 		meshShader->bind();
@@ -53,10 +49,9 @@ namespace SE
 				continue;
 			}
 
-			MeshResource* meshResource = context.resources.getResource<MeshResource>(meshResourceId);
+			const auto* meshResource = context.resources.getResource<MeshResource>(meshResourceId);
 			if (!meshResource)
 			{
-				m_logger.warn("Mesh resource with ID {} not found, skipping entity {}", meshResourceId, draw.entityId);
 				continue;
 			}
 
@@ -71,14 +66,6 @@ namespace SE
 		meshShader->unbind();
 
 
-		// Get terrain shader
-		Shader* terrainShader = context.resources.getResource<Shader>(m_terrainShaderId);
-		if (!terrainShader)
-		{
-			m_logger.critical("Terrain wireframe shader not found, cannot render");
-			return;
-		}
-
 		// per frame uniforms
 		terrainShader->bind();
 		terrainShader->setMat4("projectionView", camera.viewProjectionMatrix);
@@ -92,25 +79,20 @@ namespace SE
 				continue;
 			}
 
-			Terrain* terrain = context.resources.getResource<Terrain>(terrainResourceId);
+			const auto* terrain = context.resources.getResource<Terrain>(terrainResourceId);
 			if (!terrain)
-			{
-				m_logger.warn("Terrain with ID {} not found, skipping entity {}", terrainResourceId, draw.entityId);
 				continue;
-			}
 
 			terrainShader->setMat4("model", interpolateTransform(draw.previous, draw.current, context.t)); // Set transform
 
 			// Load height map texture
-			Texture* heightMapTexture = nullptr;
-			if (const uint32_t heightMapTextureId = context.resources.loadTexture({ .path = terrain->getHeightMapPath(), .name = terrain->getHeightMapPath() }))
-			{
-				heightMapTexture = context.resources.getResource<Texture>(heightMapTextureId);
-			}
+			const auto& path = terrain->getHeightMapPath();
+			const auto id = path.empty() ? 0 : context.resources.requestTexture({ path, path });
+			auto heightMapTexture = context.gpu.texture(context.resources, id);
 			if (!heightMapTexture)
-			{
-				heightMapTexture = context.resources.getResource<Texture>(m_defaultTextureId);
-			}
+				heightMapTexture = context.gpu.texture(context.resources, m_defaultTextureId);
+			if (!heightMapTexture)
+				continue;
 
 			const std::vector<SubMesh>& subMeshes = terrain->getSubMeshes();
 			for (size_t i = 0; i < subMeshes.size(); ++i)
@@ -119,7 +101,7 @@ namespace SE
 				if (heightMapTexture)
 				{
 					glActiveTexture(GL_TEXTURE0 + 1);
-					glBindTexture(GL_TEXTURE_2D, heightMapTexture->getTextureId());
+					glBindTexture(GL_TEXTURE_2D, heightMapTexture);
 					terrainShader->setInt("terrainHeightMap", 1);
 				}
 

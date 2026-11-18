@@ -1,5 +1,6 @@
 #pragma once
 #include "FBO.h"
+#include "AssetGPUCache.h"
 #include "MeshGPUCache.h"
 #include "RenderFrame.h"
 #include "Viewport.h"
@@ -39,6 +40,7 @@ namespace SE
 		Viewport& viewport;
 		ResourceManager& resources;
 		MeshGPUCache& meshes;
+		AssetGPUCache& gpu;
 		const RenderTargets& targets;
 		const DirectionalLight& sun;
 		float t = 1.0f; // for interpolation

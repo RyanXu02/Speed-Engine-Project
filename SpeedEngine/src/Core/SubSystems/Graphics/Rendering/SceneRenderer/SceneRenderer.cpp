@@ -18,7 +18,7 @@ namespace SE
 		m_logger.info("Initializing");
 
 		ResourceManager* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		m_defaultShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/default.vert", .fragmentShaderPath = "Assets/Shaders/default.frag", .name = "defaultShader" });
+		m_defaultShaderId = resources->requestShader({ "Assets/Shaders/default.vert", "Assets/Shaders/default.frag", "defaultShader" });
 		m_defaultMaterialId = resources->createMaterial({ .shaderId = m_defaultShaderId, .textures = {}, .name = "defaultMaterial" });
 	}
 	void SceneRenderer::shutdown()
@@ -45,7 +45,7 @@ namespace SE
 		m_transparentItems.clear();
 		for (const auto& draw : context.frame.draws)
 		{
-			MeshResource* meshResource = draw.meshResourceId ? context.resources.getResource<MeshResource>(draw.meshResourceId) : nullptr;
+			const auto* meshResource = context.resources.getResource<MeshResource>(draw.meshResourceId);
 			if (!meshResource) {
 				continue;
 			}
@@ -73,14 +73,11 @@ namespace SE
 			[](const TransparentItem& a, const TransparentItem& b) { return a.distanceSq > b.distanceSq; });
 
 		// Get default shader
-		Shader* defaultShader = context.resources.getResource<Shader>(m_defaultShaderId);
+		Shader* defaultShader = context.gpu.shader(context.resources, m_defaultShaderId, m_logger);
 		if (!defaultShader)
-		{
-			m_logger.critical("Default shader not found, cannot render");
 			return;
-		}
 		// Get default material
-		Material* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
+		const auto* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
 
 		// test against the opaque depth copied by the deferred pass, readonly
 		glEnable(GL_BLEND);
@@ -100,7 +97,7 @@ namespace SE
 			const PBRMaterial& pbr = item.meshResource->getMaterials()[materialIndex];
 
 			const std::vector<uint32_t>& meshMaterials = _getMeshMaterials(context, meshResourceId, *item.meshResource);
-			Material* material = context.resources.getResource<Material>(meshMaterials[materialIndex]);
+			const auto* material = context.resources.getResource<Material>(meshMaterials[materialIndex]);
 			if (!material) {
 				material = defaultMaterial;
 			}
@@ -117,13 +114,13 @@ namespace SE
 			defaultShader->setFloat("normalScale", pbr.normalScale);
 
 			if (material) {
-				material->bind();
+				context.gpu.bindMaterial(context.resources, *material, *defaultShader);
 			}
 
 			context.meshes.draw(meshResourceId, *item.meshResource, item.subMeshIndex);
 
 			if (material) {
-				material->unbind();
+				context.gpu.unbindMaterial();
 			}
 		}
 
@@ -200,7 +197,7 @@ namespace SE
 				if (path.empty()) {
 					continue;
 				}
-				if (const uint32_t textureId = context.resources.loadTexture({ .path = path, .name = path })) {
+				if (const auto textureId = context.resources.requestTexture({ path, path })) {
 					textures.push_back({ .usage = type, .textureId = textureId });
 				}
 			}
@@ -209,13 +206,13 @@ namespace SE
 			uint32_t materialId = 0;
 			if (!textures.empty() && pbr.albedoFactor.a < 1.0f)
 			{
-				std::string materialName = fmt::format("{}_{}_{}", meshResource.getResourceName(), i, pbr.name);
+				std::string materialName = fmt::format("{}_{}_{}", meshResourceId, i, pbr.name);
 				materialId = context.resources.createMaterial({ .shaderId = m_defaultShaderId, .textures = textures, .name = materialName });
 			}
 			it->second.push_back(materialId);
 		}
 
-		m_logger.info("Created {} materials for mesh resource {}", it->second.size(), meshResource.getResourceName());
+		m_logger.info("Created {} materials for mesh resource {}", it->second.size(), meshResourceId);
 		return it->second;
 	}
 

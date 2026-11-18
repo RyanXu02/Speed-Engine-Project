@@ -4,6 +4,8 @@
 #include "RenderFrame.h"
 
 #include "Core/EngineStates.h"
+#include "Core/Engine.h"
+#include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/Scene/Scene.h"
 #include "Core/SubSystems/Physics/PhysicsSystem.h"
 
@@ -50,6 +52,7 @@ namespace SE
 			    });
 
 			auto* resource = frame.uiDraws.get_allocator().resource();
+			auto& assets = *Engine::Instance().getSubSystem<ResourceManager>();
 			for (auto& member : members)
 			{
 				const auto& rect = *member.entity.getComponent<UIRectComponent>();
@@ -62,12 +65,14 @@ namespace SE
 				const bool hasBackground = image && image->color.a > 0.0f;
 				if (hasBackground)
 				{
-					frame.uiDraws.emplace_back(std::in_place_type<UIRectDraw>, rect, member.referenceResolution, *image, resource);
+					const auto texture = image->texturePath.empty() ? 0 : assets.requestTexture({ image->texturePath, image->texturePath });
+					frame.uiDraws.emplace_back(std::in_place_type<UIRectDraw>, rect, member.referenceResolution, *image, texture);
 					std::get<UIRectDraw>(frame.uiDraws.back()).color *= tint;
 				}
 				if (const auto* text = member.entity.getComponent<UITextComponent>(); text && !text->text.empty() && !text->fontPath.empty() && text->fontPixelHeight > 0 && text->fontSize > 0.0f && text->color.a > 0.0f)
 				{
-					frame.uiDraws.emplace_back(std::in_place_type<UITextDraw>, rect, member.referenceResolution, *text, resource);
+					const auto font = assets.requestFont({ text->fontPath, text->fontPixelHeight, text->fontPath });
+					frame.uiDraws.emplace_back(std::in_place_type<UITextDraw>, rect, member.referenceResolution, *text, font, resource);
 					if (!hasBackground)
 						std::get<UITextDraw>(frame.uiDraws.back()).color *= tint;
 				}
@@ -75,10 +80,10 @@ namespace SE
 		}
 	} // Helper to append all UI elements in the scene to RenderFrame
 
-	void RenderFrameBuilder::submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color)
+	void RenderFrameBuilder::submitText(ResourceID font, std::string_view text, glm::vec2 position, glm::vec4 color)
 	{
 		if (font && !text.empty())
-			m_textSubmissions.push_back({ std::move(font), std::string(text), position, color });
+			m_textSubmissions.push_back({ font, std::string(text), position, color });
 	}
 
 	void RenderFrameBuilder::captureSimulation(Scene& scene, std::chrono::steady_clock::time_point tickTime)

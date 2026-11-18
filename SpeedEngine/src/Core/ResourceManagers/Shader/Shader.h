@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Resource.h"
 
 #include <glm/mat2x2.hpp>
 #include <glm/mat3x3.hpp>
@@ -21,10 +20,10 @@ namespace SE
 	// @brief Represents a shader program
 	// @brief A shader program represents a vertex shader and a fragment shader that
 	// are compiled and linked together
-	class Shader : public Resource
+	class Shader
 	{
 	public:
-		Shader(uint32_t id, std::string resourceName);
+		Shader() = default;
 		~Shader();
 
 		Shader(const Shader&) = delete;

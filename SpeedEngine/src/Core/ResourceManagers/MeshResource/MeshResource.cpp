@@ -1,18 +1,22 @@
 #include "pch.h"
 
 #include "MeshResource.h"
+#include "Core/Logger/LoggerProxy.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/GltfMaterial.h>
 
-#include <filesystem>
 
 namespace SE
 {
-	bool MeshResource::init(std::string_view meshPath)
+	static void loadMaterials(std::vector<PBRMaterial>& m_materials, const aiScene* scene,
+		const std::string& meshPath, LoggerProxy& m_logger);
+
+	std::unique_ptr<MeshResource> loadMeshData(const std::string& meshPath, Logger& logger)
 	{
+		LoggerProxy m_logger(logger, "MeshResource");
 		Assimp::Importer importer;
 
 		// Read in mesh file with given flags
@@ -29,12 +33,14 @@ namespace SE
 
 		const aiScene* scene = importer.ReadFile(meshPath.data(), flags);
 
-		if (!scene)
+		if (!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->HasMeshes())
 		{
 			m_logger.warn("Failed to load mesh at {}. \n {}", meshPath, importer.GetErrorString());
-			return false;
+			return {};
 		}
 
+		auto data = std::make_unique<MeshResource>();
+		auto& [m_vertices, m_submeshes, m_indices, m_materials] = *data;
 		m_submeshes.resize(scene->mNumMeshes);
 
 		// Count vertices and indices to reserve space in vectors
@@ -43,7 +49,11 @@ namespace SE
 
 		for (unsigned int i = 0; i < m_submeshes.size(); i++)
 		{
-			m_submeshes[i].indexCount = scene->mMeshes[i]->mNumFaces * 3;
+			const auto& mesh = *scene->mMeshes[i];
+			m_submeshes[i].indexCount = 0;
+			for (unsigned int face = 0; face < mesh.mNumFaces; ++face)
+				if (mesh.mFaces[face].mNumIndices == 3)
+					m_submeshes[i].indexCount += 3;
 			m_submeshes[i].vertexCount = scene->mMeshes[i]->mNumVertices;
 			m_submeshes[i].indexOffset = numIndices;
 			m_submeshes[i].vertexOffset = numVertices;
@@ -53,6 +63,8 @@ namespace SE
 			numIndices += m_submeshes[i].indexCount;
 		}
 
+		if (numIndices == 0)
+			return {};
 		m_indices.reserve(numIndices);
 		m_vertices.reserve(numVertices);
 
@@ -75,20 +87,23 @@ namespace SE
 			for (unsigned int k = 0; k < mesh->mNumFaces; k++)
 			{
 				const aiFace& face = mesh->mFaces[k];
+				if (face.mNumIndices != 3)
+					continue;
 				m_indices.push_back(face.mIndices[0]);
 				m_indices.push_back(face.mIndices[1]);
 				m_indices.push_back(face.mIndices[2]);
 			}
 		}
 
-		_loadMaterials(scene, meshPath);
+		loadMaterials(m_materials, scene, meshPath, m_logger);
 
 		m_logger.info("Loaded mesh: {} vertices, {} indices, {} submeshes, {} materials", m_vertices.size(), m_indices.size(), m_submeshes.size(), m_materials.size());
 
-		return true;
+		return data;
 	}
 
-	void MeshResource::_loadMaterials(const aiScene* scene, std::string_view meshPath)
+	static void loadMaterials(std::vector<PBRMaterial>& m_materials, const aiScene* scene,
+		const std::string& meshPath, LoggerProxy& m_logger)
 	{
 		const std::string directory = std::filesystem::path(meshPath).parent_path().string();
 
@@ -145,11 +160,4 @@ namespace SE
 		}
 	}
 
-	void MeshResource::destroy()
-	{
-		m_vertices.clear();
-		m_submeshes.clear();
-		m_indices.clear();
-		m_materials.clear();
-	}
 } // namespace SE

@@ -6,7 +6,6 @@
 #include "Core/ResourceManagers/Shader/Shader.h"
 
 #include <glad/glad.h>
-#include <stb_image.h>
 
 namespace SE
 {
@@ -35,10 +34,11 @@ namespace SE
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		// the equirect is only needed while precomputing
-		stbi_set_flip_vertically_on_load(true);
-		int width = 0, height = 0, channels = 0;
-		float* pixels = stbi_loadf(m_hdrPath.c_str(), &width, &height, &channels, 3);
-		if (!pixels) {
+		auto& resources = *Engine::Instance().getSubSystem<ResourceManager>();
+		const auto id = resources.requestTexture({ m_hdrPath, "Environment" });
+		resources.waitForStartupResource(id);
+		const auto* image = resources.getResource<TextureData>(id);
+		if (!image || image->hdrPixels.empty()) {
 			m_logger.warn("Failed to load HDR environment {}, using flat ambient instead", m_hdrPath);
 			return;
 		}
@@ -46,16 +46,15 @@ namespace SE
 		unsigned int hdrTexture = 0;
 		glGenTextures(1, &hdrTexture);
 		glBindTexture(GL_TEXTURE_2D, hdrTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, pixels);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, image->width, image->height, 0, GL_RGB, GL_FLOAT, image->hdrPixels.data());
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);		// longitude wraps around
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		stbi_image_free(pixels);
 
 		_equirectangularToCubemap(hdrTexture);
-		_irradianceSH(hdrTexture, width, height);
+		_irradianceSH(hdrTexture, image->width, image->height);
 		_prefilter();
 		_integrateBRDF();
 		glDeleteTextures(1, &hdrTexture);
@@ -82,12 +81,12 @@ namespace SE
 	bool ImageBasedRenderer::_compile(Shader& shader, std::string_view path)
 	{
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		const std::string* source = resources->getString(path);
-		if (!source) {
+		const auto id = resources->requestComputeShader({ path, path });
+		if (!resources->waitForStartupResource(id)) {
 			m_logger.warn("Missing compute shader {}", path);
 			return false;
 		}
-		GLCompStatus status = shader.initCompute(*source);
+		const auto status = shader.initCompute(resources->getResource<ShaderSource>(id)->compute);
 		if (!status.success) {
 			m_logger.warn("Failed to compile {}: {}", path, status.log);
 			return false;
@@ -98,7 +97,7 @@ namespace SE
 	// equirect to a mipmapped cubemap, the mips let the prefilter read blurrier levels for sparse samples
 	void ImageBasedRenderer::_equirectangularToCubemap(unsigned int hdrTexture)
 	{
-		Shader shader(0, "equirectangularToCubemap");
+		Shader shader;
 		if (!_compile(shader, "Assets/Shaders/equirectangularToCubemap.comp")) {
 			return;
 		}
@@ -132,7 +131,7 @@ namespace SE
 	// GPU sums each 16x16 block, the CPU adds the blocks and applies the cosine lobe
 	void ImageBasedRenderer::_irradianceSH(unsigned int hdrTexture, int width, int height)
 	{
-		Shader shader(0, "irradianceSH");
+		Shader shader;
 		if (!_compile(shader, "Assets/Shaders/irradianceSH.comp")) {
 			return;
 		}
@@ -182,7 +181,7 @@ namespace SE
 			return;
 		}
 
-		Shader shader(0, "prefilter");
+		Shader shader;
 		if (!_compile(shader, "Assets/Shaders/prefilter.comp")) {
 			return;
 		}
@@ -215,7 +214,7 @@ namespace SE
 	// independent of the environment, only depends on N.V and roughness
 	void ImageBasedRenderer::_integrateBRDF()
 	{
-		Shader shader(0, "brdf");
+		Shader shader;
 		if (!_compile(shader, "Assets/Shaders/brdf.comp")) {
 			return;
 		}

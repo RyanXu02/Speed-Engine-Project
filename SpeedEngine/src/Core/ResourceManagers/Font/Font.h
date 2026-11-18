@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Core/ResourceManagers/Resource.h"
-
 #include <glm/vec2.hpp>
 
 namespace SE
 {
+	class Logger;
+
 	struct TextMetrics
 	{
 		glm::vec2 extent{ 0.0f };
@@ -28,7 +28,6 @@ namespace SE
 		float advance = 0.0f;
 	};
 
-	// Published through handles
 	struct FontData
 	{
 		static constexpr unsigned int FirstCharacter = 32;
@@ -53,18 +52,5 @@ namespace SE
 		std::vector<unsigned char> atlasPixels;
 	};
 
-	using FontHandle = std::shared_ptr<const FontData>;
-
-	class Font : public Resource
-	{
-	public:
-		Font(uint32_t id, std::string name, FontHandle data)
-			: Resource(id, std::move(name)), m_data(std::move(data))
-		{}
-
-		FontHandle getHandle() const { return m_data; }
-
-	private:
-		FontHandle m_data;
-	};
+	std::unique_ptr<FontData> loadFontData(std::string_view path, uint32_t pixelHeight, Logger& logger);
 } // namespace SE

@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Logger/LoggerProxy.h"
+#include "Core/ResourceManagers/Resource.h"
 #include "Core/ResourceManagers/MeshResource/MeshResource.h"
 #include "Core/ResourceManagers/Terrain/Terrain.h"
 
@@ -26,17 +27,16 @@ namespace SE
 		MeshGPUCache(MeshGPUCache&&) = delete;
 		MeshGPUCache& operator=(MeshGPUCache&&) = delete;
 
-		const MeshGPUData& getOrUpload(uint32_t meshId, const MeshResource& mesh);
-		const MeshGPUData& getOrUpload(uint32_t meshId, const Terrain& mesh);
-		void draw(uint32_t meshId, const MeshResource& mesh, size_t subMeshIndex);
-		void draw(uint32_t meshId, const Terrain& mesh, size_t subMeshIndex);
-		void remove(uint32_t meshId);
+		void draw(ResourceID id, const MeshResource& mesh, size_t subMeshIndex);
+		void draw(ResourceID id, const Terrain& terrain, size_t subMeshIndex);
 		void clear();
 
 	private:
+		void drawGeometry(ResourceID id, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const std::vector<SubMesh>& subMeshes, size_t subMeshIndex);
+		const MeshGPUData* getOrUpload(ResourceID id, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 		static void _destroy(MeshGPUData& data);
 
 		LoggerProxy m_logger;
-		std::unordered_map<uint32_t, MeshGPUData> m_meshes;
+		std::unordered_map<ResourceID, MeshGPUData> m_meshes;
 	};
 } // namespace SE

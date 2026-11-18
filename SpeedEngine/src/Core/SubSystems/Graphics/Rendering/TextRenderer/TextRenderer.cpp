@@ -13,14 +13,7 @@ namespace SE
 	void TextRenderer::init()
 	{
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		const auto* vertex = resources->getString("Assets/Shaders/text.vert");
-		const auto* fragment = resources->getString("Assets/Shaders/text.frag");
-		if (!vertex || !fragment)
-		{
-			m_logger.error("Text shaders are unavailable");
-			return;
-		}
-		const auto status = m_shader.init(*vertex, *fragment);
+		const auto status = loadStartupShader(m_shader, *resources, { "Assets/Shaders/text.vert", "Assets/Shaders/text.frag", "text" });
 		if (!status.success)
 		{
 			m_logger.error("Text shader compilation failed: {}", status.log);
@@ -48,10 +41,9 @@ namespace SE
 		glBindBuffer(GL_ARRAY_BUFFER, previousBuffer);
 	}
 
-	unsigned int TextRenderer::_getOrUpload(const FontHandle& font)
+	unsigned int TextRenderer::_getOrUpload(ResourceID id, const FontData& font)
 	{
-		assert(font);
-		if (auto it = m_atlases.find(font); it != m_atlases.end())
+		if (auto it = m_atlases.find(id); it != m_atlases.end())
 			return it->second;
 
 		unsigned int texture = 0;
@@ -74,8 +66,8 @@ namespace SE
 		glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 
 		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, font->atlasWidth, font->atlasHeight, 0,
-			GL_RED, GL_UNSIGNED_BYTE, font->atlasPixels.data());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, font.atlasWidth, font.atlasHeight, 0,
+			GL_RED, GL_UNSIGNED_BYTE, font.atlasPixels.data());
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -84,7 +76,7 @@ namespace SE
 		for (size_t i = 0; i < 4; ++i)
 			glPixelStorei(unpackNames[i], unpack[i]);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, unpack[4]);
-		m_atlases.emplace(font, texture);
+		m_atlases.emplace(id, texture);
 		return texture;
 	}
 
@@ -109,49 +101,41 @@ namespace SE
 		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_vertices.size()));
 	}
 
-	void TextRenderer::_drawText(const FontHandle& font, std::string_view text, glm::vec2 position, glm::vec4 color, float scale)
+	void TextRenderer::_drawText(ResourceID fontId, const FontData& font, std::string_view text, glm::vec2 position, glm::vec4 color, float scale)
 	{
-		if (!font || color.a <= 0.0f)
+		if (color.a <= 0.0f)
 			return;
 		m_vertices.clear();
-		font->layout(text, [&](const FontGlyph& glyph, const glm::vec2& topLeft)
+		font.layout(text, [&](const FontGlyph& glyph, const glm::vec2& topLeft)
 		{
 			const glm::vec2 a = position + topLeft * scale;
 			_appendQuad(a, a + glyph.size * scale, glyph.uvMin, glyph.uvMax);
 		});
 		if (m_vertices.empty())
 			return;
-		const unsigned int atlas = _getOrUpload(font);
+		const unsigned int atlas = _getOrUpload(fontId, font);
 		if (atlas)
 			_drawVertices(atlas, color, 0);
 	}
 
-	void TextRenderer::_drawRectangle(const UIRectDraw& draw, glm::vec2 outputSize, ResourceManager& resources)
+	void TextRenderer::_drawRectangle(const UIRectDraw& draw, glm::vec2 outputSize, RenderContext& context)
 	{
-		unsigned int texture = 0;
-		if (!draw.texturePath.empty())
-		{
-			const auto id = resources.loadTexture({ .path = draw.texturePath, .name = draw.texturePath });
-			const auto* resource = resources.getResource<Texture>(id);
-			if (!resource)
-				return;
-			texture = resource->getTextureId();
-		}
+		const auto texture = draw.texture ? context.gpu.texture(context.resources, draw.texture) : 0;
+		if (draw.texture && !texture)
+			return;
 		const auto canvas = resolveUICanvasLayout(outputSize, draw.referenceResolution);
 		const auto rect = resolveUIRectLayout(draw.rect, canvas);
 		m_vertices.clear();
 
 		_appendQuad(rect.pixelTopLeft, rect.pixelTopLeft + rect.pixelSize, { 0.0f, 1.0f }, { 1.0f, 0.0f });
-		_drawVertices(texture, draw.color, draw.texturePath.empty() ? 1 : 2);
+		_drawVertices(texture, draw.color, draw.texture ? 2 : 1);
 	}
 
 	void TextRenderer::_drawUIText(const UITextDraw& draw, glm::vec2 outputSize, ResourceManager& resources)
 	{
-		const auto id = resources.loadFont({ .path = draw.fontPath, .pixelHeight = draw.fontPixelHeight, .name = draw.fontPath });
-		const auto* resource = resources.getResource<Font>(id);
-		if (!resource)
+		const auto* font = resources.getResource<FontData>(draw.font);
+		if (!font)
 			return;
-		const auto font = resource->getHandle();
 		const auto canvas = resolveUICanvasLayout(outputSize, draw.referenceResolution);
 		const auto rect = resolveUIRectLayout(draw.rect, canvas);
 		const float scale = draw.fontSize / font->pixelHeight * canvas.scale;
@@ -161,7 +145,7 @@ namespace SE
 		const float vertical = draw.verticalAlignment == UIVerticalAlignment::Middle ? 0.5f
 			: draw.verticalAlignment == UIVerticalAlignment::Bottom ? 1.0f : 0.0f;
 		const glm::vec2 position = rect.pixelTopLeft + (rect.pixelSize - extent) * glm::vec2(horizontal, vertical);
-		_drawText(font, draw.text, position, draw.color, scale);
+		_drawText(draw.font, *font, draw.text, position, draw.color, scale);
 	}
 
 	void TextRenderer::render(RenderContext& context)
@@ -196,12 +180,13 @@ namespace SE
 		for (const auto& draw : context.frame.uiDraws)
 		{
 			if (const auto* rect = std::get_if<UIRectDraw>(&draw))
-				_drawRectangle(*rect, outputSize, context.resources);
+				_drawRectangle(*rect, outputSize, context);
 			else
 				_drawUIText(std::get<UITextDraw>(draw), outputSize, context.resources);
 		}
 		for (const auto& draw : context.frame.textDraws)
-			_drawText(draw.font, draw.text, draw.position, draw.color, draw.scale);
+			if (const auto* font = context.resources.getResource<FontData>(draw.font))
+				_drawText(draw.font, *font, draw.text, draw.position, draw.color, draw.scale);
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, previousBuffer);

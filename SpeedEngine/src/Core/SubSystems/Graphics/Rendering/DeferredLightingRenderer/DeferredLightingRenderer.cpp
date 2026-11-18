@@ -17,8 +17,7 @@ namespace SE
 	DeferredLightingRenderer::DeferredLightingRenderer(Logger& logger, std::string gBufferTarget, std::string shadowMapTarget)
 	    : Renderer(logger, "DeferredLightingRenderer"),
 	      m_gBufferTarget(std::move(gBufferTarget)),
-	      m_shadowMapTarget(std::move(shadowMapTarget)),
-	      m_shader(0, "DeferredLightingRenderer")
+		  m_shadowMapTarget(std::move(shadowMapTarget))
 	{}
 
 	void DeferredLightingRenderer::init()
@@ -26,9 +25,7 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		const std::string* vertexSource = resources->getString("Assets/Shaders/deferredLighting.vert");
-		const std::string* fragmentSource = resources->getString("Assets/Shaders/deferredLighting.frag");
-		GLCompStatus status = m_shader.init(*vertexSource, *fragmentSource);
+		const auto status = loadStartupShader(m_shader, *resources, { "Assets/Shaders/deferredLighting.vert", "Assets/Shaders/deferredLighting.frag", "deferredLighting" });
 		if (!status.success) {
 			m_shader.destroy();
 			throw std::runtime_error("Failed to initialize DeferredLightingRenderer shader: " + status.log);
@@ -40,7 +37,7 @@ namespace SE
 		}
 
 		// read with texelFetch, so the texture's filtering and mipmaps don't matter
-		m_blueNoiseTextureId = resources->loadTexture({ .path = "Assets/Textures/obluenoise64.png", .name = "blueNoise" });
+		m_blueNoiseTextureId = resources->requestTexture({ "Assets/Textures/obluenoise64.png", "blueNoise" });
 		if (!m_blueNoiseTextureId) {
 			m_logger.warn("Failed to load blue noise texture, PCSS falls back to gradient noise");
 		}
@@ -83,10 +80,10 @@ namespace SE
 		glActiveTexture(GL_TEXTURE0 + TextureSlots::SHADOW_MAP);
 		glBindTexture(GL_TEXTURE_2D, shadowMap.getDepthTexture());
 		
-		const Texture* blueNoise = context.resources.getResource<Texture>(m_blueNoiseTextureId);
+		const auto blueNoise = context.gpu.texture(context.resources, m_blueNoiseTextureId);
 		m_shader.setInt("blueNoise", TextureSlots::BLUE_NOISE);
 		glActiveTexture(GL_TEXTURE0 + TextureSlots::BLUE_NOISE);
-		glBindTexture(GL_TEXTURE_2D, blueNoise ? blueNoise->getTextureId() : 0);
+		glBindTexture(GL_TEXTURE_2D, blueNoise);
 		
 		if (auto* shadowRenderer = Engine::Instance().getSubSystem<RendererManager>()->getRenderer<ShadowRenderer>()) {
 			m_shader.setMat4("lightSpaceMatrix", shadowRenderer->getLightSpaceMatrix());

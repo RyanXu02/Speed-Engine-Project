@@ -9,19 +9,15 @@
 
 namespace SE
 {
+	void DebugRenderer::init()
+	{
+		auto& resources = *Engine::Instance().getSubSystem<ResourceManager>();
+		m_shaderId = resources.requestShader({ "Assets/Shaders/debug.vert", "Assets/Shaders/debug.frag", "debug" });
+	}
+
 	void DebugRenderer::_lazyInit()
 	{
 		m_logger.info("Initializing");
-
-		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		const std::string* vertexSource = resources->getString("Assets/Shaders/debug.vert");
-		const std::string* fragmentSource = resources->getString("Assets/Shaders/debug.frag");
-		GLCompStatus status = m_shader.init(*vertexSource, *fragmentSource);
-		if (!status.success)
-		{
-			m_shader.destroy();
-			throw std::runtime_error("Failed to initialize DebugRenderer shader: " + status.log);
-		}
 
 		glGenVertexArrays(1, &m_VAO);
 		glGenBuffers(1, &m_VBO);
@@ -45,6 +41,9 @@ namespace SE
 	{
 		if (context.frame.debugLines.empty() && context.frame.debugTriangles.empty())
 			return;
+		auto* shader = context.gpu.shader(context.resources, m_shaderId, m_logger);
+		if (!shader)
+			return;
 
 		if (!m_VAO)
 			_lazyInit();
@@ -57,14 +56,14 @@ namespace SE
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-		m_shader.bind();
-		m_shader.setMat4("projectionView", context.viewport.getCameraFrustum().viewProjectionMatrix);
+		shader->bind();
+		shader->setMat4("projectionView", context.viewport.getCameraFrustum().viewProjectionMatrix);
 		glBindVertexArray(m_VAO);
 		_draw(context.frame.debugTriangles, GL_TRIANGLES);
 		_draw(context.frame.debugLines, GL_LINES);
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		m_shader.unbind();
+		shader->unbind();
 
 		glDisable(GL_BLEND);
 		glEnable(GL_CULL_FACE);
@@ -92,6 +91,5 @@ namespace SE
 		glDeleteVertexArrays(1, &m_VAO);
 		m_VBO = 0;
 		m_VAO = 0;
-		m_shader.destroy();
 	}
 } // namespace SE

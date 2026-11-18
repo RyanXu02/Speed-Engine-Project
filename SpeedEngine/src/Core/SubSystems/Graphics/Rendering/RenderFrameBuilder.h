@@ -20,7 +20,7 @@ namespace SE
 		// @param text The text to render
 		// @param position The position in pixels from the top left
 		// @param color The color of the text
-		void submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color);
+		void submitText(ResourceID font, std::string_view text, glm::vec2 position, glm::vec4 color);
 
 		// @brief Captures the current state of the scene and stores it in the builder for later
 		// Call this once per simulation tick before building a RenderFrame
@@ -36,7 +36,7 @@ namespace SE
 	private:
 		struct TextSubmission
 		{
-			FontHandle font;
+			ResourceID font;
 			std::string text;
 			glm::vec2 position;
 			glm::vec4 color;

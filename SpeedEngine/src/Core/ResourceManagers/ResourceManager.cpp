@@ -1,233 +1,210 @@
 #include "pch.h"
-
 #include "ResourceManager.h"
-
 #include "Core/Logger/Logger.h"
-#include "Core/SubSystems/Events/EventSystem.h"
-#include "Engine.h"
 
 namespace SE
 {
 	void ResourceManager::init()
 	{
 		SubSystem::init();
-
-		m_shaderManager.init();
-		m_materialManager.init();
-		m_meshManager.init();
-		m_terrainManager.init();
-		m_fontManager.init();
+		m_owner = std::this_thread::get_id();
+		m_accepting = true;
+		m_worker = std::jthread([this](std::stop_token stop) { runLoader(stop); });
 	}
 
 	void ResourceManager::shutdown()
 	{
+		assert(std::this_thread::get_id() == m_owner);
+		
+		{
+			std::lock_guard lock(m_mutex);
+			m_accepting = false;
+			m_jobs.clear();
+		}
+
+		m_worker.request_stop();
+		m_worker.join();
+		m_completed.clear();
+		m_entries.clear();
+		m_assets.clear();
 		SubSystem::shutdown();
-
-		m_materialManager.shutdown();
-		m_shaderManager.shutdown();
-		m_textures.clear();
-		m_texturePaths.clear();
-		m_meshManager.shutdown();
-		m_terrainManager.shutdown();
-		m_fontManager.shutdown();
-		m_resourceTypes.clear();
-		m_stringCache.clear();
 	}
 
-	uint32_t ResourceManager::loadShader(const ShaderLoadDesc& desc)
+	ResourceID ResourceManager::request(AssetKey key, std::string_view name)
 	{
-		uint32_t id = m_shaderManager.addShader(generateId(), desc.vertexShaderPath, desc.fragmentShaderPath, desc.name);
-		if (id != 0 && m_resourceTypes.emplace(id, ResourceType::Shader).second)
-		{
-#if defined(COMPILE_WITH_EDITOR)
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Shader, true));
-#endif
-		}
-		return id;
-	}
-
-	uint32_t ResourceManager::loadMesh(const MeshLoadDesc& desc)
-	{
-		uint32_t id = m_meshManager.addMeshResource(generateId(), desc.name, desc.path);
-		if (id != 0 && m_resourceTypes.emplace(id, ResourceType::MeshResource).second)
-		{
-#if defined(COMPILE_WITH_EDITOR)
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::MeshResource, true));
-#endif
-		}
-		return id;
-	}
-
-	uint32_t ResourceManager::loadTerrain(const TerrainLoadDesc& desc)
-	{
-		uint32_t id = m_terrainManager.addTerrain(generateId(), desc.name, desc.path);
-		if (id != 0 && m_resourceTypes.emplace(id, ResourceType::Terrain).second)
-		{
-#if defined(COMPILE_WITH_EDITOR)
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Terrain, true));
-#endif
-		}
-		return id;
-	}
-
-	uint32_t ResourceManager::loadFont(const FontLoadDesc& desc)
-	{
-		uint32_t id = m_fontManager.addFont(generateId(), desc.path, desc.pixelHeight, desc.name);
-		if (id != 0 && m_resourceTypes.emplace(id, ResourceType::Font).second)
-		{
-#if defined(COMPILE_WITH_EDITOR)
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Font, true));
-#endif
-		}
-		return id;
-	}
-
-	uint32_t ResourceManager::loadTexture(const TextureLoadDesc& desc)
-	{
-		const auto path = normalizeResourcePath(desc.path);
-		if (auto it = m_texturePaths.find(path); it != m_texturePaths.end())
-		{
-			assert(m_textures.contains(it->second));
-			return it->second;
-		}
-
-		const uint32_t id = generateId();
-		auto texture = std::make_unique<Texture>(id, desc.name);
-		const auto error = texture->init(path);
-		if (!error.empty())
-		{
-			m_logger->warn("{}", error);
+		std::lock_guard lock(m_mutex);
+		if (!m_accepting)
 			return 0;
-		}
-		m_textures.emplace(id, std::move(texture));
-		m_texturePaths.emplace(path, id);
-		m_resourceTypes.emplace(id, ResourceType::Texture);
-#if defined(COMPILE_WITH_EDITOR)
-		Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Texture, true));
-#endif
+
+		if (const auto found = m_assets.find(key); found != m_assets.end())
+			return found->second;
+
+		const auto id = m_nextId++;
+		m_entries.emplace(id, Entry{ { id, key.type, ResourceState::Loading, std::string(name), key.path, {} }, {} });
+		m_assets.emplace(key, id);
+		m_jobs.push_back({ id, std::move(key) });
+		m_workAvailable.notify_one();
+
 		return id;
 	}
 
-	uint32_t ResourceManager::createMaterial(const MaterialDesc& desc)
+	ResourceID ResourceManager::requestMesh(FileLoadDesc desc)
 	{
-		uint32_t id = m_materialManager.addMaterial(generateId(), desc.shaderId, desc.textures, desc.name);
-		if (id != 0 && m_resourceTypes.emplace(id, ResourceType::Material).second)
-		{
-#if defined(COMPILE_WITH_EDITOR)
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, ResourceType::Material, true));
-#endif
-		}
+		return request({ ResourceType::MeshResource, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::requestTerrain(FileLoadDesc desc)
+	{
+		return request({ ResourceType::Terrain, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::requestTexture(FileLoadDesc desc)
+	{
+		return request({ ResourceType::Texture, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::requestFont(FontLoadDesc desc)
+	{
+		return request({ ResourceType::Font, normalizeResourcePath(desc.path), {}, desc.pixelHeight }, desc.name);
+	}
+	ResourceID ResourceManager::requestShader(ShaderLoadDesc desc)
+	{
+		if (desc.vertexShaderPath.ends_with(".frag") && desc.fragmentShaderPath.ends_with(".vert"))
+			std::swap(desc.vertexShaderPath, desc.fragmentShaderPath);
+		return request({ ResourceType::Shader, normalizeResourcePath(desc.vertexShaderPath),
+			normalizeResourcePath(desc.fragmentShaderPath) }, desc.name);
+	}
+	ResourceID ResourceManager::requestComputeShader(FileLoadDesc desc)
+	{
+		return request({ ResourceType::Shader, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::createMaterial(const MaterialDesc& desc)
+	{
+		for (const auto& binding : desc.textures)
+			if (binding.usage < TextureType::Albedo || binding.usage > TextureType::Metallic)
+				return 0;
+
+		auto material = std::make_unique<const Material>(Material{ desc.shaderId, { desc.textures.begin(), desc.textures.end() } });
+		
+		std::lock_guard lock(m_mutex);
+
+		if (!m_accepting)
+			return 0;
+
+		const auto id = m_nextId++;
+		m_entries.emplace(id, Entry{ { id, ResourceType::Material, ResourceState::Ready, std::string(desc.name), {}, {} }, std::move(material) });
+		
 		return id;
 	}
 
-
-	uint32_t ResourceManager::generateId()
+	void ResourceManager::runLoader(std::stop_token stop)
 	{
-		return m_ids.fetch_add(1, std::memory_order_relaxed);
+		while (!stop.stop_requested())
+		{
+			Job job;
+			{
+				std::unique_lock lock(m_mutex);
+				m_workAvailable.wait(lock, stop, [this] { return !m_jobs.empty(); });
+				if (stop.stop_requested())
+					return;
+				job = std::move(m_jobs.front());
+				m_jobs.pop_front();
+			}
+
+			Completion result{ job.id, {}, {} };
+			const auto& key = job.key;
+			try
+			{
+				if (!key.path.empty())
+				{
+					switch (key.type)
+					{
+					case ResourceType::MeshResource: result.data = loadMeshData(key.path, *m_logger); break;
+					case ResourceType::Terrain: result.data = loadTerrainData(key.path, *m_logger); break;
+					case ResourceType::Texture: result.data = loadTextureData(key.path); break;
+					case ResourceType::Font: result.data = loadFontData(key.path, key.pixelHeight, *m_logger); break;
+					case ResourceType::Shader: result.data = loadShaderSource(key.path, key.fragmentPath); break;
+					case ResourceType::Material: break;
+					}
+				}
+
+				if (!std::visit([](const auto& data) {
+					if constexpr (requires { data.get(); }) return static_cast<bool>(data);
+					else return false;
+				}, result.data))
+					result.error = key.path.empty() ? "Empty or invalid asset path" : fmt::format("Could not prepare '{}'", key.path);
+			}
+			catch (const std::exception& error)
+			{
+				result.error = fmt::format("Could not prepare '{}': {}", key.path, error.what());
+			}
+
+			{
+				std::lock_guard lock(m_mutex);
+				m_completed.push_back(std::move(result));
+			}
+			m_resultAvailable.notify_one();
+		}
 	}
 
-	const std::string* ResourceManager::getString(std::string_view filePath)
+	void ResourceManager::processCompletedLoads()
 	{
-		const auto path = normalizeResourcePath(filePath);
+		assert(std::this_thread::get_id() == m_owner);
 
-		// find in cache
-		auto it = m_stringCache.find(path);
-		if (it != m_stringCache.end())
+		std::deque<Completion> completed;
 		{
-			return &it->second;
+			std::lock_guard lock(m_mutex);
+			completed.swap(m_completed);
+			for (auto& result : completed)
+			{
+				auto& entry = m_entries.at(result.id);
+				if (result.error.empty())
+				{
+					entry.data = std::move(result.data);
+					entry.info.state = ResourceState::Ready;
+				}
+				else
+				{
+					entry.info.error = result.error;
+					entry.info.state = ResourceState::Failed;
+				}
+			}
 		}
-		// open file
-		std::ifstream file(path, std::ios::in | std::ios::binary);
-		if (!file.is_open())
-		{
-			m_logger->warn("Failed to open file: {}", path);
-			return nullptr;
-		}
-		std::error_code e;
-		const auto size = std::filesystem::file_size(path, e);
-		if (e)
-		{
-			m_logger->warn("Failed to get file size: {}. Error: {}", path, e.message());
-			return nullptr;
-		}
-		std::string contents(size, '\0');
-		if (size > 0 && !file.read(contents.data(), size))
-		{
-			m_logger->warn("Failed to read file: {}", path);
-			return nullptr;
-		}
-		file.close();
 
-		auto [it2, _] = m_stringCache.emplace(path, std::move(contents));
-		return &it2->second;
+		for (const auto& result : completed)
+			if (!result.error.empty())
+				m_logger->warn("Resource {} failed: {}", result.id, result.error);
 	}
 
-	void ResourceManager::forgetShaderSources(const std::pair<std::string, std::string>& paths)
+	bool ResourceManager::waitForStartupResource(ResourceID id)
 	{
-		m_stringCache.erase(paths.first);
-		m_stringCache.erase(paths.second);
+		assert(std::this_thread::get_id() == m_owner);
+		while (true)
+		{
+			const auto state = getResourceState(id);
+			if (state != ResourceState::Loading)
+				return state == ResourceState::Ready;
+
+			{
+				std::unique_lock lock(m_mutex);
+				m_resultAvailable.wait(lock, [this] { return !m_completed.empty(); });
+			}
+
+			processCompletedLoads();
+		}
 	}
 
-	Resource* ResourceManager::getResource(uint32_t id)
+	std::optional<ResourceState> ResourceManager::getResourceState(ResourceID id) const
 	{
-		auto it = m_resourceTypes.find(id);
-		if (it != m_resourceTypes.end())
-		{
-			if (it->second == ResourceType::Shader)
-			{
-				return m_shaderManager.getShader(id);
-			}
-			else if (it->second == ResourceType::Material)
-			{
-				return m_materialManager.getMaterial(id);
-			}
-			else if (it->second == ResourceType::MeshResource)
-			{
-				return m_meshManager.getMeshResource(id);
-			}
-			else if (it->second == ResourceType::Terrain)
-			{
-				return m_terrainManager.getTerrain(id);
-			}
-			else if (it->second == ResourceType::Font)
-			{
-				return m_fontManager.getFont(id);
-			}
-			else if (it->second == ResourceType::Texture)
-			{
-				auto texture = m_textures.find(id);
-				return texture == m_textures.end() ? nullptr : texture->second.get();
-			}
-			//.......
-		}
-		return nullptr;
+		std::lock_guard lock(m_mutex);
+		const auto entry = m_entries.find(id);
+		return entry == m_entries.end() ? std::nullopt : std::optional(entry->second.info.state);
 	}
 
-	bool ResourceManager::removeResource(uint32_t id)
+	std::vector<ResourceInfo> ResourceManager::inspectResources() const
 	{
-		auto it = m_resourceTypes.find(id);
-		if (it == m_resourceTypes.end())
-			return false;
-
-		const auto type = it->second;
-		bool removed = false;
-		switch (type)
-		{
-		case ResourceType::Shader: removed = m_shaderManager.removeShader(id); break;
-		case ResourceType::Material: removed = m_materialManager.removeMaterial(id); break;
-		case ResourceType::MeshResource: removed = m_meshManager.removeMeshResource(id); break;
-		case ResourceType::Terrain: removed = m_terrainManager.removeTerrain(id); break;
-		case ResourceType::Font: removed = m_fontManager.removeFont(id); break;
-		case ResourceType::Texture: return false; // Cached textures cannot be removed individually, they live until shutdown
-		}
-
-		if (removed)
-		{
-			m_resourceTypes.erase(it);
-#if defined(COMPILE_WITH_EDITOR)
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, type, false));
-#endif
-		}
-		return removed;
+		std::lock_guard lock(m_mutex);
+		std::vector<ResourceInfo> result;
+		result.reserve(m_entries.size());
+		for (const auto& [id, entry] : m_entries)
+			result.push_back(entry.info);
+		return result;
 	}
-} // namespace SE
+}

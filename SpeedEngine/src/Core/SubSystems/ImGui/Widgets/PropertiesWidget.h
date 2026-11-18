@@ -30,11 +30,9 @@ namespace SE
 		ComponentInspectorRegistry m_inspectors;
 
 		std::string m_meshPathDraft;
-		std::string m_meshPathError;
 		bool m_meshDraftInitialized{ false };
 
 		std::string m_terrainPathDraft;
-		std::string m_terrainPathError;
 		bool m_terrainDraftInitialized{ false };
 
 		std::string m_physicsShapeMeshPathDraft;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/SubSystems/SubSystem.h"
+#include "Core/ResourceManagers/Resource.h"
 
 #include "PhysicsDebugRenderer.h"
 #include "PhysicsContactListener.h"
@@ -92,6 +93,9 @@ public:
 namespace SE
 {
 	struct RenderFrame;
+	class Entity;
+	class RigidBody;
+	struct Transform;
 
 	class PhysicsSystem : public SubSystem
 	{
@@ -105,6 +109,12 @@ namespace SE
 		void createAndAddComponents();
 
 		// @brief steps physics world one tick
+		// @brief Order of operations:
+		// @brief 1. Resolve collision shapes
+		// @brief 2. Create newly available bodies
+		// @brief 3. Update body transforms
+		// @brief 4. Advance Jolt
+		// @brief 5. Write transforms back to ECS
 		// @param deltaTime fixed time step
 		void step(double deltaTime);
 
@@ -121,6 +131,14 @@ namespace SE
 		JPH::BodyInterface* getBodyInterface() { return &m_physics_system->GetBodyInterface(); }
 
 	private:
+		// @brief Retrieves a shape given a mesh resource ID. Caches the shape for future use.
+		JPH::Ref<JPH::Shape> assetShape(ResourceID id, bool terrain);
+		// @brief Syncs the shape of a RigidBody with the corresponding entity's Transform and PhysicsShape component. Creates a new shape if necessary.
+		// @brief This means two entities can share the same geometry
+		bool syncBodyShape(Entity& entity, RigidBody& body, const Transform& transform);
+
+		std::unordered_map<ResourceID, JPH::Ref<JPH::Shape>> m_assetShapes; // only the base shape, syncBodyShape is responsible for scaling it each rigidbody
+
 		PhysicsSystem()
 		    : SubSystem("PhysicsSystem") {};
 

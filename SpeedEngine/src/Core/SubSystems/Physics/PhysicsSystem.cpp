@@ -2,6 +2,7 @@
 #include "PhysicsSystem.h"
 
 #include "Engine.h"
+#include "Core/ResourceManagers/ResourceManager.h"
 #include "Core/Scene/Scene.h"
 #include "Core/SubSystems/Scenes/SceneSystem.h"
 #include "Core/Scene/Entity/Component/ComponentStructs.h"
@@ -16,6 +17,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <Jolt/Physics/Body/BodyManager.h>
+#include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Renderer/DebugRenderer.h>
 
 using namespace JPH;
@@ -40,6 +43,94 @@ namespace SE
 		// BodyInterface& body_interface = m_physics_system->GetBodyInterface();
 	}
 
+	JPH::Ref<JPH::Shape> PhysicsSystem::assetShape(ResourceID id, bool terrain)
+	{
+		if (!id)
+			return nullptr;
+
+		if (const auto cached = m_assetShapes.find(id); cached != m_assetShapes.end())
+			return cached->second;
+
+		const auto& assets = *Engine::Instance().getSubSystem<ResourceManager>();
+		JPH::Shape::ShapeResult result;
+		if (terrain)
+		{
+			const auto* data = assets.getResource<Terrain>(id);
+			if (!data)
+				return nullptr;
+
+			if (data->heightSamples.empty())
+				return m_assetShapes.emplace(id, nullptr).first->second;
+
+			const float cell = 2.0f / data->heightSampleCount;
+			JPH::HeightFieldShapeSettings settings(data->heightSamples.data(), { -1.0f, 0.0f, -1.0f },
+				{ cell, data->getHeightScale(), cell }, data->heightSampleCount);
+			result = settings.Create();
+		}
+		else
+		{
+			const auto* data = assets.getResource<MeshResource>(id);
+			if (!data)
+				return nullptr;
+
+			const auto& vertices = data->getVertices();
+			const auto& indices = data->getIndices();
+			JPH::TriangleList triangles;
+			triangles.reserve(indices.size() / 3);
+			for (const auto& sub : data->getSubMeshes())
+				for (uint32_t i = sub.indexOffset; i < sub.indexOffset + sub.indexCount; i += 3)
+					triangles.emplace_back(toJPH(vertices[sub.vertexOffset + indices[i]].position),
+						toJPH(vertices[sub.vertexOffset + indices[i + 1]].position),
+						toJPH(vertices[sub.vertexOffset + indices[i + 2]].position));
+			JPH::MeshShapeSettings settings(triangles);
+			result = settings.Create();
+		}
+
+		if (result.HasError())
+			m_logger->warn("Collision shape for resource {} failed: {}", id, result.GetError().c_str());
+
+		return m_assetShapes.emplace(id, result.IsValid() ? result.Get() : JPH::Ref<JPH::Shape>{}).first->second;
+	}
+
+	bool PhysicsSystem::syncBodyShape(Entity& entity, RigidBody& body, const Transform& transform)
+	{
+		PhysicsShape* primitive = entity.getComponent<PhysicsShapeBox>();
+		if (!primitive) primitive = entity.getComponent<PhysicsShapeCapsule>();
+		if (!primitive) primitive = entity.getComponent<PhysicsShapeSphere>();
+		if (primitive)
+		{
+			primitive->setScale(transform.scale);
+			body.setShape(primitive->getShape(), false);
+			return body.getShape() != nullptr;
+		}
+
+		JPH::Ref<JPH::Shape> base;
+		if (const auto* mesh = entity.getComponent<PhysicsShapeMesh>())
+			base = assetShape(mesh->getMeshResourceID(), false);
+		else if (const auto* terrain = entity.getComponent<PhysicsShapeTerrain>())
+			base = assetShape(terrain->getTerrainID(), true);
+
+		if (!base)
+		{
+			body.setShape(nullptr, false);
+			return false;
+		}
+
+		const auto existing = body.getShape();
+		const auto scale = toJPH(transform.scale);
+		if (existing && existing->GetSubType() == JPH::EShapeSubType::Scaled)
+		{
+			const auto* scaled = static_cast<const JPH::ScaledShape*>(existing.GetPtr());
+			if (scaled->GetInnerShape() == base.GetPtr() && scaled->GetScale() == scale)
+				return true;
+		}
+
+		JPH::ScaledShapeSettings settings(base.GetPtr(), scale);
+		const auto result = settings.Create();
+		body.setShape(result.IsValid() ? result.Get() : JPH::Ref<JPH::Shape>{}, true);
+		return result.IsValid();
+	}
+
 	void PhysicsSystem::createAndAddComponents() {
 		// Initialize all uninitialized RigidBody components at once and add them to the physics world
 		// Update initial rigidbody transforms to match entities
@@ -52,31 +143,19 @@ namespace SE
 		{
 			RigidBody* rigidBody = entity.getComponent<RigidBody>();
 			Transform* transform = entity.getComponent<Transform>();
-			bool needsMassOverride = false;
-			PhysicsShape* shape = nullptr;
-			shape = entity.getComponent<PhysicsShapeBox>();
-			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
-			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
-
-			if (!shape)
+			if (!rigidBody->isCreated() && syncBodyShape(entity, *rigidBody, *transform))
 			{
-				shape = entity.getComponent<PhysicsShapeMesh>();
-				if (!shape) shape = entity.getComponent<PhysicsShapeTerrain>();
-				if (shape) needsMassOverride = true;
-			}
-
-			// Only add if not already created/added and if it has a collider shape component
-			if (!rigidBody->isCreated() && shape)
-			{
-				shape->setScale(transform->scale);
-				rigidBody->setShape(shape->getShape(), needsMassOverride);
 				rigidBody->createBody();
+				if (!rigidBody->isCreated())
+					continue;
 				rigidBody->setPosition(transform->translate + (rigidBody->getOffset() * glm::conjugate(transform->rotate)));
 				rigidBody->setRotation(transform->rotate);
 				ioBodies.push_back(rigidBody->getBodyID());
 			}
 		}
 		// Batch add all bodies for better performance
+		if (ioBodies.empty())
+			return;
 		BodyInterface::AddState addState = getBodyInterface()->AddBodiesPrepare(ioBodies.data(), static_cast<int>(ioBodies.size()));
 		getBodyInterface()->AddBodiesFinalize(ioBodies.data(), static_cast<int>(ioBodies.size()), addState, EActivation::Activate);
 		m_physics_system->OptimizeBroadPhase();
@@ -85,11 +164,7 @@ namespace SE
 	void PhysicsSystem::step(double deltaTime) {
 		const int cCollisionSteps = 1; // If stepping physics less that 60hz, do more collision steps per simulation step
 
-		// Step physics simulation
-		if (m_running)
-			m_physics_system->Update(static_cast<float>(deltaTime), cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
-
-		// Update entity transforms
+		// Install newly published shapes before the world steps
 		Scene* scene = Engine::Instance().getSubSystem<SceneSystem>()->getCurrentScene();
 		if (!scene)
 			return;
@@ -98,24 +173,8 @@ namespace SE
 		{
 			RigidBody* rigidBody = entity.getComponent<RigidBody>();
 			Transform* transform = entity.getComponent<Transform>();
-			bool needsMassOverride = false;
-			PhysicsShape* shape = nullptr;
-			// Check for each type of physics shape component
-			shape = entity.getComponent<PhysicsShapeBox>();
-			if (!shape) shape = entity.getComponent<PhysicsShapeCapsule>();
-			if (!shape) shape = entity.getComponent<PhysicsShapeSphere>();
-			if (!shape)
-			{
-				shape = entity.getComponent<PhysicsShapeMesh>();
-				if (!shape) shape = entity.getComponent<PhysicsShapeTerrain>();
-				if (shape) needsMassOverride = true;
-			}
-
-			if (shape)
-			{
-				shape->setScale(transform->scale);
-				rigidBody->setShape(shape->getShape(), needsMassOverride);
-			}
+			if (!syncBodyShape(entity, *rigidBody, *transform))
+				continue;
 
 			if (!rigidBody->isCreated())
 			{
@@ -123,6 +182,9 @@ namespace SE
 				// Note: this is inefficient if many new entities are being created at once,
 				// In that case use createAndAddComponents to do it in a batch
 				rigidBody->createBody();
+				if (!rigidBody->isCreated())
+					continue;
+
 				rigidBody->setPosition(transform->translate + (rigidBody->getOffset() * glm::conjugate(transform->rotate)));
 				rigidBody->setRotation(transform->rotate);
 				getBodyInterface()->AddBody(rigidBody->getBodyID(), rigidBody->isActive() ? EActivation::Activate : EActivation::DontActivate);
@@ -133,11 +195,21 @@ namespace SE
 				rigidBody->setPosition(transform->translate + (rigidBody->getOffset() * glm::conjugate(transform->rotate)));
 				rigidBody->setRotation(transform->rotate);
 			}
-			else
-			{
-				transform->translate = rigidBody->getPosition() + (-rigidBody->getOffset() * glm::conjugate(rigidBody->getRotation()));
-				transform->rotate = rigidBody->getRotation();
-			}
+		}
+
+		if (!m_running)
+			return;
+
+		m_physics_system->Update(static_cast<float>(deltaTime), cCollisionSteps, m_temp_allocator.get(), m_job_system.get());
+		
+		for (auto& entity : entities)
+		{
+			const auto* body = entity.getComponent<RigidBody>();
+			if (!body->isCreated() || body->getMotionType() == EMotionType::Static)
+				continue;
+			auto* transform = entity.getComponent<Transform>();
+			transform->rotate = body->getRotation();
+			transform->translate = body->getPosition() - body->getOffset() * glm::conjugate(transform->rotate);
 		}
 	}
 
@@ -145,6 +217,7 @@ namespace SE
 		SubSystem::shutdown();
 		// Shut down physics system
 		m_physics_system.reset();
+		m_assetShapes.clear();
 		m_physicsDebugRenderer.reset();
 		m_job_system.reset();
 		m_temp_allocator.reset();

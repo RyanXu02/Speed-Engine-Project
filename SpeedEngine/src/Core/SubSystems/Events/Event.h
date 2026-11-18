@@ -1,13 +1,11 @@
 #pragma once
 
-#include "../../ResourceManagers/Resource.h"
 #include "core/features/Serializable.h"
 #include "Core/Features/MathToJSONBindings.h"
 #include <glm/glm.hpp>
 #include <Jolt/Physics/Body/BodyID.h>
 
 
-// When adding editor-only events, add them at the bottom of this file inside the COMPILE_WITH_EDITOR block
 namespace SE
 {
 	struct CameraFrustum;
@@ -34,9 +32,6 @@ namespace SE
 		CollisionPersistedEvent,
 		CollisionRemovedEvent,
 		ButtonActivated,
-#if defined(COMPILE_WITH_EDITOR)
-		ResourceChanged, // A resource in the resource manager has been added or removed
-#endif
 	};
 
 	// @brief Base class for all events that can be sent through the EventSystem
@@ -242,29 +237,4 @@ namespace SE
 			member("bodyID2", &CollisionRemovedEvent::bodyID2));
 	};
 
-#if defined(COMPILE_WITH_EDITOR)
-	// @brief Event that is triggered when a resource in the resource manager is
-	// changed
-	class ResourceChanged : public Event
-	{
-	public:
-		uint32_t id;
-		ResourceType type;
-		bool adding;
-
-		ResourceChanged(uint32_t p_id, ResourceType p_type, bool p_adding)
-		    : id(p_id),
-		      type(p_type),
-		      adding(p_adding)
-		{}
-
-		EventType getEventType() const override { return EventType::ResourceChanged; }
-		std::string getName() const override { return "ResourceChanged"; }
-		std::string getDataAsString() const override
-		{
-			// return std::format("id {}, type {}, adding = {}",id, type, adding);
-			return "";
-		}
-	};
-#endif
 } // namespace SE

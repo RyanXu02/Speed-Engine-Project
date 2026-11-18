@@ -28,6 +28,8 @@ namespace SE
 		{
 			if (!m_unscaledShape)
 				createUnscaledShape();
+			if (!m_unscaledShape)
+				return;
 
 			JPH::ScaledShapeSettings shapeSettings(m_unscaledShape, toJPH(m_scale));
 			JPH::Shape::ShapeResult result; // can be used for error checking

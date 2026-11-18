@@ -103,7 +103,7 @@ namespace SE
 
 	void RigidBody::setShape(JPH::Ref<JPH::Shape> shape, bool needsMassOverride)
 	{
-		if (shape == m_shape)
+		if (shape == m_shape && needsMassOverride == m_needsMassOverride)
 			return;
 
 		m_shape = shape;
@@ -111,7 +111,7 @@ namespace SE
 		m_needsMassOverride = needsMassOverride;
 		if (m_body)
 		{
-			if (massOverrideChanged)
+			if (!shape || massOverrideChanged)
 			{
 				m_bodyInterface->RemoveBody(getBodyID());
 				m_bodyInterface->DestroyBody(getBodyID());

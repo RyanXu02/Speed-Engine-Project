@@ -2,25 +2,51 @@
 
 #include "Terrain.h"
 #include "Core/Features/Serializable.h"
+#include "Core/Logger/LoggerProxy.h"
 
+#include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/GltfMaterial.h>
 
 #include <filesystem>
+#include <stb_image.h>
 
 using nlohmann::json;
 
 namespace SE
 {
-	bool Terrain::init(std::string_view terrainPath)
+	static void loadMaterial(PBRMaterial& pbr, const std::string& materialPath,
+		Assimp::Importer& importer, LoggerProxy& m_logger);
+
+	std::unique_ptr<Terrain> loadTerrainData(const std::string& terrainPath, Logger& logger)
 	{
+		LoggerProxy m_logger(logger, "Terrain");
 		// Deserialize terrain path
 		json jsonTemp;
-		_loadTerrainJson(terrainPath.data(), jsonTemp);
-		TerrainMaterial terrainMat = jsonTemp.get<TerrainMaterial>();
+		if (!Serializable::loadJson(std::string(terrainPath), m_logger, jsonTemp))
+			return {};
+
+		TerrainMaterial terrainMat;
+		try
+		{
+			terrainMat = jsonTemp.get<TerrainMaterial>();
+		}
+		catch (const json::exception& error)
+		{
+			m_logger.warn("Invalid terrain {}: {}", terrainPath, error.what());
+			return {};
+		}
+
+		if (terrainMat.resolution < 2)
+			return {};
 
 		// Build terrain mesh
+		auto data = std::make_unique<Terrain>();
+		auto& m_vertices = data->m_vertices;
+		auto& m_indices = data->m_indices;
+		auto& m_submeshes = data->m_submeshes;
+		auto& m_materials = data->m_materials;
 		unsigned int numVertices = terrainMat.resolution * terrainMat.resolution;
 		m_indices.reserve((terrainMat.resolution - 1) * (terrainMat.resolution - 1) * 6);
 		m_vertices.reserve(numVertices);
@@ -65,27 +91,41 @@ namespace SE
 		// Import materials
 		Assimp::Importer importer;
 		m_materials.resize(3);
-		_loadMaterial(TerrainMaterialType::HIGH, terrainMat.materialHighPath, importer);
-		_loadMaterial(TerrainMaterialType::MIDDLE, terrainMat.materialMiddlePath, importer);
-		_loadMaterial(TerrainMaterialType::LOW, terrainMat.materialLowPath, importer);
+		loadMaterial(m_materials[0], terrainMat.materialHighPath, importer, m_logger);
+		loadMaterial(m_materials[1], terrainMat.materialMiddlePath, importer, m_logger);
+		loadMaterial(m_materials[2], terrainMat.materialLowPath, importer, m_logger);
 
-		m_splatMapPath = terrainMat.splatMapPath;
-		m_heightMapPath = terrainMat.heightMapPath;
-		m_heightScale = terrainMat.heightScale;
+		data->m_splatMapPath = terrainMat.splatMapPath;
+		data->m_heightMapPath = terrainMat.heightMapPath;
+		data->m_heightScale = terrainMat.heightScale;
+		
+		stbi_set_flip_vertically_on_load_thread(true);
+
+		int width = 0, height = 0, channels = 0;
+		const std::unique_ptr<uint16_t, decltype(&stbi_image_free)> samples(stbi_load_16(data->m_heightMapPath.c_str(), &width, &height, &channels, 1), stbi_image_free);
+		if (samples && width == height && width > 1)
+		{
+			data->heightSampleCount = static_cast<uint32_t>(height);
+			data->heightSamples.resize(static_cast<size_t>(width) * height);
+			std::transform(samples.get(), samples.get() + data->heightSamples.size(), data->heightSamples.begin(),
+				[](uint16_t sample) { return sample / 65535.0f; });
+		}
+		else
+			m_logger.warn("Terrain {} has no usable square collision heightmap", terrainPath);
 
 		m_logger.info("Loaded terrain: {} vertices, {} indices", m_vertices.size(), m_indices.size());
 
-		return true;
+		return data;
 	}
 
-	void Terrain::_loadMaterial(TerrainMaterialType materialType, std::string_view materialPath, Assimp::Importer& importer)
+	static void loadMaterial(PBRMaterial& pbr, const std::string& materialPath, Assimp::Importer& importer, LoggerProxy& m_logger)
 	{
 		// Use assimp to import pbr material
 		const aiScene* scene = importer.ReadFile(materialPath.data(), 0);
 
-		if (!scene)
+		if (!scene || !scene->HasMaterials())
 		{
-			m_logger.warn("Failed to load terrain material {} at {}. \n {}", static_cast<int>(materialType), materialPath, importer.GetErrorString());
+			m_logger.warn("Failed to load terrain material at {}: {}", materialPath, importer.GetErrorString());
 			return;
 		}
 
@@ -111,7 +151,6 @@ namespace SE
 		};
 
 		const aiMaterial* mat = scene->mMaterials[0];
-		PBRMaterial& pbr = m_materials[materialType];
 
 		pbr.name = mat->GetName().C_Str();
 		pbr.albedoPath = getTexturePath(mat, { aiTextureType_BASE_COLOR, aiTextureType_DIFFUSE });
@@ -136,35 +175,6 @@ namespace SE
 		mat->Get(AI_MATKEY_GLTF_TEXTURE_STRENGTH(aiTextureType_LIGHTMAP, 0), pbr.aoStrength);
 		mat->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), pbr.normalScale);
 
-		m_logger.debug("Material {} '{}': albedo='{}' normal='{}' ao='{}' emissive='{}' metallicRoughness='{}'", static_cast<int>(materialType), pbr.name, pbr.albedoPath, pbr.normalPath, pbr.aoPath, pbr.emissivePath, pbr.roughnessPath);
 	}
 
-	void Terrain::destroy()
-	{
-		m_vertices.clear();
-		m_submeshes.clear();
-		m_indices.clear();
-		m_materials.clear();
-	}
-
-	bool Terrain::_loadTerrainJson(const std::string& path, nlohmann::json& json)
-	{
-		std::ifstream file(path);
-		if (!file.is_open())
-		{
-			m_logger.warn("Fail to open json: {}", path);
-			return false;
-		}
-
-		// noexcept, returns a discarded json object on error
-		json = nlohmann::json::parse(file, nullptr, false);
-
-		if (json.is_discarded())
-		{
-			m_logger.warn("Fail to parse json: {}", path);
-			return false;
-		}
-
-		return true;
-	}
 } // namespace SE

@@ -34,9 +34,9 @@ namespace SE
 		// @param text The text to render
 		// @param position The position in pixels from the top left
 		// @param color The color of the text
-		void submitText(FontHandle font, std::string_view text, glm::vec2 position, glm::vec4 color = glm::vec4(1.0f))
+		void submitText(ResourceID font, std::string_view text, glm::vec2 position, glm::vec4 color = glm::vec4(1.0f))
 		{
-			m_frameBuilder.submitText(std::move(font), text, position, color);
+			m_frameBuilder.submitText(font, text, position, color);
 		}
 
 		// @brief Get the requested SubSystem, use this for all subsystems in the
@@ -93,7 +93,6 @@ namespace SE
 		EventSubscription m_windowCloseEvent;
 		EventSubscription m_cameraSwitchEvent;
 
-		FontHandle QSfont; // temporary
 		EventSubscription m_buttonSubscription;
 	};
 } // namespace SE

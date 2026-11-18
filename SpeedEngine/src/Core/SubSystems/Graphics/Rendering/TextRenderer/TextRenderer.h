@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/ResourceManagers/Font/Font.h"
+#include "Core/ResourceManagers/Resource.h"
 #include "Core/ResourceManagers/Shader/Shader.h"
 #include "Core/SubSystems/Graphics/Rendering/Renderer.h"
 
@@ -14,7 +15,7 @@ namespace SE
 	{
 	public:
 		explicit TextRenderer(Logger& logger)
-			: Renderer(logger, "TextRenderer"), m_shader(0, "TextRenderer")
+			: Renderer(logger, "TextRenderer")
 		{}
 		~TextRenderer() override { shutdown(); }
 
@@ -32,20 +33,20 @@ namespace SE
 		// @brief Uploads the font atlas to the GPU if it hasn't been uploaded yet, and returns the OpenGL texture ID
 		// @param font The font handle
 		// @return The OpenGL texture ID of the font atlas
-		unsigned int _getOrUpload(const FontHandle& font);
+		unsigned int _getOrUpload(ResourceID id, const FontData& font);
 
 		void _appendQuad(glm::vec2 a, glm::vec2 b, glm::vec2 uvMin, glm::vec2 uvMax);
 
 		void _drawVertices(unsigned int texture, const glm::vec4& color, int mode);
-		void _drawText(const FontHandle& font, std::string_view text, glm::vec2 position, glm::vec4 color, float scale);
-		void _drawRectangle(const UIRectDraw& draw, glm::vec2 outputSize, ResourceManager& resources);
+		void _drawText(ResourceID fontId, const FontData& font, std::string_view text, glm::vec2 position, glm::vec4 color, float scale);
+		void _drawRectangle(const UIRectDraw& draw, glm::vec2 outputSize, RenderContext& context);
 		void _drawUIText(const UITextDraw& draw, glm::vec2 outputSize, ResourceManager& resources);
 
 		Shader m_shader;
 		unsigned int m_VAO = 0;
 		unsigned int m_VBO = 0;
 
-		std::unordered_map<FontHandle, unsigned int> m_atlases;
+		std::unordered_map<ResourceID, unsigned int> m_atlases;
 		std::vector<Vertex> m_vertices;
 	};
 } // namespace SE

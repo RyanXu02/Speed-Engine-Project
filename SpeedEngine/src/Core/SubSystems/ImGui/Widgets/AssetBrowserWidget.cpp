@@ -3,6 +3,8 @@
 #if defined(COMPILE_WITH_EDITOR)
 #include "AssetBrowserWidget.h"
 #include "AssetPathPayload.h"
+#include "Core/Engine.h"
+#include "Core/ResourceManagers/ResourceManager.h"
 
 #include <shellapi.h>
 #pragma comment(lib, "Shell32.lib")
@@ -40,6 +42,23 @@ namespace SE
 		ImGui::EndDisabled();
 		ImGui::SameLine();
 		ImGui::TextUnformatted(m_directory.generic_string().c_str());
+		if (ImGui::CollapsingHeader("Requested resources"))
+		{
+			auto entries = Engine::Instance().getSubSystem<ResourceManager>()->inspectResources();
+			std::ranges::sort(entries, {}, &ResourceInfo::id);
+			if (ImGui::BeginChild("Resource states", ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 6)))
+			{
+				static constexpr const char* types[] = { "Material", "Shader", "Mesh", "Font", "Texture", "Terrain" };
+				for (const auto& entry : entries)
+				{
+					const auto& label = entry.name.empty() ? entry.path : entry.name;
+					ImGui::Text("%u  %s  %s  %s", entry.id, types[static_cast<size_t>(entry.type)], resourceStateName(entry.state), label.c_str());
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("%s%s%s", entry.path.c_str(), entry.error.empty() ? "" : "\n", entry.error.c_str());
+				}
+			}
+			ImGui::EndChild();
+		}
 
 		std::filesystem::path nextDirectory;
 		ImGui::PushID(m_directory.generic_string().c_str());

@@ -13,9 +13,9 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		m_defaultShaderId = resources->loadShader({ .vertexShaderPath = "Assets/Shaders/terrain_gpass.vert", .fragmentShaderPath = "Assets/Shaders/terrain_gpass.frag", .name = "gBufferShader" });
+		m_defaultShaderId = resources->requestShader({ "Assets/Shaders/terrain_gpass.vert", "Assets/Shaders/terrain_gpass.frag", "terrainGBufferShader" });
 		m_defaultMaterialId = resources->createMaterial({ .shaderId = m_defaultShaderId, .textures = {}, .name = "defaultGBufferMaterial" });
-		m_defaultTextureId = resources->loadTexture({ .path = "Assets/Textures/default-texture-128.png", .name = "defaultTexture" });
+		m_defaultTextureId = resources->requestTexture({ "Assets/Textures/default-texture-128.png", "defaultTexture" });
 	}
 
 	void TerrainRenderer::shutdown()
@@ -31,14 +31,11 @@ namespace SE
 		const CameraFrustum& camera = context.viewport.getCameraFrustum();
 
 		// Get default shader
-		Shader* defaultShader = context.resources.getResource<Shader>(m_defaultShaderId);
+		Shader* defaultShader = context.gpu.shader(context.resources, m_defaultShaderId, m_logger);
 		if (!defaultShader)
-		{
-			m_logger.critical("G-buffer shader not found, cannot render");
 			return;
-		}
 		// Get default material
-		Material* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
+		const auto* defaultMaterial = context.resources.getResource<Material>(m_defaultMaterialId);
 
 		// per frame uniforms
 		defaultShader->bind();
@@ -52,36 +49,23 @@ namespace SE
 				continue;
 			}
 
-			Terrain* terrain = context.resources.getResource<Terrain>(terrainResourceId);
+			const auto* terrain = context.resources.getResource<Terrain>(terrainResourceId);
 			if (!terrain)
-			{
-				m_logger.warn("Terrain with ID {} not found, skipping entity {}", terrainResourceId, draw.entityId);
 				continue;
-			}
 
 			defaultShader->setMat4("model", interpolateTransform(draw.previous, draw.current, context.t));	// Set transform
 
 			// Load splat map texture
-			Texture* splatMapTexture = nullptr;
-			if (const uint32_t splatMapTextureId = context.resources.loadTexture({ .path = terrain->getSplatMapPath(), .name = terrain->getSplatMapPath() }))
+			const auto textureOrDefault = [&](const std::string& path)
 			{
-				splatMapTexture = context.resources.getResource<Texture>(splatMapTextureId);
-			}
-			if (!splatMapTexture)
-			{
-				splatMapTexture = context.resources.getResource<Texture>(m_defaultTextureId);
-			}
-
-			// Load height map texture
-			Texture* heightMapTexture = nullptr;
-			if (const uint32_t heightMapTextureId = context.resources.loadTexture({ .path = terrain->getHeightMapPath(), .name = terrain->getHeightMapPath() }))
-			{
-				heightMapTexture = context.resources.getResource<Texture>(heightMapTextureId);
-			}
-			if (!heightMapTexture)
-			{
-				heightMapTexture = context.resources.getResource<Texture>(m_defaultTextureId);
-			}
+				const auto id = path.empty() ? 0 : context.resources.requestTexture({ path, path });
+				const auto texture = context.gpu.texture(context.resources, id);
+				return texture ? texture : context.gpu.texture(context.resources, m_defaultTextureId);
+			};
+			const auto splatMapTexture = textureOrDefault(terrain->getSplatMapPath());
+			const auto heightMapTexture = textureOrDefault(terrain->getHeightMapPath());
+			if (!splatMapTexture || !heightMapTexture)
+				continue;
 
 			const std::vector<uint32_t>& terrainMaterials = _getTerrainMaterials(context, terrainResourceId, *terrain);
 			const std::vector<SubMesh>& subMeshes = terrain->getSubMeshes();
@@ -96,7 +80,7 @@ namespace SE
 				{
 					const PBRMaterial* pbr = &terrain->getMaterials()[j];
 
-					Material* material = context.resources.getResource<Material>(terrainMaterials[j]);
+					const auto* material = context.resources.getResource<Material>(terrainMaterials[j]);
 					if (!material)
 					{
 						material = defaultMaterial;
@@ -118,17 +102,17 @@ namespace SE
 
 					if (material)
 					{
-						material->bindOffset(j);
+						context.gpu.bindMaterial(context.resources, *material, *defaultShader, j);
 					}
 				}
 
 				// Load terrain specific textures
 				if (splatMapTexture) {
-					_bindTexture(*splatMapTexture, *defaultShader, m_splatMapSlot, "terrainSplatMap");
+					_bindTexture(splatMapTexture, *defaultShader, m_splatMapSlot, "terrainSplatMap");
 				}
 				if (heightMapTexture)
 				{
-					_bindTexture(*heightMapTexture, *defaultShader, m_heightMapSlot, "terrainHeightMap");
+					_bindTexture(heightMapTexture, *defaultShader, m_heightMapSlot, "terrainHeightMap");
 				}
 
 				// Set height scale
@@ -139,14 +123,7 @@ namespace SE
 
 				// Unbind 3 PBR materials
 				for (size_t j = 0; j < 3; ++j)
-				{
-					Material* material = context.resources.getResource<Material>(terrainMaterials[j]);
-					if (!material)
-					{
-						material = defaultMaterial;
-					}
-					material->unbindOffset(j);
-				}
+					context.gpu.unbindMaterial(j);
 
 				// Unbind terrain textures
 				if (splatMapTexture)
@@ -191,7 +168,7 @@ namespace SE
 				if (path.empty()) {
 					continue;
 				}
-				if (const uint32_t textureId = context.resources.loadTexture({ .path = path, .name = path })) {
+				if (const auto textureId = context.resources.requestTexture({ path, path })) {
 					textures.push_back({ .usage = type, .textureId = textureId });
 				}
 			}
@@ -200,20 +177,20 @@ namespace SE
 			uint32_t materialId = 0;
 			if (!textures.empty() && pbr.albedoFactor.a >= 1.0f)
 			{
-				std::string materialName = fmt::format("{}_{}_{}", terrain.getResourceName(), i, pbr.name);
+				std::string materialName = fmt::format("{}_{}_{}", terrainResourceId, i, pbr.name);
 				materialId = context.resources.createMaterial({ .shaderId = m_defaultShaderId, .textures = textures, .name = materialName });
 			}
 			it->second.push_back(materialId);
 		}
 
-		m_logger.info("Created {} materials for mesh resource {}", it->second.size(), terrain.getResourceName());
+		m_logger.info("Created {} materials for terrain resource {}", it->second.size(), terrainResourceId);
 		return it->second;
 	}
 
-	void TerrainRenderer::_bindTexture(const Texture& texture, Shader& shader, const uint32_t slot, std::string name)
+	void TerrainRenderer::_bindTexture(unsigned int texture, Shader& shader, const uint32_t slot, std::string_view name)
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, texture.getTextureId());
+		glBindTexture(GL_TEXTURE_2D, texture);
 		shader.setInt(name, slot);
 	}
 

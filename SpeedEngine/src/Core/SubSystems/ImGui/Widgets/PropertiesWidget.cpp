@@ -15,6 +15,15 @@
 
 namespace SE
 {
+	static void showResourceState(ResourceID id)
+	{
+		if (id)
+		{
+			const auto state = Engine::Instance().getSubSystem<ResourceManager>()->getResourceState(id);
+			ImGui::Text("Asset: %s", state ? resourceStateName(*state) : "Unknown");
+		}
+	}
+
 	bool PropertiesWidget::authoredEdit(bool changed)
 	{
 		if (changed)
@@ -41,19 +50,13 @@ namespace SE
 		// Registers a component type with an editor function for components that need special handling
 		// onEdited function will not be called since the editor function is provided
 		m_inspectors.registerComponent<Transform>("Transform", "General", false,
-			[this](Entity& entity, Transform& component)
+			[this](Entity&, Transform& component)
 		    {
 				auto rotation = glm::eulerAngles(component.rotate);
 				authoredEdit(ImGui::DragFloat3("Position", &component.translate.x, 0.1f));
 				if (authoredEdit(ImGui::DragFloat3("Rotation (radians)", &rotation.x, 0.01f)))
 					component.rotate = glm::quat(rotation);
-				if (authoredEdit(ImGui::DragFloat3("Scale", &component.scale.x, 0.01f)))
-				{
-					// For physics colliders, need to manually update scale
-				    auto* terrainCollider = entity.getComponent<PhysicsShapeTerrain>();
-				    if (terrainCollider)
-					    terrainCollider->setScale(component.scale);
-				}
+				authoredEdit(ImGui::DragFloat3("Scale", &component.scale.x, 0.01f));
 		    });
 
 		m_inspectors.registerComponent<MeshComponent>("Mesh", "Rendering", true,
@@ -70,22 +73,10 @@ namespace SE
 			    // user confirmed a new path
 				if ((enter || deactivated || dropped) && m_meshPathDraft != component.path)
 			    {
-				    uint32_t resource = 0;
-				    const bool empty = m_meshPathDraft.empty() || m_meshPathDraft == "None";
-				    if (!empty)
-						resource = Engine::Instance().getSubSystem<ResourceManager>()->loadMesh({ .path = m_meshPathDraft, .name = m_meshPathDraft });
-				    if (empty || resource != 0)
-				    {
-					    component.path = m_meshPathDraft;
-					    component.meshResourceID = resource;
-						m_session.markDirty();
-					    m_meshPathError.clear();
-				    }
-				    else
-					    m_meshPathError = "Mesh could not be loaded; previous mesh retained.";
+					component.setPath(m_meshPathDraft);
+					m_session.markDirty();
 			    }
-			    if (!m_meshPathError.empty())
-				    ImGui::TextWrapped("%s", m_meshPathError.c_str());
+				showResourceState(component.meshResourceID);
 		    });
 
 		m_inspectors.registerComponent<TerrainComponent>("Terrain", "Rendering", true,
@@ -102,22 +93,10 @@ namespace SE
 			    // user confirmed a new path
 			    if ((enter || deactivated || dropped) && m_terrainPathDraft != component.path)
 			    {
-				    uint32_t resource = 0;
-				    const bool empty = m_terrainPathDraft.empty() || m_terrainPathDraft == "None";
-				    if (!empty)
-					    resource = Engine::Instance().getSubSystem<ResourceManager>()->loadTerrain({ .path = m_terrainPathDraft, .name = m_terrainPathDraft });
-				    if (empty || resource != 0)
-				    {
-					    component.path = m_terrainPathDraft;
-					    component.terrainResourceID = resource;
-					    m_session.markDirty();
-					    m_terrainPathError.clear();
-				    }
-				    else
-					    m_terrainPathError = "Terrain could not be loaded; previous terrain retained.";
+					component.setPath(m_terrainPathDraft);
+					m_session.markDirty();
 			    }
-			    if (!m_terrainPathError.empty())
-				    ImGui::TextWrapped("%s", m_terrainPathError.c_str());
+				showResourceState(component.terrainResourceID);
 		    });
 
 		m_inspectors.registerComponent<ScriptComponent>("Script", "Scripting", false,
@@ -304,9 +283,13 @@ namespace SE
 			    // user confirmed a new path
 				if ((enter || deactivated || dropped) && m_physicsShapeMeshPathDraft != component.getPath())
 				{
-				    component.setPath(m_physicsShapeMeshPathDraft);
+					const auto& path = m_physicsShapeMeshPathDraft;
+					const auto id = path.empty() || path == "None" ? 0
+						: Engine::Instance().getSubSystem<ResourceManager>()->requestMesh({ path, path });
+					component.setPath(path, id);
 					m_session.markDirty();
 				}
+				showResourceState(component.getMeshResourceID());
 		    });
 
 		m_inspectors.registerComponent<PhysicsShapeTerrain>("Terrain Collider", "Physics", true,
@@ -323,9 +306,13 @@ namespace SE
 			    // user confirmed a new path
 			    if ((enter || deactivated || dropped) && m_physicsShapeTerrainPathDraft != component.getPath())
 			    {
-				    component.setPath(m_physicsShapeTerrainPathDraft);
+					const auto& path = m_physicsShapeTerrainPathDraft;
+					const auto id = path.empty() || path == "None" ? 0
+						: Engine::Instance().getSubSystem<ResourceManager>()->requestTerrain({ path, path });
+					component.setPath(path, id);
 				    m_session.markDirty();
 			    }
+				showResourceState(component.getTerrainID());
 		    });
 
 		m_inspectors.registerComponent<AudioSFXComponent>("Sound Effect", "Audio", true,
@@ -553,7 +540,6 @@ namespace SE
 		m_physicsShapeMeshPathDraft.clear();
 		m_soundPathDraft.clear();
 		m_musicPathDraft.clear();
-		m_meshPathError.clear();
 		m_soundPathError.clear();
 		m_musicPathError.clear();
 	}
@@ -657,12 +643,10 @@ namespace SE
 			if (remove->type == typeid(MeshComponent))
 			{
 				m_meshDraftInitialized = false;
-				m_meshPathError.clear();
 			}
 			if (remove->type == typeid(TerrainComponent))
 			{
 				m_terrainDraftInitialized = false;
-				m_terrainPathError.clear();
 			}
 			if (remove->type == typeid(PhysicsShapeMesh))
 				m_physicsShapeMeshDraftInitialized = false;

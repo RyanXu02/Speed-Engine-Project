@@ -44,7 +44,7 @@ namespace SE
 		// push back subsystems in order of initialization
 		m_subSystems.push_back(std::unique_ptr<MemoryTrackingSystem>(new MemoryTrackingSystem()));
 		m_subSystems.push_back(std::unique_ptr<EventSystem>(new EventSystem()));
-		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720, "Speed Engine"))); // has to be BEFORE ResourceManager
+		m_subSystems.push_back(std::unique_ptr<Window>(new Window(1280, 720, "Speed Engine")));
 		m_subSystems.push_back(std::unique_ptr<InputSystem>(new InputSystem(getSubSystem<Window>()->inputEvents())));
 		m_subSystems.push_back(std::unique_ptr<ResourceManager>(new ResourceManager()));
 		m_subSystems.push_back(std::unique_ptr<RendererManager>(new RendererManager(*getSubSystem<Window>())));
@@ -121,6 +121,7 @@ namespace SE
 		while (!m_shutdownRequested.load() && !window->shouldClose())
 		{
 			window->update(0.0);
+			getSubSystem<ResourceManager>()->processCompletedLoads();
 			const auto now = Clock::now();
 			const double deltaTime = std::chrono::duration<double>(now - lastTime).count();
 			lastTime = now;
@@ -203,6 +204,7 @@ namespace SE
 		while (!m_shutdownRequested.load() && !window->shouldClose())
 		{
 			window->update(0.0);
+			getSubSystem<ResourceManager>()->processCompletedLoads();
 			if (auto next = m_frameExchange.tryAcquireReady())
 				displayed.emplace(std::move(next));
 			if (displayed)

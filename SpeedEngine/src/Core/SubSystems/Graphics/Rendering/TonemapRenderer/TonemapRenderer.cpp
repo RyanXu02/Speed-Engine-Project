@@ -12,7 +12,7 @@ namespace SE
 	TonemapRenderer::TonemapRenderer(Logger& logger, std::string inputTarget)
 	    : Renderer(logger, "TonemapRenderer"),
 	      m_inputTarget(std::move(inputTarget)),
-	      m_shader(0, "TonemapRenderer")
+		  m_shader()
 	{}
 
 	void TonemapRenderer::init()
@@ -20,9 +20,7 @@ namespace SE
 		m_logger.info("Initializing");
 
 		auto* resources = Engine::Instance().getSubSystem<ResourceManager>();
-		const std::string* vertexSource = resources->getString("Assets/Shaders/tonemap.vert");
-		const std::string* fragmentSource = resources->getString("Assets/Shaders/tonemap.frag");
-		GLCompStatus status = m_shader.init(*vertexSource, *fragmentSource);
+		const auto status = loadStartupShader(m_shader, *resources, { "Assets/Shaders/tonemap.vert", "Assets/Shaders/tonemap.frag", "tonemap" });
 		if (!status.success) {
 			m_shader.destroy();
 			throw std::runtime_error("Failed to initialize TonemapRenderer shader: " + status.log);
