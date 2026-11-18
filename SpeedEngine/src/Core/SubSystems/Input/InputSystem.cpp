@@ -1,86 +1,119 @@
 #include "pch.h"
+
 #include "InputSystem.h"
+
 #include "Engine.h"
-
-#include "GLFW/glfw3.h"
-
-#include "../../Logger/Logger.h"
+#include "Core/SubSystems/Events/EventSystem.h"
 
 namespace SE
 {
 	void InputSystem::init()
 	{
 		SubSystem::init();
-
-		glfwSetScrollCallback(glfwGetCurrentContext(),
-			[](GLFWwindow* window, double xoffset, double yoffset)
-			{
-				Engine::Instance().getSubSystem<InputSystem>()->scroll_callback(window, xoffset, yoffset);
-			});
 	}
 
 	void InputSystem::update(double deltaTime)
 	{
 		SubSystem::update(deltaTime);
 
-		m_mouseScroll = m_mouseScrollAccumulated;
-		m_mouseScrollAccumulated = { 0.0, 0.0 };
-
-		// update key states
 		m_keyPrevState = m_keyCurrState;
-		for (int key = KEY_SPACE; key <= KEY_MENU; key++)
-		{
-			KeyCodes thisKey = static_cast<KeyCodes>(key);
-			switch (glfwGetKey(glfwGetCurrentContext(), key))
-			{
-			case GLFW_PRESS:
-				_setKeyState(thisKey);
-				break;
-			case GLFW_RELEASE:
-				_clearKeyState(thisKey);
-				break;
-			default:
-				break;
-			}
-		}
-
-		// update mouse states
 		m_mousePrevState = m_mouseCurrState;
-		for (int button = MOUSE_BUTTON_1; button <= MOUSE_BUTTON_LAST; button++)
+		m_keyRising.reset();
+		m_keyFalling.reset();
+		m_mouseRising.reset();
+		m_mouseFalling.reset();
+		m_mouseDelta = { 0.0, 0.0 };
+		m_mouseScroll = { 0.0, 0.0 };
+
+		auto* ES = Engine::Instance().getSubSystem<EventSystem>();
+
+		// drain input events from the queue and process them
+		m_inputEvents.drain(m_pendingEvents);
+		for (const auto& inputEvent : m_pendingEvents)
 		{
-			MouseCodes thisButton = static_cast<MouseCodes>(button);
-			switch (glfwGetMouseButton(glfwGetCurrentContext(), button))
+			// update current state rising and falling edges for keys and mouse
+			const auto update = [&inputEvent](auto& current, auto& rising, auto& falling)
 			{
-			case GLFW_PRESS:
-				_setMouseState(thisButton);
+				const auto code = static_cast<size_t>(inputEvent.code);
+				if (inputEvent.action == InputEvent::Action::Press && !current.test(code))
+					rising.set(code);
+				else if (inputEvent.action == InputEvent::Action::Release && current.test(code))
+					falling.set(code);
+				current.set(code, inputEvent.action != InputEvent::Action::Release);
+			};
+
+			switch (inputEvent.type)
+			{
+			case InputEvent::Type::Key:
+				update(m_keyCurrState, m_keyRising, m_keyFalling);
+				if (inputEvent.action != InputEvent::Action::Release)
+					ES->publish(std::make_unique<KeyPressedEvent>(inputEvent.code, inputEvent.action == InputEvent::Action::Repeat));
 				break;
-			case GLFW_RELEASE:
-				_clearMouseState(thisButton);
+
+			case InputEvent::Type::MouseButton:
+				update(m_mouseCurrState, m_mouseRising, m_mouseFalling);
 				break;
-			default:
+
+			case InputEvent::Type::CursorPosition:
+				if (m_hasMousePosition)
+				{
+					m_mouseDelta.x += inputEvent.x - m_mousePosition.x;
+					m_mouseDelta.y += inputEvent.y - m_mousePosition.y;
+				}
+				m_mousePosition = { inputEvent.x, inputEvent.y };
+				m_hasMousePosition = true;
+				ES->publish(std::make_unique<MouseMovedEvent>(inputEvent.x, inputEvent.y));
+				break;
+
+			case InputEvent::Type::Scroll:
+				m_mouseScroll.xoffset += inputEvent.x;
+				m_mouseScroll.yoffset += inputEvent.y;
+				break;
+
+			case InputEvent::Type::Focus:
+				m_hasFocus = inputEvent.action != InputEvent::Action::Release;
+				if (!m_hasFocus)
+				{
+					m_keyFalling |= m_keyCurrState;
+					m_mouseFalling |= m_mouseCurrState;
+					m_keyCurrState.reset();
+					m_mouseCurrState.reset();
+					m_mouseDelta = { 0.0, 0.0 };
+					m_hasMousePosition = false;
+				}
+				break;
+
+			case InputEvent::Type::WindowClose:
+				ES->publish(std::make_unique<WindowClose>());
+				break;
+
+			case InputEvent::Type::InputRegion:
+				m_inputRegion = inputEvent.inputRegion;
 				break;
 			}
 		}
-
-		// update key rises and falls
-		std::bitset<512> keyChanges = m_keyCurrState ^ m_keyPrevState;
-		m_keyRising = keyChanges & m_keyCurrState;
-		m_keyFalling = keyChanges & (~m_keyCurrState);
-		// update mouse rises and falls
-		std::bitset<8> mouseChanges = m_mouseCurrState ^ m_mousePrevState;
-		m_mouseRising = mouseChanges & m_mouseCurrState;
-		m_mouseFalling = mouseChanges & (~m_mouseCurrState);
-
-		// update mouse pos
-		m_prevMousePosition = m_mousePosition;
-		glfwGetCursorPos(glfwGetCurrentContext(), &m_mousePosition.x, &m_mousePosition.y);
-		m_mouseDelta.x = m_mousePosition.x - m_prevMousePosition.x;
-		m_mouseDelta.y = m_mousePosition.y - m_prevMousePosition.y;
 	}
 
 	void InputSystem::shutdown()
 	{
 		SubSystem::shutdown();
+	}
+
+	bool InputSystem::isPointerInInputRegion() const
+	{
+		if (!m_hasMousePosition)
+			return false;
+		const glm::vec2 local = glm::vec2(m_mousePosition.x, m_mousePosition.y) - m_inputRegion.imageTopLeft;
+		return local.x >= 0.0f && local.y >= 0.0f && local.x < m_inputRegion.imageSize.x && local.y < m_inputRegion.imageSize.y;
+	}
+
+	std::optional<glm::vec2> InputSystem::getPointerPositionInInputRegion() const
+	{
+		if (!m_hasMousePosition || m_inputRegion.imageSize.x <= 0.0f || m_inputRegion.imageSize.y <= 0.0f ||
+			m_inputRegion.renderTargetSize.x == 0 || m_inputRegion.renderTargetSize.y == 0)
+			return std::nullopt;
+		const glm::vec2 local = glm::vec2(m_mousePosition.x, m_mousePosition.y) - m_inputRegion.imageTopLeft;
+		return local / m_inputRegion.imageSize * glm::vec2(m_inputRegion.renderTargetSize);
 	}
 
 	bool InputSystem::isKeyRising(KeyCodes key) const
@@ -138,28 +171,4 @@ namespace SE
 		return m_mouseScroll;
 	}
 
-	void InputSystem::_setKeyState(KeyCodes key)
-	{
-		m_keyCurrState.set(static_cast<size_t>(key));
-	}
-
-	void InputSystem::_clearKeyState(KeyCodes key)
-	{
-		m_keyCurrState.reset(static_cast<size_t>(key));
-	}
-
-	void InputSystem::_setMouseState(MouseCodes key)
-	{
-		m_mouseCurrState.set(static_cast<size_t>(key));
-	}
-
-	void InputSystem::_clearMouseState(MouseCodes key)
-	{
-		m_mouseCurrState.reset(static_cast<size_t>(key));
-	}
-
-	void InputSystem::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-		m_mouseScrollAccumulated.xoffset += xoffset;
-		m_mouseScrollAccumulated.yoffset += yoffset;
-	}
-}
+} // namespace SE

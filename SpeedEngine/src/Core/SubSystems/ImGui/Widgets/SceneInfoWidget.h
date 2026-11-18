@@ -1,37 +1,34 @@
 #pragma once
-#include "../Widget.h"
-
-#include "../../../Scene/Entity/Entity.h"
+#if defined(COMPILE_WITH_EDITOR)
 #include "../../Events/EventSubscription.h"
-
+#include "../Widget.h"
+#include "Core/SubSystems/ImGui/EditorSession.h"
 
 namespace SE
 {
-	class SceneInfoWidget : public Widget
+	class SceneInfoWidget : public VisibleWidget<SceneInfoWidget>
 	{
 	public:
-		SceneInfoWidget();
+		explicit SceneInfoWidget(EditorSession& session);
 
 		void render() override;
 		void shutdown() override;
 
-
 	private:
-		std::unordered_map<uint32_t, std::string> m_entityNameCache;
+		EditorSession& m_session;
 
-		std::unordered_set<uint32_t> m_selectedEntities;
-
-		EventSubscription m_activeSceneModified;
 		EventSubscription m_sceneChanged;
 
 		uint32_t m_renameEntityId = 0;
+		std::vector<uint32_t> m_renameTargets;
+		bool m_focusRename = false;
 		std::string m_renameBuffer{};
 
 		bool m_requestDelete = false;
 
-		void _rightClickMenu(const std::string& name,uint32_t id);
-		void _leftClickHandle(const std::string& name, uint32_t id);
-		void _f2Handle(const std::string& name, uint32_t id);
-		void _renamingHandle(uint32_t id);
+		bool _rightClickMenu(uint32_t id);
+		void _beginRename(const std::string& name, uint32_t id);
+		void _renamingHandle();
 	};
-}
+} // namespace SE
+#endif

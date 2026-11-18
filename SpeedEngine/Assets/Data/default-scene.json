@@ -1,0 +1,552 @@
+{
+  "entities": [
+    {
+      "components": {
+        "CameraComponent": {
+          "farPlane": 1000.0,
+          "fov": 70.0,
+          "isPrimary": true,
+          "nearPlane": 0.10000000149011612
+        },
+        "NameComponent": {
+          "name": "camera"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/Camera.lua"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "id": 1
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "player"
+        },
+        "PhysicsShapeCapsule": {
+          "halfHeight": 0.4000000059604645,
+          "radius": 0.800000011920929
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/Player.lua"
+        },
+        "Transform": {
+          "rotate": [
+            -0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.5976836085319519,
+            -0.8999999761581421,
+            0.27476173639297485
+          ]
+        }
+      },
+      "id": 2
+    },
+    {
+      "components": {
+        "AudioMusicComponent": {
+          "filepath": "Assets/Audio/funkytown.wav"
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "entity"
+        },
+        "PhysicsShapeSphere": {
+          "radius": 0.5
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": true,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
+          "restitution": 0.0
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/physicstest.lua"
+        },
+        "Transform": {
+          "rotate": [
+            -0.5578107833862305,
+            -0.013553425669670105,
+            -0.43748876452445984,
+            -0.7051717042922974
+          ],
+          "scale": [
+            15.0,
+            15.0,
+            15.0
+          ],
+          "translate": [
+            -9.45142936706543,
+            -119648.78125,
+            12.250982284545898
+          ]
+        }
+      },
+      "id": 3
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/cube.obj"
+        },
+        "NameComponent": {
+          "name": "floor"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            30.0,
+            0.009999999776482582,
+            30.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            -0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            30.0,
+            0.009999999776482582,
+            30.0
+          ],
+          "translate": [
+            0.0,
+            -10.0,
+            0.0
+          ]
+        }
+      },
+      "id": 4
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "entity2"
+        },
+        "PhysicsShapeSphere": {
+          "radius": 0.5
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": true,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.7700176239013672,
+            -0.08732476085424423,
+            0.36285480856895447,
+            0.5174782276153564
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            -3.9369866847991943,
+            -9.113349914550781,
+            -0.9299945831298828
+          ]
+        }
+      },
+      "id": 5
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/DamagedHelmet/DamagedHelmet.gltf"
+        },
+        "NameComponent": {
+          "name": "entity3"
+        },
+        "PhysicsShapeSphere": {
+          "radius": 0.5
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": true,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.5,
+            0.20000000298023224
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.24862979352474213,
+            0.023890871554613113,
+            0.8660020232200623,
+            0.43318942189216614
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.9000086188316345,
+            -121072.8671875,
+            0.5999897718429565
+          ]
+        }
+      },
+      "id": 6
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/thomas_the_train/scene.gltf"
+        },
+        "NameComponent": {
+          "name": "thomas the tank engine"
+        },
+        "Transform": {
+          "rotate": [
+            -2.141054267212894e-08,
+            0.8345394134521484,
+            -2.141054267212894e-08,
+            0.5509482026100159
+          ],
+          "scale": [
+            32.970001220703125,
+            30.950000762939453,
+            26.25
+          ],
+          "translate": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "id": 7
+    },
+    {
+      "components": {
+        "NameComponent": {
+          "name": "particle"
+        },
+        "ParticleEmitter": {
+          "acceleration": [
+            0.0,
+            -9.800000190734863,
+            0.0
+          ],
+          "alpha": 1.0,
+          "azimuthRange": [
+            0.0,
+            360.0
+          ],
+          "coneAngleRange": [
+            0.0,
+            180.0
+          ],
+          "directionAxis": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "emitMax": 50000,
+          "emitRate": 3000.0,
+          "frameIndex": 0,
+          "lifetimeMax": 5.0,
+          "lifetimeMin": 1.0,
+          "oneShot": false,
+          "particleScaleMax": [
+            0.05000000074505806,
+            0.5,
+            0.5
+          ],
+          "particleScaleMin": [
+            0.004999999888241291,
+            0.05000000074505806,
+            0.05000000074505806
+          ],
+          "rotationMax": 90.0,
+          "rotationMin": 0.0,
+          "rotationSpeedMax": 0.0,
+          "rotationSpeedMin": 0.0,
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "sheetColumns": 1,
+          "sheetRows": 1,
+          "speedMax": 10.0,
+          "speedMin": 3.0,
+          "tintColor": [
+            0.19400447607040405,
+            0.2505324184894562,
+            0.3089700937271118
+          ]
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            -11.100000381469727,
+            22.0,
+            0.0
+          ]
+        }
+      },
+      "id": 8
+    },
+    {
+      "components": {
+        "NameComponent": {
+          "name": "thomas the dank engine"
+        },
+        "ParticleEmitter": {
+          "acceleration": [
+            0.0,
+            5.0,
+            -5.0
+          ],
+          "alpha": 0.3176470696926117,
+          "azimuthRange": [
+            0.0,
+            360.0
+          ],
+          "coneAngleRange": [
+            0.0,
+            59.099998474121094
+          ],
+          "directionAxis": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "emitMax": 50000,
+          "emitRate": 5000.0,
+          "frameIndex": 0,
+          "lifetimeMax": 3.0,
+          "lifetimeMin": 1.0,
+          "oneShot": false,
+          "particleScaleMax": [
+            0.10000000149011612,
+            0.10000000149011612,
+            0.10000000149011612
+          ],
+          "particleScaleMin": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotationMax": 0.0,
+          "rotationMin": 0.0,
+          "rotationSpeedMax": 0.0,
+          "rotationSpeedMin": 0.0,
+          "scale": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "sheetColumns": 1,
+          "sheetRows": 1,
+          "speedMax": 3.0,
+          "speedMin": 1.0,
+          "tintColor": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            9.0,
+            4.5,
+            2.700000047683716
+          ]
+        }
+      },
+      "id": 9
+    },
+    {
+      "components": {
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death.wav",
+          "isGameSFX": true
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/Ball.glb"
+        },
+        "NameComponent": {
+          "name": "3d sound test with player"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            -11.300000190734863,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "id": 10
+    },
+    {
+      "components": {
+        "AudioMusicComponent": {
+          "filepath": "Assets/Audio/funkytown.wav"
+        },
+        "AudioSFXComponent": {
+          "filepath": "Assets/Audio/shaco_death_nongame.wav",
+          "isGameSFX": false
+        },
+        "MeshComponent": {
+          "path": "Assets/Meshes/cube.obj"
+        },
+        "NameComponent": {
+          "name": "sound scripting test"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/soundtest.lua"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            -7.599999904632568,
+            0.0
+          ]
+        }
+      },
+      "id": 11
+    }
+  ],
+  "scene_name": "default"
+}

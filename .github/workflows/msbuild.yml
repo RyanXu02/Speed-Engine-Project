@@ -1,0 +1,48 @@
+name: MSBuild
+
+on:
+  schedule:
+    - cron: '0 0 * * *' 
+      timezone: 'America/Los_Angeles'
+  workflow_dispatch: {}
+
+env:
+  PROJECT_FILE_PATH: SpeedEngine/SpeedEngine.vcxproj
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release, Editor]
+        platform: [x64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Cache vcpkg
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~\AppData\Local\vcpkg\archives
+            SpeedEngine\vcpkg_installed
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('SpeedEngine/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v3
+
+      - name: Build with MSBuild
+        run: >
+          msbuild
+          "${{ env.PROJECT_FILE_PATH }}"
+          /m
+          /p:Configuration=${{ matrix.configuration }}
+          /p:Platform=${{ matrix.platform }}

@@ -1,72 +1,55 @@
 #pragma once
 #include "../Renderer.h"
 
-#include "../../../../ResourceManagers/MeshResource/MeshResource.h"
-
-
 namespace SE
 {
-    class Entity;
-    struct DrawData;
+	struct MeshResource;
+	class Shader;
+	struct DrawItem;
 
-    // GPU mesh data cache
-    struct MeshGPUData {
-        unsigned int VAO = 0;
-        unsigned int VBO = 0;
-        unsigned int EBO = 0;
-        size_t indexCount = 0;
-        bool needsUpdate = true;
-    };
+	// Note: shaders must match the max lights value defined here
+	constexpr size_t MAX_LIGHTS = 16;
 
-	// @brief SceneRenderer is responsible for rendering all drawable entities in the scene
-    class SceneRenderer : public Renderer
-    {
-		friend class RendererManager;
-    public:
+	struct LightingSettings
+	{
+		float ambientStrength = 0.03f;
+	};
 
-        void init() override;
-        void shutdown() override;
-        void update(double deltaTime) override;
+	// @brief Forward pass, copies the input target's color and depth then draws the transparent submeshes sorted back to front
+	class SceneRenderer : public Renderer
+	{
+	public:
+		// @param inputTarget the name of the render target to draw on top of, usually the deferred output
+		SceneRenderer(Logger& logger, std::string inputTarget) : Renderer(logger, "SceneRenderer"), m_inputTarget(std::move(inputTarget)) {}
 
-        void render() const override;
+		void init() override;
+		void shutdown() override;
 
-        // @brief get scene preview camera sensitivity
-		// @return reference to camera sensitivity, used for imgui widgets
-		float& getCameraSensitivity() { return m_sensitivity; }
-        // @brief get scene preview camera move speed
-        // @return reference to camera move speed, used for imgui widgets
-		float& getCameraMoveSpeed() { return m_cameraMoveSpeed; }
-        // @brief get scene preview camera dolly speed
-        // @return reference to camera dolly speed, used for imgui widgets
-        float& getCameraDollySpeed() { return m_cameraDollySpeed; }
+		void render(RenderContext& context) override;
 
-    private:
-		SceneRenderer(Logger& logger, std::unique_ptr<Viewport> viewport) : Renderer(logger, "SceneRenderer", std::move(viewport)) {}
-        
-        std::vector<Entity*> getDrawableEntities() const;
+		LightingSettings& getLightingSettings() { return m_lightingSettings; }
 
-        // Helper methods for mesh rendering
-        void uploadMeshToGPU(
-            uint32_t meshId, 
-            const std::vector<Vertex>& positions, 
-            const std::vector<SubMesh>& subMeshes, 
-            const std::vector<uint32_t>& indices
-        ) const;
-        void cleanupMeshGPU(uint32_t meshId) const;
+		//NOTE: shared with the deferred pass, not the most ideal for scale but good enough for now
+		void setLightUniforms(const RenderContext& context, Shader& shader);
 
-        // Cache of GPU mesh data (mutable for const render method)
-        mutable std::unordered_map<uint32_t, MeshGPUData> m_meshCache;
+	private:
+		std::string m_inputTarget;
+		LightingSettings m_lightingSettings;
 
-        // Default shader for meshes without material
-        uint32_t m_defaultShaderId = 1;
+		// Default shader for meshes without material
+		uint32_t m_defaultShaderId = 0;
+		uint32_t m_defaultMaterialId = 0;
 
-        // Camera controls
-		void _updateCameraPosition(double deltaTime, CameraFrustum& camera);
-		void _updateCameraTarget(double deltaTime, CameraFrustum& camera);
-		void _updateCamera(double deltaTime, CameraFrustum& camera, FBO& fbo);
-		float m_sensitivity = 0.005f;
-		float m_cameraMoveSpeed = 6.0f;
-		float m_cameraDollySpeed = 10.0f;
-    };
-}
+		std::unordered_map<uint32_t, std::vector<uint32_t>> m_meshMaterials;
+		const std::vector<uint32_t>& _getMeshMaterials(RenderContext& context, uint32_t meshResourceId, const MeshResource& meshResource);
 
+		struct TransparentItem
+		{
+			const DrawItem* draw;
+			const MeshResource* meshResource;
+			size_t subMeshIndex;
+			float distanceSq; // distance from the camera, for sorting
+		};
+		std::vector<TransparentItem> m_transparentItems;
+	};
+} // namespace SE

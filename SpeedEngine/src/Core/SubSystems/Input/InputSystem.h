@@ -1,11 +1,11 @@
 #pragma once
-#include "../SubSystem.h"
+#include "Core/SubSystems/SubSystem.h"
 #include "KeyCodes.h"
+#include "InputEventQueue.h"
 
-struct GLFWwindow;
-
-namespace SE {
-	// @brief 0 at top left corner, measured in screen space (sub)pixels
+namespace SE
+{
+	// @brief Window content coordinates in logical units, with (0,0) at the top left.
 	struct MousePos
 	{
 		double x;
@@ -26,6 +26,17 @@ namespace SE {
 		void init() override;
 		void update(double deltaTime) override;
 		void shutdown() override;
+		bool hasFocus() const { return m_hasFocus; }
+
+		// @brief Gets the region in the window where input events are accepted and mapped to a render target
+		const InputRegion& getInputRegion() const { return m_inputRegion; }
+
+		bool isAcceptingInput() const { return m_hasFocus && m_inputRegion.acceptsInput; }
+
+		// @brief Check if the mouse pointer is inside the input region
+		bool isPointerInInputRegion() const;
+		// @brief Get the mouse pointer position in the input region, 
+		std::optional<glm::vec2> getPointerPositionInInputRegion() const;
 
 		// @brief Rising edge (key 0 -> 1)
 		bool isKeyRising(KeyCodes key) const;
@@ -45,7 +56,8 @@ namespace SE {
 		// @brief Mouse button is currently up (button 0)
 		bool isMouseUp(MouseCodes key) const;
 
-		// @brief Get mouse position in screen space (0,0 top left corner)
+		// @brief Get mouse position in GLFW screen coordinates, with (0,0) at the top left of the window
+		// @brief Use getPointerPositionInInputRegion() for render target coordinates
 		const MousePos& getMousePosition() const;
 		// @brief Get mouse position delta between last and this frame
 		const MousePos& getMouseDelta() const;
@@ -53,15 +65,15 @@ namespace SE {
 		const MouseScroll& getMouseScroll() const;
 
 	private:
-		InputSystem() : SubSystem("InputSystem") {}
+		InputSystem(InputEventQueue& inputEvents)
+			: SubSystem("InputSystem"), m_inputEvents(inputEvents)
+		{}
 
-		void _setKeyState(KeyCodes key);
-		void _clearKeyState(KeyCodes key);
+		InputEventQueue& m_inputEvents;
+		std::vector<InputEvent> m_pendingEvents;
+		bool m_hasFocus{ true };
 
-		void _setMouseState(MouseCodes key);
-		void _clearMouseState(MouseCodes key);
-
-		void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+		InputRegion m_inputRegion;
 
 		std::bitset<512> m_keyCurrState{ 0 };
 		std::bitset<512> m_keyPrevState{ 0 };
@@ -74,11 +86,9 @@ namespace SE {
 		std::bitset<8> m_mouseFalling{ 0 };
 
 		MousePos m_mousePosition{ 0.0, 0.0 };
-		MousePos m_prevMousePosition{ 0.0, 0.0 };
-		MousePos m_mouseDelta{ 0.0, 0.0 }; // per-frame
+		MousePos m_mouseDelta{ 0.0, 0.0 }; // per simulation tick
+		bool m_hasMousePosition = false;
 
 		MouseScroll m_mouseScroll{ 0.0, 0.0 };
-		MouseScroll m_mouseScrollAccumulated{ 0.0, 0.0 };
 	};
-}
-
+} // namespace SE

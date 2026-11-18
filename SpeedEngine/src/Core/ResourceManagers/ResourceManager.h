@@ -1,167 +1,164 @@
 #pragma once
-#include "../SubSystems/SubSystem.h"
-#include "../Logger/Logger.h"
-#include "Resource.h"
-#include "Manager.h"
 
-#include "Shader/ShaderManager.h"
-#include "Material/MaterialManager.h"
-#include "MeshResource/MeshResourceManager.h"
-#include "../SubSystems/Events/EventSystem.h"
+#include "Core/SubSystems/SubSystem.h"
+#include "Resource.h"
+#include "MeshResource/MeshResource.h"
+#include "Terrain/Terrain.h"
+#include "Material/Material.h"
+#include "Material/Texture.h"
+#include "Font/Font.h"
+#include "Shader/ShaderSource.h"
 
 namespace SE
 {
-	// @brief Public interface for managing all resources in the engine.
+	// @brief The state of a resource:
+	// @brief	Loading: Still being loaded on worker thread
+	// @brief	Ready: CPU data has finished loading and has been published
+	// @brief	Failed: The resource failed to load
+	enum class ResourceState { Loading, Ready, Failed };
+
+	constexpr const char* resourceStateName(ResourceState state)
+	{
+		switch (state)
+		{
+		case ResourceState::Loading: return "Loading";
+		case ResourceState::Ready: return "Ready";
+		case ResourceState::Failed: return "Failed";
+		}
+		return "Unknown";
+	}
+
+	struct ShaderLoadDesc{ std::string_view vertexShaderPath, fragmentShaderPath, name; };
+	struct FileLoadDesc { std::string_view path, name; };
+	struct FontLoadDesc { std::string_view path; uint32_t pixelHeight; std::string_view name; };
+	struct MaterialDesc { ResourceID shaderId; std::span<const TextureBinding> textures; std::string_view name; };
+	
+	// @brief Metadata about a resource
+	struct ResourceInfo
+	{
+		ResourceID id;
+		ResourceType type;
+		ResourceState state;
+		std::string name;
+		std::string path;
+		std::string error;
+	};
+
+	// @brief Manages CPU data of resources
+	// @brief This SubSystem doesn't know anything about graphics or physics
+	// @brief Any published resources are immutable and live until shutdown
 	class ResourceManager : public SubSystem
 	{
-	public:
 		friend class Engine;
-
+	public:
 		void init() override;
 		void shutdown() override;
 
-		//@brief generates a resource id. atomic and does not reuse ids
-		//@returns an id (uint32)
-		uint32_t generateId();
+		// @brief Publish completed loads on the main thread
+		void processCompletedLoads();
 
-		//@brief retrieves the contents of a text file
-		//@param filePath file to open and retrieve contents
-		//@returns filePath's entire contents
-		std::string getString(std::string_view filePath);
+		// @brief Request a mesh to be loaded from disk
+		// @return A unique ID for the resource, or 0 if the request failed
+		ResourceID requestMesh(FileLoadDesc desc);
+		// @brief Request a terrain to be loaded from disk
+		// @return A unique ID for the resource, or 0 if the request failed
+		ResourceID requestTerrain(FileLoadDesc desc);
+		// @brief Request a texture to be loaded from disk
+		// @return A unique ID for the resource, or 0 if the request failed
+		ResourceID requestTexture(FileLoadDesc desc);
+		// @brief Request a font to be loaded from disk
+		// @return A unique ID for the resource, or 0 if the request failed
+		ResourceID requestFont(FontLoadDesc desc);
+		// @brief Request a shader to be loaded from disk
+		// @return A unique ID for the resource, or 0 if the request failed
+		ResourceID requestShader(ShaderLoadDesc desc);
+		// @brief Request a compute shader to be loaded from disk
+		// @return A unique ID for the resource, or 0 if the request failed
+		ResourceID requestComputeShader(FileLoadDesc desc);
+		// @brief Create a material from a shader and texture bindings
+		// @return A unique ID for the resource, or 0 if the request failed
+		ResourceID createMaterial(const MaterialDesc& desc);
 
-		//@brief adds a resource to the Resource Manager
-		//@param type the type of resource being added
-		//@param args arguments to pass for type of resource being added (filepaths, names, etc)
-		//@returns id of newly added resource
-		template<ResourceType Type, typename... Args>
-		uint32_t addResource(Args&&... args)
-		{
-			if constexpr (Type == ResourceType::Shader)
-			{
-				return _addResourceImpl<ResourceType::Shader>(std::forward<Args>(args)...);
-			}
-			else if constexpr (Type == ResourceType::Material)
-			{
-				return _addResourceImpl<ResourceType::Material>(std::forward<Args>(args)...);
-			}
-			else if constexpr (Type == ResourceType::MeshResource)
-			{
-				return _addResourceImpl<ResourceType::MeshResource>(std::forward<Args>(args)...);
-			}
-			else
-			{
-				m_logger->warn("ResourceManager::addResource: Unhandled ResourceType");
-				return 0;
-			}
-		}
+		// @brief Block the calling thread until the resource is ready or failed
+		// @brief Use during your initialization if you need something to be ready
+		// @returns true if the resource is ready, false if it failed or the ID is invalid
+		bool waitForStartupResource(ResourceID id);
 
-		//@brief retrieves a resource of requested type given an id (Not prefered, used the other one. It is callers responsibility to ensure the type is correct)
-		//@param id the id to retrieve
-		//@returns the requested resource of the specified type if it exists, nullptr if not
+		// @brief Returns the state of a resource
+		std::optional<ResourceState> getResourceState(ResourceID id) const;
+
+		// @brief Returns a list of all resources and their states
+		std::vector<ResourceInfo> inspectResources() const;
+
+		// @brief Returns a pointer to the resource data if it is ready, or nullptr otherwise
+		// @tparam T The type of resource to get
+		// @param id The ID of the resource to get
+		// @return A pointer to the resource data if it is ready, or nullptr otherwise
 		template<typename T>
-		T* getResource(uint32_t id) {
-			auto it = m_resourceTypes.find(id);
-			if (it != m_resourceTypes.end()) {
-				if constexpr (std::is_same_v<T, Shader>) {
-					return _getManager<ShaderManager>()->getShader(id);
-				}
-				else if constexpr (std::is_same_v<T, Material>) {
-					return _getManager<MaterialManager>()->getMaterial(id);
-				}
-				else if constexpr (std::is_same_v<T, MeshResource>) {
-					return _getManager<MeshResourceManager>()->getMeshResource(id);
-				}
-				// ...
-				else {
-					m_logger->warn("ResourceManager::getResource: Unhandled type T");
-					return nullptr;
-				}
-			}
-			return nullptr;
+		const T* getResource(ResourceID id) const
+		{
+			std::lock_guard lock(m_mutex);
+
+			const auto entry = m_entries.find(id);
+			if (entry == m_entries.end())
+				return nullptr;
+
+			const auto* data = std::get_if<std::unique_ptr<const T>>(&entry->second.data);
+			return data ? data->get() : nullptr;
 		}
-
-		//@brief retrieves a resource given an id
-		//@param id the id of a resource to retrieve
-		//@returns a the resource as a Resource* if it exists, nullptr if not
-		Resource* getResource(uint32_t id);
-
-		//@brief gets the resource type map as a copy
-		std::unordered_map<uint32_t, ResourceType> getInitialRTMap() const {
-			return m_resourceTypes;
-		}
-		
-		//@brief removes a resource given an id
-		//@param id the id of the resource to remove
-		//@returns true if successfully removed, false if not
-		bool removeResource(uint32_t id);
-
 
 	private:
-		// singleton instance, use singleton Engine to access its subsystems
 		ResourceManager() : SubSystem("ResourceManager") {}
 
-		// universal id for all resources in the engine
-		std::atomic<uint32_t> m_ids{ 1 }; // 0 for invalid id
-
-		// All registered managers
-		std::vector<std::unique_ptr<Manager>> m_managers;
-
-		// path -> file contents
-		std::unordered_map<std::string, std::string> m_stringCache;
-		// id -> ResourceType
-		std::unordered_map<uint32_t, ResourceType> m_resourceTypes;
-
-		// get manager of type T
-		template<typename T>
-		T* _getManager()
+		// @brief Key for uniquely identifying a resource to load
+		struct AssetKey
 		{
-			for (auto& manager : m_managers)
-			{
-				if (auto ptr = dynamic_cast<T*>(manager.get()))
-				{
-					return ptr;
-				}
-			}
-			return nullptr;
-		}
+			ResourceType type;
+			std::string path;
+			std::string fragmentPath{};
+			uint32_t pixelHeight = 0;
+			auto operator<=>(const AssetKey&) const = default;
+		};
 
-		// helper function to add a resource of a specific type
-		template<ResourceType Type, typename... Args>
-		uint32_t _addResourceImpl(Args&&... args)
-		{
-			if constexpr (Type == ResourceType::Shader)
-			{
-				uint32_t id = _getManager<ShaderManager>()->addShader(generateId(), std::forward<Args>(args)...);
-				if (id != 0) {
-					m_resourceTypes.insert({ id, ResourceType::Shader });
-				}
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
-				return id;
-			}
-			else if constexpr (Type == ResourceType::Material)
-			{
-				uint32_t id = _getManager<MaterialManager>()->addMaterial(generateId(), std::forward<Args>(args)...);
-				if (id != 0) {
-					m_resourceTypes.insert({ id, ResourceType::Material });
-				}
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
-				return id;
-			}
-			else if constexpr (Type == ResourceType::MeshResource)
-			{
-				uint32_t id = _getManager<MeshResourceManager>()->addMeshResource(generateId(), std::forward<Args>(args)...);
-				if (id != 0) {
-					m_resourceTypes.insert({ id, ResourceType::MeshResource });
-				}
-				Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, Type, true));
-				return id;
-			}
-			else
-			{
-				static_assert(false, "Unhandled ResourceType in _addResourceImpl");
-				return 0;
-			}
-		}
+		// Inheritance is the source of all evil
+		// We know the types of resources already
+		using Data = std::variant<
+			std::monostate,
+			std::unique_ptr<const MeshResource>,
+			std::unique_ptr<const Terrain>,
+			std::unique_ptr<const TextureData>,
+			std::unique_ptr<const FontData>,
+			std::unique_ptr<const ShaderSource>,
+			std::unique_ptr<const Material>
+		>;
 
+		// @brief metadata, state, and the actual resource data
+		struct Entry { ResourceInfo info; Data data; };
+		// @brief A job to load a resource
+		struct Job { ResourceID id; AssetKey key; };
+		// @brief A completed load of a resource
+		struct Completion { ResourceID id; Data data; std::string error; };
+
+		// A request for a resource
+		ResourceID request(AssetKey key, std::string_view name);
+		// Worker thread function to load resources
+		void runLoader(std::stop_token stop);
+
+		mutable std::mutex m_mutex; // Don't want to un-const functions just to lock the mutex, so make it mutable
+
+		std::condition_variable_any m_workAvailable;
+		std::condition_variable m_resultAvailable;
+
+		std::unordered_map<ResourceID, Entry> m_entries;
+		std::map<AssetKey, ResourceID> m_assets; // To prevent duplicate loads
+
+		std::deque<Job> m_jobs; // Pending background loading jobs
+		std::deque<Completion> m_completed; // Results waiting for publication
+
+		ResourceID m_nextId = 1;
+
+		std::thread::id m_owner; // The thread that owns ResourceManager
+		bool m_accepting = false;
+		std::jthread m_worker; // resource loading thread
 	};
 }

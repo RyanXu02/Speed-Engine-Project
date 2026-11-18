@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
+    <ProjectConfiguration Include="Editor|x64">
+      <Configuration>Editor</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -26,20 +22,13 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v145</PlatformToolset>
@@ -53,60 +42,32 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <VcpkgRoot Condition="'$(VcpkgRoot)' == ''">$(VCInstallDir)vcpkg\</VcpkgRoot>
+  </PropertyGroup>
+  <Import Project="$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props')" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-    <Manifest>
-      <EnableSegmentHeap>true</EnableSegmentHeap>
-    </Manifest>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-    <Manifest>
-      <EnableSegmentHeap>true</EnableSegmentHeap>
-    </Manifest>
-  </ItemDefinitionGroup>
+  <PropertyGroup>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgManifestRoot>$(MSBuildProjectDirectory)\</VcpkgManifestRoot>
+    <VcpkgTriplet Condition="'$(Platform)' == 'x64' and '$(VcpkgTriplet)' == ''">x64-windows</VcpkgTriplet>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -115,166 +76,318 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <IntrinsicFunctions>
       </IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\;$(ProjectDir)ThirdParty\include\stb;$(ProjectDir)ThirdParty\include\nlohmann;$(ProjectDir)ThirdParty\include\glm;$(ProjectDir)ThirdParty\include\glfw;$(ProjectDir)ThirdParty\include\glad\include;$(ProjectDir)ThirdParty\include\spdlog;$(ProjectDir)ThirdParty\include\imgui;$(ProjectDir)ThirdParty\include\FMOD;$(ProjectDir)ThirdParty\include;$(ProjectDir)ThirdParty\include\rapidobj;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Jolt.lib;glfw3dll.lib;spdlog.lib;fmodL_vc.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PreBuildEvent>
-      <Command>xcopy "$(ProjectDir)ThirdParty\dll\$(Configuration)\*.dll" "$(OutDir)" /s /r /y /q
-
-xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
-</Command>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;COMPILE_WITH_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <IntrinsicFunctions>
+      </IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+    </Link>
+    <Manifest>
+      <EnableSegmentHeap>true</EnableSegmentHeap>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\;$(ProjectDir)src\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalTemplatesDiagnostics>false</ExternalTemplatesDiagnostics>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Jolt.lib;glfw3dll.lib;spdlog.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets" /s /r /y /q /i
+xcopy "$(ProjectDir)fonts" "$(OutDir)fonts" /s /r /y /q /i
+xcopy "$(ProjectDir)default_UI.ini" "$(OutDir)" /y /i</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\ResourceManagers\Terrain\Terrain.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsContactListener.cpp" />
+    <ClCompile Include="src\Core\Features\CameraFrustum.cpp" />
+    <ClCompile Include="src\Core\Features\CameraController.cpp" />
+    <ClCompile Include="src\Core\Memory\FrameSlot.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Font\Font.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.cpp" />
+    <ClCompile Include="src\Core\Threading\FrameExchange.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.cpp" />
+    <ClCompile Include="src\Core\EngineStates.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\AudioComponents.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\RigidBody.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Audio\AudioSystem.cpp" />
+    <ClCompile Include="src\Core\Features\Math.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\Component\ComponentStructs.cpp" />
+    <ClCompile Include="src\Core\Scene\Entity\EntityRegistry.cpp" />
+    <ClCompile Include="src\Core\Features\MemoryTrackable.cpp" />
+    <ClCompile Include="src\Core\Features\MemoryTrackingSystem.cpp" />
+    <ClCompile Include="src\Core\Features\Serializable.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.cpp" />
+    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Input\InputSystem.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\UI\UISystem.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\MeshResource\MeshResource.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\Mesh.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\Component.cpp" />
     <ClCompile Include="src\Core\SubSystems\Scenes\SceneSystem.cpp" />
     <ClCompile Include="src\Core\Scene\Entity\Entity.cpp" />
     <ClCompile Include="src\Core\Scene\Scene.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.cpp" />
-    <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\FBO.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\TonemapRenderer\TonemapRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImageBasedRenderer\ImageBasedRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\GeometryRenderer\GeometryRenderer.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\DeferredLightingRenderer\DeferredLightingRenderer.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSubscription.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\EventSystem.cpp" />
     <ClCompile Include="src\Core\SubSystems\Events\Event.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Resource.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderManager.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Shader\Shader.cpp" />
+    <ClCompile Include="src\Core\ResourceManagers\Shader\ShaderSource.cpp" />
     <ClCompile Include="src\Core\Logger\Logger.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\ResourceManager.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Scriptings\ScriptingSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Core\SubSystems\SubSystem.cpp" />
-    <ClCompile Include="src\Core\ResourceManagers\Material\Material.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\AssetGPUCache.cpp" />
     <ClCompile Include="src\Core\ResourceManagers\Material\Texture.cpp" />
-    <ClCompile Include="ThirdParty\include\glad\src\gl.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_demo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_draw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_impl_glfw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_impl_opengl3.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_tables.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\include\imgui\imgui_widgets.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\pch.cpp">
+    <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Core\SubSystems\Graphics\Window.cpp" />
     <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\Viewport.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widget.cpp" />
     <ClCompile Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.cpp" />
-    <ClCompile Include="src\Core\Scene\Entity\Component\Transform.cpp" />
+    <ClCompile Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Core\ResourceManagers\Terrain\Terrain.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeTerrain.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ShadowRenderer\ShadowRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TerrainRenderer\TerrainRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetBrowserWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\AssetPathPayload.h" />
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsContactListener.h" />
+    <ClInclude Include="src\Core\Features\CameraFrustum.h" />
+    <ClInclude Include="src\Core\Features\CameraState.h" />
+    <ClInclude Include="src\Core\Features\CameraController.h" />
+    <ClInclude Include="src\Core\Features\RNG.h" />
+    <ClInclude Include="src\Core\Memory\FrameSlot.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Font\Font.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleContainer.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\Particles\ParticleEmitter.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ParticleRenderer\ParticleRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TextRenderer\TextRenderer.h" />
+    <ClInclude Include="src\Core\Threading\FrameExchange.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrame.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Presentation.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderFrameBuilder.h" />
+    <ClInclude Include="src\Core\EngineStates.h" />
+    <ClInclude Include="src\Core\SubSystems\UI\UISystem.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\EngineStateWidget.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\MathToLuaBindings.h" />
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsDebugRenderer.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\AudioComponents.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeMesh.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeCapsule.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeBox.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShapeSphere.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\PhysicsShape\PhysicsShape.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\RigidBody.h" />
+    <ClInclude Include="src\Core\SubSystems\Physics\PhysicsSystem.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ComponentToLuaBindings.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\EventToLuaBindings.h" />
+    <ClInclude Include="src\Core\SubSystems\Audio\AudioSystem.h" />
+    <ClInclude Include="src\Core\Features\Math.h" />
+    <ClInclude Include="src\Core\Features\MathToJSONBindings.h" />
+    <ClInclude Include="src\Core\Logger\ConsoleSink.h" />
+    <ClInclude Include="src\Core\Scene\Entity\EntityRegistry.h" />
+    <ClInclude Include="src\Core\Features\MemoryTag.h" />
+    <ClInclude Include="src\Core\Features\MemoryTrackable.h" />
+    <ClInclude Include="src\Core\Features\MemoryTrackingSystem.h" />
+    <ClInclude Include="src\Core\Features\Serializable.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\ComponentStructs.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UICanvasComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIRectComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIElementComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIImageComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UITextComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISelectableComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UIButtonComponent.h" />
+    <ClInclude Include="src\Core\Scene\Entity\Component\UISliderComponent.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ComponentInspectorRegistry.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\EditorSession.h" />
+    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MemoryWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Input\InputSystem.h" />
-    <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResourceManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Input\InputEvent.h" />
+    <ClInclude Include="src\Core\SubSystems\Input\InputEventQueue.h" />
     <ClInclude Include="src\Core\ResourceManagers\MeshResource\MeshResource.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\Mesh.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\PropertiesWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\SceneInfoWidget.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\Component.h" />
     <ClInclude Include="src\Core\SubSystems\Input\KeyCodes.h" />
     <ClInclude Include="src\Core\SubSystems\Scenes\SceneSystem.h" />
+    <ClInclude Include="src\Core\SubSystems\UI\UILayout.h" />
     <ClInclude Include="src\Core\Scene\Entity\Entity.h" />
     <ClInclude Include="src\Core\Scene\Scene.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ScenePreviewWidget.h" />
-    <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ResourceBrowserWidget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\MainWidget.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\FBO.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\MeshGPUCache.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\AssetGPUCache.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RenderContext.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DebugRenderer\DebugRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GrayscaleRenderer\GrayscaleRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\TonemapRenderer\TonemapRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImageBasedRenderer\ImageBasedRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\SceneRenderer\SceneRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\GeometryRenderer\GeometryRenderer.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\DeferredLightingRenderer\DeferredLightingRenderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\RendererManager.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Renderer.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\ImGuiRenderer\ImGuiRenderer.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Material\MaterialManager.h" />
     <ClInclude Include="src\Core\Logger\LoggerProxy.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSubscription.h" />
     <ClInclude Include="src\Core\SubSystems\Events\EventSystem.h" />
     <ClInclude Include="src\Core\SubSystems\Events\Event.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Manager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Resource.h" />
-    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderManager.h" />
     <ClInclude Include="src\Core\ResourceManagers\Shader\Shader.h" />
+    <ClInclude Include="src\Core\ResourceManagers\Shader\ShaderSource.h" />
     <ClInclude Include="src\Core\Logger\Logger.h" />
     <ClInclude Include="src\Core\Engine.h" />
     <ClInclude Include="src\Core\EngineConfig.h" />
     <ClInclude Include="src\Core\ResourceManagers\ResourceManager.h" />
+    <ClInclude Include="src\Core\SubSystems\Scriptings\ScriptingSystem.h" />
     <ClInclude Include="src\Core\SubSystems\SubSystem.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Material.h" />
     <ClInclude Include="src\Core\ResourceManagers\Material\Texture.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imconfig.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui_impl_opengl3.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imgui_internal.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imstb_rectpack.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imstb_textedit.h" />
-    <ClInclude Include="ThirdParty\include\imgui\imstb_truetype.h" />
-    <ClInclude Include="ThirdParty\pch.h" />
+    <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Window.h" />
     <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\Viewport.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widget.h" />
     <ClInclude Include="src\Core\SubSystems\ImGui\Widgets\ConsoleWidget.h" />
-    <ClInclude Include="src\Core\Scene\Entity\Component\Transform.h" />
+    <ClInclude Include="src\Core\SubSystems\Graphics\Rendering\WireframeRenderer\WireframeRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\debug.frag" />
+    <None Include="Assets\Shaders\debug.vert" />
+    <None Include="Assets\Shaders\grayscale.vert" />
+    <None Include="Assets\Shaders\grayscale.frag" />
+    <None Include="Assets\Shaders\tonemap.vert" />
+    <None Include="Assets\Shaders\tonemap.frag" />
+    <None Include="Assets\Shaders\equirectangularToCubemap.comp" />
+    <None Include="Assets\Shaders\irradianceSH.comp" />
+    <None Include="Assets\Shaders\prefilter.comp" />
+    <None Include="Assets\Shaders\brdf.comp" />
     <None Include="Assets\Shaders\default.frag" />
     <None Include="Assets\Shaders\default.vert" />
+    <None Include="Assets\Shaders\particle_billboard.frag" />
+    <None Include="Assets\Shaders\particle_billboard.vert" />
+    <None Include="Assets\Shaders\gpass.vert" />
+    <None Include="Assets\Shaders\gpass.frag" />
+    <None Include="Assets\Shaders\deferredLighting.vert" />
+    <None Include="Assets\Shaders\deferredLighting.frag" />
+    <None Include="Assets\Shaders\text.frag" />
+    <None Include="Assets\Shaders\text.vert" />
+    <None Include="Assets\Terrain\MainTerrain\main-terrain.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

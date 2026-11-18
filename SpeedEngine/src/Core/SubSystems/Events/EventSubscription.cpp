@@ -1,5 +1,7 @@
 #include "pch.h"
+
 #include "EventSubscription.h"
+
 #include "Engine.h"
 
 namespace SE
@@ -10,7 +12,8 @@ namespace SE
 	}
 
 	EventSubscription::EventSubscription(EventSubscription&& other) noexcept
-		: m_eventType(other.m_eventType), m_id(other.m_id)
+	    : m_eventType(other.m_eventType),
+	      m_id(other.m_id)
 	{
 		other.m_id = 0; // invalidate the moved-from object
 	}
@@ -29,7 +32,6 @@ namespace SE
 	void EventSubscription::unsubscribe() const
 	{
 		Engine::Instance().getSubSystem<EventSystem>()->unsubscribe(m_id, m_eventType);
-
 	}
 
-}
+} // namespace SE

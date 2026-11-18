@@ -1,89 +1,170 @@
 #include "pch.h"
+
 #include "Entity.h"
+
+#include "Component/ComponentStructs.h"
+#include "Core/SubSystems/Events/EventSystem.h"
+#include "Core/SubSystems/Physics/PhysicsSystem.h"
 #include "Engine.h"
+#include "ResourceManagers/ResourceManager.h"
+#include "SubSystems/Scriptings/ScriptingSystem.h"
 
-#include "../../SubSystems/Scenes/SceneSystem.h"
-
-#include "../../SubSystems/Events/EventSystem.h"
-
-#include "Component/Transform.h"
 namespace SE
 {
 	using MT = ActiveSceneModified::ModifyType;
 
 
-	uint32_t Entity::s_nextId = 1;
-
-	Entity::Entity(std::string name) :
-		m_instanceId(s_nextId++),
-		m_name(name)
+	Entity::Entity(const Entity& other) 
 	{
-		m_components.push_back(std::make_unique<Transform>());
+		m_id = other.m_id;
+		m_registry = other.m_registry;
 	}
 
-	Entity::Entity(const Entity& other) :
-		m_instanceId(s_nextId++),
-		m_name(other.m_name),
-		m_isAlive(other.m_isAlive),
-		m_tag(other.m_tag)
+	Entity::Entity(uint32_t id, EntityRegistry* registry)
+	    : m_id(id),
+	      m_registry(registry)
+	{}
+
+	Entity::HookFunction Entity::_onMeshComponentAdded()
 	{
-		for (const auto& component : other.m_components)
+		HookFunction function = [](Entity entity)
 		{
-			auto cloned = std::unique_ptr<Component>(component->clone());
-			cloned->setParentEntity(this);
-			m_components.push_back(std::move(cloned));
-		}
+			auto* meshComponent = entity.getComponent<MeshComponent>();
+			if (meshComponent->meshResourceID == 0 && !meshComponent->path.empty() && meshComponent->path != "None")
+				meshComponent->setPath(meshComponent->path);
+		};
+		return function;
 	}
 
-	void Entity::initializeEntity(Scene* parentScene)
+	Entity::HookFunction Entity::_onTerrainComponentAdded()
 	{
-		m_parentScene = parentScene;
-	}
-
-	void Entity::updateEntity(double deltaTime)
-	{
-		for (const auto& component : m_components)
+		HookFunction function = [](Entity entity)
 		{
-			component->updateComponent();
-		}
+			auto* terrainComponent = entity.getComponent<TerrainComponent>();
+			if (terrainComponent->terrainResourceID == 0 && !terrainComponent->path.empty() && terrainComponent->path != "None")
+				terrainComponent->setPath(terrainComponent->path);
+		};
+		return function;
 	}
 
-	void Entity::setName(std::string_view name)
+	Entity::HookFunction Entity::_onScriptComponentAdded()
 	{
-		m_name = std::string(name);
-		Engine::Instance().getSubSystem<EventSystem>()->publish(
-			std::make_unique<ActiveSceneModified>(MT::Rename, m_instanceId, m_name)
-		);
+		HookFunction function = [](Entity entity)
+		{
+			auto* scriptComponent = entity.getComponent<ScriptComponent>();
+			auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
+			scriptingSystem->loadScript(entity, scriptComponent->path);
+		};
+		return function;
 	}
 
-	void Entity::addComponent(std::unique_ptr<Component> component)
+	Entity::HookFunction Entity::_onScriptComponentRemoved()
 	{
-		if (!component)
+		HookFunction function = [](Entity entity)
 		{
-			m_parentScene->getLogger().critical("Attempted to add a null component to entity '{}'", m_name);
-			assert(false && "Attempted to add a null component to entity");
-			return;
-		}
+			auto scriptingSystem = Engine::Instance().getSubSystem<ScriptingSystem>();
+			scriptingSystem->removeScript(entity);
+		};
+		return function;
+	}
 
-		if (!component->allowsMultipleComponents())
+	Entity::HookFunction Entity::_onCameraComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
 		{
-			for (const auto& existingComponent : m_components)
+			auto* cameraComponent = entity.getComponent<CameraComponent>();
+			cameraComponent->frustum.setFOV(cameraComponent->fov);
+			cameraComponent->frustum.setNearPlane(cameraComponent->nearPlane);
+			cameraComponent->frustum.setFarPlane(cameraComponent->farPlane);
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onCameraComponentRemoved()
+	{
+		return [](Entity entity)
+		{
+			EngineStates::releaseCamera(&entity.getComponent<CameraComponent>()->frustum);
+		};
+	}
+
+	Entity::HookFunction Entity::_onRigidBodyComponentAdded()
+	{
+		return [](Entity entity)
+		{
+			auto* physicsSystem = Engine::Instance().getSubSystem<PhysicsSystem>();
+			entity.getComponent<RigidBody>()->initialize(physicsSystem->getBodyInterface());
+		};
+	}
+
+	Entity::HookFunction Entity::_onSFXComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* sfxComponent = entity.getComponent<AudioSFXComponent>();
+			if (!sfxComponent->getFilepath().empty() && sfxComponent->getFilepath() != "None")
+				sfxComponent->createSound(sfxComponent->getFilepath(), sfxComponent->isGameSFX());
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onMusicComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* musicComponent = entity.getComponent<AudioMusicComponent>();
+			if (!musicComponent->getFilepath().empty() && musicComponent->getFilepath() != "None")
+				musicComponent->createTrack(musicComponent->getFilepath());
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onSFXComponentRemoved()
+	{
+		return [](Entity entity)
+		{
+			entity.getComponent<AudioSFXComponent>()->StopMySound();
+		};
+	}
+
+
+	Entity::HookFunction Entity::_onPhysicsShapeMeshComponentAdded() 
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* physicsShapeMeshComponent = entity.getComponent<PhysicsShapeMesh>();
+			const auto path = physicsShapeMeshComponent->getPath();
+			if (physicsShapeMeshComponent->getMeshResourceID() == 0 && !path.empty() && path != "None")
 			{
-				if (typeid(*existingComponent) == typeid(*component))
-				{
-					m_parentScene->getLogger().critical("Attempted to add a duplicate component of type '{}' to entity '{}'", typeid(*component).name(), m_name);
-					return;
-				}
+				auto meshResourceManager = Engine::Instance().getSubSystem<ResourceManager>();
+				physicsShapeMeshComponent->setMeshResourceID(meshResourceManager->requestMesh({ .path = path, .name = path }));
 			}
-		}
+		};
+		return function;
+	}
 
-		if (!component->initComponent())
+	Entity::HookFunction Entity::_onPhysicsShapeTerrainComponentAdded()
+	{
+		HookFunction function = [](Entity entity)
 		{
-			m_parentScene->getLogger().critical("Failed to initialize component for entity '{}'", m_name);
-			assert(false && "Failed to initialize component for entity");
-			return;
-		}
-		component->setParentEntity(this);
-		m_components.push_back(std::move(component));
+			auto* physicsShapeTerrainComponent = entity.getComponent<PhysicsShapeTerrain>();
+			const auto path = physicsShapeTerrainComponent->getPath();
+			if (physicsShapeTerrainComponent->getTerrainID() == 0 && !path.empty() && path != "None")
+			{
+				auto terrainManager = Engine::Instance().getSubSystem<ResourceManager>();
+				physicsShapeTerrainComponent->setTerrainID(terrainManager->requestTerrain({ .path = path, .name = path }));
+			}
+		};
+		return function;
+	}
+
+	Entity::HookFunction Entity::_onParticleEmitterAdded()
+	{
+		HookFunction function = [](Entity entity)
+		{
+			auto* pe = entity.getComponent<ParticleEmitter>();
+			pe->finalize();
+		};
+		return function;
 	}
 }

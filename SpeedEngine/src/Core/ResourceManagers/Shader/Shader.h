@@ -1,35 +1,46 @@
 #pragma once
 
-#include "vec2.hpp"
-#include "vec3.hpp"
-#include "vec4.hpp"
-#include "mat2x2.hpp"
-#include "mat3x3.hpp"
-#include "mat4x4.hpp"
 
-#include"../Resource.h"
+#include <glm/mat2x2.hpp>
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace SE
 {
-	//compilation status of shader + its files
+	// compilation status of shader + its files
 	struct GLCompStatus
 	{
-		bool success { false };
-		std::string log { "" };
+		bool success{ false };
+		std::string log{ "" };
 	};
 
 	// @brief Represents a shader program
-	// @brief A shader program represents a vertex shader and a fragment shader that are compiled and linked together
-	class Shader : public Resource
+	// @brief A shader program represents a vertex shader and a fragment shader that
+	// are compiled and linked together
+	class Shader
 	{
 	public:
-		Shader(uint32_t id, std::string resourceName);
+		Shader() = default;
+		~Shader();
+
+		Shader(const Shader&) = delete;
+		Shader& operator=(const Shader&) = delete;
+		Shader(Shader&&) = delete;
+		Shader& operator=(Shader&&) = delete;
 
 		//@brief compiles and links a shader object
 		//@param vertexShaderSource the literal source code of vertex shader as a string
 		//@param fragmentShaderSource the literal source code of fragment shader as a string
 		//@returns compilation status containing its success (T/F) and any compilation logs
 		GLCompStatus init(std::string_view vertexShaderSource, std::string_view fragmentShaderSource);
+
+		//@brief compiles and links a compute only shader object, needs a 4.3+ context
+		//@param computeShaderSource the literal source code of the compute shader as a string
+		//@returns compilation status containing its success (T/F) and any compilation logs
+		GLCompStatus initCompute(std::string_view computeShaderSource);
 
 		//@brief binds shader to be used in graphics pipeline
 		void bind();
@@ -54,7 +65,6 @@ namespace SE
 		void setMat3(std::string_view name, const glm::mat3& mat);
 		void setMat4(std::string_view name, const glm::mat4& mat);
 
-
 	private:
 		unsigned int m_ProgramId = 0;
 
@@ -63,5 +73,4 @@ namespace SE
 
 		GLCompStatus _checkCompilationErr(unsigned int shader, std::string_view type);
 	};
-}
-
+} // namespace SE

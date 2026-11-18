@@ -1,0 +1,425 @@
+{
+  "entities": [
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/Cube.obj"
+        },
+        "NameComponent": {
+          "name": "floor"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            15.0,
+            0.10000000149011612,
+            15.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "id": 1
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/Cube.obj"
+        },
+        "NameComponent": {
+          "name": "wall1"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            15.0,
+            2.5,
+            0.10000000149011612
+          ],
+          "translate": [
+            0.0,
+            2.5,
+            15.0
+          ]
+        }
+      },
+      "id": 2
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/Cube.obj"
+        },
+        "NameComponent": {
+          "name": "wall2"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.10000000149011612,
+            2.5,
+            15.0
+          ],
+          "translate": [
+            -15.0,
+            2.5,
+            0.0
+          ]
+        }
+      },
+      "id": 3
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/Cube.obj"
+        },
+        "NameComponent": {
+          "name": "wall3"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            15.0,
+            2.5,
+            0.10000000149011612
+          ],
+          "translate": [
+            0.0,
+            2.5,
+            -15.0
+          ]
+        }
+      },
+      "id": 4
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/Cube.obj"
+        },
+        "NameComponent": {
+          "name": "wall4"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            0.10000000149011612,
+            2.5,
+            15.0
+          ],
+          "translate": [
+            15.0,
+            2.5,
+            0.0
+          ]
+        }
+      },
+      "id": 5
+    },
+    {
+      "components": {
+        "MeshComponent": {
+          "path": "Assets/Meshes/Cube.obj"
+        },
+        "NameComponent": {
+          "name": "cube1"
+        },
+        "PhysicsShapeBox": {
+          "halfExtents": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": true,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 2,
+          "needsMassOverride": false,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.30000001192092896
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/physicstest.lua"
+        },
+        "Transform": {
+          "rotate": [
+            2.4502804762960295e-07,
+            -1.8555127098807134e-05,
+            7.877078189721942e-08,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "translate": [
+            -0.0007992983446456492,
+            4.199999809265137,
+            0.0009798412211239338
+          ]
+        }
+      },
+      "id": 6
+    },
+    {
+      "components": {
+        "NameComponent": {
+          "name": "physicstestscene"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/physicstestscene.lua"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "id": 7
+    },
+    {
+      "components": {
+        "CameraComponent": {
+          "farPlane": 1000.0,
+          "fov": 90.0,
+          "isPrimary": false,
+          "nearPlane": 0.10000000149011612
+        },
+        "NameComponent": {
+          "name": "camera"
+        },
+        "ScriptComponent": {
+          "path": "Assets/Scripts/cameraslow.lua"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "translate": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "id": 8
+    },
+    {
+      "components": {
+        "NameComponent": {
+          "name": "terrain"
+        },
+        "PhysicsShapeTerrain": {
+          "path": "Assets/Terrain/MainTerrain/main-terrain.json"
+        },
+        "RigidBody": {
+          "friction": 0.20000000298023224,
+          "gravityFactor": 1.0,
+          "isActive": false,
+          "maxAngularVelocity": 47.12385177612305,
+          "maxLinearVelocity": 500.0,
+          "motionType": 0,
+          "needsMassOverride": true,
+          "offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "restitution": 0.0
+        },
+        "TerrainComponent": {
+          "path": "Assets/Terrain/MainTerrain/main-terrain.json"
+        },
+        "Transform": {
+          "rotate": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": [
+            50.0,
+            50.0,
+            50.0
+          ],
+          "translate": [
+            0.0,
+            0.5,
+            0.0
+          ]
+        }
+      },
+      "id": 9
+    }
+  ],
+  "scene_name": "Untitled"
+}

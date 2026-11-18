@@ -1,0 +1,50 @@
+{
+  "components": {
+    "MeshComponent": {
+      "path": "Assets/Meshes/cube.obj"
+    },
+    "NameComponent": {
+      "name": "Cube"
+    },
+    "PhysicsShapeBox": {
+      "halfExtents": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "RigidBody": {
+      "friction": 0.20000000298023224,
+      "gravityFactor": 9.800000190734863,
+      "isActive": true,
+      "maxAngularVelocity": 45.0,
+      "maxLinearVelocity": 100.0,
+      "motionType": 2,
+      "needsMassOverride": false,
+      "offset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "restitution": 0.0
+    },
+    "Transform": {
+      "rotate": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "translate": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

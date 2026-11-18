@@ -1,63 +1,88 @@
 #pragma once
 
-#include "Component/Component.h"
+#include "Component/ComponentStructs.h"
+#include "EntityRegistry.h"
 
 namespace SE
 {
 	class Scene;
 
-	// @brief An entity is a container for components that define its behavior and appearance in the scene
-	// @brief An entity is owned by a scene, and can be created and destroyed by the scene
+	// @brief An entity is a just handle, registry owns all entities and component
+	// @brief entity is owned by a scene, and can be created and destroyed by the scene
+
 	class Entity
 	{
 	public:
-		Entity(std::string name);
+		Entity(const Entity& other);
+		Entity(uint32_t id, EntityRegistry* registry);
 
-		Entity(const Entity&);
+		operator uint32_t() { return m_id; }
 
-		void initializeEntity(Scene* parentScene);
-		void updateEntity(double deltaTime);
-		void shutdownEntity() {};
+		// @brief Returns the runtime ID of the entity
+		uint32_t id() const { return m_id; }
+		// @brief Returns the Scene Serialization ID of the entity
+		// @brief This ID used for serialization and deserialization of the entity only
+		uint64_t ssid() const { return m_registry->getEntitySSID(m_id); }
 
-		uint32_t getInstanceId() const { return m_instanceId; }
+		const EntityRegistry::ComponentRegistry* getComponentRegistry() const { return m_registry->getComponentRegistry(m_id); }
 
-		const std::string& getName() const { return m_name; }
-		void setName(std::string_view name);
-
-		// @brief Marks the entity as dead, so it can be removed from the scene in the next update cycle
-		void killEntity() { m_isAlive = false; }
-		bool isAlive() const { return m_isAlive; }
-
-		void addComponent(std::unique_ptr<Component> component);
-
-		template <typename T>
-		T* getComponent() const
+		template<typename T, typename... Args>
+		T* addComponent(Args&&... args)
 		{
-			for (const auto& component : m_components)
-			{
-				if (typeid(*component.get()) == typeid(T))
-				{
-					return static_cast<T*>(component.get());
-				}
-			}
-			return nullptr;
+			return m_registry->addComponent<T>(m_id, std::forward<Args>(args)...);
 		}
 
-		const std::vector<std::unique_ptr<Component>>& getComponents() const { return m_components; }
+		template<typename T>
+		T* getComponent()
+		{
+			return m_registry->getComponent<T>(m_id);
+		}
+
+		template<typename T>
+		bool removeComponent()
+		{
+			return m_registry->removeComponent<T>(m_id);
+		}
+		// @brief Direction vectors from the entity's transform rotation (local space)
+		glm::vec3 forward() { return _rotated(glm::vec3(0.f, 0.f, -1.f)); }
+		glm::vec3 up() { return _rotated(glm::vec3(0.f, 1.f, 0.f)); }
+		glm::vec3 right() { return _rotated(glm::vec3(1.f, 0.f, 0.f)); }
 
 	private:
-		bool m_isAlive{ true };
+		glm::vec3 _rotated(const glm::vec3& axis)
+		{
+			//Transform* t = getComponent<Transform>();
+			//return t ? glm::normalize(t->rotate * axis) : axis;
+			return glm::normalize(getComponent<Transform>()->rotate * axis);
+		}
 
-		std::string m_name;
+		uint32_t m_id;
+		EntityRegistry* m_registry;
+		typedef std::function<void(Entity)> HookFunction;
 
-		uint32_t m_instanceId;
-		static uint32_t s_nextId;
-		
-		Scene* m_parentScene{ nullptr };
+		friend class EntityRegistry;
 
-		std::vector<std::unique_ptr<Component>> m_components;
+		static HookFunction _onMeshComponentAdded();
 
-		std::string m_tag{ "Untagged" }; // not used, but could be used for filtering entities in the future
+		static HookFunction _onTerrainComponentAdded();
+
+		static HookFunction _onScriptComponentAdded();
+		static HookFunction _onScriptComponentRemoved();
+
+		static HookFunction _onCameraComponentAdded();
+		static HookFunction _onCameraComponentRemoved();
+
+		static HookFunction _onRigidBodyComponentAdded();
+
+		static HookFunction _onSFXComponentAdded();
+		static HookFunction _onSFXComponentRemoved();
+
+		static HookFunction _onMusicComponentAdded();
+
+		static HookFunction _onPhysicsShapeMeshComponentAdded();
+
+		static HookFunction _onPhysicsShapeTerrainComponentAdded();
+
+		static HookFunction _onParticleEmitterAdded();
 	};
-}
-
+} // namespace SE

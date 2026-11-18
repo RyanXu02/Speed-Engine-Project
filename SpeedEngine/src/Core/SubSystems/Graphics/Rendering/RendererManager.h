@@ -1,62 +1,166 @@
 #pragma once
-#include "../../SubSystem.h"
-
-#include "../Window.h"
-
-#include "Renderer.h"
-#include "SceneRenderer/SceneRenderer.h"
-#include "ImGuiRenderer/ImGuiRenderer.h"
-
-#include "Viewport.h"
+#include "Core/SubSystems/SubSystem.h"
+#include "Core/SubSystems/Graphics/Window.h"
+#include "Core/SubSystems/Graphics/Rendering/ImGuiRenderer/ImGuiRenderer.h"
+#include "Core/SubSystems/Graphics/Rendering/RenderContext.h"
+#include "Core/SubSystems/Graphics/Rendering/Renderer.h"
+#include "Core/SubSystems/Input/InputEvent.h"
 
 namespace SE
 {
+	class TextRenderer;
+
+	namespace TextureSlots
+	{
+		extern const int G_POSITION;
+		extern const int G_NORMAL;
+		extern const int G_ALBEDO;
+		extern const int G_MATERIAL;
+		extern const int G_EMISSIVE;
+		extern const int SHADOW_MAP;
+		extern const int BLUE_NOISE;
+		extern const int IBL_PREFILTER;
+		extern const int IBL_BRDF_LUT;
+		extern const int SKY;
+	}
+
+	// @brief Use this to define a render pass
+	// @brief A render pass is a single rendering operation that uses a specific renderer and outputs to a specific FBO
+	// @param renderer The renderer to use for this pass
+	// @param output The FBO to render to
+	// @param clearMask What to clear the current bound FBO to, default is GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+	// @param clearColor The color to clear the output FBO to, default is (0.1, 0.1, 0.1, 1.0)
+	// @param clearDepth The depth to clear the output FBO to, default is 1.0
+	struct RenderPass
+	{
+		Renderer& renderer;
+		FBO& output;
+		GLbitfield clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+		glm::vec4 clearColor{ 0.1f, 0.1f, 0.1f, 1.0f };
+		double clearDepth = 1.0;
+		bool debugOnly = false;
+		bool wireframeOnly = false;
+	};
+
 	// @brief Manager for all renderers in the engine
 	// @brief Manages the lifecycle of renderers, viewports, and rendering operations
-    class RendererManager : public SubSystem
-    {
+	class RendererManager : public SubSystem
+	{
 		friend class Engine; // only Engine should create instance of subsystems
 
-    public:
+	public:
 		const Window* getWindow() const { return m_window; }
 		void setWindow(Window& window) { m_window = &window; }
 
-		template <typename T> requires std::derived_from<T, Renderer>
-        T* getRenderer()
-        {
-            if (m_sceneRenderer && dynamic_cast<T*>(m_sceneRenderer.get()))
-            {
-                return static_cast<T*>(m_sceneRenderer.get());
-            }
-            return nullptr;
-        }
-
-		template <typename T> requires std::derived_from<T, Renderer>
-		void removeRenderer()
+		template<typename T>
+		requires std::derived_from<T, Renderer> T* getRenderer()
 		{
-			if (m_sceneRenderer && dynamic_cast<T*>(m_sceneRenderer.get()))
+			for (auto& renderer : m_renderers)
 			{
-				m_sceneRenderer->shutdown();
-				m_sceneRenderer.reset();
+				if (auto* result = dynamic_cast<T*>(renderer.get()))
+					return result;
 			}
+
+			// imgui renderer is special
+			return dynamic_cast<T*>(m_imguiRenderer.get());
 		}
 
+		template<typename T, typename... Args>
+		requires std::derived_from<T, Renderer> T& addRenderer(Args&&... args)
+		{
+			auto renderer = std::make_unique<T>(*m_logger, std::forward<Args>(args)...);
+			renderer->init();
+			T& result = *renderer;
+			m_renderers.push_back(std::move(renderer));
+			return result;
+		}
+		// @brief Creates a render target to be used in a render pass
+		// @param name The name of the render target
+		// @param descriptor The descriptor of the render target, includes width, height, and attachments
+		// @param size The size of the render target, either following the scene viewport or using a fixed scale
+		// @return A reference to the created FBO
+		FBO& createRenderTarget(const std::string& name, Descriptor descriptor, RenderTargetSize size = {});
+		FBO& getRenderTarget(const std::string& name) const { return *m_targets.at(name).framebuffer; }
+
+		// @brief Adds a render pass to the renderer manager
+		// @param pass The render pass to add
+		// @param 
+		void addPass(RenderPass pass) { m_passes.push_back(pass); }
+
+		// @brief Sets the final scene output to be presented to the window
+		// @param target The name of the render target to use as the final scene output
+		// @param colorAttachment The color attachment index of the render target to use as the final scene output
+		void setFinalSceneOutput(const std::string& target, size_t colorAttachment = 0);
+
+		// @brief Gets the final scene output texture to be presented to the window
+		// @return The texture ID of the final scene output
+		uint32_t getFinalSceneTexture() const { return m_finalSceneOutput->getColorTexture(m_finalColorAttachment); }
+
+		glm::uvec2 getFinalSceneSize() const
+		{
+			return { m_finalSceneOutput->getWidth(), m_finalSceneOutput->getHeight() };
+		}
+
+		// @brief Gets the scene viewport, which defines the size and camera of the scene being rendered
+		// @return A reference to the scene viewport
+		const Viewport& getSceneViewport() const { return *m_sceneViewport; }
+
+		void requestSceneResize(uint32_t width, uint32_t height);
+
+		// @brief Sets the input region for the game, which defines the area of the window that will receive input events
+		// @param inputRegion The input region to set
+		// @param scenePreviewItemActive Used for the weird input conflict with ImGui
+		void setGameInputRegion(const InputRegion& inputRegion, bool scenePreviewItemActive = false)
+		{
+			m_gameInputRegion = inputRegion;
+			m_scenePreviewItemActive = scenePreviewItemActive;
+		}
+
+		// @brief Gets the scene's single directional light, passed to every pass through the RenderContext
+		// @return reference to the sun data
+		DirectionalLight& getSun() { return m_sun; }
+
 		void init() override;
-		void update(double deltaTime) override;
 		void shutdown() override;
 
-		void render() const;
+		// @brief Renders a frame through all render passes
+		// @param frame The RenderFrame to render
+		// @param t The interpolation factor between the current and next frame
+		void render(const RenderFrame& frame, float t);
 
-    private:
-		RendererManager() = delete;
-		RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window) {};
+	private:
+		explicit RendererManager(Window& window) : SubSystem("RendererManager"), m_window(&window){};
 
 		const Window* m_window;
 
-		std::unique_ptr<SceneRenderer> m_sceneRenderer;
-		std::unique_ptr<ImGuiRenderer> m_imguiRenderer;
-		// subsequent renderers for parts such as ui and debug views
-		// ...
-    };
-}
+		void _applySceneResize();
 
+		// @brief Prepares the game input region based on the current framebuffer size
+		void _prepareGameInputRegion(int framebufferWidth, int framebufferHeight);
+		// @brief Publishes the game input region to the window's input event queue
+		void _publishGameInputRegion();
+
+		std::unique_ptr<Viewport> m_sceneViewport;
+
+		std::unique_ptr<MeshGPUCache> m_meshes;
+		AssetGPUCache m_gpu;
+
+		RenderTargets m_targets;
+
+		DirectionalLight m_sun;
+
+		std::vector<std::unique_ptr<Renderer>> m_renderers;
+		TextRenderer* m_textRenderer = nullptr; // owned by m_renderers
+		std::unique_ptr<ImGuiRenderer> m_imguiRenderer; // imgui is special
+
+		InputRegion m_gameInputRegion;
+		bool m_scenePreviewItemActive{ false };
+
+		std::vector<RenderPass> m_passes;
+
+		FBO* m_finalSceneOutput = nullptr;
+		size_t m_finalColorAttachment = 0;
+
+		std::optional<std::pair<uint32_t, uint32_t>> m_pendingSceneSize;
+	};
+} // namespace SE

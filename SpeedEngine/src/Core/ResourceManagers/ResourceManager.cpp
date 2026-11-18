@@ -1,106 +1,210 @@
 #include "pch.h"
-#include "Engine.h"
-
 #include "ResourceManager.h"
-#include "../Logger/Logger.h"
-
-#include "Shader/ShaderManager.h"
-#include "Material/MaterialManager.h"
-#include "MeshResource/MeshResourceManager.h"
+#include "Core/Logger/Logger.h"
 
 namespace SE
 {
 	void ResourceManager::init()
 	{
 		SubSystem::init();
-
-		// init managers
-		m_managers.emplace_back(std::make_unique<ShaderManager>());
-		m_managers.emplace_back(std::make_unique<MaterialManager>());
-		m_managers.emplace_back(std::make_unique<MeshResourceManager>());
-		//...
-		for (auto& manager : m_managers)
-		{
-			manager->init();
-		}
+		m_owner = std::this_thread::get_id();
+		m_accepting = true;
+		m_worker = std::jthread([this](std::stop_token stop) { runLoader(stop); });
 	}
 
 	void ResourceManager::shutdown()
 	{
+		assert(std::this_thread::get_id() == m_owner);
+		
+		{
+			std::lock_guard lock(m_mutex);
+			m_accepting = false;
+			m_jobs.clear();
+		}
+
+		m_worker.request_stop();
+		m_worker.join();
+		m_completed.clear();
+		m_entries.clear();
+		m_assets.clear();
 		SubSystem::shutdown();
-
-		for (auto& manager : m_managers)
-		{
-			manager->shutdown();
-		}
-		m_managers.clear();
-
 	}
 
-	uint32_t ResourceManager::generateId()
+	ResourceID ResourceManager::request(AssetKey key, std::string_view name)
 	{
-		return m_ids.fetch_add(1, std::memory_order_relaxed);
+		std::lock_guard lock(m_mutex);
+		if (!m_accepting)
+			return 0;
+
+		if (const auto found = m_assets.find(key); found != m_assets.end())
+			return found->second;
+
+		const auto id = m_nextId++;
+		m_entries.emplace(id, Entry{ { id, key.type, ResourceState::Loading, std::string(name), key.path, {} }, {} });
+		m_assets.emplace(key, id);
+		m_jobs.push_back({ id, std::move(key) });
+		m_workAvailable.notify_one();
+
+		return id;
 	}
 
-	std::string ResourceManager::getString(std::string_view filePath)
+	ResourceID ResourceManager::requestMesh(FileLoadDesc desc)
 	{
-		// find in cache
-		auto it = m_stringCache.find(filePath.data());
-		if (it != m_stringCache.end())
-		{
-			return it->second;
-		}
-		// open file
-		std::ifstream file(filePath.data());
-		if (!file.is_open())
-		{
-			m_logger->warn("Failed to open file: {}", filePath);
-			return "";
-		}
-		std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		file.close();
+		return request({ ResourceType::MeshResource, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::requestTerrain(FileLoadDesc desc)
+	{
+		return request({ ResourceType::Terrain, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::requestTexture(FileLoadDesc desc)
+	{
+		return request({ ResourceType::Texture, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::requestFont(FontLoadDesc desc)
+	{
+		return request({ ResourceType::Font, normalizeResourcePath(desc.path), {}, desc.pixelHeight }, desc.name);
+	}
+	ResourceID ResourceManager::requestShader(ShaderLoadDesc desc)
+	{
+		if (desc.vertexShaderPath.ends_with(".frag") && desc.fragmentShaderPath.ends_with(".vert"))
+			std::swap(desc.vertexShaderPath, desc.fragmentShaderPath);
+		return request({ ResourceType::Shader, normalizeResourcePath(desc.vertexShaderPath),
+			normalizeResourcePath(desc.fragmentShaderPath) }, desc.name);
+	}
+	ResourceID ResourceManager::requestComputeShader(FileLoadDesc desc)
+	{
+		return request({ ResourceType::Shader, normalizeResourcePath(desc.path) }, desc.name);
+	}
+	ResourceID ResourceManager::createMaterial(const MaterialDesc& desc)
+	{
+		for (const auto& binding : desc.textures)
+			if (binding.usage < TextureType::Albedo || binding.usage > TextureType::Metallic)
+				return 0;
 
-		m_stringCache[filePath.data()] = contents;
-		return contents;
+		auto material = std::make_unique<const Material>(Material{ desc.shaderId, { desc.textures.begin(), desc.textures.end() } });
+		
+		std::lock_guard lock(m_mutex);
+
+		if (!m_accepting)
+			return 0;
+
+		const auto id = m_nextId++;
+		m_entries.emplace(id, Entry{ { id, ResourceType::Material, ResourceState::Ready, std::string(desc.name), {}, {} }, std::move(material) });
+		
+		return id;
 	}
 
-	Resource* ResourceManager::getResource(uint32_t id) {
-		auto it = m_resourceTypes.find(id);
-		if (it != m_resourceTypes.end()) {
-			if (it->second == ResourceType::Shader) {
-				return _getManager<ShaderManager>()->getShader(id);
+	void ResourceManager::runLoader(std::stop_token stop)
+	{
+		while (!stop.stop_requested())
+		{
+			Job job;
+			{
+				std::unique_lock lock(m_mutex);
+				m_workAvailable.wait(lock, stop, [this] { return !m_jobs.empty(); });
+				if (stop.stop_requested())
+					return;
+				job = std::move(m_jobs.front());
+				m_jobs.pop_front();
 			}
-			else if (it->second == ResourceType::Material) {
-				return _getManager<MaterialManager>()->getMaterial(id);
+
+			Completion result{ job.id, {}, {} };
+			const auto& key = job.key;
+			try
+			{
+				if (!key.path.empty())
+				{
+					switch (key.type)
+					{
+					case ResourceType::MeshResource: result.data = loadMeshData(key.path, *m_logger); break;
+					case ResourceType::Terrain: result.data = loadTerrainData(key.path, *m_logger); break;
+					case ResourceType::Texture: result.data = loadTextureData(key.path); break;
+					case ResourceType::Font: result.data = loadFontData(key.path, key.pixelHeight, *m_logger); break;
+					case ResourceType::Shader: result.data = loadShaderSource(key.path, key.fragmentPath); break;
+					case ResourceType::Material: break;
+					}
+				}
+
+				if (!std::visit([](const auto& data) {
+					if constexpr (requires { data.get(); }) return static_cast<bool>(data);
+					else return false;
+				}, result.data))
+					result.error = key.path.empty() ? "Empty or invalid asset path" : fmt::format("Could not prepare '{}'", key.path);
 			}
-			else if (it->second == ResourceType::MeshResource) {
-				return _getManager<MeshResourceManager>()->getMeshResource(id);
+			catch (const std::exception& error)
+			{
+				result.error = fmt::format("Could not prepare '{}': {}", key.path, error.what());
 			}
-			//.......
+
+			{
+				std::lock_guard lock(m_mutex);
+				m_completed.push_back(std::move(result));
+			}
+			m_resultAvailable.notify_one();
 		}
-		return nullptr;
 	}
 
-	bool ResourceManager::removeResource(uint32_t id) {
-		bool removed = false;
-		auto it = m_resourceTypes.find(id);
-		if (it == m_resourceTypes.end()) return false;
-		if (it->second == ResourceType::Shader) {
-			removed = _getManager<ShaderManager>()->removeShader(id);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
-			return removed;
+	void ResourceManager::processCompletedLoads()
+	{
+		assert(std::this_thread::get_id() == m_owner);
+
+		std::deque<Completion> completed;
+		{
+			std::lock_guard lock(m_mutex);
+			completed.swap(m_completed);
+			for (auto& result : completed)
+			{
+				auto& entry = m_entries.at(result.id);
+				if (result.error.empty())
+				{
+					entry.data = std::move(result.data);
+					entry.info.state = ResourceState::Ready;
+				}
+				else
+				{
+					entry.info.error = result.error;
+					entry.info.state = ResourceState::Failed;
+				}
+			}
 		}
-		else if (it->second == ResourceType::Material) {
-			removed = _getManager<MaterialManager>()->removeMaterial(id);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
-			return removed;
+
+		for (const auto& result : completed)
+			if (!result.error.empty())
+				m_logger->warn("Resource {} failed: {}", result.id, result.error);
+	}
+
+	bool ResourceManager::waitForStartupResource(ResourceID id)
+	{
+		assert(std::this_thread::get_id() == m_owner);
+		while (true)
+		{
+			const auto state = getResourceState(id);
+			if (state != ResourceState::Loading)
+				return state == ResourceState::Ready;
+
+			{
+				std::unique_lock lock(m_mutex);
+				m_resultAvailable.wait(lock, [this] { return !m_completed.empty(); });
+			}
+
+			processCompletedLoads();
 		}
-		else if (it->second == ResourceType::MeshResource) {
-			removed = _getManager<MeshResourceManager>()->removeMeshResource(id);
-			Engine::Instance().getSubSystem<EventSystem>()->publish(std::make_unique<ResourceChanged>(id, it->second, false));
-			return removed;
-		}
-		//.....
-		return false;
+	}
+
+	std::optional<ResourceState> ResourceManager::getResourceState(ResourceID id) const
+	{
+		std::lock_guard lock(m_mutex);
+		const auto entry = m_entries.find(id);
+		return entry == m_entries.end() ? std::nullopt : std::optional(entry->second.info.state);
+	}
+
+	std::vector<ResourceInfo> ResourceManager::inspectResources() const
+	{
+		std::lock_guard lock(m_mutex);
+		std::vector<ResourceInfo> result;
+		result.reserve(m_entries.size());
+		for (const auto& [id, entry] : m_entries)
+			result.push_back(entry.info);
+		return result;
 	}
 }

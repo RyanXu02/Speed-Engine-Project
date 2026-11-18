@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+	<VcpkgEnableManifest>true</VcpkgEnableManifest>
+	<VcpkgApplocalDeps>true</VcpkgApplocalDeps>
+  </PropertyGroup>
+</Project>
